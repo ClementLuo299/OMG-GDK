@@ -1,6 +1,5 @@
 package com.utils;
 
-import com.config.ModuleConfig;
 import com.game.GameModule;
 import com.utils.error_handling.Logging;
 
@@ -21,6 +20,37 @@ import java.util.List;
  * @since 1.0
  */
 public class ModuleLoader {
+    
+    /**
+     * Discovers and loads all game modules from a modules directory.
+     * 
+     * @param modulesDirPath The path to the modules directory
+     * @return List of discovered GameModule instances
+     */
+    public static List<GameModule> discoverModules(String modulesDirPath) {
+        List<GameModule> modules = new ArrayList<>();
+        File modulesDir = new File(modulesDirPath);
+        
+        if (!modulesDir.exists() || !modulesDir.isDirectory()) {
+            Logging.warning("⚠️ Modules directory not found: " + modulesDirPath);
+            return modules;
+        }
+        
+        File[] moduleDirs = modulesDir.listFiles(File::isDirectory);
+        if (moduleDirs == null) {
+            Logging.warning("⚠️ Could not list modules directory: " + modulesDirPath);
+            return modules;
+        }
+        
+        for (File moduleDir : moduleDirs) {
+            GameModule module = loadModule(moduleDir);
+            if (module != null) {
+                modules.add(module);
+            }
+        }
+        
+        return modules;
+    }
     
     /**
      * Loads a single game module from a module directory.
@@ -64,7 +94,7 @@ public class ModuleLoader {
      */
     private static Class<?> findGameModuleClass(File moduleDir, String moduleName) {
         // Use the standardized Main class name
-        String className = ModuleConfig.MODULE_MAIN_CLASS_NAME;
+        String className = "Main";
         return tryLoadClass(moduleDir, moduleName, className);
     }
     
@@ -85,7 +115,7 @@ public class ModuleLoader {
             }
             
             // Try to load from current classpath
-            String fullClassName = ModuleConfig.MODULE_PACKAGE_PREFIX + moduleName.toLowerCase() + "." + className;
+            String fullClassName = "com.games.modules." + moduleName.toLowerCase() + "." + className;
             return Class.forName(fullClassName);
             
         } catch (ClassNotFoundException e) {
@@ -107,13 +137,13 @@ public class ModuleLoader {
      */
     private static Class<?> tryLoadFromCompiledClasses(File moduleDir, String moduleName, String className) {
         try {
-            File classesDir = new File(moduleDir, ModuleConfig.CLASSES_DIR);
+            File classesDir = new File(moduleDir, "target/classes");
             if (!classesDir.exists()) {
                 return null;
             }
             
             URLClassLoader classLoader = new URLClassLoader(new URL[]{classesDir.toURI().toURL()});
-            String fullClassName = ModuleConfig.MODULE_PACKAGE_PREFIX + moduleName.toLowerCase() + "." + className;
+            String fullClassName = "com.games.modules." + moduleName.toLowerCase() + "." + className;
             
             return classLoader.loadClass(fullClassName);
             

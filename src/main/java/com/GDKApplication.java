@@ -10,6 +10,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import java.util.List;
 import java.util.Properties;
@@ -129,11 +131,11 @@ public class GDKApplication extends Application {
     private void createUI() {
         try {
             // Load the GDK Game Lobby FXML
-            FXMLLoader loader = new FXMLLoader(GDKApplication.class.getResource("GDKGameLobby.fxml"));
+            FXMLLoader loader = new FXMLLoader(GDKApplication.class.getResource("/GDKGameLobby.fxml"));
             Scene scene = new Scene(loader.load());
             
-            // Apply CSS
-            scene.getStylesheets().add(GDKApplication.class.getResource("gdk-lobby.css").toExternalForm());
+            // Apply white theme CSS
+            scene.getStylesheets().add(GDKApplication.class.getResource("/gdk-lobby-white.css").toExternalForm());
             
             // Get the controller and set the primary stage
             GDKGameLobbyController controller = loader.getController();
@@ -160,35 +162,35 @@ public class GDKApplication extends Application {
     private void createSimpleFallbackUI() {
         VBox root = new VBox(15);
         root.setPadding(new javafx.geometry.Insets(20));
-        root.setStyle("-fx-background-color: #2b2b2b; -fx-text-fill: white;");
+        root.setStyle("-fx-background-color: #f8f9fa; -fx-text-fill: #212529;");
 
         // Title
         Label titleLabel = new Label("OMG Game Development Kit");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
 
         // Welcome message
         String username = config.getProperty("username", "Developer");
         Label welcomeLabel = new Label("Welcome, " + username + "!");
-        welcomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #cccccc;");
+        welcomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #495057;");
 
         // Game selection
         VBox gameSection = createGameSection();
         
         // Launch button
         Button launchButton = new Button("🚀 Launch Game");
-        launchButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 12px 24px; -fx-cursor: hand;");
+        launchButton.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 12px 24px; -fx-cursor: hand;");
         launchButton.setOnAction(e -> launchSelectedGame());
 
         // Settings button
         Button settingsButton = new Button("⚙️ Settings");
-        settingsButton.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 8px 16px; -fx-cursor: hand;");
+        settingsButton.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 8px 16px; -fx-cursor: hand;");
         settingsButton.setOnAction(e -> openSettings());
 
         // Log area
         logArea = new TextArea();
         logArea.setEditable(false);
         logArea.setWrapText(true);
-        logArea.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: #00ff00; -fx-font-family: 'Consolas'; -fx-font-size: 12px;");
+        logArea.setStyle("-fx-background-color: #f8f9fa; -fx-text-fill: #28a745; -fx-font-family: 'Consolas'; -fx-font-size: 12px;");
         logArea.setPrefRowCount(10);
 
         // Add all components
@@ -206,21 +208,21 @@ public class GDKApplication extends Application {
      */
     private VBox createGameSection() {
         VBox section = new VBox(10);
-        section.setStyle("-fx-background-color: #3c3c3c; -fx-padding: 15px; -fx-border-color: #555555; -fx-border-radius: 8px;");
+        section.setStyle("-fx-background-color: #ffffff; -fx-padding: 15px; -fx-border-color: #dee2e6; -fx-border-radius: 8px; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);");
 
         Label sectionTitle = new Label("Game Module Selection");
-        sectionTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+        sectionTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
 
         // Game selector
         HBox gameRow = new HBox(10);
         Label gameLabel = new Label("Available Games:");
-        gameLabel.setStyle("-fx-font-weight: bold;");
+        gameLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #495057;");
         gameSelector = new ComboBox<>();
         gameSelector.setPrefWidth(300);
-        gameSelector.setStyle("-fx-background-color: #555555; -fx-text-fill: white;");
+        gameSelector.setStyle("-fx-background-color: #ffffff; -fx-text-fill: #212529; -fx-border-color: #ced4da;");
         
         Button refreshButton = new Button("🔄 Refresh");
-        refreshButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-cursor: hand;");
+        refreshButton.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-cursor: hand;");
         refreshButton.setOnAction(e -> refreshGameList());
         
         gameRow.getChildren().addAll(gameLabel, gameSelector, refreshButton);
