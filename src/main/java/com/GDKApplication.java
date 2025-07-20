@@ -25,7 +25,8 @@ import java.io.IOException;
  * Allows developers to easily run and test game modules.
  *
  * @authors Clement Luo
- * @date January 2025
+ * @date July 20, 2025
+ * @edited July 20, 2025
  * @since 1.0
  */
 public class GDKApplication extends Application {

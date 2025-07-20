@@ -29,6 +29,11 @@ public class ModuleLoader {
      */
     public static List<GameModule> discoverModules(String modulesDirPath) {
         List<GameModule> modules = new ArrayList<>();
+        
+        // First, try to load modules from the current classpath
+        modules.addAll(discoverModulesFromClasspath());
+        
+        // Then try to load from the modules directory (only if not already found in classpath)
         File modulesDir = new File(modulesDirPath);
         
         if (!modulesDir.exists() || !modulesDir.isDirectory()) {
@@ -43,13 +48,126 @@ public class ModuleLoader {
         }
         
         for (File moduleDir : moduleDirs) {
-            GameModule module = loadModule(moduleDir);
-            if (module != null) {
-                modules.add(module);
+            // Only load if not already found in classpath
+            if (!isModuleAlreadyLoaded(modules, moduleDir.getName())) {
+                GameModule module = loadModule(moduleDir);
+                if (module != null) {
+                    modules.add(module);
+                }
+            }
+        }
+        
+        // Also try to load from outer modules directory (only if not already found)
+        List<GameModule> outerModules = discoverModulesFromOuterDirectory();
+        for (GameModule outerModule : outerModules) {
+            if (!isModuleAlreadyLoaded(modules, outerModule.getGameId())) {
+                modules.add(outerModule);
             }
         }
         
         return modules;
+    }
+    
+    /**
+     * Discovers game modules from the current classpath.
+     * 
+     * @return List of discovered GameModule instances
+     */
+    private static List<GameModule> discoverModulesFromClasspath() {
+        List<GameModule> modules = new ArrayList<>();
+        
+        // Known module names to look for with their actual class names
+        String[][] knownModules = {
+            {"tictactoe", "Main"},
+            {"example", "Main"}
+        };
+        
+        for (String[] moduleInfo : knownModules) {
+            String moduleName = moduleInfo[0];
+            String className = moduleInfo[1];
+            
+            try {
+                // Try to load the module class directly
+                String fullClassName = "com.games.modules." + moduleName + "." + className;
+                Class<?> moduleClass = Class.forName(fullClassName);
+                
+                if (GameModule.class.isAssignableFrom(moduleClass)) {
+                    GameModule module = instantiateGameModule(moduleClass);
+                    if (module != null) {
+                        modules.add(module);
+                        Logging.info("✅ Loaded module from classpath: " + module.getGameName());
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                // Module not found, this is expected
+                Logging.info("ℹ️ Module not found in classpath: " + moduleName);
+            } catch (Exception e) {
+                Logging.error("❌ Error loading module from classpath: " + moduleName + " - " + e.getMessage());
+            }
+        }
+        
+        return modules;
+    }
+    
+    /**
+     * Discovers game modules from the outer modules directory.
+     * 
+     * @return List of discovered GameModule instances
+     */
+    private static List<GameModule> discoverModulesFromOuterDirectory() {
+        List<GameModule> modules = new ArrayList<>();
+        
+        // Check the outer modules directory
+        File outerModulesDir = new File("modules");
+        if (!outerModulesDir.exists() || !outerModulesDir.isDirectory()) {
+            return modules;
+        }
+        
+        File[] moduleDirs = outerModulesDir.listFiles(File::isDirectory);
+        if (moduleDirs == null) {
+            return modules;
+        }
+        
+        for (File moduleDir : moduleDirs) {
+            try {
+                String moduleName = moduleDir.getName();
+                Logging.info("🔍 Checking outer module: " + moduleName);
+                
+                // Try to load the Main class from the outer module
+                String className = "com.games.modules." + moduleName + ".Main";
+                Class<?> moduleClass = Class.forName(className);
+                
+                if (GameModule.class.isAssignableFrom(moduleClass)) {
+                    GameModule module = instantiateGameModule(moduleClass);
+                    if (module != null) {
+                        modules.add(module);
+                        Logging.info("✅ Loaded outer module: " + module.getGameName());
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                Logging.info("ℹ️ Outer module not found: " + moduleDir.getName());
+            } catch (Exception e) {
+                Logging.error("❌ Error loading outer module " + moduleDir.getName() + ": " + e.getMessage());
+            }
+        }
+        
+        return modules;
+    }
+    
+    /**
+     * Checks if a module is already loaded in the list.
+     * 
+     * @param modules The list of already loaded modules
+     * @param moduleId The module ID to check
+     * @return true if the module is already loaded, false otherwise
+     */
+    private static boolean isModuleAlreadyLoaded(List<GameModule> modules, String moduleId) {
+        for (GameModule module : modules) {
+            if (module.getGameId().equals(moduleId)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
@@ -93,9 +211,22 @@ public class ModuleLoader {
      * @return The found Class, or null if not found
      */
     private static Class<?> findGameModuleClass(File moduleDir, String moduleName) {
-        // Use the standardized Main class name
-        String className = "Main";
-        return tryLoadClass(moduleDir, moduleName, className);
+        // Try different possible class names for the game module
+        String[] possibleClassNames = {
+            moduleName + "Module",  // e.g., "TicTacToeModule"
+            "Main",
+            moduleName.substring(0, 1).toUpperCase() + moduleName.substring(1) + "Module", // Capitalized
+            moduleName.toLowerCase() + "Module" // Lowercase
+        };
+        
+        for (String className : possibleClassNames) {
+            Class<?> foundClass = tryLoadClass(moduleDir, moduleName, className);
+            if (foundClass != null) {
+                return foundClass;
+            }
+        }
+        
+        return null;
     }
     
     /**
@@ -108,19 +239,28 @@ public class ModuleLoader {
      */
     private static Class<?> tryLoadClass(File moduleDir, String moduleName, String className) {
         try {
-            // Try to load from compiled classes first
+            // Try to load from current classpath first (since modules are part of main project)
+            String fullClassName = "com.games.modules." + moduleName.toLowerCase() + "." + className;
+            try {
+                return Class.forName(fullClassName);
+            } catch (ClassNotFoundException e) {
+                // Try with capitalized module name
+                fullClassName = "com.games.modules." + moduleName + "." + className;
+                try {
+                    return Class.forName(fullClassName);
+                } catch (ClassNotFoundException e2) {
+                    // Continue to try other methods
+                }
+            }
+            
+            // Try to load from compiled classes in module directory
             Class<?> gameClass = tryLoadFromCompiledClasses(moduleDir, moduleName, className);
             if (gameClass != null) {
                 return gameClass;
             }
             
-            // Try to load from current classpath
-            String fullClassName = "com.games.modules." + moduleName.toLowerCase() + "." + className;
-            return Class.forName(fullClassName);
-            
-        } catch (ClassNotFoundException e) {
-            // Class not found, this is expected
             return null;
+            
         } catch (Exception e) {
             Logging.error("❌ Error loading class " + className + " from " + moduleName + ": " + e.getMessage(), e);
             return null;

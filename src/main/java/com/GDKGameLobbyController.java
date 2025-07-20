@@ -28,36 +28,30 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * GDK Game Lobby Controller - Simplified game lobby for the GDK.
- * Combines game module discovery with lobby functionality for easy game testing.
+ * GDK Game Picker Controller - Simplified game picker for the GDK.
+ * Allows developers to easily select and run game modules for testing.
  *
  * @authors Clement Luo
- * @date January 2025
+ * @date July 20, 2025
+ * @edited July 20, 2025
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
 
     // ==================== FXML INJECTIONS ====================
     
-    @FXML private BorderPane mainContainer;
+    @FXML private VBox mainContainer;
     @FXML private Button backButton;
     @FXML private Button refreshButton;
     @FXML private Label gameTitleLabel;
     @FXML private Label gameDescriptionLabel;
     @FXML private ImageView gameIconImageView;
-    @FXML private VBox createMatchPanel;
     @FXML private ComboBox<GameModule> gameSelector;
     @FXML private ComboBox<GameMode> gameModeComboBox;
     @FXML private Spinner<Integer> playerCountSpinner;
-    @FXML private TextField matchNameField;
-    @FXML private CheckBox privateMatchCheckBox;
-    @FXML private Spinner<Integer> timeLimitSpinner;
     @FXML private ComboBox<String> difficultyComboBox;
-    @FXML private Button createMatchButton;
+    @FXML private Button launchGameButton;
     @FXML private Button quickPlayButton;
-    @FXML private VBox availableMatchesPanel;
-    @FXML private ListView<MatchInfo> availableMatchesListView;
-    @FXML private Label noMatchesLabel;
     @FXML private TextArea logArea;
     
     // ==================== DEPENDENCIES ====================
@@ -66,14 +60,13 @@ public class GDKGameLobbyController implements Initializable {
     private static Properties config;
     private Stage primaryStage;
     private ObservableList<GameModule> availableGames;
-    private ObservableList<MatchInfo> availableMatches;
     private GameModule selectedGame;
     
     // ==================== INITIALIZATION ====================
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Logging.info("🎮 Initializing GDK Game Lobby Controller");
+        Logging.info("🎮 Initializing GDK Game Picker Controller");
         
         // Load configuration
         loadConfig();
@@ -85,7 +78,7 @@ public class GDKGameLobbyController implements Initializable {
         // Load available games
         refreshGameList();
         
-        Logging.info("✅ GDK Game Lobby Controller initialized successfully");
+        Logging.info("✅ GDK Game Picker Controller initialized successfully");
     }
     
     /**
@@ -161,28 +154,14 @@ public class GDKGameLobbyController implements Initializable {
         // Set up player count spinner
         playerCountSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 8, 2));
         
-        // Set up time limit spinner (in minutes)
-        timeLimitSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 120, 30));
-        
         // Set up difficulty combo box
         difficultyComboBox.setItems(FXCollections.observableArrayList("Easy", "Medium", "Hard"));
         difficultyComboBox.setValue("Medium");
-        
-        // Set up available matches list
-        availableMatches = FXCollections.observableArrayList();
-        availableMatchesListView.setItems(availableMatches);
-        availableMatchesListView.setCellFactory(param -> new MatchInfoListCell());
-        
-        // Set up match name field
-        matchNameField.setText("My Match");
         
         // Set up log area
         logArea.setEditable(false);
         logArea.setWrapText(true);
         logArea.setPrefRowCount(8);
-        
-        // Initially hide no matches label
-        noMatchesLabel.setVisible(false);
         
         // Update game info when game is selected
         gameSelector.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -201,7 +180,6 @@ public class GDKGameLobbyController implements Initializable {
         // Back button
         backButton.setOnAction(e -> {
             Logging.info("Back button clicked");
-            // For GDK, this could go back to a main menu or close the app
             if (primaryStage != null) {
                 primaryStage.close();
             }
@@ -213,26 +191,11 @@ public class GDKGameLobbyController implements Initializable {
             refreshGameList();
         });
         
-        // Create match button
-        createMatchButton.setOnAction(e -> {
-            Logging.info("Create match button clicked");
-            createMatch();
-        });
+        // Launch game button
+        launchGameButton.setOnAction(e -> launchGame());
         
         // Quick play button
-        quickPlayButton.setOnAction(e -> {
-            Logging.info("Quick play button clicked");
-            quickPlay();
-        });
-        
-        // Available matches list
-        availableMatchesListView.setOnMouseClicked(event -> {
-            MatchInfo selectedMatch = availableMatchesListView.getSelectionModel().getSelectedItem();
-            if (selectedMatch != null) {
-                Logging.info("Selected match: " + selectedMatch.getMatchName());
-                joinMatch(selectedMatch);
-            }
-        });
+        quickPlayButton.setOnAction(e -> quickPlay());
     }
     
     // ==================== GAME MANAGEMENT ====================
@@ -251,9 +214,6 @@ public class GDKGameLobbyController implements Initializable {
                 logArea.appendText("✅ " + module.getGameName() + " - " + module.getGameDescription() + "\n");
             }
             
-            // Generate some sample matches for demonstration
-            generateSampleMatches();
-            
         } catch (Exception e) {
             Logging.error("❌ Failed to refresh games: " + e.getMessage());
             logArea.appendText("❌ Error: " + e.getMessage() + "\n");
@@ -267,17 +227,21 @@ public class GDKGameLobbyController implements Initializable {
             
             // Try to load game icon
             try {
-                String iconPath = selectedGame.getGameIconPath();
-                if (iconPath != null && !iconPath.isEmpty()) {
-                    // For now, we'll just show a placeholder
-                    // In a real implementation, you'd load the actual icon
+                String iconPath = "/games/" + selectedGame.getGameName().toLowerCase().replace(" ", "") + "/icons/game_icon.png";
+                javafx.scene.image.Image icon = new javafx.scene.image.Image(getClass().getResourceAsStream(iconPath));
+                if (icon != null) {
+                    gameIconImageView.setImage(icon);
                 }
             } catch (Exception e) {
-                Logging.warning("Could not load game icon: " + e.getMessage());
+                // Use default icon or leave empty
+                Logging.info("No custom icon found for " + selectedGame.getGameName());
             }
+            
+            updatePlayerCountLimits();
         } else {
             gameTitleLabel.setText("Select a Game");
-            gameDescriptionLabel.setText("Choose a game from the dropdown to get started");
+            gameDescriptionLabel.setText("Choose a game from the dropdown to get started...");
+            gameIconImageView.setImage(null);
         }
     }
     
@@ -290,136 +254,38 @@ public class GDKGameLobbyController implements Initializable {
                 minPlayers, maxPlayers, Math.max(minPlayers, playerCountSpinner.getValue())
             );
             playerCountSpinner.setValueFactory(factory);
-        }
-    }
-    
-    // ==================== MATCH MANAGEMENT ====================
-    
-    private void generateSampleMatches() {
-        availableMatches.clear();
-        
-        if (selectedGame != null) {
-            // Generate some sample matches for the selected game
-            availableMatches.add(new MatchInfo(
-                selectedGame.getGameName() + " - Quick Match",
-                config.getProperty("username", "GDK Developer"),
-                GameMode.LOCAL_MULTIPLAYER,
-                1,
-                2,
-                false
-            ));
             
-            availableMatches.add(new MatchInfo(
-                selectedGame.getGameName() + " - Tournament",
-                "Player2",
-                GameMode.ONLINE_MULTIPLAYER,
-                2,
-                4,
-                false
-            ));
-            
-            availableMatches.add(new MatchInfo(
-                selectedGame.getGameName() + " - Private Game",
-                "Player3",
-                GameMode.LOCAL_MULTIPLAYER,
-                1,
-                2,
-                true
-            ));
-        }
-        
-        updateMatchesDisplay();
-    }
-    
-    private void updateMatchesDisplay() {
-        if (availableMatches.isEmpty()) {
-            noMatchesLabel.setVisible(true);
-            availableMatchesListView.setVisible(false);
-        } else {
-            noMatchesLabel.setVisible(false);
-            availableMatchesListView.setVisible(true);
+            logArea.appendText("🎮 " + selectedGame.getGameName() + " supports " + minPlayers + "-" + maxPlayers + " players\n");
         }
     }
     
-    private void createMatch() {
+    private void launchGame() {
         if (selectedGame == null) {
-            showError("No Game Selected", "Please select a game first.");
+            showError("No Game Selected", "Please select a game to launch.");
             return;
         }
-        
+
         GameMode gameMode = gameModeComboBox.getValue();
         int playerCount = playerCountSpinner.getValue();
-        String matchName = matchNameField.getText();
-        boolean isPrivate = privateMatchCheckBox.isSelected();
-        int timeLimit = timeLimitSpinner.getValue();
         String difficulty = difficultyComboBox.getValue();
-        
-        // Validate inputs
-        if (matchName == null || matchName.trim().isEmpty()) {
-            showError("Invalid Match Name", "Please enter a match name.");
+
+        // Validate player count
+        if (playerCount < selectedGame.getMinPlayers() || playerCount > selectedGame.getMaxPlayers()) {
+            showError("Invalid Player Count", 
+                "This game supports " + selectedGame.getMinPlayers() + "-" + selectedGame.getMaxPlayers() + " players.");
             return;
         }
-        
+
         // Create game options
         GameOptions options = new GameOptions();
-        options.setOption("matchName", matchName);
-        options.setOption("isPrivate", String.valueOf(isPrivate));
-        options.setOption("timeLimit", String.valueOf(timeLimit));
+        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
+        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
+        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
         options.setOption("difficulty", difficulty);
-        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
-        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
-        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
-        
-        logArea.appendText("🚀 Creating match: " + matchName + " for " + selectedGame.getGameName() + "\n");
-        
-        // Launch the game
-        launchGame(gameMode, playerCount, options);
-    }
-    
-    private void quickPlay() {
-        if (selectedGame == null) {
-            showError("No Game Selected", "Please select a game first.");
-            return;
-        }
-        
-        // Quick play with default settings
-        GameOptions options = new GameOptions();
-        options.setOption("matchName", "Quick Play");
-        options.setOption("isPrivate", "false");
-        options.setOption("timeLimit", "30");
-        options.setOption("difficulty", "Medium");
-        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
-        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
-        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
-        
-        logArea.appendText("⚡ Quick play: " + selectedGame.getGameName() + "\n");
-        
-        // Launch with default mode and player count
-        GameMode defaultMode = selectedGame.supportsLocalMultiplayer() ? 
-            GameMode.LOCAL_MULTIPLAYER : GameMode.SINGLE_PLAYER;
-        int defaultPlayers = Math.max(selectedGame.getMinPlayers(), 2);
-        
-        launchGame(defaultMode, defaultPlayers, options);
-    }
-    
-    private void joinMatch(MatchInfo match) {
-        logArea.appendText("🎮 Joining match: " + match.getMatchName() + "\n");
-        
-        // For GDK, we'll just launch the game directly
-        // In a real implementation, you'd connect to the match server
-        
-        GameOptions options = new GameOptions();
-        options.setOption("matchName", match.getMatchName());
-        options.setOption("isPrivate", String.valueOf(match.isPrivate()));
-        options.setOption("hostName", match.getHostName());
-        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
-        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
-        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
-        
-        launchGame(match.getGameMode(), match.getMaxPlayers(), options);
-    }
-    
-    private void launchGame(GameMode gameMode, int playerCount, GameOptions options) {
+
+        logArea.appendText("🚀 Launching " + selectedGame.getGameName() + " in " + gameMode.getDisplayName() + 
+                          " mode with " + playerCount + " players (Difficulty: " + difficulty + ")\n");
+
         try {
             Scene gameScene = selectedGame.launchGame(primaryStage, gameMode, playerCount, options);
             if (gameScene != null) {
@@ -435,60 +301,30 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
     
+    private void quickPlay() {
+        if (selectedGame == null) {
+            showError("No Game Selected", "Please select a game for quick play.");
+            return;
+        }
+
+        // Set default quick play settings
+        gameModeComboBox.setValue(GameMode.LOCAL_MULTIPLAYER);
+        playerCountSpinner.getValueFactory().setValue(selectedGame.getMinPlayers());
+        difficultyComboBox.setValue("Medium");
+
+        logArea.appendText("⚡ Quick play mode activated for " + selectedGame.getGameName() + "\n");
+        
+        // Launch the game with quick play settings
+        launchGame();
+    }
+    
+    // ==================== UTILITY METHODS ====================
+    
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-    
-    // ==================== INNER CLASSES ====================
-    
-    public static class MatchInfo {
-        private String matchName;
-        private String hostName;
-        private GameMode gameMode;
-        private int currentPlayers;
-        private int maxPlayers;
-        private boolean isPrivate;
-        
-        public MatchInfo(String matchName, String hostName, GameMode gameMode, 
-                        int currentPlayers, int maxPlayers, boolean isPrivate) {
-            this.matchName = matchName;
-            this.hostName = hostName;
-            this.gameMode = gameMode;
-            this.currentPlayers = currentPlayers;
-            this.maxPlayers = maxPlayers;
-            this.isPrivate = isPrivate;
-        }
-        
-        public String getMatchName() { return matchName; }
-        public String getHostName() { return hostName; }
-        public GameMode getGameMode() { return gameMode; }
-        public int getCurrentPlayers() { return currentPlayers; }
-        public int getMaxPlayers() { return maxPlayers; }
-        public boolean isPrivate() { return isPrivate; }
-        
-        @Override
-        public String toString() {
-            return String.format("%s (%s) - %s/%d players - %s", 
-                matchName, hostName, currentPlayers, maxPlayers, 
-                isPrivate ? "Private" : "Public");
-        }
-    }
-    
-    private class MatchInfoListCell extends ListCell<MatchInfo> {
-        @Override
-        protected void updateItem(MatchInfo match, boolean empty) {
-            super.updateItem(match, empty);
-            if (empty || match == null) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                setText(match.toString());
-                setStyle("-fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8px;");
-            }
-        }
     }
 } 
