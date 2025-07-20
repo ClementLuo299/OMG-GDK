@@ -16,6 +16,7 @@
     <modules>
         <module>gdk-core</module>
         <module>modules/tictactoe</module>
+        <module>modules/example</module>
         <!-- Add more modules here as needed -->
     </modules>
 

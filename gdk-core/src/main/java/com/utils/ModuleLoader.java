@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class for dynamically loading game modules from the modules directory.
- * This class provides core loading functionality used by LocalGameSource.
+ * Utility class for dynamically loading game modules from source directories.
+ * Loads modules from classpath and compiled source directories for development.
  * 
  * @authors Clement Luo
  * @date July 18, 2025
@@ -73,7 +73,7 @@ public class ModuleLoader {
         // Known module names to look for with their actual class names
         String[][] knownModules = {
             {"tictactoe", "TicTacToeModule"},
-            {"example", "ExampleGameModule"}
+            {"example", "Main"}
         };
         
         for (String[] moduleInfo : knownModules) {

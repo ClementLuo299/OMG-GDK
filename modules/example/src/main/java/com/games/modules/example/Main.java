@@ -95,29 +95,13 @@ public class Main implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage stage, GameMode mode, int playerCount, GameOptions options) {
+    public Scene launchGame(Stage stage, GameMode mode, int playerCount, GameOptions options, com.game.GameEventHandler eventHandler) {
         try {
             Logging.info("🎮 Launching " + GAME_NAME + " in " + mode + " mode with " + playerCount + " players");
             
-            // Load the FXML file
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(getGameFxmlPath()));
-            Scene scene = new Scene(loader.load());
-            
-            // Apply CSS if available
-            if (getGameCssPath() != null) {
-                scene.getStylesheets().add(getClass().getResource(getGameCssPath()).toExternalForm());
-            }
-            
-            // Set up the stage
-            stage.setTitle(GAME_NAME);
-            stage.setScene(scene);
-            stage.setResizable(true);
-            
-            // Show the game
-            stage.show();
-            
-            Logging.info("✅ " + GAME_NAME + " launched successfully");
-            return scene;
+            // Delegate to the ExampleGameModule for the test interface
+            ExampleGameModule exampleModule = new ExampleGameModule();
+            return exampleModule.launchGame(stage, mode, playerCount, options, eventHandler);
             
         } catch (Exception e) {
             Logging.error("❌ Error launching " + GAME_NAME + ": " + e.getMessage(), e);

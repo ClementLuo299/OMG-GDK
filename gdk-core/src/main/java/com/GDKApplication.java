@@ -140,8 +140,8 @@ public class GDKApplication extends Application {
             FXMLLoader loader = new FXMLLoader(GDKApplication.class.getResource("/GDKGameLobby.fxml"));
             lobbyScene = new Scene(loader.load());
             
-            // Apply white theme CSS
-            lobbyScene.getStylesheets().add(GDKApplication.class.getResource("/gdk-lobby-white.css").toExternalForm());
+            // Apply GDK lobby CSS
+            lobbyScene.getStylesheets().add(GDKApplication.class.getResource("/gdk-lobby.css").toExternalForm());
             
             // Get the controller and set the primary stage
             GDKGameLobbyController controller = loader.getController();

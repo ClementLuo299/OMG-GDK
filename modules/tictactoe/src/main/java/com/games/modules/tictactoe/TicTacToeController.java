@@ -355,7 +355,7 @@ public class TicTacToeController implements Initializable {
                 "tictactoe",
                 "User requested return to GDK lobby"
             ));
-        } else {
+            } else {
             Logging.warning("⚠️ No event handler available, cannot return to lobby");
         }
     }
