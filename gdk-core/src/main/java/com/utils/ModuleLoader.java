@@ -306,7 +306,8 @@ public class ModuleLoader {
                 return null;
             }
             
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{classesDir.toURI().toURL()});
+            // Create a classloader that includes the module classes
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{classesDir.toURI().toURL()}, ModuleLoader.class.getClassLoader());
             String fullClassName = "com.games.modules." + moduleName.toLowerCase() + "." + className;
             
             return classLoader.loadClass(fullClassName);

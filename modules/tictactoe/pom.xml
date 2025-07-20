@@ -19,9 +19,10 @@
     <description>TicTacToe game module for the OMG Game Development Kit</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>17.0.2</javafx.version>
     </properties>
 
     <dependencies>
@@ -33,21 +34,84 @@
             <scope>provided</scope>
         </dependency>
         
-        <!-- Module-specific dependencies -->
+        <!-- JavaFX for UI components -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>17.0.2</version>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
         </dependency>
         
-        <!-- Example: Add specific libraries for this game -->
+        <!-- JSON processing for configuration -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.15.2</version>
         </dependency>
         
-        <!-- Example: Add networking library for online multiplayer -->
+        <!-- Command line argument parsing -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        
+        <!-- File operations -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.8</version>
+        </dependency>
+        
+        <!-- Gson for JSON processing -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        
+        <!-- Lombok for reducing boilerplate code -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- Java WebSocket for WebSocket functionality -->
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+        
+        <!-- Networking library for online multiplayer -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
@@ -60,10 +124,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
             </plugin>
             

@@ -188,6 +188,10 @@ public class TicTacToeController implements Initializable {
         this.playerCount = playerCount;
         this.gameOptions = gameOptions;
         
+        // Initialize players
+        player1 = new TicTacToePlayer("Player 1", "X");
+        player2 = new TicTacToePlayer("Player 2", "O");
+        
         Logging.info("🎯 Initializing TicTacToe game with " + playerCount + " players, mode: " + gameMode.getDisplayName());
         
         // Apply any game-specific options
