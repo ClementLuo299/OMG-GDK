@@ -32,7 +32,7 @@ import java.io.IOException;
 public class GDKApplication extends Application {
 
     private static final String CONFIG_FILE = "gdk-config.properties";
-    private static final String MODULES_DIR = "modules";
+    private static final String MODULES_DIR = "../modules";
     private static Properties config;
     
     private ComboBox<GameModule> gameSelector;

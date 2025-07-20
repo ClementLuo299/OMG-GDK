@@ -204,7 +204,7 @@ public class GDKGameLobbyController implements Initializable {
         try {
             logArea.appendText("🔄 Refreshing game modules...\n");
             
-            List<GameModule> modules = ModuleLoader.discoverModules("modules");
+            List<GameModule> modules = ModuleLoader.discoverModules("../modules");
             availableGames.clear();
             availableGames.addAll(modules);
             

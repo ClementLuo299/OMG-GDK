@@ -30,39 +30,31 @@ public class ModuleLoader {
     public static List<GameModule> discoverModules(String modulesDirPath) {
         List<GameModule> modules = new ArrayList<>();
         
+        Logging.info("🔍 Starting module discovery...");
+        
         // First, try to load modules from the current classpath
         modules.addAll(discoverModulesFromClasspath());
         
-        // Then try to load from the modules directory (only if not already found in classpath)
+        // Then try to load from the modules directory
         File modulesDir = new File(modulesDirPath);
         
         if (!modulesDir.exists() || !modulesDir.isDirectory()) {
             Logging.warning("⚠️ Modules directory not found: " + modulesDirPath);
-            return modules;
+        } else {
+            modules.addAll(discoverModulesFromDirectory(modulesDir));
         }
         
-        File[] moduleDirs = modulesDir.listFiles(File::isDirectory);
-        if (moduleDirs == null) {
-            Logging.warning("⚠️ Could not list modules directory: " + modulesDirPath);
-            return modules;
-        }
-        
-        for (File moduleDir : moduleDirs) {
-            // Only load if not already found in classpath
-            if (!isModuleAlreadyLoaded(modules, moduleDir.getName())) {
-                GameModule module = loadModule(moduleDir);
-                if (module != null) {
-                    modules.add(module);
-                }
-            }
-        }
-        
-        // Also try to load from outer modules directory (only if not already found)
+        // Also try to load from outer modules directory
         List<GameModule> outerModules = discoverModulesFromOuterDirectory();
         for (GameModule outerModule : outerModules) {
             if (!isModuleAlreadyLoaded(modules, outerModule.getGameId())) {
                 modules.add(outerModule);
             }
+        }
+        
+        Logging.info("📦 Module discovery complete. Found " + modules.size() + " modules:");
+        for (GameModule module : modules) {
+            Logging.info("  ✅ " + module.getGameName() + " (" + module.getGameId() + ")");
         }
         
         return modules;
@@ -76,10 +68,12 @@ public class ModuleLoader {
     private static List<GameModule> discoverModulesFromClasspath() {
         List<GameModule> modules = new ArrayList<>();
         
+        Logging.info("🔍 Searching for modules in classpath...");
+        
         // Known module names to look for with their actual class names
         String[][] knownModules = {
-            {"tictactoe", "Main"},
-            {"example", "Main"}
+            {"tictactoe", "TicTacToeModule"},
+            {"example", "ExampleGameModule"}
         };
         
         for (String[] moduleInfo : knownModules) {
@@ -110,12 +104,42 @@ public class ModuleLoader {
     }
     
     /**
+     * Discovers game modules from a modules directory.
+     * 
+     * @param modulesDir The modules directory
+     * @return List of discovered GameModule instances
+     */
+    private static List<GameModule> discoverModulesFromDirectory(File modulesDir) {
+        List<GameModule> modules = new ArrayList<>();
+        
+        File[] moduleDirs = modulesDir.listFiles(File::isDirectory);
+        if (moduleDirs == null) {
+            Logging.warning("⚠️ Could not list modules directory: " + modulesDir.getPath());
+            return modules;
+        }
+        
+        for (File moduleDir : moduleDirs) {
+            // Only load if not already found in classpath
+            if (!isModuleAlreadyLoaded(modules, moduleDir.getName())) {
+                GameModule module = loadModule(moduleDir);
+                if (module != null) {
+                    modules.add(module);
+                }
+            }
+        }
+        
+        return modules;
+    }
+    
+    /**
      * Discovers game modules from the outer modules directory.
      * 
      * @return List of discovered GameModule instances
      */
     private static List<GameModule> discoverModulesFromOuterDirectory() {
         List<GameModule> modules = new ArrayList<>();
+        
+        Logging.info("🔍 Searching for modules in outer modules directory...");
         
         // Check the outer modules directory
         File outerModulesDir = new File("modules");

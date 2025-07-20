@@ -123,20 +123,43 @@ public class TicTacToeModule implements GameModule {
         Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
         
         try {
-            // For now, create a simple game scene since we don't have the full FXML
-            return createSimpleGameScene(primaryStage, gameMode, playerCount, gameOptions);
+            // Load the FXML file
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(getGameFxmlPath()));
+            Scene scene = new Scene(loader.load());
+            
+            // Get the controller and initialize it
+            TicTacToeController controller = loader.getController();
+            if (controller != null) {
+                controller.setPrimaryStage(primaryStage);
+                controller.initializeGame(gameMode, playerCount, gameOptions);
+            }
+            
+            // Apply CSS if available
+            try {
+                String cssPath = getGameCssPath();
+                if (cssPath != null && !cssPath.isEmpty()) {
+                    scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+                }
+            } catch (Exception e) {
+                Logging.warning("⚠️ Could not load CSS for " + getGameName() + ": " + e.getMessage());
+            }
+            
+            Logging.info("✅ " + getGameName() + " launched successfully");
+            return scene;
             
         } catch (Exception e) {
             Logging.error("❌ Failed to launch " + getGameName() + ": " + e.getMessage(), e);
-            return null;
+            
+            // Fallback to simple game scene
+            return createSimpleGameScene(primaryStage, gameMode, playerCount, gameOptions);
         }
     }
     
     /**
-     * Creates a simple game scene for TicTacToe.
+     * Creates a simple game scene for TicTacToe as fallback.
      */
     private Scene createSimpleGameScene(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions) {
-        Logging.info("🎮 Creating simple TicTacToe game scene");
+        Logging.info("🎮 Creating simple TicTacToe game scene (fallback)");
         
         // Create a simple game board
         javafx.scene.layout.GridPane gameBoard = new javafx.scene.layout.GridPane();
@@ -186,8 +209,6 @@ public class TicTacToeModule implements GameModule {
         Logging.info("✅ Simple " + getGameName() + " scene created successfully");
         return scene;
     }
-    
-
     
     @Override
     public void loadGameState(GameState gameState) {
