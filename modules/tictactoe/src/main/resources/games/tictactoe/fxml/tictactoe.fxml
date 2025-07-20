@@ -8,6 +8,8 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -78,7 +80,9 @@
                         <padding>
                             <Insets bottom="10" left="10" right="10" top="10" />
                         </padding>
-                        <Label fx:id="player1Avatar" styleClass="player-avatar-text" text="👤" />
+                        <ImageView fx:id="player1Avatar" fitHeight="60" fitWidth="60" styleClass="player-avatar">
+                            <Image url="@../icons/tic_tac_toe_icon.png" />
+                        </ImageView>
                         <Label fx:id="player1Name" styleClass="player-name" text="Player 1 (X)" />
                         <Label fx:id="player1Score" styleClass="player-score" text="Score: 0" />
                     </VBox>
@@ -91,7 +95,9 @@
                         <padding>
                             <Insets bottom="10" left="10" right="10" top="10" />
                         </padding>
-                        <Label fx:id="player2Avatar" styleClass="player-avatar-text" text="👤" />
+                        <ImageView fx:id="player2Avatar" fitHeight="60" fitWidth="60" styleClass="player-avatar">
+                            <Image url="@../icons/tic_tac_toe_icon.png" />
+                        </ImageView>
                         <Label fx:id="player2Name" styleClass="player-name" text="Player 2 (O)" />
                         <Label fx:id="player2Score" styleClass="player-score" text="Score: 0" />
                     </VBox>

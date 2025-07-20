@@ -49,10 +49,10 @@ public class TicTacToeController implements Initializable {
     @FXML private Label moveCountLabel;
     
     // Player information
-    @FXML private Label player1Avatar;
+    @FXML private ImageView player1Avatar;
     @FXML private Label player1Name;
     @FXML private Label player1Score;
-    @FXML private Label player2Avatar;
+    @FXML private ImageView player2Avatar;
     @FXML private Label player2Name;
     @FXML private Label player2Score;
     @FXML private Label matchIdLabel;
@@ -130,15 +130,13 @@ public class TicTacToeController implements Initializable {
             player1 = new TicTacToePlayer("Player 1", "X");
             player2 = new TicTacToePlayer("Player 2", "O");
             
-            // Set avatar emojis
+            // Apply color effects to avatar images
             if (player1Avatar != null) {
-                player1Avatar.setText("👤");
-                player1Avatar.setStyle("-fx-font-size: 48px; -fx-text-fill: #007bff;");
+                player1Avatar.setEffect(new javafx.scene.effect.ColorAdjust(0, 0.5, 0, -0.2)); // Blue tint
             }
             
             if (player2Avatar != null) {
-                player2Avatar.setText("👤");
-                player2Avatar.setStyle("-fx-font-size: 48px; -fx-text-fill: #dc3545;");
+                player2Avatar.setEffect(new javafx.scene.effect.ColorAdjust(0.7, 0.5, 0, 0)); // Red tint
             }
         } catch (Exception e) {
             Logging.error("Error initializing game: " + e.getMessage(), e);

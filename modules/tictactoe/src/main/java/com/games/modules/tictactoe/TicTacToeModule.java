@@ -123,8 +123,17 @@ public class TicTacToeModule implements GameModule {
         Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
         
         try {
-            // Load the FXML file
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(getGameFxmlPath()));
+            // Load the FXML file with proper class loader context
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource(getGameFxmlPath()));
+            loader.setControllerFactory(param -> {
+                try {
+                    return Class.forName(param.getName()).getDeclaredConstructor().newInstance();
+                } catch (Exception e) {
+                    Logging.error("❌ Failed to create controller: " + param.getName() + " - " + e.getMessage());
+                    return null;
+                }
+            });
             Scene scene = new Scene(loader.load());
             
             // Get the controller and initialize it
