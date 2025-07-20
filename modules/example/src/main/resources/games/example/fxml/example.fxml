@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.games.modules.ExampleGameModule$ExampleGameController"
+      styleClass="game-container"
+      spacing="20"
+      alignment="CENTER">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- Game Title -->
+    <Label text="Example Game" styleClass="game-title"/>
+
+    <!-- Game Content -->
+    <VBox spacing="10" alignment="CENTER">
+        <Label fx:id="statusLabel" text="Example Game - Template" styleClass="status-label"/>
+        <Label text="This is a template for creating new games" styleClass="instruction-label"/>
+    </VBox>
+
+    <!-- Game Controls -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="New Game" fx:id="newGameBtn" styleClass="control-button"/>
+        <Button text="Back to Library" fx:id="backBtn" styleClass="control-button"/>
+    </HBox>
+
+</VBox> 

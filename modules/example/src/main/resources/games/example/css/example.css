@@ -1,0 +1,41 @@
+/* Snake Game Styles */
+
+.game-container {
+    -fx-background-color: #2c3e50;
+    -fx-padding: 20px;
+}
+
+.game-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ecf0f1;
+    -fx-alignment: center;
+}
+
+.status-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #ecf0f1;
+    -fx-alignment: center;
+}
+
+.instruction-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #bdc3c7;
+    -fx-alignment: center;
+}
+
+.control-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+
+.control-button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.control-button:pressed {
+    -fx-background-color: #21618c;
+} 

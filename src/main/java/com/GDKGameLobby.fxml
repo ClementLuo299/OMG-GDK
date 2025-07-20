@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:id="mainContainer" prefHeight="700.0" prefWidth="1000.0" 
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.GDKGameLobbyController"
+            styleClass="game-lobby-container">
+    
+    <!-- Top Navigation Bar -->
+    <top>
+        <HBox styleClass="top-navigation" alignment="CENTER_LEFT" spacing="20">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <!-- Back Button -->
+            <Button fx:id="backButton" text="← Back to GDK" styleClass="nav-button"/>
+            
+            <!-- Game Title -->
+            <Label fx:id="gameTitleLabel" text="GDK Game Lobby" styleClass="game-title"/>
+            
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <!-- Refresh Button -->
+            <Button fx:id="refreshButton" text="🔄 Refresh" styleClass="nav-button"/>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <HBox spacing="20" styleClass="main-content">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <!-- Left Panel - Game Info & Match Creation -->
+            <VBox spacing="20" prefWidth="400" styleClass="left-panel">
+                
+                <!-- Game Information -->
+                <VBox styleClass="game-info-panel" spacing="10">
+                    <padding>
+                        <Insets top="15" right="15" bottom="15" left="15"/>
+                    </padding>
+                    
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <ImageView fx:id="gameIconImageView" fitHeight="60" fitWidth="60" 
+                                  styleClass="game-icon"/>
+                        <VBox spacing="5">
+                            <Label fx:id="gameTitleLabel" text="Select a Game" 
+                                   styleClass="game-title-large"/>
+                            <Label fx:id="gameDescriptionLabel" text="Choose a game from the dropdown to get started..." 
+                                   styleClass="game-description" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+                
+                <!-- Match Creation Panel -->
+                <VBox fx:id="createMatchPanel" styleClass="match-creation-panel" spacing="15">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                    
+                    <Label text="Game Configuration" styleClass="section-title"/>
+                    
+                    <!-- Game Selection -->
+                    <VBox spacing="5">
+                        <Label text="Select Game:" styleClass="field-label"/>
+                        <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
+                                 styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <!-- Game Mode Selection -->
+                    <VBox spacing="5">
+                        <Label text="Game Mode:" styleClass="field-label"/>
+                        <ComboBox fx:id="gameModeComboBox" promptText="Select Game Mode" 
+                                 styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <!-- Player Count -->
+                    <VBox spacing="5">
+                        <Label text="Player Count:" styleClass="field-label"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Spinner fx:id="playerCountSpinner" editable="true" 
+                                    styleClass="spinner"/>
+                            <Label text="players" styleClass="field-hint"/>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Match Name -->
+                    <VBox spacing="5">
+                        <Label text="Match Name:" styleClass="field-label"/>
+                        <TextField fx:id="matchNameField" promptText="Enter match name" 
+                                  styleClass="text-field"/>
+                    </VBox>
+                    
+                    <!-- Private Match Option -->
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <CheckBox fx:id="privateMatchCheckBox" text="Private Match" 
+                                 styleClass="check-box"/>
+                    </HBox>
+                    
+                    <!-- Time Limit -->
+                    <VBox spacing="5">
+                        <Label text="Time Limit (minutes):" styleClass="field-label"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Spinner fx:id="timeLimitSpinner" editable="true" 
+                                    styleClass="spinner"/>
+                            <Label text="minutes" styleClass="field-hint"/>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Difficulty -->
+                    <VBox spacing="5">
+                        <Label text="Difficulty:" styleClass="field-label"/>
+                        <ComboBox fx:id="difficultyComboBox" promptText="Select difficulty" 
+                                 styleClass="combo-box"/>
+                    </VBox>
+                    
+                    <!-- Action Buttons -->
+                    <HBox spacing="10" alignment="CENTER">
+                        <Button fx:id="createMatchButton" text="Create Match" 
+                                styleClass="primary-button"/>
+                        <Button fx:id="quickPlayButton" text="Quick Play" 
+                                styleClass="secondary-button"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+            
+            <!-- Right Panel - Available Matches & Logs -->
+            <VBox spacing="20" HBox.hgrow="ALWAYS" styleClass="right-panel">
+                
+                <!-- Available Matches Header -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Available Matches" styleClass="section-title"/>
+                    <Label text="Click a match to join" styleClass="section-subtitle"/>
+                </HBox>
+                
+                <!-- Available Matches List -->
+                <VBox fx:id="availableMatchesPanel" VBox.vgrow="ALWAYS" 
+                      styleClass="matches-panel">
+                    
+                    <!-- No Matches Label -->
+                    <Label fx:id="noMatchesLabel" text="No matches available" 
+                           styleClass="no-matches-label" alignment="CENTER"/>
+                    
+                    <!-- Matches ListView -->
+                    <ListView fx:id="availableMatchesListView" VBox.vgrow="ALWAYS" 
+                              styleClass="matches-list-view"/>
+                </VBox>
+                
+                <!-- Log Area -->
+                <VBox styleClass="log-panel" spacing="5">
+                    <Label text="Activity Log" styleClass="section-title"/>
+                    <TextArea fx:id="logArea" VBox.vgrow="ALWAYS" 
+                              styleClass="log-area" editable="false" wrapText="true"/>
+                </VBox>
+            </VBox>
+        </HBox>
+    </center>
+    
+    <!-- Bottom Status Bar -->
+    <bottom>
+        <HBox styleClass="status-bar" alignment="CENTER_LEFT" spacing="20">
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20"/>
+            </padding>
+            
+            <Label text="GDK Game Lobby - Ready to test games!" styleClass="status-text"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Modules: 2 | Games: 2" styleClass="status-text"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane> 
