@@ -259,21 +259,32 @@ public class GDKApplication extends Application {
      */
     private void refreshGameList() {
         try {
-            logArea.appendText("🔄 Refreshing game modules...\n");
+            // Only log if we're using the fallback UI
+            if (logArea != null) {
+                logArea.appendText("🔄 Refreshing game modules...\n");
+            }
             
             List<GameModule> modules = ModuleLoader.discoverModules(MODULES_DIR);
-            gameSelector.getItems().clear();
-            gameSelector.getItems().addAll(modules);
             
-            logArea.appendText("📦 Found " + modules.size() + " game modules\n");
+            // Only update UI if we're using the fallback UI
+            if (gameSelector != null) {
+                gameSelector.getItems().clear();
+                gameSelector.getItems().addAll(modules);
+            }
             
-            for (GameModule module : modules) {
-                logArea.appendText("✅ " + module.getGameName() + " - " + module.getGameDescription() + "\n");
+            if (logArea != null) {
+                logArea.appendText("📦 Found " + modules.size() + " game modules\n");
+                
+                for (GameModule module : modules) {
+                    logArea.appendText("✅ " + module.getGameName() + " - " + module.getGameDescription() + "\n");
+                }
             }
             
         } catch (Exception e) {
             Logging.error("❌ Failed to refresh games: " + e.getMessage());
-            logArea.appendText("❌ Error: " + e.getMessage() + "\n");
+            if (logArea != null) {
+                logArea.appendText("❌ Error: " + e.getMessage() + "\n");
+            }
         }
     }
 
@@ -281,6 +292,12 @@ public class GDKApplication extends Application {
      * Launches the selected game.
      */
     private void launchSelectedGame() {
+        // Only work if we're using the fallback UI
+        if (gameSelector == null || gameModeSelector == null || playerCountSpinner == null) {
+            Logging.info("🎮 Game launching handled by FXML controller");
+            return;
+        }
+        
         GameModule selectedGame = gameSelector.getValue();
         if (selectedGame == null) {
             showError("No Game Selected", "Please select a game to launch.");
@@ -303,20 +320,28 @@ public class GDKApplication extends Application {
         options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
         options.setOption("serverPort", config.getProperty("serverPort", "8080"));
 
-        logArea.appendText("🚀 Launching " + selectedGame.getGameName() + " in " + gameMode.getDisplayName() + " mode with " + playerCount + " players\n");
+        if (logArea != null) {
+            logArea.appendText("🚀 Launching " + selectedGame.getGameName() + " in " + gameMode.getDisplayName() + " mode with " + playerCount + " players\n");
+        }
 
         try {
             javafx.scene.Scene gameScene = selectedGame.launchGame(primaryStage, gameMode, playerCount, options);
             if (gameScene != null) {
                 primaryStage.setScene(gameScene);
                 primaryStage.setTitle(selectedGame.getGameName() + " - GDK");
-                logArea.appendText("✅ Game launched successfully\n");
+                if (logArea != null) {
+                    logArea.appendText("✅ Game launched successfully\n");
+                }
             } else {
-                logArea.appendText("❌ Failed to launch game\n");
+                if (logArea != null) {
+                    logArea.appendText("❌ Failed to launch game\n");
+                }
             }
         } catch (Exception e) {
             Logging.error("❌ Error launching game: " + e.getMessage());
-            logArea.appendText("❌ Error: " + e.getMessage() + "\n");
+            if (logArea != null) {
+                logArea.appendText("❌ Error: " + e.getMessage() + "\n");
+            }
         }
     }
 
@@ -354,7 +379,9 @@ public class GDKApplication extends Application {
                 config.setProperty("serverUrl", serverField.getText());
                 config.setProperty("serverPort", String.valueOf(portSpinner.getValue()));
                 saveConfig();
-                logArea.appendText("💾 Settings saved\n");
+                if (logArea != null) {
+                    logArea.appendText("💾 Settings saved\n");
+                }
             }
             return null;
         });
