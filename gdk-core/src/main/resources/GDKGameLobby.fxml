@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox fx:id="mainContainer" prefHeight="600.0" prefWidth="800.0" 
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.GDKGameLobbyController"
+      styleClass="game-picker-container" spacing="20" alignment="CENTER">
+    
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header">
+        <Button fx:id="backButton" text="← Back" styleClass="nav-button"/>
+        <Label fx:id="gameTitleLabel" text="GDK Game Picker" styleClass="main-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="refreshButton" text="🔄 Refresh" styleClass="nav-button"/>
+    </HBox>
+    
+    <!-- Game Information -->
+    <VBox styleClass="game-info-panel" spacing="10" alignment="CENTER" maxWidth="500">
+        <padding>
+            <Insets top="15" right="15" bottom="15" left="15"/>
+        </padding>
+        
+        <HBox alignment="CENTER" spacing="15">
+            <ImageView fx:id="gameIconImageView" fitHeight="60" fitWidth="60" 
+                      styleClass="game-icon"/>
+            <VBox spacing="5" alignment="CENTER">
+                <Label fx:id="gameTitleLabel" text="Select a Game" 
+                       styleClass="game-title-large"/>
+                <Label fx:id="gameDescriptionLabel" text="Choose a game from the dropdown to get started..." 
+                       styleClass="game-description" wrapText="true"/>
+            </VBox>
+        </HBox>
+    </VBox>
+    
+    <!-- Game Configuration -->
+    <VBox styleClass="game-config-panel" spacing="15" alignment="CENTER" maxWidth="500">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+        
+        <Label text="Game Configuration" styleClass="section-title"/>
+        
+        <!-- Game Selection -->
+        <VBox spacing="5" alignment="CENTER">
+            <Label text="Select Game:" styleClass="field-label"/>
+            <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
+                     styleClass="combo-box" prefWidth="300"/>
+        </VBox>
+        
+        <!-- Game Mode Selection -->
+        <VBox spacing="5" alignment="CENTER">
+            <Label text="Game Mode:" styleClass="field-label"/>
+            <ComboBox fx:id="gameModeComboBox" promptText="Select Game Mode" 
+                     styleClass="combo-box" prefWidth="300"/>
+        </VBox>
+        
+        <!-- Player Count -->
+        <VBox spacing="5" alignment="CENTER">
+            <Label text="Player Count:" styleClass="field-label"/>
+            <HBox spacing="10" alignment="CENTER">
+                <Spinner fx:id="playerCountSpinner" editable="true" 
+                        styleClass="spinner"/>
+                <Label text="players" styleClass="field-hint"/>
+            </HBox>
+        </VBox>
+        
+        <!-- Difficulty -->
+        <VBox spacing="5" alignment="CENTER">
+            <Label text="Difficulty:" styleClass="field-label"/>
+            <ComboBox fx:id="difficultyComboBox" promptText="Select difficulty" 
+                     styleClass="combo-box" prefWidth="300"/>
+        </VBox>
+        
+        <!-- Action Buttons -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button fx:id="launchGameButton" text="🚀 Launch Game" 
+                    styleClass="primary-button"/>
+            <Button fx:id="quickPlayButton" text="⚡ Quick Play" 
+                    styleClass="secondary-button"/>
+        </HBox>
+    </VBox>
+    
+    <!-- Log Area -->
+    <VBox styleClass="log-panel" spacing="5" VBox.vgrow="ALWAYS" alignment="CENTER" maxWidth="600">
+        <Label text="Activity Log" styleClass="section-title"/>
+        <TextArea fx:id="logArea" VBox.vgrow="ALWAYS" 
+                  styleClass="log-area" editable="false" wrapText="true"/>
+    </VBox>
+    
+    <!-- Status Bar -->
+    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="status-bar">
+        <Label text="GDK Game Picker - Ready to test games!" styleClass="status-text"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Modules: 2 | Games: 2" styleClass="status-text"/>
+    </HBox>
+    
+</VBox> 
