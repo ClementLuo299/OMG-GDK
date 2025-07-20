@@ -10,12 +10,16 @@ import java.time.format.DateTimeFormatter;
 
 import com.game.GameOptions;
 import com.game.GameState;
+import com.game.GameEventHandler;
+import com.game.GameEvent;
 import com.game.enums.GameMode;
 import com.utils.error_handling.Logging;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -106,6 +110,7 @@ public class TicTacToeController implements Initializable {
     private int playerCount;
     private GameOptions gameOptions;
     private Stage primaryStage;
+    private GameEventHandler eventHandler;
 
     /**
      * Initialize the controller.
@@ -178,6 +183,10 @@ public class TicTacToeController implements Initializable {
      */
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+    }
+    
+    public void setEventHandler(GameEventHandler eventHandler) {
+        this.eventHandler = eventHandler;
     }
     
     /**
@@ -320,6 +329,10 @@ public class TicTacToeController implements Initializable {
         
         updateScoreLabels();
         gameInProgress = false;
+        
+        // Return to GDK after forfeit
+        Logging.info("🏳️ Game forfeited - requesting return to GDK");
+        onBackButtonClicked();
     }
 
     /**
@@ -327,7 +340,7 @@ public class TicTacToeController implements Initializable {
      */
     @FXML
     private void onBackButtonClicked() {
-        Logging.info("🔙 Back button clicked - returning to GDK");
+        Logging.info("🔙 Back button clicked - requesting return to GDK");
         
         // Stop any active timers
         if (moveTimer != null) {
@@ -335,9 +348,15 @@ public class TicTacToeController implements Initializable {
             Logging.info("⏸️ Timer stopped");
         }
         
-        // Close the current stage to return to GDK
-        if (primaryStage != null) {
-            primaryStage.close();
+        // Send event to GDK to handle the return to lobby
+        if (eventHandler != null) {
+            eventHandler.handleGameEvent(new GameEvent(
+                GameEvent.EventType.BACK_TO_LOBBY_REQUESTED,
+                "tictactoe",
+                "User requested return to GDK lobby"
+            ));
+        } else {
+            Logging.warning("⚠️ No event handler available, cannot return to lobby");
         }
     }
 

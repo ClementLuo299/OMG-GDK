@@ -87,9 +87,10 @@ public interface GameModule {
      * @param gameMode The game mode (SINGLE_PLAYER, LOCAL_MULTIPLAYER, ONLINE_MULTIPLAYER)
      * @param playerCount Number of players
      * @param gameOptions Additional game-specific options
+     * @param eventHandler Handler for game events (games use this to communicate back to GDK)
      * @return The game scene
      */
-    Scene launchGame(Stage primaryStage, com.game.enums.GameMode gameMode, int playerCount, GameOptions gameOptions);
+    Scene launchGame(Stage primaryStage, com.game.enums.GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler);
     
     /**
      * Gets the game's icon path (relative to resources).

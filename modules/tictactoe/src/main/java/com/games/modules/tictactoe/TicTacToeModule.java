@@ -5,6 +5,7 @@ import com.game.enums.GameDifficulty;
 import com.game.enums.GameMode;
 import com.game.GameOptions;
 import com.game.GameState;
+import com.game.GameEventHandler;
 import com.utils.error_handling.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -119,7 +120,7 @@ public class TicTacToeModule implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
         Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
         
         try {
@@ -141,6 +142,7 @@ public class TicTacToeModule implements GameModule {
             TicTacToeController controller = loader.getController();
             if (controller != null) {
                 controller.setPrimaryStage(primaryStage);
+                controller.setEventHandler(eventHandler);
                 controller.initializeGame(gameMode, playerCount, gameOptions);
             }
             

@@ -4,6 +4,8 @@ import com.game.GameModule;
 import com.game.enums.GameDifficulty;
 import com.game.enums.GameMode;
 import com.game.GameOptions;
+import com.game.GameEventHandler;
+import com.game.GameEvent;
 import com.utils.ModuleLoader;
 import com.utils.error_handling.Logging;
 import javafx.fxml.FXML;
@@ -61,6 +63,7 @@ public class GDKGameLobbyController implements Initializable {
     private Stage primaryStage;
     private ObservableList<GameModule> availableGames;
     private GameModule selectedGame;
+    private GDKApplication gdkApplication;
     
     // ==================== INITIALIZATION ====================
     
@@ -86,6 +89,13 @@ public class GDKGameLobbyController implements Initializable {
      */
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;
+    }
+    
+    /**
+     * Sets the GDK application reference for proper event handling.
+     */
+    public void setGDKApplication(GDKApplication gdkApplication) {
+        this.gdkApplication = gdkApplication;
     }
     
     // ==================== CONFIGURATION ====================
@@ -287,13 +297,12 @@ public class GDKGameLobbyController implements Initializable {
                           " mode with " + playerCount + " players (Difficulty: " + difficulty + ")\n");
 
         try {
-            Scene gameScene = selectedGame.launchGame(primaryStage, gameMode, playerCount, options);
-            if (gameScene != null) {
-                primaryStage.setScene(gameScene);
-                primaryStage.setTitle(selectedGame.getGameName() + " - GDK");
-                logArea.appendText("✅ Game launched successfully\n");
+            // Delegate to the GDK application to launch the game with proper event handling
+            if (gdkApplication != null) {
+                gdkApplication.launchGame(selectedGame, gameMode, playerCount, difficulty);
             } else {
-                logArea.appendText("❌ Failed to launch game\n");
+                Logging.error("❌ GDK Application reference not set");
+                logArea.appendText("❌ Error: GDK Application not available\n");
             }
         } catch (Exception e) {
             Logging.error("❌ Error launching game: " + e.getMessage());

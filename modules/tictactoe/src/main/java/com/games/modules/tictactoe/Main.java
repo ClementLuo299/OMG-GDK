@@ -5,6 +5,7 @@ import com.game.enums.GameDifficulty;
 import com.game.enums.GameMode;
 import com.game.GameOptions;
 import com.game.GameState;
+import com.game.GameEventHandler;
 import com.utils.error_handling.Logging;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -113,8 +114,8 @@ public class Main implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions) {
-        return ticTacToeModule.launchGame(primaryStage, gameMode, playerCount, gameOptions);
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
+        return ticTacToeModule.launchGame(primaryStage, gameMode, playerCount, gameOptions, eventHandler);
     }
     
     @Override
