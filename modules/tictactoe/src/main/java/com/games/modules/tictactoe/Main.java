@@ -1,8 +1,8 @@
 package com.games.modules.tictactoe;
 
 import com.gdk.shared.game.GameModule;
-import com.gdk.shared.enums.GameDifficulty;
-import com.gdk.shared.enums.GameMode;
+import com.gdk.shared.game.GameMode;
+import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
 import com.gdk.shared.game.GameEventHandler;

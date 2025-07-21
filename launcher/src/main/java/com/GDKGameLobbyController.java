@@ -1,8 +1,8 @@
 package com;
 
 import com.gdk.shared.game.GameModule;
-import com.gdk.shared.enums.GameDifficulty;
-import com.gdk.shared.enums.GameMode;
+import com.gdk.shared.game.GameMode;
+import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameEventHandler;
@@ -195,7 +195,15 @@ public class GDKGameLobbyController implements Initializable {
                 } else {
                     setText(item);
                     // Find the corresponding GameDifficulty and set tooltip
-                    for (GameDifficulty difficulty : GameDifficulty.values()) {
+                    GameDifficulty[] difficulties = {
+                        GameDifficulty.EASY,
+                        GameDifficulty.MEDIUM,
+                        GameDifficulty.HARD,
+                        GameDifficulty.EXPERT,
+                        GameDifficulty.NIGHTMARE,
+                        GameDifficulty.CUSTOM
+                    };
+                    for (GameDifficulty difficulty : difficulties) {
                         if (difficulty.getDisplayName().equals(item)) {
                             setTooltip(new Tooltip(difficulty.getDescription()));
                             break;

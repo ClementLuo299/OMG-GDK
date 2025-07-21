@@ -1,7 +1,7 @@
 package com;
 
 import com.gdk.shared.game.GameModule;
-import com.gdk.shared.enums.GameMode;
+import com.gdk.shared.game.GameMode;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameEvent;
 import com.gdk.shared.game.GameEventHandler;
@@ -242,7 +242,23 @@ public class GDKApplication extends Application {
         Label modeLabel = new Label("Game Mode:");
         modeLabel.setStyle("-fx-font-weight: bold;");
         gameModeSelector = new ComboBox<>();
-        gameModeSelector.getItems().addAll(GameMode.values());
+        gameModeSelector.getItems().addAll(
+            GameMode.SINGLE_PLAYER,
+            GameMode.LOCAL_MULTIPLAYER,
+            GameMode.ONLINE_MULTIPLAYER,
+            GameMode.PRACTICE,
+            GameMode.TUTORIAL,
+            GameMode.HOT_SEAT,
+            GameMode.RANKED,
+            GameMode.CASUAL,
+            GameMode.TIME_TRIAL,
+            GameMode.SURVIVAL,
+            GameMode.PUZZLE,
+            GameMode.CREATIVE,
+            GameMode.SANDBOX,
+            GameMode.AI_VERSUS,
+            GameMode.AI_COOP
+        );
         gameModeSelector.setValue(GameMode.LOCAL_MULTIPLAYER);
         gameModeSelector.setStyle("-fx-background-color: #555555; -fx-text-fill: white;");
 

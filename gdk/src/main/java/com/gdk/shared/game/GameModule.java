@@ -1,14 +1,12 @@
 package com.gdk.shared.game;
 
-import com.gdk.shared.enums.GameMode;
-import com.gdk.shared.enums.GameDifficulty;
 import com.gdk.shared.settings.GameSettings;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * Core interface that all game modules must implement.
- * Defines the contract between the GDK and game modules.
+ * Core interface for all game modules.
+ * Defines the contract that all games must implement to integrate with the GDK.
  *
  * @authors Clement Luo
  * @date July 19, 2025
@@ -154,8 +152,12 @@ public interface GameModule {
      * @return Array of supported difficulty levels
      */
     default GameDifficulty[] getSupportedDifficulties() {
-        // Default to all difficulties
-        return GameDifficulty.values();
+        // Default to common difficulties
+        return new GameDifficulty[] {
+            GameDifficulty.EASY,
+            GameDifficulty.MEDIUM,
+            GameDifficulty.HARD
+        };
     }
     
     /**
@@ -177,7 +179,6 @@ public interface GameModule {
     }
     
     /**
-     * Gets the default game mode for this game.
      * @return The default game mode
      */
     default GameMode getDefaultGameMode() {
@@ -217,7 +218,7 @@ public interface GameModule {
      */
     default boolean supportsGameMode(GameMode gameMode) {
         for (GameMode supportedMode : getSupportedGameModes()) {
-            if (supportedMode == gameMode) {
+            if (supportedMode.equals(gameMode)) {
                 return true;
             }
         }
@@ -231,7 +232,7 @@ public interface GameModule {
      */
     default boolean supportsDifficulty(GameDifficulty difficulty) {
         for (GameDifficulty supportedDifficulty : getSupportedDifficulties()) {
-            if (supportedDifficulty == difficulty) {
+            if (supportedDifficulty.equals(difficulty)) {
                 return true;
             }
         }

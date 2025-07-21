@@ -1,10 +1,11 @@
 package com.games.modules.example;
 
 import com.gdk.shared.game.GameModule;
-import com.gdk.shared.enums.GameDifficulty;
-import com.gdk.shared.enums.GameMode;
+import com.gdk.shared.game.GameMode;
+import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
+import com.gdk.shared.game.GameEventHandler;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -95,7 +96,7 @@ public class Main implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage stage, GameMode mode, int playerCount, GameOptions options, com.gdk.shared.game.GameEventHandler eventHandler) {
+    public Scene launchGame(Stage stage, GameMode mode, int playerCount, GameOptions options, GameEventHandler eventHandler) {
         try {
             Logging.info("🎮 Launching " + GAME_NAME + " in " + mode + " mode with " + playerCount + " players");
             

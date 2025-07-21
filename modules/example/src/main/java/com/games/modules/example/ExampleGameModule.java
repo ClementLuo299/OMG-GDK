@@ -1,11 +1,12 @@
 package com.games.modules.example;
 
 import com.gdk.shared.game.GameModule;
-import com.gdk.shared.enums.GameDifficulty;
-import com.gdk.shared.enums.GameMode;
-import com.gdk.shared.settings.GameSettings;
+import com.gdk.shared.game.GameMode;
+import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
+import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -85,29 +86,28 @@ public class ExampleGameModule implements GameModule {
     
     @Override
     public GameMode[] getSupportedGameModes() {
-        // Example game supports a subset of modes for demonstration
+        // Example game supports many modes for demonstration
         return new GameMode[] {
             GameMode.SINGLE_PLAYER,
-            GameMode.STORY_MODE,
             GameMode.PRACTICE,
             GameMode.LOCAL_MULTIPLAYER,
             GameMode.HOT_SEAT,
             GameMode.PUZZLE,
             GameMode.CREATIVE,
             GameMode.AI_VERSUS,
-            GameMode.AI_TRAINING
+            GameMode.AI_COOP
         };
     }
     
     @Override
     public GameDifficulty[] getSupportedDifficulties() {
-        // Example game supports a subset of difficulties
+        // Example game supports all difficulty levels
         return new GameDifficulty[] {
-            GameDifficulty.BEGINNER,
             GameDifficulty.EASY,
             GameDifficulty.MEDIUM,
             GameDifficulty.HARD,
-            GameDifficulty.EXPERT
+            GameDifficulty.EXPERT,
+            GameDifficulty.NIGHTMARE
         };
     }
     
@@ -115,16 +115,15 @@ public class ExampleGameModule implements GameModule {
     public java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
         java.util.Map<GameMode, int[]> playerCounts = new java.util.HashMap<>();
         
-        // Different modes support different player counts
+        // Example game supports various player counts for different modes
         playerCounts.put(GameMode.SINGLE_PLAYER, new int[]{1, 1});
-        playerCounts.put(GameMode.STORY_MODE, new int[]{1, 1});
         playerCounts.put(GameMode.PRACTICE, new int[]{1, 1});
         playerCounts.put(GameMode.LOCAL_MULTIPLAYER, new int[]{2, 4});
         playerCounts.put(GameMode.HOT_SEAT, new int[]{2, 4});
         playerCounts.put(GameMode.PUZZLE, new int[]{1, 2});
         playerCounts.put(GameMode.CREATIVE, new int[]{1, 4});
         playerCounts.put(GameMode.AI_VERSUS, new int[]{1, 1});
-        playerCounts.put(GameMode.AI_TRAINING, new int[]{1, 1});
+        playerCounts.put(GameMode.AI_COOP, new int[]{1, 1});
         
         return playerCounts;
     }
@@ -136,21 +135,20 @@ public class ExampleGameModule implements GameModule {
     
     @Override
     public GameDifficulty getDefaultDifficulty() {
-        return GameDifficulty.EASY;
+        return GameDifficulty.MEDIUM;
     }
     
     @Override
     public int getDefaultPlayerCount(GameMode gameMode) {
-        java.util.Map<GameMode, int[]> playerCounts = getSupportedPlayerCounts();
-        int[] range = playerCounts.get(gameMode);
-        if (range != null) {
-            return range[0]; // Return minimum as default
+        // Example game defaults to 1 player for single player modes, 2 for multiplayer
+        if (gameMode == GameMode.LOCAL_MULTIPLAYER || gameMode == GameMode.HOT_SEAT) {
+            return 2;
         }
-        return 1;
+        return 1; // Single player modes default to 1
     }
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, com.gdk.shared.game.GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
         Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
         
         try {
@@ -166,7 +164,7 @@ public class ExampleGameModule implements GameModule {
     /**
      * Creates a simple test interface to demonstrate game communication.
      */
-    private Scene createTestInterface(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, com.gdk.shared.game.GameEventHandler eventHandler) {
+    private Scene createTestInterface(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
         javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
         root.setPadding(new javafx.geometry.Insets(20));
         root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
@@ -252,7 +250,15 @@ public class ExampleGameModule implements GameModule {
             
             // Find the corresponding GameDifficulty enum
             GameDifficulty currentDifficulty = null;
-            for (GameDifficulty diff : GameDifficulty.values()) {
+            GameDifficulty[] difficulties = {
+                GameDifficulty.EASY,
+                GameDifficulty.MEDIUM,
+                GameDifficulty.HARD,
+                GameDifficulty.EXPERT,
+                GameDifficulty.NIGHTMARE,
+                GameDifficulty.CUSTOM
+            };
+            for (GameDifficulty diff : difficulties) {
                 if (diff.getDisplayName().equals(currentDifficultyName)) {
                     currentDifficulty = diff;
                     break;
@@ -262,7 +268,7 @@ public class ExampleGameModule implements GameModule {
             if (currentDifficulty != null) {
                 String message = "Current Difficulty: " + currentDifficulty.getDisplayName() + 
                                "\nDescription: " + currentDifficulty.getDescription() +
-                               "\nNumeric Value: " + currentDifficulty.getNumericValue() +
+                               "\nNumeric Value: " + currentDifficulty.getLevel() +
                                "\nColor: " + currentDifficulty.getColorCode();
                 
                 javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);

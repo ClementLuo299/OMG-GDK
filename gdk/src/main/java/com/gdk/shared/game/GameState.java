@@ -1,19 +1,18 @@
 package com.gdk.shared.game;
 
-import com.gdk.shared.enums.GameMode;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents the state of a game for saving and loading.
- * Contains all necessary information to restore a game to a specific point.
+ * Represents the state of a game that can be saved and loaded.
+ * Used for persistence and game state management.
  *
  * @authors Clement Luo
  * @date July 19, 2025
+ * @edited July 21, 2025
  * @since 1.0
  */
 public class GameState {
-    
     private final String gameId;
     private final String gameName;
     private final GameMode gameMode;
@@ -22,15 +21,6 @@ public class GameState {
     private final Map<String, Object> stateData;
     private final long timestamp;
     
-    /**
-     * Creates a new GameState with basic information.
-     * 
-     * @param gameId The unique identifier for the game
-     * @param gameName The display name of the game
-     * @param gameMode The game mode being played
-     * @param playerCount The number of players
-     * @param gameOptions The game options used
-     */
     public GameState(String gameId, String gameName, GameMode gameMode, int playerCount, GameOptions gameOptions) {
         this.gameId = gameId;
         this.gameName = gameName;
@@ -41,73 +31,12 @@ public class GameState {
         this.timestamp = System.currentTimeMillis();
     }
     
-    /**
-     * Creates a new GameState with all information including state data.
-     * 
-     * @param gameId The unique identifier for the game
-     * @param gameName The display name of the game
-     * @param gameMode The game mode being played
-     * @param playerCount The number of players
-     * @param gameOptions The game options used
-     * @param stateData Additional state data
-     */
-    public GameState(String gameId, String gameName, GameMode gameMode, int playerCount, GameOptions gameOptions, Map<String, Object> stateData) {
-        this.gameId = gameId;
-        this.gameName = gameName;
-        this.gameMode = gameMode;
-        this.playerCount = playerCount;
-        this.gameOptions = gameOptions;
-        this.stateData = new HashMap<>(stateData);
-        this.timestamp = System.currentTimeMillis();
-    }
-    
-    /**
-     * Gets the game ID.
-     * @return The game ID
-     */
-    public String getGameId() {
-        return gameId;
-    }
-    
-    /**
-     * Gets the game name.
-     * @return The game name
-     */
-    public String getGameName() {
-        return gameName;
-    }
-    
-    /**
-     * Gets the game mode.
-     * @return The game mode
-     */
-    public GameMode getGameMode() {
-        return gameMode;
-    }
-    
-    /**
-     * Gets the player count.
-     * @return The player count
-     */
-    public int getPlayerCount() {
-        return playerCount;
-    }
-    
-    /**
-     * Gets the game options.
-     * @return The game options
-     */
-    public GameOptions getGameOptions() {
-        return gameOptions;
-    }
-    
-    /**
-     * Gets the timestamp when this state was created.
-     * @return The timestamp in milliseconds
-     */
-    public long getTimestamp() {
-        return timestamp;
-    }
+    public String getGameId() { return gameId; }
+    public String getGameName() { return gameName; }
+    public GameMode getGameMode() { return gameMode; }
+    public int getPlayerCount() { return playerCount; }
+    public GameOptions getGameOptions() { return gameOptions; }
+    public long getTimestamp() { return timestamp; }
     
     /**
      * Sets a state value.
