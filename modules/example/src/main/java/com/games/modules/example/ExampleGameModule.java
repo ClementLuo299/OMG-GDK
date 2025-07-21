@@ -56,7 +56,7 @@ public class ExampleGameModule implements GameModule {
     
     @Override
     public GameDifficulty getDifficulty() {
-        return GameDifficulty.MEDIUM;
+        return GameDifficulty.EASY;
     }
     
     @Override
@@ -77,6 +77,75 @@ public class ExampleGameModule implements GameModule {
     @Override
     public boolean supportsSinglePlayer() {
         return true;
+    }
+    
+    // ==================== ENHANCED SUPPORT METHODS ====================
+    // Example game demonstrates custom support configuration
+    
+    @Override
+    public GameMode[] getSupportedGameModes() {
+        // Example game supports a subset of modes for demonstration
+        return new GameMode[] {
+            GameMode.SINGLE_PLAYER,
+            GameMode.STORY_MODE,
+            GameMode.PRACTICE,
+            GameMode.LOCAL_MULTIPLAYER,
+            GameMode.HOT_SEAT,
+            GameMode.PUZZLE,
+            GameMode.CREATIVE,
+            GameMode.AI_VERSUS,
+            GameMode.AI_TRAINING
+        };
+    }
+    
+    @Override
+    public GameDifficulty[] getSupportedDifficulties() {
+        // Example game supports a subset of difficulties
+        return new GameDifficulty[] {
+            GameDifficulty.BEGINNER,
+            GameDifficulty.EASY,
+            GameDifficulty.MEDIUM,
+            GameDifficulty.HARD,
+            GameDifficulty.EXPERT
+        };
+    }
+    
+    @Override
+    public java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
+        java.util.Map<GameMode, int[]> playerCounts = new java.util.HashMap<>();
+        
+        // Different modes support different player counts
+        playerCounts.put(GameMode.SINGLE_PLAYER, new int[]{1, 1});
+        playerCounts.put(GameMode.STORY_MODE, new int[]{1, 1});
+        playerCounts.put(GameMode.PRACTICE, new int[]{1, 1});
+        playerCounts.put(GameMode.LOCAL_MULTIPLAYER, new int[]{2, 4});
+        playerCounts.put(GameMode.HOT_SEAT, new int[]{2, 4});
+        playerCounts.put(GameMode.PUZZLE, new int[]{1, 2});
+        playerCounts.put(GameMode.CREATIVE, new int[]{1, 4});
+        playerCounts.put(GameMode.AI_VERSUS, new int[]{1, 1});
+        playerCounts.put(GameMode.AI_TRAINING, new int[]{1, 1});
+        
+        return playerCounts;
+    }
+    
+    @Override
+    public GameMode getDefaultGameMode() {
+        return GameMode.SINGLE_PLAYER;
+    }
+    
+    @Override
+    public GameDifficulty getDefaultDifficulty() {
+        return GameDifficulty.EASY;
+    }
+    
+    @Override
+    public int getDefaultPlayerCount(GameMode gameMode) {
+        java.util.Map<GameMode, int[]> playerCounts = getSupportedPlayerCounts();
+        int[] range = playerCounts.get(gameMode);
+        if (range != null) {
+            return range[0]; // Return minimum as default
+        }
+        return 1;
     }
     
     @Override
@@ -106,8 +175,9 @@ public class ExampleGameModule implements GameModule {
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
         // Game info
+        String difficulty = gameOptions.getStringOption("difficulty", "Medium");
         javafx.scene.control.Label infoLabel = new javafx.scene.control.Label(
-            "Game: " + getGameName() + " | Mode: " + gameMode.getDisplayName() + " | Players: " + playerCount
+            "Game: " + getGameName() + " | Mode: " + gameMode.getDisplayName() + " | Players: " + playerCount + " | Difficulty: " + difficulty
         );
         infoLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #495057;");
         
@@ -173,6 +243,53 @@ public class ExampleGameModule implements GameModule {
             ));
         });
         
+        javafx.scene.control.Button difficultyButton = new javafx.scene.control.Button("🎯 Show Difficulty Info");
+        difficultyButton.setStyle("-fx-background-color: #6f42c1; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
+        difficultyButton.setOnAction(e -> {
+            String currentDifficultyName = gameOptions.getStringOption("difficulty", "Medium");
+            Logging.info("🎯 Difficulty Info: " + currentDifficultyName);
+            
+            // Find the corresponding GameDifficulty enum
+            GameDifficulty currentDifficulty = null;
+            for (GameDifficulty diff : GameDifficulty.values()) {
+                if (diff.getDisplayName().equals(currentDifficultyName)) {
+                    currentDifficulty = diff;
+                    break;
+                }
+            }
+            
+            if (currentDifficulty != null) {
+                String message = "Current Difficulty: " + currentDifficulty.getDisplayName() + 
+                               "\nDescription: " + currentDifficulty.getDescription() +
+                               "\nNumeric Value: " + currentDifficulty.getNumericValue() +
+                               "\nColor: " + currentDifficulty.getColorCode();
+                
+                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+                alert.setTitle("Difficulty Information");
+                alert.setHeaderText("Game Difficulty Details");
+                alert.setContentText(message);
+                alert.showAndWait();
+            }
+        });
+        
+        javafx.scene.control.Button gameModeButton = new javafx.scene.control.Button("🎮 Show Game Mode Info");
+        gameModeButton.setStyle("-fx-background-color: #20c997; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
+        gameModeButton.setOnAction(e -> {
+            Logging.info("🎮 Game Mode Info: " + gameMode.getDisplayName());
+            
+            String message = "Current Game Mode: " + gameMode.getDisplayName() + 
+                           "\nDescription: " + gameMode.getDescription() +
+                           "\nCategory: " + gameMode.getCategory() +
+                           "\nIcon: " + gameMode.getIcon() +
+                           "\nColor: " + gameMode.getColorCode();
+            
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Mode Information");
+            alert.setHeaderText("Game Mode Details");
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+        
         javafx.scene.control.Button backButton = new javafx.scene.control.Button("🔙 Back to Lobby");
         backButton.setStyle("-fx-background-color: #fd7e14; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         backButton.setOnAction(e -> {
@@ -195,7 +312,7 @@ public class ExampleGameModule implements GameModule {
         // Add all components
         root.getChildren().addAll(
             titleLabel, infoLabel,
-            startButton, moveButton, turnButton, messageButton, errorButton, endButton, backButton,
+            startButton, moveButton, turnButton, messageButton, errorButton, endButton, difficultyButton, gameModeButton, backButton,
             instructionsLabel
         );
         

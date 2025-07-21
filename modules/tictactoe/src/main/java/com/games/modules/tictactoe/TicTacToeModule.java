@@ -57,7 +57,7 @@ public class TicTacToeModule implements GameModule {
     
     @Override
     public GameDifficulty getDifficulty() {
-        return GameDifficulty.EASY;
+        return GameDifficulty.MEDIUM;
     }
     
     @Override
@@ -78,6 +78,68 @@ public class TicTacToeModule implements GameModule {
     @Override
     public boolean supportsSinglePlayer() {
         return true; // vs AI
+    }
+    
+    // ==================== ENHANCED SUPPORT METHODS ====================
+    // TicTacToe has specific support requirements
+    
+    @Override
+    public GameMode[] getSupportedGameModes() {
+        // TicTacToe is a 2-player game, so it supports specific modes
+        return new GameMode[] {
+            GameMode.SINGLE_PLAYER,    // vs AI
+            GameMode.LOCAL_MULTIPLAYER, // 2 players on same device
+            GameMode.HOT_SEAT,         // Turn-based on same device
+            GameMode.AI_VERSUS,        // vs AI with different difficulty
+            GameMode.PRACTICE,         // Practice mode
+            GameMode.TUTORIAL          // Learn the game
+        };
+    }
+    
+    @Override
+    public GameDifficulty[] getSupportedDifficulties() {
+        // TicTacToe AI can have different difficulty levels
+        return new GameDifficulty[] {
+            GameDifficulty.BEGINNER,
+            GameDifficulty.EASY,
+            GameDifficulty.MEDIUM,
+            GameDifficulty.HARD,
+            GameDifficulty.EXPERT
+        };
+    }
+    
+    @Override
+    public java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
+        java.util.Map<GameMode, int[]> playerCounts = new java.util.HashMap<>();
+        
+        // TicTacToe is always 2 players (or 1 vs AI)
+        playerCounts.put(GameMode.SINGLE_PLAYER, new int[]{1, 1});
+        playerCounts.put(GameMode.LOCAL_MULTIPLAYER, new int[]{2, 2});
+        playerCounts.put(GameMode.HOT_SEAT, new int[]{2, 2});
+        playerCounts.put(GameMode.AI_VERSUS, new int[]{1, 1});
+        playerCounts.put(GameMode.PRACTICE, new int[]{1, 1});
+        playerCounts.put(GameMode.TUTORIAL, new int[]{1, 1});
+        
+        return playerCounts;
+    }
+    
+    @Override
+    public GameMode getDefaultGameMode() {
+        return GameMode.LOCAL_MULTIPLAYER; // Classic 2-player mode
+    }
+    
+    @Override
+    public GameDifficulty getDefaultDifficulty() {
+        return GameDifficulty.MEDIUM; // Balanced AI difficulty
+    }
+    
+    @Override
+    public int getDefaultPlayerCount(GameMode gameMode) {
+        // TicTacToe defaults to 2 players for multiplayer modes
+        if (gameMode == GameMode.LOCAL_MULTIPLAYER || gameMode == GameMode.HOT_SEAT) {
+            return 2;
+        }
+        return 1; // Single player modes default to 1
     }
     
     @Override

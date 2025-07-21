@@ -131,6 +131,134 @@ public interface GameModule {
         return true;
     }
     
+    // ==================== ENHANCED SUPPORT METHODS ====================
+    // These methods allow games to specify exactly what they support
+    
+    /**
+     * Gets the list of supported game modes for this game.
+     * @return Array of supported game modes
+     */
+    default com.game.enums.GameMode[] getSupportedGameModes() {
+        // Default implementation based on the old boolean methods
+        java.util.List<com.game.enums.GameMode> modes = new java.util.ArrayList<>();
+        
+        if (supportsSinglePlayer()) {
+            modes.add(com.game.enums.GameMode.SINGLE_PLAYER);
+        }
+        if (supportsLocalMultiplayer()) {
+            modes.add(com.game.enums.GameMode.LOCAL_MULTIPLAYER);
+        }
+        if (supportsOnlineMultiplayer()) {
+            modes.add(com.game.enums.GameMode.ONLINE_MULTIPLAYER);
+        }
+        
+        return modes.toArray(new com.game.enums.GameMode[0]);
+    }
+    
+    /**
+     * Gets the list of supported difficulty levels for this game.
+     * @return Array of supported difficulty levels
+     */
+    default com.game.enums.GameDifficulty[] getSupportedDifficulties() {
+        // Default to all difficulties
+        return com.game.enums.GameDifficulty.values();
+    }
+    
+    /**
+     * Gets the supported player count ranges for each game mode.
+     * @return Map of game mode to player count range (min, max)
+     */
+    default java.util.Map<com.game.enums.GameMode, int[]> getSupportedPlayerCounts() {
+        java.util.Map<com.game.enums.GameMode, int[]> playerCounts = new java.util.HashMap<>();
+        
+        // Default implementation based on min/max players
+        int minPlayers = getMinPlayers();
+        int maxPlayers = getMaxPlayers();
+        
+        for (com.game.enums.GameMode mode : getSupportedGameModes()) {
+            playerCounts.put(mode, new int[]{minPlayers, maxPlayers});
+        }
+        
+        return playerCounts;
+    }
+    
+    /**
+     * Gets the default game mode for this game.
+     * @return The default game mode
+     */
+    default com.game.enums.GameMode getDefaultGameMode() {
+        com.game.enums.GameMode[] supportedModes = getSupportedGameModes();
+        if (supportedModes.length > 0) {
+            return supportedModes[0];
+        }
+        return com.game.enums.GameMode.SINGLE_PLAYER;
+    }
+    
+    /**
+     * Gets the default difficulty for this game.
+     * @return The default difficulty
+     */
+    default com.game.enums.GameDifficulty getDefaultDifficulty() {
+        return getDifficulty(); // Use the existing method
+    }
+    
+    /**
+     * Gets the default player count for a specific game mode.
+     * @param gameMode The game mode
+     * @return The default player count for that mode
+     */
+    default int getDefaultPlayerCount(com.game.enums.GameMode gameMode) {
+        java.util.Map<com.game.enums.GameMode, int[]> playerCounts = getSupportedPlayerCounts();
+        int[] range = playerCounts.get(gameMode);
+        if (range != null) {
+            return range[0]; // Return minimum as default
+        }
+        return getMinPlayers();
+    }
+    
+    /**
+     * Checks if a specific game mode is supported.
+     * @param gameMode The game mode to check
+     * @return true if the game mode is supported
+     */
+    default boolean supportsGameMode(com.game.enums.GameMode gameMode) {
+        for (com.game.enums.GameMode supportedMode : getSupportedGameModes()) {
+            if (supportedMode == gameMode) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Checks if a specific difficulty is supported.
+     * @param difficulty The difficulty to check
+     * @return true if the difficulty is supported
+     */
+    default boolean supportsDifficulty(com.game.enums.GameDifficulty difficulty) {
+        for (com.game.enums.GameDifficulty supportedDifficulty : getSupportedDifficulties()) {
+            if (supportedDifficulty == difficulty) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Checks if a specific player count is supported for a game mode.
+     * @param gameMode The game mode
+     * @param playerCount The player count to check
+     * @return true if the player count is supported for that mode
+     */
+    default boolean supportsPlayerCount(com.game.enums.GameMode gameMode, int playerCount) {
+        java.util.Map<com.game.enums.GameMode, int[]> playerCounts = getSupportedPlayerCounts();
+        int[] range = playerCounts.get(gameMode);
+        if (range != null) {
+            return playerCount >= range[0] && playerCount <= range[1];
+        }
+        return false;
+    }
+    
     /**
      * Gets the game's icon path (relative to resources).
      * @return Path to the game icon

@@ -157,16 +157,52 @@ public class GDKGameLobbyController implements Initializable {
         });
         gameSelector.setButtonCell(gameSelector.getCellFactory().call(null));
         
-        // Set up game mode combo box
-        gameModeComboBox.setItems(FXCollections.observableArrayList(GameMode.values()));
-        gameModeComboBox.setValue(GameMode.LOCAL_MULTIPLAYER);
+        // Set up game mode combo box (will be populated when game is selected)
+        gameModeComboBox.setItems(FXCollections.observableArrayList());
         
-        // Set up player count spinner
+        // Add tooltip to show game mode descriptions
+        gameModeComboBox.setCellFactory(param -> new ListCell<GameMode>() {
+            @Override
+            protected void updateItem(GameMode item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setTooltip(null);
+                } else {
+                    setText(item.toString()); // Uses the enhanced toString() method
+                    setTooltip(new Tooltip(item.getDescription()));
+                }
+            }
+        });
+        gameModeComboBox.setButtonCell(gameModeComboBox.getCellFactory().call(null));
+        
+        // Set up player count spinner (will be configured when game is selected)
         playerCountSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 8, 2));
         
-        // Set up difficulty combo box
-        difficultyComboBox.setItems(FXCollections.observableArrayList("Easy", "Medium", "Hard"));
-        difficultyComboBox.setValue("Medium");
+        // Set up difficulty combo box (will be populated when game is selected)
+        difficultyComboBox.setItems(FXCollections.observableArrayList());
+        
+        // Add tooltip to show difficulty descriptions
+        difficultyComboBox.setCellFactory(param -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setTooltip(null);
+                } else {
+                    setText(item);
+                    // Find the corresponding GameDifficulty and set tooltip
+                    for (GameDifficulty difficulty : GameDifficulty.values()) {
+                        if (difficulty.getDisplayName().equals(item)) {
+                            setTooltip(new Tooltip(difficulty.getDescription()));
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+        difficultyComboBox.setButtonCell(difficultyComboBox.getCellFactory().call(null));
         
         // Set up log area
         logArea.setEditable(false);
@@ -182,7 +218,10 @@ public class GDKGameLobbyController implements Initializable {
         
         // Update player count limits when game mode changes
         gameModeComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            updatePlayerCountLimits();
+            if (newVal != null) {
+                updatePlayerCountLimits();
+                logArea.appendText("🎮 Switched to " + newVal.getDisplayName() + " mode\n");
+            }
         });
     }
     
@@ -247,25 +286,90 @@ public class GDKGameLobbyController implements Initializable {
                 Logging.info("No custom icon found for " + selectedGame.getGameName());
             }
             
+            // Update game mode options based on what the game supports
+            updateGameModeOptions();
+            
+            // Update difficulty options based on what the game supports
+            updateDifficultyOptions();
+            
+            // Update player count limits
             updatePlayerCountLimits();
+            
+            logArea.appendText("🎮 Loaded game options for " + selectedGame.getGameName() + "\n");
         } else {
             gameTitleLabel.setText("Select a Game");
             gameDescriptionLabel.setText("Choose a game from the dropdown to get started...");
             gameIconImageView.setImage(null);
+            
+            // Clear all options
+            gameModeComboBox.getItems().clear();
+            difficultyComboBox.getItems().clear();
+            playerCountSpinner.getValueFactory().setValue(1);
+        }
+    }
+    
+    private void updateGameModeOptions() {
+        if (selectedGame != null) {
+            GameMode[] supportedModes = selectedGame.getSupportedGameModes();
+            ObservableList<GameMode> modeOptions = FXCollections.observableArrayList(supportedModes);
+            gameModeComboBox.setItems(modeOptions);
+            
+            // Set default game mode
+            GameMode defaultMode = selectedGame.getDefaultGameMode();
+            if (modeOptions.contains(defaultMode)) {
+                gameModeComboBox.setValue(defaultMode);
+            } else if (!modeOptions.isEmpty()) {
+                gameModeComboBox.setValue(modeOptions.get(0));
+            }
+            
+            logArea.appendText("🎮 Supported game modes: " + modeOptions.size() + " modes\n");
+        }
+    }
+    
+    private void updateDifficultyOptions() {
+        if (selectedGame != null) {
+            GameDifficulty[] supportedDifficulties = selectedGame.getSupportedDifficulties();
+            ObservableList<String> difficultyOptions = FXCollections.observableArrayList();
+            
+            for (GameDifficulty difficulty : supportedDifficulties) {
+                difficultyOptions.add(difficulty.getDisplayName());
+            }
+            
+            difficultyComboBox.setItems(difficultyOptions);
+            
+            // Set default difficulty
+            GameDifficulty defaultDifficulty = selectedGame.getDefaultDifficulty();
+            String defaultDifficultyName = defaultDifficulty.getDisplayName();
+            if (difficultyOptions.contains(defaultDifficultyName)) {
+                difficultyComboBox.setValue(defaultDifficultyName);
+            } else if (!difficultyOptions.isEmpty()) {
+                difficultyComboBox.setValue(difficultyOptions.get(0));
+            }
+            
+            logArea.appendText("🎮 Supported difficulties: " + difficultyOptions.size() + " levels\n");
         }
     }
     
     private void updatePlayerCountLimits() {
         if (selectedGame != null) {
-            int minPlayers = selectedGame.getMinPlayers();
-            int maxPlayers = selectedGame.getMaxPlayers();
-            
-            SpinnerValueFactory<Integer> factory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                minPlayers, maxPlayers, Math.max(minPlayers, playerCountSpinner.getValue())
-            );
-            playerCountSpinner.setValueFactory(factory);
-            
-            logArea.appendText("🎮 " + selectedGame.getGameName() + " supports " + minPlayers + "-" + maxPlayers + " players\n");
+            GameMode currentMode = gameModeComboBox.getValue();
+            if (currentMode != null) {
+                java.util.Map<GameMode, int[]> playerCounts = selectedGame.getSupportedPlayerCounts();
+                int[] range = playerCounts.get(currentMode);
+                
+                if (range != null) {
+                    int minPlayers = range[0];
+                    int maxPlayers = range[1];
+                    int defaultPlayers = selectedGame.getDefaultPlayerCount(currentMode);
+                    
+                    SpinnerValueFactory<Integer> factory = new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                        minPlayers, maxPlayers, defaultPlayers
+                    );
+                    playerCountSpinner.setValueFactory(factory);
+                    
+                    logArea.appendText("🎮 " + currentMode.getDisplayName() + " supports " + minPlayers + "-" + maxPlayers + " players\n");
+                }
+            }
         }
     }
     
@@ -316,12 +420,25 @@ public class GDKGameLobbyController implements Initializable {
             return;
         }
 
-        // Set default quick play settings
-        gameModeComboBox.setValue(GameMode.LOCAL_MULTIPLAYER);
-        playerCountSpinner.getValueFactory().setValue(selectedGame.getMinPlayers());
-        difficultyComboBox.setValue("Medium");
+        // Set default quick play settings based on game's defaults
+        GameMode defaultMode = selectedGame.getDefaultGameMode();
+        if (gameModeComboBox.getItems().contains(defaultMode)) {
+            gameModeComboBox.setValue(defaultMode);
+        }
+        
+        int defaultPlayerCount = selectedGame.getDefaultPlayerCount(defaultMode);
+        playerCountSpinner.getValueFactory().setValue(defaultPlayerCount);
+        
+        GameDifficulty defaultDifficulty = selectedGame.getDefaultDifficulty();
+        String defaultDifficultyName = defaultDifficulty.getDisplayName();
+        if (difficultyComboBox.getItems().contains(defaultDifficultyName)) {
+            difficultyComboBox.setValue(defaultDifficultyName);
+        }
 
-        logArea.appendText("⚡ Quick play mode activated for " + selectedGame.getGameName() + "\n");
+        logArea.appendText("⚡ Quick play mode activated for " + selectedGame.getGameName() + 
+                          " (Mode: " + defaultMode.getDisplayName() + 
+                          ", Players: " + defaultPlayerCount + 
+                          ", Difficulty: " + defaultDifficultyName + ")\n");
         
         // Launch the game with quick play settings
         launchGame();
