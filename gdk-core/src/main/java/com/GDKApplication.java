@@ -153,7 +153,7 @@ public class GDKApplication extends Application {
             // Set the scene
             primaryStage.setScene(lobbyScene);
             
-            Logging.info("✅ GDK Game Lobby loaded successfully");
+            Logging.info("✅ GDK Game Lobby loaded successfully - lobbyScene: " + (lobbyScene != null ? "created" : "null"));
             
         } catch (Exception e) {
             Logging.error("❌ Failed to load GDK Game Lobby: " + e.getMessage(), e);
@@ -323,6 +323,7 @@ public class GDKApplication extends Application {
         try {
             // Create game event handler that points to the GDK application
             GameEventHandler eventHandler = this::handleGameEvent;
+            Logging.info("🎮 Created event handler for " + selectedGame.getGameName() + " - handler: " + (eventHandler != null ? "valid" : "null"));
             
             javafx.scene.Scene gameScene = selectedGame.launchGame(primaryStage, gameMode, playerCount, options, eventHandler);
             if (gameScene != null) {
@@ -331,6 +332,7 @@ public class GDKApplication extends Application {
                 primaryStage.setScene(gameScene);
                 primaryStage.setTitle(selectedGame.getGameName() + " - GDK");
                 Logging.info("🎮 Game launched successfully - GDK event handler connected");
+                Logging.info("🎮 Current state - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getGameName() : "null"));
             } else {
                 Logging.error("❌ Failed to launch game - null scene returned");
             }
@@ -456,6 +458,7 @@ public class GDKApplication extends Application {
         switch (event.getType()) {
             case BACK_TO_LOBBY_REQUESTED:
                 Logging.info("🔙 GDK received BACK_TO_LOBBY_REQUESTED event");
+                Logging.info("🔙 Current game state - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getGameName() : "null"));
                 returnToLobby();
                 break;
             case GAME_ENDED:
@@ -482,6 +485,8 @@ public class GDKApplication extends Application {
      * Returns to the GDK lobby from a running game.
      */
     private void returnToLobby() {
+        Logging.info("🔙 returnToLobby() called - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getGameName() : "null") + ", lobbyScene: " + (lobbyScene != null ? "exists" : "null"));
+        
         if (gameIsRunning && currentGame != null) {
             Logging.info("🔙 Returning to GDK lobby");
             
@@ -490,12 +495,18 @@ public class GDKApplication extends Application {
             gameIsRunning = false;
             currentGame = null;
             
-            // Return to lobby scene
+            // Return to lobby scene - ensure we're on the JavaFX Application Thread
             if (lobbyScene != null) {
-                primaryStage.setScene(lobbyScene);
-                primaryStage.setTitle("OMG Game Development Kit");
-                Logging.info("✅ Returned to GDK lobby");
+                javafx.application.Platform.runLater(() -> {
+                    primaryStage.setScene(lobbyScene);
+                    primaryStage.setTitle("OMG Game Development Kit");
+                    Logging.info("✅ Returned to GDK lobby");
+                });
+            } else {
+                Logging.error("❌ lobbyScene is null - cannot return to lobby");
             }
+        } else {
+            Logging.warning("⚠️ Cannot return to lobby - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? "exists" : "null"));
         }
     }
     

@@ -176,11 +176,13 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button backButton = new javafx.scene.control.Button("🔙 Back to Lobby");
         backButton.setStyle("-fx-background-color: #fd7e14; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         backButton.setOnAction(e -> {
+            Logging.info("🔙 Back to Lobby button clicked in Example Game");
             eventHandler.handleGameEvent(new com.game.GameEvent(
                 com.game.GameEvent.EventType.BACK_TO_LOBBY_REQUESTED,
                 getGameId(),
                 "User requested to return to lobby"
             ));
+            Logging.info("🔙 BACK_TO_LOBBY_REQUESTED event sent from Example Game");
         });
         
         // Instructions
