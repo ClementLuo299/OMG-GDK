@@ -18,6 +18,7 @@ import java.io.StringWriter;
 import java.util.Optional;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import com.gdk.shared.utils.error_handling.Logging;
 
 /**
  * Dialog utility for the application.

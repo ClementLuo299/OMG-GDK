@@ -1,14 +1,14 @@
 package com;
 
-import com.game.GameModule;
+import com.gdk.shared.game.GameModule;
 import com.gdk.shared.enums.GameDifficulty;
 import com.gdk.shared.enums.GameMode;
 import com.gdk.shared.settings.GameSettings;
-import com.game.GameOptions;
-import com.game.GameEventHandler;
-import com.game.GameEvent;
-import com.utils.ModuleLoader;
-import com.utils.error_handling.Logging;
+import com.gdk.shared.game.GameOptions;
+import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.game.GameEvent;
+import com.gdk.shared.utils.ModuleLoader;
+import com.gdk.shared.utils.error_handling.Logging;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;

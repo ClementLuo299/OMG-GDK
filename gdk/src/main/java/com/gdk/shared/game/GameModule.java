@@ -1,27 +1,18 @@
-package com.game;
+package com.gdk.shared.game;
 
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import com.gdk.shared.enums.GameMode;
 import com.gdk.shared.enums.GameDifficulty;
 import com.gdk.shared.settings.GameSettings;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
- * Interface for game modules with single-point communication.
- * 
- * Core Communication:
- * - Games communicate with GDK through GameEventHandler only
- * - All game events sent via eventHandler.handleGameEvent(GameEvent)
- * - GDK controls games through the launchGame method
- * 
- * Default Implementations:
- * - Most methods have sensible defaults
- * - Games can override defaults or communicate via events
- * - Minimal interface requirements for new games
+ * Core interface that all game modules must implement.
+ * Defines the contract between the GDK and game modules.
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited July 20, 2025
+ * @edited July 21, 2025
  * @since 1.0
  */
 public interface GameModule {

@@ -12,17 +12,17 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>gdk-core</artifactId>
+    <artifactId>launcher</artifactId>
     <packaging>jar</packaging>
 
-    <name>GDK Core</name>
-    <description>Core functionality for the OMG Game Development Kit</description>
+    <name>GDK Launcher</name>
+    <description>Launcher application for the OMG Game Development Kit</description>
 
     <dependencies>
-        <!-- GDK Shared Library -->
+        <!-- GDK Library -->
         <dependency>
             <groupId>com.omg</groupId>
-            <artifactId>gdk-shared</artifactId>
+            <artifactId>gdk</artifactId>
             <version>1.0.0</version>
         </dependency>
         

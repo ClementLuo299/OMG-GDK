@@ -1,12 +1,12 @@
 package com;
 
-import com.game.GameModule;
+import com.gdk.shared.game.GameModule;
 import com.gdk.shared.enums.GameMode;
-import com.game.GameOptions;
-import com.game.GameEvent;
-import com.game.GameEventHandler;
-import com.utils.ModuleLoader;
-import com.utils.error_handling.Logging;
+import com.gdk.shared.game.GameOptions;
+import com.gdk.shared.game.GameEvent;
+import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.utils.ModuleLoader;
+import com.gdk.shared.utils.error_handling.Logging;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -453,9 +453,9 @@ public class GDKApplication extends Application {
      * This method is called by games to communicate state changes.
      */
     private void handleGameEvent(GameEvent event) {
-        Logging.info("🎮 Game Event: " + event.getType() + " - " + event.getMessage());
+        Logging.info("🎮 Game Event: " + event.getEventType() + " - " + event.getMessage());
         
-        switch (event.getType()) {
+        switch (event.getEventType()) {
             case BACK_TO_LOBBY_REQUESTED:
                 Logging.info("🔙 GDK received BACK_TO_LOBBY_REQUESTED event");
                 Logging.info("🔙 Current game state - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getGameName() : "null"));

@@ -1,12 +1,13 @@
 package com.games.modules.tictactoe;
 
-import com.game.GameModule;
+import com.gdk.shared.game.GameModule;
 import com.gdk.shared.enums.GameDifficulty;
 import com.gdk.shared.enums.GameMode;
-import com.game.GameOptions;
-import com.game.GameState;
-import com.game.GameEventHandler;
-import com.utils.error_handling.Logging;
+import com.gdk.shared.game.GameOptions;
+import com.gdk.shared.game.GameState;
+import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.utils.error_handling.Logging;
+import com.games.modules.tictactoe.TicTacToeModule;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 

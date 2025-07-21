@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 import com.utils.error_handling.enums.ErrorCategory;
 import com.utils.error_handling.enums.ErrorSeverity;
+import com.gdk.shared.utils.error_handling.Logging;
 
 /**
  * Core error handling utility for the application.
@@ -114,14 +115,11 @@ public final class ErrorHandler {
         errorContext.put("errorSeverity", severity.name());
         errorContext.put("isCritical", String.valueOf(isCritical));
 
-        // Set MDC context and log the error
-        Logging.setMDC(errorContext);
-        
         // Log the error with context
         if (isCritical) {
-            Logging.fatal(userMessage, throwable);
+            Logging.error(userMessage, throwable);
         } else {
-            Logging.warning(userMessage, throwable);
+            Logging.warning(userMessage + ": " + throwable.getMessage());
         }
 
         // Show appropriate dialog based on severity and criticality
@@ -144,8 +142,7 @@ public final class ErrorHandler {
             }
         }
         
-        // Clear MDC context
-        Logging.clearMDC();
+        // Removed Logging.clearMDC() call
     }
 
     //endregion
@@ -234,11 +231,9 @@ public final class ErrorHandler {
      * @param context additional context information
      */
     public static void reportError(Throwable throwable, Map<String, String> context) {
-        Logging.setMDC(context);
         Logging.error("Error reported for analytics", throwable);
         // Here you could add integration with error reporting services
         // like Sentry, LogRocket, or custom analytics
-        Logging.clearMDC();
     }
 
     /**
@@ -281,16 +276,8 @@ public final class ErrorHandler {
     public static void handleValidationError(String field, String value, String reason) {
         String userMessage = String.format("Invalid value for '%s': %s. %s", field, value, reason);
         
-        Map<String, String> context = Map.of(
-            "validationField", field,
-            "validationValue", value,
-            "validationReason", reason
-        );
-
-        Logging.setMDC(context);
-        Logging.logValidationError(field, value, reason);
+        Logging.warning(field + " validation failed: " + value + " (" + reason + ")");
         Dialog.showWarning("Validation Error", userMessage, null);
-        Logging.clearMDC();
     }
 
     /**
@@ -309,14 +296,8 @@ public final class ErrorHandler {
                 error.getField(), error.getValue(), error.getReason()));
         }
 
-        Map<String, String> context = Map.of(
-            "validationErrorCount", String.valueOf(validationErrors.size())
-        );
-
-        Logging.setMDC(context);
         Logging.warning("Multiple validation errors: " + message.toString());
         Dialog.showWarning("Validation Errors", message.toString(), null);
-        Logging.clearMDC();
     }
 
     /**

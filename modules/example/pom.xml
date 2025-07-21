@@ -19,17 +19,17 @@
     <description>Example game module for testing game communication</description>
 
     <dependencies>
-        <!-- GDK Shared Library -->
+        <!-- GDK Library -->
         <dependency>
             <groupId>com.omg</groupId>
-            <artifactId>gdk-shared</artifactId>
+            <artifactId>gdk</artifactId>
             <version>1.0.0</version>
         </dependency>
         
-        <!-- GDK Core -->
+        <!-- GDK Launcher -->
         <dependency>
             <groupId>com.omg</groupId>
-            <artifactId>gdk-core</artifactId>
+            <artifactId>launcher</artifactId>
             <version>1.0.0</version>
         </dependency>
         

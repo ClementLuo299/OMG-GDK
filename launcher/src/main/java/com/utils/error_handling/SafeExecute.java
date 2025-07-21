@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import com.gdk.shared.utils.error_handling.Logging;
 
 /**
  * Safe execution utility for the application.
@@ -557,7 +558,7 @@ public final class SafeExecute {
             T result = task.call();
             long duration = System.currentTimeMillis() - startTime;
             // Log successful operation performance
-            Logging.logPerformance(operationName, duration);
+            Logging.info("Operation '" + operationName + "' completed in " + duration + "ms");
             return result;
         } catch (Exception e) {
             // Calculate duration even for failed operations
@@ -699,12 +700,11 @@ public final class SafeExecute {
      */
     public static <T> T executeWithContext(Callable<T> task, String errorMessage, 
                                          String context) {
-        // Log task start with context for better traceability
-        Logging.debugWithContext("Executing task", context);
+        // Removed Logging.debugWithContext, Logging.executeWithMDC, and Logging.logWithMDC calls
         try {
             // Execute the task and log successful completion
             T result = task.call();
-            Logging.debugWithContext("Task completed successfully", context);
+            Logging.info("Task completed successfully in context: " + context);
             return result;
         } catch (Exception e) {
             // Log detailed error with context information
@@ -726,11 +726,11 @@ public final class SafeExecute {
     public static <T> T executeWithMDC(Callable<T> task, String errorMessage, 
                                      Map<String, String> context) {
         try {
-            // Execute the task with MDC context using the Logging utility
-            return Logging.executeWithMDC(context, task);
+            // Execute the task (no MDC support in Logging)
+            return task.call();
         } catch (Exception e) {
-            // Log the error with MDC context information
-            Logging.logWithMDC("ERROR", "Task failed with context: " + context, e);
+            // Log the error with context information
+            Logging.error("Task failed with context: " + context, e);
             ErrorHandler.handleNonCriticalError(e, errorMessage + " (context: " + context + ")");
             return null;
         }

@@ -11,9 +11,9 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>gdk-shared</artifactId>
-    <name>GDK Shared Library</name>
-    <description>Shared enums, interfaces, and utilities for the GDK</description>
+    <artifactId>gdk</artifactId>
+    <name>GDK Library</name>
+    <description>Game Development Kit library with shared enums, interfaces, and utilities</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -26,6 +26,24 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
+            <version>17.0.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>17.0.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>17.0.2</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
             <version>17.0.2</version>
         </dependency>
         

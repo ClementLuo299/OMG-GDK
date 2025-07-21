@@ -1,12 +1,12 @@
 package com.games.modules.example;
 
-import com.game.GameModule;
+import com.gdk.shared.game.GameModule;
 import com.gdk.shared.enums.GameDifficulty;
 import com.gdk.shared.enums.GameMode;
 import com.gdk.shared.settings.GameSettings;
-import com.game.GameOptions;
-import com.game.GameState;
-import com.utils.error_handling.Logging;
+import com.gdk.shared.game.GameOptions;
+import com.gdk.shared.game.GameState;
+import com.gdk.shared.utils.error_handling.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -150,7 +150,7 @@ public class ExampleGameModule implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, com.game.GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, com.gdk.shared.game.GameEventHandler eventHandler) {
         Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
         
         try {
@@ -166,7 +166,7 @@ public class ExampleGameModule implements GameModule {
     /**
      * Creates a simple test interface to demonstrate game communication.
      */
-    private Scene createTestInterface(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, com.game.GameEventHandler eventHandler) {
+    private Scene createTestInterface(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, com.gdk.shared.game.GameEventHandler eventHandler) {
         javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
         root.setPadding(new javafx.geometry.Insets(20));
         root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
@@ -186,8 +186,8 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button startButton = new javafx.scene.control.Button("🚀 Start Game");
         startButton.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         startButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.game.GameEvent(
-                com.game.GameEvent.EventType.GAME_STARTED,
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.GAME_STARTED,
                 getGameId(),
                 "Example game started with " + playerCount + " players in " + gameMode.getDisplayName() + " mode"
             ));
@@ -196,8 +196,8 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button moveButton = new javafx.scene.control.Button("🎯 Make Move");
         moveButton.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         moveButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.game.GameEvent(
-                com.game.GameEvent.EventType.MOVE_MADE,
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.MOVE_MADE,
                 getGameId(),
                 "Player made a test move",
                 "Test move data"
@@ -207,8 +207,8 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button turnButton = new javafx.scene.control.Button("🔄 Change Turn");
         turnButton.setStyle("-fx-background-color: #ffc107; -fx-text-fill: #212529; -fx-padding: 10 20; -fx-cursor: hand;");
         turnButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.game.GameEvent(
-                com.game.GameEvent.EventType.PLAYER_TURN_CHANGED,
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.PLAYER_TURN_CHANGED,
                 getGameId(),
                 "Turn changed to next player"
             ));
@@ -217,8 +217,8 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button messageButton = new javafx.scene.control.Button("💬 Send Message");
         messageButton.setStyle("-fx-background-color: #6f42c1; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         messageButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.game.GameEvent(
-                com.game.GameEvent.EventType.MOVE_MADE,
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.MOVE_MADE,
                 getGameId(),
                 "Test message from example game: " + java.time.LocalTime.now()
             ));
@@ -227,8 +227,8 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button errorButton = new javafx.scene.control.Button("❌ Simulate Error");
         errorButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         errorButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.game.GameEvent(
-                com.game.GameEvent.EventType.ERROR_OCCURRED,
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.ERROR_OCCURRED,
                 getGameId(),
                 "Simulated error for testing error handling"
             ));
@@ -237,8 +237,8 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button endButton = new javafx.scene.control.Button("🏁 End Game");
         endButton.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         endButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.game.GameEvent(
-                com.game.GameEvent.EventType.GAME_ENDED,
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.GAME_ENDED,
                 getGameId(),
                 "Example game ended - test completed"
             ));
@@ -295,8 +295,8 @@ public class ExampleGameModule implements GameModule {
         backButton.setStyle("-fx-background-color: #fd7e14; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         backButton.setOnAction(e -> {
             Logging.info("🔙 Back to Lobby button clicked in Example Game");
-            eventHandler.handleGameEvent(new com.game.GameEvent(
-                com.game.GameEvent.EventType.BACK_TO_LOBBY_REQUESTED,
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.BACK_TO_LOBBY_REQUESTED,
                 getGameId(),
                 "User requested to return to lobby"
             ));
@@ -318,8 +318,8 @@ public class ExampleGameModule implements GameModule {
         );
         
         // Send game started event immediately
-        eventHandler.handleGameEvent(new com.game.GameEvent(
-            com.game.GameEvent.EventType.GAME_STARTED,
+        eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+            com.gdk.shared.game.GameEvent.EventType.GAME_STARTED,
             getGameId(),
             "Example game test interface loaded"
         ));

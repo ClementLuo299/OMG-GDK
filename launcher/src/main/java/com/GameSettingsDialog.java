@@ -2,7 +2,7 @@ package com;
 
 import com.gdk.shared.settings.GameSetting;
 import com.gdk.shared.settings.GameSettings;
-import com.utils.error_handling.Logging;
+import com.gdk.shared.utils.error_handling.Logging;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

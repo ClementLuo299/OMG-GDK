@@ -26,17 +26,17 @@
     </properties>
 
     <dependencies>
-        <!-- GDK Shared Library -->
+        <!-- GDK Library -->
         <dependency>
             <groupId>com.omg</groupId>
-            <artifactId>gdk-shared</artifactId>
+            <artifactId>gdk</artifactId>
             <version>${project.version}</version>
         </dependency>
         
-        <!-- Core GDK dependencies -->
+        <!-- GDK Launcher dependencies -->
         <dependency>
             <groupId>com.omg</groupId>
-            <artifactId>gdk-core</artifactId>
+            <artifactId>launcher</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

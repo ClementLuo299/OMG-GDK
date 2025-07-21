@@ -8,12 +8,12 @@ import java.util.ResourceBundle;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-import com.game.GameOptions;
-import com.game.GameState;
-import com.game.GameEventHandler;
-import com.game.GameEvent;
+import com.gdk.shared.game.GameOptions;
+import com.gdk.shared.game.GameState;
+import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.game.GameEvent;
 import com.gdk.shared.enums.GameMode;
-import com.utils.error_handling.Logging;
+import com.gdk.shared.utils.error_handling.Logging;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
