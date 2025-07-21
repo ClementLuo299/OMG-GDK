@@ -26,6 +26,13 @@
     </properties>
 
     <dependencies>
+        <!-- GDK Shared Library -->
+        <dependency>
+            <groupId>com.omg</groupId>
+            <artifactId>gdk-shared</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         <!-- Core GDK dependencies -->
         <dependency>
             <groupId>com.omg</groupId>

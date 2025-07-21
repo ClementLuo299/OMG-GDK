@@ -14,6 +14,7 @@
     <description>A simple Game Development Kit for testing and running game modules</description>
     
     <modules>
+        <module>gdk-shared</module>
         <module>gdk-core</module>
         <module>modules/tictactoe</module>
         <module>modules/example</module>

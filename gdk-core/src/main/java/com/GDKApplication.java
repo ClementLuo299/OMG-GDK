@@ -1,7 +1,7 @@
 package com;
 
 import com.game.GameModule;
-import com.game.enums.GameMode;
+import com.gdk.shared.enums.GameMode;
 import com.game.GameOptions;
 import com.game.GameEvent;
 import com.game.GameEventHandler;

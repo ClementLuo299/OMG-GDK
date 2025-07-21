@@ -1,4 +1,4 @@
-package com.game.enums;
+package com.gdk.shared.enums;
 
 /**
  * Game difficulty levels.

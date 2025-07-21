@@ -19,6 +19,13 @@
     <description>Core functionality for the OMG Game Development Kit</description>
 
     <dependencies>
+        <!-- GDK Shared Library -->
+        <dependency>
+            <groupId>com.omg</groupId>
+            <artifactId>gdk-shared</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        
         <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>

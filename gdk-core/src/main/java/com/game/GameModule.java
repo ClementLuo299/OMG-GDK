@@ -2,6 +2,9 @@ package com.game;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import com.gdk.shared.enums.GameMode;
+import com.gdk.shared.enums.GameDifficulty;
+import com.gdk.shared.settings.GameSettings;
 
 /**
  * Interface for game modules with single-point communication.
@@ -39,13 +42,13 @@ public interface GameModule {
      * Launches the game with single-point communication.
      * 
      * @param primaryStage The primary JavaFX stage
-     * @param gameMode The game mode (SINGLE_PLAYER, LOCAL_MULTIPLAYER, ONLINE_MULTIPLAYER)
+     * @param gameMode The game mode
      * @param playerCount Number of players
      * @param gameOptions Additional game-specific options
      * @param eventHandler Single communication channel for game events
      * @return The game scene
      */
-    Scene launchGame(Stage primaryStage, com.game.enums.GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler);
+    Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler);
     
     /**
      * Called when the game is being closed.
@@ -95,8 +98,8 @@ public interface GameModule {
      * Gets the difficulty level of the game.
      * @return Game difficulty
      */
-    default com.game.enums.GameDifficulty getDifficulty() {
-        return com.game.enums.GameDifficulty.MEDIUM;
+    default GameDifficulty getDifficulty() {
+        return GameDifficulty.MEDIUM;
     }
     
     /**
@@ -138,44 +141,44 @@ public interface GameModule {
      * Gets the list of supported game modes for this game.
      * @return Array of supported game modes
      */
-    default com.game.enums.GameMode[] getSupportedGameModes() {
+    default GameMode[] getSupportedGameModes() {
         // Default implementation based on the old boolean methods
-        java.util.List<com.game.enums.GameMode> modes = new java.util.ArrayList<>();
+        java.util.List<GameMode> modes = new java.util.ArrayList<>();
         
         if (supportsSinglePlayer()) {
-            modes.add(com.game.enums.GameMode.SINGLE_PLAYER);
+            modes.add(GameMode.SINGLE_PLAYER);
         }
         if (supportsLocalMultiplayer()) {
-            modes.add(com.game.enums.GameMode.LOCAL_MULTIPLAYER);
+            modes.add(GameMode.LOCAL_MULTIPLAYER);
         }
         if (supportsOnlineMultiplayer()) {
-            modes.add(com.game.enums.GameMode.ONLINE_MULTIPLAYER);
+            modes.add(GameMode.ONLINE_MULTIPLAYER);
         }
         
-        return modes.toArray(new com.game.enums.GameMode[0]);
+        return modes.toArray(new GameMode[0]);
     }
     
     /**
      * Gets the list of supported difficulty levels for this game.
      * @return Array of supported difficulty levels
      */
-    default com.game.enums.GameDifficulty[] getSupportedDifficulties() {
+    default GameDifficulty[] getSupportedDifficulties() {
         // Default to all difficulties
-        return com.game.enums.GameDifficulty.values();
+        return GameDifficulty.values();
     }
     
     /**
      * Gets the supported player count ranges for each game mode.
      * @return Map of game mode to player count range (min, max)
      */
-    default java.util.Map<com.game.enums.GameMode, int[]> getSupportedPlayerCounts() {
-        java.util.Map<com.game.enums.GameMode, int[]> playerCounts = new java.util.HashMap<>();
+    default java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
+        java.util.Map<GameMode, int[]> playerCounts = new java.util.HashMap<>();
         
         // Default implementation based on min/max players
         int minPlayers = getMinPlayers();
         int maxPlayers = getMaxPlayers();
         
-        for (com.game.enums.GameMode mode : getSupportedGameModes()) {
+        for (GameMode mode : getSupportedGameModes()) {
             playerCounts.put(mode, new int[]{minPlayers, maxPlayers});
         }
         
@@ -186,19 +189,19 @@ public interface GameModule {
      * Gets the default game mode for this game.
      * @return The default game mode
      */
-    default com.game.enums.GameMode getDefaultGameMode() {
-        com.game.enums.GameMode[] supportedModes = getSupportedGameModes();
+    default GameMode getDefaultGameMode() {
+        GameMode[] supportedModes = getSupportedGameModes();
         if (supportedModes.length > 0) {
             return supportedModes[0];
         }
-        return com.game.enums.GameMode.SINGLE_PLAYER;
+        return GameMode.SINGLE_PLAYER;
     }
     
     /**
      * Gets the default difficulty for this game.
      * @return The default difficulty
      */
-    default com.game.enums.GameDifficulty getDefaultDifficulty() {
+    default GameDifficulty getDefaultDifficulty() {
         return getDifficulty(); // Use the existing method
     }
     
@@ -207,8 +210,8 @@ public interface GameModule {
      * @param gameMode The game mode
      * @return The default player count for that mode
      */
-    default int getDefaultPlayerCount(com.game.enums.GameMode gameMode) {
-        java.util.Map<com.game.enums.GameMode, int[]> playerCounts = getSupportedPlayerCounts();
+    default int getDefaultPlayerCount(GameMode gameMode) {
+        java.util.Map<GameMode, int[]> playerCounts = getSupportedPlayerCounts();
         int[] range = playerCounts.get(gameMode);
         if (range != null) {
             return range[0]; // Return minimum as default
@@ -221,8 +224,8 @@ public interface GameModule {
      * @param gameMode The game mode to check
      * @return true if the game mode is supported
      */
-    default boolean supportsGameMode(com.game.enums.GameMode gameMode) {
-        for (com.game.enums.GameMode supportedMode : getSupportedGameModes()) {
+    default boolean supportsGameMode(GameMode gameMode) {
+        for (GameMode supportedMode : getSupportedGameModes()) {
             if (supportedMode == gameMode) {
                 return true;
             }
@@ -235,8 +238,8 @@ public interface GameModule {
      * @param difficulty The difficulty to check
      * @return true if the difficulty is supported
      */
-    default boolean supportsDifficulty(com.game.enums.GameDifficulty difficulty) {
-        for (com.game.enums.GameDifficulty supportedDifficulty : getSupportedDifficulties()) {
+    default boolean supportsDifficulty(GameDifficulty difficulty) {
+        for (GameDifficulty supportedDifficulty : getSupportedDifficulties()) {
             if (supportedDifficulty == difficulty) {
                 return true;
             }
@@ -250,13 +253,41 @@ public interface GameModule {
      * @param playerCount The player count to check
      * @return true if the player count is supported for that mode
      */
-    default boolean supportsPlayerCount(com.game.enums.GameMode gameMode, int playerCount) {
-        java.util.Map<com.game.enums.GameMode, int[]> playerCounts = getSupportedPlayerCounts();
+    default boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
+        java.util.Map<GameMode, int[]> playerCounts = getSupportedPlayerCounts();
         int[] range = playerCounts.get(gameMode);
         if (range != null) {
             return playerCount >= range[0] && playerCount <= range[1];
         }
         return false;
+    }
+    
+    // ==================== CUSTOM SETTINGS SUPPORT ====================
+    
+    /**
+     * Gets the custom settings for this game.
+     * Games can override this to provide custom configuration options.
+     * @return The game settings, or null if no custom settings
+     */
+    default GameSettings getCustomSettings() {
+        return null; // Default: no custom settings
+    }
+    
+    /**
+     * Checks if this game has custom settings.
+     * @return true if the game has custom settings
+     */
+    default boolean hasCustomSettings() {
+        return getCustomSettings() != null;
+    }
+    
+    /**
+     * Gets the number of custom settings for this game.
+     * @return The number of custom settings
+     */
+    default int getCustomSettingsCount() {
+        GameSettings settings = getCustomSettings();
+        return settings != null ? settings.getCustomSettings().size() : 0;
     }
     
     /**
@@ -288,7 +319,7 @@ public interface GameModule {
      * @return Game state object
      */
     default GameState getGameState() {
-        return new GameState(getGameId(), getGameName(), com.game.enums.GameMode.LOCAL_MULTIPLAYER, 2, new GameOptions());
+        return new GameState(getGameId(), getGameName(), GameMode.LOCAL_MULTIPLAYER, 2, new GameOptions());
     }
     
     /**

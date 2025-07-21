@@ -1,8 +1,9 @@
 package com;
 
 import com.game.GameModule;
-import com.game.enums.GameDifficulty;
-import com.game.enums.GameMode;
+import com.gdk.shared.enums.GameDifficulty;
+import com.gdk.shared.enums.GameMode;
+import com.gdk.shared.settings.GameSettings;
 import com.game.GameOptions;
 import com.game.GameEventHandler;
 import com.game.GameEvent;
@@ -54,6 +55,7 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private ComboBox<String> difficultyComboBox;
     @FXML private Button launchGameButton;
     @FXML private Button quickPlayButton;
+    @FXML private Button settingsButton;
     @FXML private TextArea logArea;
     
     // ==================== DEPENDENCIES ====================
@@ -245,6 +247,9 @@ public class GDKGameLobbyController implements Initializable {
         
         // Quick play button
         quickPlayButton.setOnAction(e -> quickPlay());
+        
+        // Settings button
+        settingsButton.setOnAction(e -> openGameSettings());
     }
     
     // ==================== GAME MANAGEMENT ====================
@@ -452,5 +457,37 @@ public class GDKGameLobbyController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+    
+    /**
+     * Opens the game settings dialog for the selected game.
+     */
+    private void openGameSettings() {
+        if (selectedGame == null) {
+            showError("No Game Selected", "Please select a game to configure settings.");
+            return;
+        }
+        
+        if (!selectedGame.hasCustomSettings()) {
+            showError("No Custom Settings", "This game doesn't have any custom settings to configure.");
+            return;
+        }
+        
+        try {
+            GameSettings gameSettings = selectedGame.getCustomSettings();
+            GameSettingsDialog dialog = new GameSettingsDialog(primaryStage, gameSettings);
+            
+            logArea.appendText("⚙️ Opening settings for " + selectedGame.getGameName() + "\n");
+            
+            if (dialog.showAndWait()) {
+                logArea.appendText("✅ Settings configured successfully\n");
+            } else {
+                logArea.appendText("❌ Settings configuration cancelled or invalid\n");
+            }
+            
+        } catch (Exception e) {
+            Logging.error("❌ Failed to open game settings: " + e.getMessage(), e);
+            showError("Settings Error", "Failed to open game settings: " + e.getMessage());
+        }
     }
 } 

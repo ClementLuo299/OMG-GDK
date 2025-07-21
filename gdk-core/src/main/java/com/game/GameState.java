@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.game.enums.GameMode;
+import com.gdk.shared.enums.GameMode;
 
 /**
  * Represents the state of a game for saving and loading purposes.

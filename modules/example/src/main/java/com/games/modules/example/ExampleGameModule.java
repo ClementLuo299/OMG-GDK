@@ -1,8 +1,9 @@
 package com.games.modules.example;
 
 import com.game.GameModule;
-import com.game.enums.GameDifficulty;
-import com.game.enums.GameMode;
+import com.gdk.shared.enums.GameDifficulty;
+import com.gdk.shared.enums.GameMode;
+import com.gdk.shared.settings.GameSettings;
 import com.game.GameOptions;
 import com.game.GameState;
 import com.utils.error_handling.Logging;
@@ -371,6 +372,13 @@ public class ExampleGameModule implements GameModule {
             
             Logging.info("📊 Loaded example game state - Data: " + exampleData + ", Score: " + score);
         }
+    }
+    
+    // ==================== CUSTOM SETTINGS ====================
+    
+    @Override
+    public GameSettings getCustomSettings() {
+        return new ExampleGameSettings();
     }
     
     /**

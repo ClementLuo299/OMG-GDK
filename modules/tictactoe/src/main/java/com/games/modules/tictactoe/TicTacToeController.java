@@ -12,7 +12,7 @@ import com.game.GameOptions;
 import com.game.GameState;
 import com.game.GameEventHandler;
 import com.game.GameEvent;
-import com.game.enums.GameMode;
+import com.gdk.shared.enums.GameMode;
 import com.utils.error_handling.Logging;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
