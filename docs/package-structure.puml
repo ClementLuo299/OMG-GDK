@@ -1,0 +1,165 @@
+@startuml
+
+title GDK Package Structure and File Organization
+
+package "OMG-GDK" {
+    package "gdk" {
+        package "com.gdk.shared" {
+            package "game" {
+                class GameModule
+                class GameMode
+                class GameDifficulty
+                class GameOptions
+                class GameState
+                class GameEvent
+                class GameEventHandler
+                class GameModeFactory
+            }
+            
+            package "settings" {
+                class GameSettings
+                class GameSetting
+                class BooleanSetting
+                class IntegerSetting
+                class StringSetting
+            }
+            
+            package "utils" {
+                class ModuleLoader
+                package "error_handling" {
+                    class Logging
+                }
+            }
+        }
+    }
+    
+    package "launcher" {
+        package "com" {
+            class GDKApplication
+            class GDKGameLobbyController
+            class GameSettingsDialog
+            package "utils" {
+                package "error_handling" {
+                    class Dialog
+                    class ErrorHandler
+                    class SafeExecute
+                    package "enums" {
+                        class ErrorCategory
+                        class ErrorSeverity
+                    }
+                }
+            }
+        }
+        
+        package "resources" {
+            file "GDKGameLobby.fxml"
+            file "gdk-lobby.css"
+        }
+    }
+    
+    package "modules" {
+        package "example" {
+            package "com.games.modules.example" {
+                class Main
+                class GameMetadata
+                class ExampleGameModule
+                class ExampleGameSettings
+                class CustomGameModesExample
+            }
+            
+            package "resources" {
+                package "games/example" {
+                    package "css" {
+                        file "example.css"
+                    }
+                    package "fxml" {
+                        file "example.fxml"
+                    }
+                    package "icons" {
+                        file "example_icon.png"
+                    }
+                }
+            }
+        }
+        
+        package "tictactoe" {
+            package "com.games.modules.tictactoe" {
+                class Main
+                class GameMetadata
+                class TicTacToeModule
+                class TicTacToeController
+                class TicTacToeGame
+                class TicTacToePlayer
+            }
+            
+            package "resources" {
+                package "games/tictactoe" {
+                    package "css" {
+                        file "tictactoe.css"
+                    }
+                    package "fxml" {
+                        file "tictactoe.fxml"
+                    }
+                    package "icons" {
+                        file "tic_tac_toe_icon.png"
+                    }
+                    package "images" {
+                        ' Game-specific images
+                    }
+                }
+            }
+        }
+    }
+    
+    file "pom.xml"
+    file "README.md"
+    file "run.sh"
+    file "run-full.sh"
+}
+
+package "Documentation" {
+    file "docs/architecture.puml"
+    file "docs/module-structure.puml"
+    file "docs/class-hierarchy.puml"
+    file "docs/data-flow.puml"
+    file "docs/package-structure.puml"
+    file "JSON_DATA_FEATURE.md"
+    file "SCRIPT_UPDATES.md"
+}
+
+' Relationships
+gdk --> launcher : provides interfaces
+launcher --> modules : discovers and loads
+modules --> gdk : implements interfaces
+
+' Module structure
+example --> tictactoe : similar structure
+example --> gdk : implements GameModule
+tictactoe --> gdk : implements GameModule
+
+note right of gdk
+  **GDK Core (gdk module):**
+  • Core interfaces and classes
+  • Shared utilities
+  • Module loading system
+  • Settings framework
+end note
+
+note right of launcher
+  **Launcher Application:**
+  • Main application entry point
+  • UI controllers
+  • Module discovery and loading
+  • Game lifecycle management
+end note
+
+note right of modules
+  **Game Modules:**
+  • Each module follows the same structure
+  • Main class for entry point
+  • GameMetadata for configuration
+  • GameModule for implementation
+  • Resources for UI assets
+end note
+
+@enduml 

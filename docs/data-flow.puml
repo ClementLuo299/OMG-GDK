@@ -1,0 +1,97 @@
+@startuml
+
+title GDK Data Flow and Component Interactions
+
+actor User
+participant "GDKApplication" as App
+participant "GDKGameLobbyController" as Controller
+participant "ModuleLoader" as Loader
+participant "Main" as GameMain
+participant "GameMetadata" as Metadata
+participant "GameModule" as Game
+participant "GameEventHandler" as Events
+
+== Module Discovery ==
+User -> App: Start GDK
+App -> Loader: discoverModules("modules")
+Loader -> Loader: scan directories
+Loader -> GameMain: instantiate Main class
+GameMain -> Metadata: create GameMetadata
+Loader -> App: return List<GameModule>
+App -> Controller: populate game selector
+
+== Game Configuration ==
+User -> Controller: select game
+Controller -> GameMain: getSupportedGameModes()
+GameMain -> Metadata: getSupportedGameModes()
+Metadata -> Controller: return GameMode[]
+Controller -> GameMain: getSupportedDifficulties()
+GameMain -> Metadata: getSupportedDifficulties()
+Metadata -> Controller: return GameDifficulty[]
+
+User -> Controller: enter JSON data
+Controller -> Controller: validate JSON
+Controller -> Controller: parse to Map<String, Object>
+
+== Game Launch ==
+User -> Controller: click Launch
+Controller -> App: launchGame(game, mode, players, difficulty, options)
+App -> GameMain: launchGame(stage, mode, players, options, handler)
+GameMain -> GameMain: handleJsonData(options)
+note right: Process JSON data\n- Extract player names\n- Parse settings\n- Validate configuration
+
+GameMain -> Events: handleGameEvent(GAME_STARTED)
+Events -> App: notify game started
+
+GameMain -> Game: launchGame(stage, mode, players, options, handler)
+Game -> Game: create game interface
+Game -> GameMain: return Scene
+GameMain -> App: return Scene
+App -> App: set scene and show game
+
+== Game Execution ==
+User -> Game: interact with game
+Game -> Events: handleGameEvent(STATE_CHANGED)
+Events -> App: notify state change
+
+Game -> Game: update game state
+Game -> Game: save to GameState
+
+== Game Close ==
+User -> Game: close game
+Game -> GameMain: onGameClose()
+GameMain -> Game: cleanup resources
+GameMain -> Events: handleGameEvent(GAME_ENDED)
+Events -> App: notify game ended
+App -> App: returnToLobby()
+
+== JSON Data Processing ==
+note over GameMain
+  **JSON Data Handling:**
+  
+  Example Game:
+  - playerName: String
+  - level: Number
+  - settings: Map<String, Object>
+  
+  TicTacToe:
+  - player1Name: String
+  - player2Name: String
+  - aiDifficulty: String
+  - boardSize: Number
+  - gameSettings: Map<String, Object>
+end note
+
+== Event Communication ==
+note over Events
+  **Game Events:**
+  
+  GAME_STARTED: Game initialization
+  GAME_PAUSED: Game paused
+  GAME_RESUMED: Game resumed
+  GAME_ENDED: Game completion
+  ERROR_OCCURRED: Error handling
+  STATE_CHANGED: State updates
+end note
+
+@enduml 

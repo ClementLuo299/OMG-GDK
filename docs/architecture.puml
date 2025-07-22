@@ -1,0 +1,152 @@
+@startuml
+title OMG Game Development Kit (GDK) - Overall Architecture
+
+package "GDK Core" {
+    package "gdk" {
+        class GameModule {
+            +getGameId(): String
+            +getGameName(): String
+            +getGameDescription(): String
+            +launchGame(Stage, GameMode, int, GameOptions, GameEventHandler): Scene
+            +onGameClose(): void
+        }
+        
+        class GameMode {
+            +id: String
+            +displayName: String
+            +description: String
+            +getCategory(): String
+        }
+        
+        class GameDifficulty {
+            +id: String
+            +displayName: String
+            +level: int
+            +description: String
+        }
+        
+        class GameOptions {
+            +setOption(String, Object): void
+            +getOption(String, Object): Object
+            +hasOption(String): boolean
+        }
+        
+        class GameState {
+            +gameId: String
+            +status: String
+            +setStateValue(String, Object): void
+            +getStateValue(String): Object
+        }
+        
+        class GameEvent {
+            +eventType: EventType
+            +gameId: String
+            +message: String
+        }
+        
+        class ModuleLoader {
+            +discoverModules(String): List<GameModule>
+            +loadModule(File): GameModule
+            +validateModule(GameModule): boolean
+        }
+        
+        class Logging {
+            +info(String): void
+            +error(String): void
+            +warning(String): void
+            +debug(String): void
+        }
+    }
+    
+    package "launcher" {
+        class GDKApplication {
+            -gameSelector: ComboBox<GameModule>
+            -gameModeSelector: ComboBox<GameMode>
+            -currentGame: GameModule
+            +launchGame(GameModule, GameMode, int, String, GameOptions): void
+            +returnToLobby(): void
+        }
+        
+        class GDKGameLobbyController {
+            -jsonDataTextArea: TextArea
+            -validateJsonButton: Button
+            +launchGame(): void
+            +validateJsonData(): void
+        }
+        
+        class GameSettingsDialog {
+            +showDialog(GameSettings): boolean
+            +getSettings(): GameSettings
+        }
+    }
+}
+
+package "Game Modules" {
+    package "Example Module" {
+        class ExampleMain {
+            -metadata: GameMetadata
+            -gameModule: ExampleGameModule
+            +launchGame(...): Scene
+            +handleJsonData(GameOptions): void
+        }
+        
+        class ExampleGameMetadata {
+            +GAME_ID: String = "example"
+            +GAME_NAME: String = "Example Game"
+            +getSupportedGameModes(): GameMode[]
+            +getSupportedDifficulties(): GameDifficulty[]
+        }
+        
+        class ExampleGameModule {
+            +launchGame(...): Scene
+            +createTestInterface(...): Scene
+        }
+    }
+    
+    package "TicTacToe Module" {
+        class TicTacToeMain {
+            -metadata: GameMetadata
+            -gameModule: TicTacToeModule
+            +launchGame(...): Scene
+            +handleJsonData(GameOptions): void
+        }
+        
+        class TicTacToeGameMetadata {
+            +GAME_ID: String = "tictactoe"
+            +GAME_NAME: String = "Tic Tac Toe"
+            +getSupportedGameModes(): GameMode[]
+            +getSupportedDifficulties(): GameDifficulty[]
+        }
+        
+        class TicTacToeModule {
+            +launchGame(...): Scene
+            +onGameClose(): void
+        }
+    }
+}
+
+' Relationships
+GDKApplication --> GameModule : uses
+GDKApplication --> ModuleLoader : discovers
+GDKApplication --> GameEvent : handles
+GDKGameLobbyController --> GDKApplication : controls
+GameSettingsDialog --> GameSettings : configures
+
+ExampleMain --> ExampleGameMetadata : delegates metadata
+ExampleMain --> ExampleGameModule : delegates execution
+TicTacToeMain --> TicTacToeGameMetadata : delegates metadata
+TicTacToeMain --> TicTacToeModule : delegates execution
+
+ExampleMain ..|> GameModule : implements
+TicTacToeMain ..|> GameModule : implements
+ExampleGameMetadata ..|> GameModule : implements
+TicTacToeGameMetadata ..|> GameModule : implements
+
+ModuleLoader --> GameModule : loads
+GameModule --> GameMode : uses
+GameModule --> GameDifficulty : uses
+GameModule --> GameOptions : uses
+GameModule --> GameState : manages
+GameModule --> GameEventHandler : communicates
+
+@enduml 

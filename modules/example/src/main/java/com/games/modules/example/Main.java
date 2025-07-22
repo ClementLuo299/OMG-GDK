@@ -8,206 +8,329 @@ import com.gdk.shared.game.GameState;
 import com.gdk.shared.game.GameEventHandler;
 import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.util.Map;
 
 /**
- * Example game module - demonstrates the standardized Main class structure.
- * This is the main entry point for the example game module.
+ * Main entry point for the Example Game module.
+ * Handles JSON communication and game start/stop operations.
+ * Delegates metadata to GameMetadata class.
  *
  * @authors Clement Luo
- * @date July 19, 2025
+ * @date July 21, 2025
  * @since 1.0
  */
 public class Main implements GameModule {
     
-    private static final String GAME_ID = "example";
-    private static final String GAME_NAME = "Example Game";
-    private static final String GAME_DESCRIPTION = "Template game for development and testing";
+    private final GameMetadata metadata;
+    private ExampleGameModule gameModule; // Lazy initialization
     
-    @Override
-    public String getGameId() {
-        return GAME_ID;
+    /**
+     * Default constructor that initializes the module components.
+     */
+    public Main() {
+        this.metadata = new GameMetadata();
+        // Don't instantiate gameModule here - do it lazily when needed
+        Logging.info("🎮 Example Game Main module initialized");
     }
     
-    @Override
-    public String getGameName() {
-        return GAME_NAME;
-    }
+    // ==================== JSON COMMUNICATION & GAME CONTROL ====================
     
     @Override
-    public String getGameDescription() {
-        return GAME_DESCRIPTION;
-    }
-    
-    @Override
-    public int getMinPlayers() {
-        return 1;
-    }
-    
-    @Override
-    public int getMaxPlayers() {
-        return 4;
-    }
-    
-    @Override
-    public int getEstimatedDuration() {
-        return 10; // 10 minutes
-    }
-    
-    @Override
-    public GameDifficulty getDifficulty() {
-        return GameDifficulty.EASY;
-    }
-    
-    @Override
-    public String getGameCategory() {
-        return "Classic";
-    }
-    
-    @Override
-    public boolean supportsOnlineMultiplayer() {
-        return true;
-    }
-    
-    @Override
-    public boolean supportsLocalMultiplayer() {
-        return true;
-    }
-    
-    @Override
-    public boolean supportsSinglePlayer() {
-        return true;
-    }
-    
-    @Override
-    public String getGameFxmlPath() {
-        return "/games/example/fxml/example.fxml";
-    }
-    
-    @Override
-    public String getGameCssPath() {
-        return "/games/example/css/example.css";
-    }
-    
-    @Override
-    public String getGameIconPath() {
-        return "/games/example/icons/example_icon.png";
-    }
-    
-    @Override
-    public Scene launchGame(Stage stage, GameMode mode, int playerCount, GameOptions options, GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
         try {
-            Logging.info("🎮 Launching " + GAME_NAME + " in " + mode + " mode with " + playerCount + " players");
+            Logging.info("🚀 Starting Example Game...");
             
-            // Delegate to the ExampleGameModule for the test interface
-            ExampleGameModule exampleModule = new ExampleGameModule();
-            return exampleModule.launchGame(stage, mode, playerCount, options, eventHandler);
+            // Handle JSON data if present
+            handleJsonData(gameOptions);
+            
+            // Log game start event
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.GAME_STARTED,
+                getGameId(),
+                "Example Game started with " + playerCount + " players in " + gameMode.getDisplayName() + " mode"
+            ));
+            
+            // Initialize game module lazily and delegate to it for actual game execution
+            if (gameModule == null) {
+                gameModule = new ExampleGameModule();
+            }
+            Scene gameScene = gameModule.launchGame(primaryStage, gameMode, playerCount, gameOptions, eventHandler);
+            
+            Logging.info("✅ Example Game launched successfully");
+            return gameScene;
             
         } catch (Exception e) {
-            Logging.error("❌ Error launching " + GAME_NAME + ": " + e.getMessage(), e);
+            Logging.error("❌ Error launching Example Game: " + e.getMessage(), e);
+            
+            // Send error event
+            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                com.gdk.shared.game.GameEvent.EventType.ERROR_OCCURRED,
+                getGameId(),
+                "Failed to launch Example Game: " + e.getMessage()
+            ));
+            
             return null;
         }
     }
     
     @Override
+    public void onGameClose() {
+        try {
+            Logging.info("🔒 Example Game closing - cleaning up resources");
+            
+            // Clean up game resources
+            if (gameModule != null) {
+                gameModule.onGameClose();
+            }
+            
+            Logging.info("✅ Example Game cleanup completed");
+            
+        } catch (Exception e) {
+            Logging.error("❌ Error during Example Game cleanup: " + e.getMessage(), e);
+        }
+    }
+    
+    @Override
     public GameState getGameState() {
-        return new GameState(GAME_ID, "Not Started", GameMode.SINGLE_PLAYER, 1, new GameOptions());
+        return metadata.getGameState();
     }
     
     @Override
     public void loadGameState(GameState gameState) {
-        Logging.info("📂 Loading game state for " + GAME_NAME);
+        try {
+            Logging.info("📂 Loading game state for Example Game");
+            metadata.loadGameState(gameState);
+            Logging.info("✅ Game state loaded successfully");
+        } catch (Exception e) {
+            Logging.error("❌ Error loading game state: " + e.getMessage(), e);
+        }
+    }
+    
+    // ==================== JSON DATA HANDLING ====================
+    
+    /**
+     * Handles JSON data received from the launcher.
+     * @param gameOptions The game options containing JSON data
+     */
+    private void handleJsonData(GameOptions gameOptions) {
+        if (gameOptions.hasOption("customData")) {
+            Object customData = gameOptions.getOption("customData", null);
+            Logging.info("📦 Received JSON data: " + customData);
+            
+            // Process the JSON data as needed
+            if (customData instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> data = (Map<String, Object>) customData;
+                processJsonData(data);
+            }
+        } else {
+            Logging.info("📦 No JSON data received");
+        }
+    }
+    
+    /**
+     * Processes the parsed JSON data.
+     * @param data The parsed JSON data as a Map
+     */
+    private void processJsonData(Map<String, Object> data) {
+        try {
+            // Example JSON processing
+            if (data.containsKey("playerName")) {
+                String playerName = (String) data.get("playerName");
+                Logging.info("👤 Player name from JSON: " + playerName);
+            }
+            
+            if (data.containsKey("level")) {
+                Object levelObj = data.get("level");
+                if (levelObj instanceof Number) {
+                    int level = ((Number) levelObj).intValue();
+                    Logging.info("📊 Level from JSON: " + level);
+                }
+            }
+            
+            if (data.containsKey("settings")) {
+                Object settingsObj = data.get("settings");
+                if (settingsObj instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> settings = (Map<String, Object>) settingsObj;
+                    Logging.info("⚙️ Settings from JSON: " + settings);
+                }
+            }
+            
+        } catch (Exception e) {
+            Logging.error("❌ Error processing JSON data: " + e.getMessage(), e);
+        }
+    }
+    
+    // ==================== METADATA DELEGATION ====================
+    
+    @Override
+    public String getGameId() {
+        return metadata.getGameId();
     }
     
     @Override
-    public void onGameClose() {
-        Logging.info("🔒 " + GAME_NAME + " closing - cleaning up resources");
+    public String getGameName() {
+        return metadata.getGameName();
     }
     
-    // ==================== ENHANCED SUPPORT METHODS ====================
+    @Override
+    public String getGameDescription() {
+        return metadata.getGameDescription();
+    }
+    
+    @Override
+    public int getMinPlayers() {
+        return metadata.getMinPlayers();
+    }
+    
+    @Override
+    public int getMaxPlayers() {
+        return metadata.getMaxPlayers();
+    }
+    
+    @Override
+    public int getEstimatedDuration() {
+        return metadata.getEstimatedDuration();
+    }
+    
+    @Override
+    public GameDifficulty getDifficulty() {
+        return metadata.getDifficulty();
+    }
+    
+    @Override
+    public String getGameCategory() {
+        return metadata.getGameCategory();
+    }
+    
+    @Override
+    public boolean supportsOnlineMultiplayer() {
+        return metadata.supportsOnlineMultiplayer();
+    }
+    
+    @Override
+    public boolean supportsLocalMultiplayer() {
+        return metadata.supportsLocalMultiplayer();
+    }
+    
+    @Override
+    public boolean supportsSinglePlayer() {
+        return metadata.supportsSinglePlayer();
+    }
+    
+    @Override
+    public String getGameFxmlPath() {
+        return metadata.getGameFxmlPath();
+    }
+    
+    @Override
+    public String getGameCssPath() {
+        return metadata.getGameCssPath();
+    }
+    
+    @Override
+    public String getGameIconPath() {
+        return metadata.getGameIconPath();
+    }
     
     @Override
     public GameMode[] getSupportedGameModes() {
-        // Delegate to ExampleGameModule for consistency
-        ExampleGameModule exampleModule = new ExampleGameModule();
-        return exampleModule.getSupportedGameModes();
+        return metadata.getSupportedGameModes();
     }
     
     @Override
     public GameDifficulty[] getSupportedDifficulties() {
-        // Delegate to ExampleGameModule for consistency
-        ExampleGameModule exampleModule = new ExampleGameModule();
-        return exampleModule.getSupportedDifficulties();
+        return metadata.getSupportedDifficulties();
     }
     
     @Override
     public Map<GameMode, int[]> getSupportedPlayerCounts() {
-        // Delegate to ExampleGameModule for consistency
-        ExampleGameModule exampleModule = new ExampleGameModule();
-        return exampleModule.getSupportedPlayerCounts();
+        return metadata.getSupportedPlayerCounts();
     }
     
     @Override
     public GameMode getDefaultGameMode() {
-        return GameMode.SINGLE_PLAYER;
+        return metadata.getDefaultGameMode();
     }
     
     @Override
     public GameDifficulty getDefaultDifficulty() {
-        return GameDifficulty.EASY;
+        return metadata.getDefaultDifficulty();
     }
     
     @Override
     public int getDefaultPlayerCount(GameMode gameMode) {
-        return 1;
+        return metadata.getDefaultPlayerCount(gameMode);
     }
     
     @Override
     public boolean supportsGameMode(GameMode gameMode) {
-        GameMode[] supportedModes = getSupportedGameModes();
-        for (GameMode mode : supportedModes) {
-            if (mode.equals(gameMode)) {
-                return true;
-            }
-        }
-        return false;
+        return metadata.supportsGameMode(gameMode);
     }
     
     @Override
     public boolean supportsDifficulty(GameDifficulty difficulty) {
-        GameDifficulty[] supportedDifficulties = getSupportedDifficulties();
-        for (GameDifficulty diff : supportedDifficulties) {
-            if (diff.equals(difficulty)) {
-                return true;
-            }
-        }
-        return false;
+        return metadata.supportsDifficulty(difficulty);
     }
     
     @Override
     public boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
-        Map<GameMode, int[]> supportedCounts = getSupportedPlayerCounts();
-        int[] counts = supportedCounts.get(gameMode);
-        if (counts != null) {
-            for (int count : counts) {
-                if (count == playerCount) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return metadata.supportsPlayerCount(gameMode, playerCount);
     }
     
     @Override
     public boolean hasCustomSettings() {
-        return false;
+        return metadata.hasCustomSettings();
     }
     
     @Override
     public GameSettings getCustomSettings() {
-        return null;
+        return metadata.getCustomSettings();
+    }
+    
+    // ==================== UTILITY METHODS ====================
+    
+    /**
+     * Gets the metadata instance.
+     * @return The GameMetadata instance
+     */
+    public GameMetadata getMetadata() {
+        return metadata;
+    }
+    
+    /**
+     * Gets the game module instance.
+     * @return The ExampleGameModule instance
+     */
+    public ExampleGameModule getGameModule() {
+        if (gameModule == null) {
+            gameModule = new ExampleGameModule();
+        }
+        return gameModule;
+    }
+    
+    /**
+     * Main method for standalone execution (if needed).
+     * @param args Command line arguments
+     */
+    public static void main(String[] args) {
+        Logging.info("🎮 Example Game module starting in standalone mode");
+        
+        try {
+            Main main = new Main();
+            Logging.info("✅ Example Game module initialized successfully");
+            Logging.info("🎮 Game: " + main.getGameName());
+            Logging.info("📝 Description: " + main.getGameDescription());
+            Logging.info("👥 Players: " + main.getMinPlayers() + "-" + main.getMaxPlayers());
+            Logging.info("⏱️ Duration: " + main.getEstimatedDuration() + " minutes");
+            Logging.info("🎯 Difficulty: " + main.getDifficulty());
+            Logging.info("📂 Category: " + main.getGameCategory());
+            
+        } catch (Exception e) {
+            Logging.error("❌ Failed to initialize Example Game module: " + e.getMessage(), e);
+        }
     }
 } 
