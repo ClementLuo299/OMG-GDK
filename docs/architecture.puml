@@ -3,12 +3,30 @@ title OMG Game Development Kit (GDK) - Overall Architecture
 
 package "GDK Core" {
     package "gdk" {
-        class GameModule {
+        interface GameModule {
             +getGameId(): String
             +getGameName(): String
             +getGameDescription(): String
             +launchGame(Stage, GameMode, int, GameOptions, GameEventHandler): Scene
             +onGameClose(): void
+            +getCustomSettings(): GameSettings
+            +hasCustomSettings(): boolean
+            +getSupportedGameModes(): GameMode[]
+            +getSupportedDifficulties(): GameDifficulty[]
+            +getSupportedPlayerCounts(): Map<GameMode, int[]>
+        }
+        
+        interface GameSettings {
+            +getCustomSettings(): List<GameSetting<?>>
+            +validateSettings(): boolean
+            +resetToDefaults(): void
+        }
+        
+        abstract class GameSetting<T> {
+            +getKey(): String
+            +getDisplayName(): String
+            +createControl(): Control
+            +isValid(): boolean
         }
         
         class GameMode {
@@ -48,6 +66,7 @@ package "GDK Core" {
             +discoverModules(String): List<GameModule>
             +loadModule(File): GameModule
             +validateModule(GameModule): boolean
+            +findMainClassRecursively(File, String): String
         }
         
         class Logging {
@@ -65,6 +84,7 @@ package "GDK Core" {
             -currentGame: GameModule
             +launchGame(GameModule, GameMode, int, String, GameOptions): void
             +returnToLobby(): void
+            +handleGameEvent(GameEvent): void
         }
         
         class GDKGameLobbyController {
@@ -72,11 +92,13 @@ package "GDK Core" {
             -validateJsonButton: Button
             +launchGame(): void
             +validateJsonData(): void
+            +openGameSettings(): void
+            +updateGameInfo(): void
         }
         
         class GameSettingsDialog {
-            +showDialog(GameSettings): boolean
-            +getSettings(): GameSettings
+            +showAndWait(): boolean
+            +getGameSettings(): GameSettings
         }
     }
 }
@@ -88,6 +110,7 @@ package "Game Modules" {
             -gameModule: ExampleGameModule
             +launchGame(...): Scene
             +handleJsonData(GameOptions): void
+            +getCustomSettings(): GameSettings
         }
         
         class ExampleGameMetadata {
@@ -95,11 +118,18 @@ package "Game Modules" {
             +GAME_NAME: String = "Example Game"
             +getSupportedGameModes(): GameMode[]
             +getSupportedDifficulties(): GameDifficulty[]
+            +getCustomSettings(): GameSettings
         }
         
         class ExampleGameModule {
             +launchGame(...): Scene
             +createTestInterface(...): Scene
+            +getCustomSettings(): GameSettings
+        }
+        
+        class ExampleGameSettings {
+            +getCustomSettings(): List<GameSetting<?>>
+            +validateSettings(): boolean
         }
     }
     
@@ -109,6 +139,7 @@ package "Game Modules" {
             -gameModule: TicTacToeModule
             +launchGame(...): Scene
             +handleJsonData(GameOptions): void
+            +getCustomSettings(): GameSettings
         }
         
         class TicTacToeGameMetadata {
@@ -116,6 +147,7 @@ package "Game Modules" {
             +GAME_NAME: String = "Tic Tac Toe"
             +getSupportedGameModes(): GameMode[]
             +getSupportedDifficulties(): GameDifficulty[]
+            +getCustomSettings(): GameSettings
         }
         
         class TicTacToeModule {
@@ -125,28 +157,60 @@ package "Game Modules" {
     }
 }
 
-' Relationships
-GDKApplication --> GameModule : uses
-GDKApplication --> ModuleLoader : discovers
-GDKApplication --> GameEvent : handles
-GDKGameLobbyController --> GDKApplication : controls
-GameSettingsDialog --> GameSettings : configures
+' Core relationships - grouped by functionality
+ModuleLoader --> GameModule : discovers
+GameModule --> GameSettings : provides
+GameSettings --> GameSetting : contains
 
+' Game module delegation pattern
 ExampleMain --> ExampleGameMetadata : delegates metadata
 ExampleMain --> ExampleGameModule : delegates execution
+ExampleMain --> ExampleGameSettings : provides settings
 TicTacToeMain --> TicTacToeGameMetadata : delegates metadata
 TicTacToeMain --> TicTacToeModule : delegates execution
 
+' Interface implementations
 ExampleMain ..|> GameModule : implements
 TicTacToeMain ..|> GameModule : implements
 ExampleGameMetadata ..|> GameModule : implements
 TicTacToeGameMetadata ..|> GameModule : implements
+ExampleGameSettings ..|> GameSettings : implements
 
-ModuleLoader --> GameModule : loads
+' Launcher relationships
+GDKApplication --> ModuleLoader : uses
+GDKApplication --> GameEvent : handles
+GDKGameLobbyController --> GDKApplication : controls
+GDKGameLobbyController --> GameSettingsDialog : opens
+GameSettingsDialog --> GameSettings : configures
+
+' Game module usage
 GameModule --> GameMode : uses
 GameModule --> GameDifficulty : uses
 GameModule --> GameOptions : uses
 GameModule --> GameState : manages
 GameModule --> GameEventHandler : communicates
+
+note right of TicTacToeGameMetadata
+  **TicTacToe has no custom settings:**
+  • hasCustomSettings() returns false
+  • getCustomSettings() returns null
+end note
+
+note right of ExampleGameSettings
+  **Example Game has 6 custom settings:**
+  • Sound Effects (boolean)
+  • Maximum Turns (integer)
+  • Player Name (string)
+  • Background Music (boolean)
+  • Difficulty Multiplier (integer)
+  • Game Theme (string)
+end note
+
+note right of ModuleLoader
+  **Flexible Module Discovery:**
+  • Recursively searches for Main.class
+  • Supports any package structure
+  • No hardcoded package names
+end note
 
 @enduml 

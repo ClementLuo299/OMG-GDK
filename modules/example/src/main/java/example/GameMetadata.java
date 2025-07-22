@@ -1,4 +1,4 @@
-package com.games.modules.example;
+package example;
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;

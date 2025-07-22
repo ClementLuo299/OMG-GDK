@@ -1,4 +1,4 @@
-package com.games.modules.example;
+package example;
 
 import com.gdk.shared.settings.*;
 

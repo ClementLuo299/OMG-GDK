@@ -1,8 +1,9 @@
-package com.games.modules.example;
+package example;
 
 import com.gdk.shared.game.GameMode;
 import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.game.GameModeFactory;
+import com.gdk.shared.utils.error_handling.Logging;
 
 import java.util.HashMap;
 import java.util.Map;

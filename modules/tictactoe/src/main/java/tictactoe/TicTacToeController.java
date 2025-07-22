@@ -1,4 +1,4 @@
-package com.games.modules.tictactoe;
+package tictactoe;
 
 import java.net.URL;
 import java.util.ArrayList;

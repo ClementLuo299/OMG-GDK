@@ -19,6 +19,7 @@ package "Game Module" {
         +getGameDescription(): String
         +getSupportedGameModes(): GameMode[]
         +getSupportedDifficulties(): GameDifficulty[]
+        +getCustomSettings(): GameSettings
     }
     
     class GameMetadata {
@@ -43,6 +44,7 @@ package "Game Module" {
         +supportsGameMode(GameMode): boolean
         +supportsDifficulty(GameDifficulty): boolean
         +supportsPlayerCount(GameMode, int): boolean
+        +getCustomSettings(): GameSettings
         --
         ' Delegated execution
         +launchGame(...): Scene
@@ -57,11 +59,21 @@ package "Game Module" {
         +onGameClose(): void
         +getGameState(): GameState
         +loadGameState(GameState): void
+        +getCustomSettings(): GameSettings
         --
         ' UI creation methods
         +createGameInterface(...): Scene
         +handleUserInput(...): void
         +updateGameState(...): void
+    }
+    
+    class GameSettings {
+        ' Custom settings implementation
+        +getCustomSettings(): List<GameSetting<?>>
+        +validateSettings(): boolean
+        +resetToDefaults(): void
+        +getSettingsDisplayName(): String
+        +getSettingsDescription(): String
     }
 }
 
@@ -74,6 +86,7 @@ package "GDK Core" {
         +onGameClose(): void
         +getGameState(): GameState
         +loadGameState(GameState): void
+        +getCustomSettings(): GameSettings
     }
     
     class GameOptions {
@@ -91,6 +104,7 @@ package "GDK Core" {
 Main ..|> GameModuleInterface : implements
 GameMetadata ..|> GameModuleInterface : implements
 GameModule ..|> GameModuleInterface : implements
+GameSettings ..|> GameSettings : implements
 
 Main --> GameMetadata : delegates metadata
 Main --> GameModule : delegates execution
@@ -99,9 +113,11 @@ Main --> GameEventHandler : sends events
 
 GameMetadata --> GameModule : delegates execution
 GameMetadata --> GameOptions : uses for state
+GameMetadata --> GameSettings : provides settings
 
 GameModule --> GameOptions : uses for configuration
 GameModule --> GameEventHandler : communicates events
+GameModule --> GameSettings : provides settings
 
 note right of Main
   **Main Class Responsibilities:**
@@ -118,6 +134,7 @@ note right of GameMetadata
   • Player count configurations
   • Default settings
   • Validation methods
+  • Custom settings definition
 end note
 
 note right of GameModule
@@ -126,6 +143,15 @@ note right of GameModule
   • UI implementation
   • User interaction
   • Game state management
+  • Custom settings implementation
+end note
+
+note right of GameSettings
+  **GameSettings Class Responsibilities:**
+  • Define custom configurable options
+  • Provide UI controls for settings
+  • Validate user input
+  • Manage default values
 end note
 
 @enduml 

@@ -1,4 +1,4 @@
-package com.games.modules.example;
+package example;
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
@@ -6,11 +6,21 @@ import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
 import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.game.GameEvent;
 import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
-import javafx.fxml.FXMLLoader;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import java.util.Map;
 
 /**
  * Example game module to demonstrate the dynamic game discovery system.

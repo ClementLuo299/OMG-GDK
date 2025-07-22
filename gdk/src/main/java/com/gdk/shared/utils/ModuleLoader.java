@@ -128,18 +128,34 @@ public class ModuleLoader {
      * @return The main class name, or null if not found
      */
     private static String findMainClassInDirectory(File classesDir) {
-        // Common main class names to look for
-        String[] mainClassNames = {
-            "com.games.modules.example.Main",
-            "com.games.modules.tictactoe.Main",
-            "Main"
-        };
+        // Look for Main class in any package structure
+        return findMainClassRecursively(classesDir, "");
+    }
+    
+    /**
+     * Recursively searches for a Main class in the classes directory.
+     * 
+     * @param classesDir The classes directory to search
+     * @param packagePath The current package path
+     * @return The fully qualified class name, or null if not found
+     */
+    private static String findMainClassRecursively(File classesDir, String packagePath) {
+        File[] files = classesDir.listFiles();
+        if (files == null) {
+            return null;
+        }
         
-        for (String className : mainClassNames) {
-            String classPath = className.replace('.', '/') + ".class";
-            File classFile = new File(classesDir, classPath);
-            if (classFile.exists()) {
-                return className;
+        for (File file : files) {
+            if (file.isDirectory()) {
+                // Recursively search subdirectories
+                String subPackage = packagePath.isEmpty() ? file.getName() : packagePath + "." + file.getName();
+                String result = findMainClassRecursively(file, subPackage);
+                if (result != null) {
+                    return result;
+                }
+            } else if (file.getName().equals("Main.class")) {
+                // Found Main.class, return the fully qualified name
+                return packagePath.isEmpty() ? "Main" : packagePath + ".Main";
             }
         }
         

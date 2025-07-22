@@ -1,4 +1,4 @@
-package com.games.modules.tictactoe;
+package tictactoe;
 
 /**
  * Represents a player in the TicTacToe game.
