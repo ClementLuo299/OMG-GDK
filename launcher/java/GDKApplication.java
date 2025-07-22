@@ -60,10 +60,11 @@ public class GDKApplication extends Application {
             
             // Configure the stage
             primaryStage.setTitle("OMG Game Development Kit");
-            primaryStage.setWidth(800);
-            primaryStage.setHeight(600);
-            primaryStage.setMinWidth(600);
-            primaryStage.setMinHeight(400);
+            primaryStage.setWidth(1200);
+            primaryStage.setHeight(900);
+            primaryStage.setMinWidth(800);
+            primaryStage.setMinHeight(600);
+            primaryStage.setMaximized(true);
             primaryStage.centerOnScreen();
             
             // Show the stage

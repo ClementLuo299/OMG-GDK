@@ -36,7 +36,6 @@ package "OMG-GDK" {
         package "java" {
             file "GDKApplication.java"
             file "GDKGameLobbyController.java"
-            file "GameSettingsDialog.java"
         }
         
         package "resources" {
