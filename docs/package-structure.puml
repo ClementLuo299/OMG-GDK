@@ -4,54 +4,51 @@ title GDK Package Structure and File Organization
 
 package "OMG-GDK" {
     package "gdk" {
-        package "com.gdk.shared" {
+        package "src/main/java/com/gdk/shared" {
             package "game" {
-                class GameModule
-                class GameMode
-                class GameDifficulty
-                class GameOptions
-                class GameState
-                class GameEvent
-                class GameEventHandler
-                class GameModeFactory
+                file "GameModule.java"
+                file "GameMode.java"
+                file "GameDifficulty.java"
+                file "GameOptions.java"
+                file "GameState.java"
+                file "GameEvent.java"
+                file "GameEventHandler.java"
             }
             
             package "settings" {
-                class GameSettings
-                class GameSetting
-                class BooleanSetting
-                class IntegerSetting
-                class StringSetting
+                file "GameSettings.java"
+                file "GameSetting.java"
+                file "BooleanSetting.java"
+                file "IntegerSetting.java"
+                file "StringSetting.java"
             }
             
             package "utils" {
-                class ModuleLoader
+                file "ModuleLoader.java"
                 package "error_handling" {
-                    class Logging
+                    file "Logging.java"
                 }
             }
         }
     }
     
     package "launcher" {
-        package "com" {
-            class GDKApplication
-            class GDKGameLobbyController
-            class GameSettingsDialog
-            package "utils" {
-                package "error_handling" {
-                    class Dialog
-                    class ErrorHandler
-                    class SafeExecute
-                    package "enums" {
-                        class ErrorCategory
-                        class ErrorSeverity
-                    }
+        package "src/main/java/com" {
+            file "GDKApplication.java"
+            file "GDKGameLobbyController.java"
+            file "GameSettingsDialog.java"
+            package "utils/error_handling" {
+                file "Dialog.java"
+                file "ErrorHandler.java"
+                file "SafeExecute.java"
+                package "enums" {
+                    file "ErrorCategory.java"
+                    file "ErrorSeverity.java"
                 }
             }
         }
         
-        package "resources" {
+        package "src/main/resources" {
             file "GDKGameLobby.fxml"
             file "gdk-lobby.css"
         }
@@ -59,56 +56,57 @@ package "OMG-GDK" {
     
     package "modules" {
         package "example" {
-            package "com.games.modules.example" {
-                class Main
-                class GameMetadata
-                class ExampleGameModule
-                class ExampleGameSettings
-                class CustomGameModesExample
+            package "src/java/example" {
+                file "Main.java"
+                file "GameMetadata.java"
+                file "ExampleGameModule.java"
+                file "ExampleGameSettings.java"
+                file "CustomGameModesExample.java"
             }
             
-            package "resources" {
-                package "games/example" {
-                    package "css" {
-                        file "example.css"
-                    }
-                    package "fxml" {
-                        file "example.fxml"
-                    }
-                    package "icons" {
-                        file "example_icon.png"
-                    }
+            package "src/resources/games/example" {
+                package "fxml" {
+                    file "example.fxml"
+                }
+                package "css" {
+                    file "example.css"
+                }
+                package "icons" {
+                    file "example_icon.png"
                 }
             }
+            file "pom.xml"
+            file "README.md"
         }
         
         package "tictactoe" {
-            package "com.games.modules.tictactoe" {
-                class Main
-                class GameMetadata
-                class TicTacToeModule
-                class TicTacToeController
-                class TicTacToeGame
-                class TicTacToePlayer
+            package "src/java/tictactoe" {
+                file "Main.java"
+                file "GameMetadata.java"
+                file "TicTacToeModule.java"
+                file "TicTacToeController.java"
+                file "TicTacToeGame.java"
+                file "TicTacToePlayer.java"
             }
             
-            package "resources" {
-                package "games/tictactoe" {
-                    package "css" {
-                        file "tictactoe.css"
-                    }
-                    package "fxml" {
-                        file "tictactoe.fxml"
-                    }
-                    package "icons" {
-                        file "tic_tac_toe_icon.png"
-                    }
-                    package "images" {
-                        ' Game-specific images
-                    }
+            package "src/resources/games/tictactoe" {
+                package "fxml" {
+                    file "tictactoe.fxml"
+                }
+                package "css" {
+                    file "tictactoe.css"
+                }
+                package "icons" {
+                    file "tic_tac_toe_icon.png"
+                }
+                package "images" {
+                    file "*.png"
                 }
             }
+            file "pom.xml"
+            file "README.md"
         }
+        file "README.md"
     }
     
     file "pom.xml"
@@ -117,14 +115,13 @@ package "OMG-GDK" {
     file "run-full.sh"
 }
 
-package "Documentation" {
-    file "docs/architecture.puml"
-    file "docs/module-structure.puml"
-    file "docs/class-hierarchy.puml"
-    file "docs/data-flow.puml"
-    file "docs/package-structure.puml"
-    file "JSON_DATA_FEATURE.md"
-    file "SCRIPT_UPDATES.md"
+package "docs" {
+    file "architecture.puml"
+    file "module-structure.puml"
+    file "class-hierarchy.puml"
+    file "data-flow.puml"
+    file "package-structure.puml"
+    file "README.md"
 }
 
 ' Relationships
@@ -154,12 +151,10 @@ note right of launcher
 end note
 
 note right of modules
-  **Game Modules:**
-  • Each module follows the same structure
-  • Main class for entry point
-  • GameMetadata for configuration
-  • GameModule for implementation
-  • Resources for UI assets
+  **Simplified Structure:**
+  • src/java/ instead of src/main/java/
+  • src/resources/ instead of src/main/resources/
+  • Cleaner, more direct organization
 end note
 
 @enduml 
