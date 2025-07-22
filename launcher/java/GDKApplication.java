@@ -1,5 +1,3 @@
-
-
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
 import com.gdk.shared.game.GameOptions;
@@ -7,6 +5,7 @@ import com.gdk.shared.game.GameEvent;
 import com.gdk.shared.game.GameEventHandler;
 import com.gdk.shared.utils.ModuleLoader;
 import com.gdk.shared.utils.error_handling.Logging;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,13 +14,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import java.util.List;
-import java.util.Properties;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URL;
+import java.io.File;
 
 /**
  * Simple Game Development Kit (GDK) Application.
@@ -29,14 +25,18 @@ import java.net.URL;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited July 20, 2025
+ * @edited July 22, 2025
  * @since 1.0
  */
 public class GDKApplication extends Application {
 
-    private static final String CONFIG_FILE = "gdk-config.properties";
+    // Game modules directory
     private static final String MODULES_DIR = "../modules";
-    private static Properties config;
+    
+    // Configuration values - hardcoded for simplicity
+    private static String username = "GDK Developer";
+    private static String serverUrl = "localhost";
+    private static int serverPort = 8080;
     
     private ComboBox<GameModule> gameSelector;
     private ComboBox<GameMode> gameModeSelector;
@@ -52,9 +52,6 @@ public class GDKApplication extends Application {
         this.primaryStage = primaryStage;
         
         try {
-            // Load configuration
-            loadConfig();
-            
             // Create and configure the UI
             createUI();
             
@@ -83,53 +80,6 @@ public class GDKApplication extends Application {
     @Override
     public void stop() {
         Logging.info("🔄 GDK shutting down");
-    }
-
-    /**
-     * Loads configuration from file or creates default.
-     */
-    private void loadConfig() {
-        config = new Properties();
-        File configFile = new File(CONFIG_FILE);
-        
-        if (configFile.exists()) {
-            try (FileReader reader = new FileReader(configFile)) {
-                config.load(reader);
-                Logging.info("📂 Loaded configuration from " + CONFIG_FILE);
-            } catch (IOException e) {
-                Logging.error("❌ Failed to load config: " + e.getMessage());
-                createDefaultConfig();
-            }
-        } else {
-            createDefaultConfig();
-        }
-    }
-
-    /**
-     * Creates default configuration.
-     */
-    private void createDefaultConfig() {
-        Logging.info("🆕 Creating default configuration");
-        
-        config.setProperty("username", "GDK Developer");
-        config.setProperty("serverUrl", "localhost");
-        config.setProperty("serverPort", "8080");
-        config.setProperty("enableLogging", "true");
-        config.setProperty("enableDebugMode", "true");
-        
-        saveConfig();
-    }
-
-    /**
-     * Saves configuration to file.
-     */
-    private void saveConfig() {
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-            config.store(writer, "GDK Configuration");
-            Logging.info("💾 Saved configuration to " + CONFIG_FILE);
-        } catch (IOException e) {
-            Logging.error("❌ Failed to save config: " + e.getMessage());
-        }
     }
 
     /**
@@ -204,7 +154,7 @@ public class GDKApplication extends Application {
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
 
         // Welcome message
-        String username = config.getProperty("username", "Developer");
+                    String username = GDKApplication.username;
         Label welcomeLabel = new Label("Welcome, " + username + "!");
         welcomeLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #495057;");
 
@@ -346,9 +296,8 @@ public class GDKApplication extends Application {
     public void launchGame(GameModule selectedGame, GameMode gameMode, int playerCount, String difficulty) {
         // Create default options and call the overloaded method
         GameOptions options = new GameOptions();
-        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
-        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
-        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
+        options.setOption("serverUrl", serverUrl);
+        options.setOption("serverPort", String.valueOf(serverPort));
         options.setOption("difficulty", difficulty);
         
         launchGame(selectedGame, gameMode, playerCount, difficulty, options);
@@ -423,9 +372,8 @@ public class GDKApplication extends Application {
 
         // Create game options
         GameOptions options = new GameOptions();
-        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
-        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
-        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
+        options.setOption("serverUrl", serverUrl);
+        options.setOption("serverPort", String.valueOf(serverPort));
 
         if (logArea != null) {
             logArea.appendText("🚀 Launching " + selectedGame.getGameName() + " in " + gameMode.getDisplayName() + " mode with " + playerCount + " players\n");
@@ -470,13 +418,13 @@ public class GDKApplication extends Application {
         content.setPadding(new javafx.geometry.Insets(10));
 
         Label usernameLabel = new Label("Username:");
-        TextField usernameField = new TextField(config.getProperty("username", "GDK Developer"));
+        TextField usernameField = new TextField(username);
 
         Label serverLabel = new Label("Server URL:");
-        TextField serverField = new TextField(config.getProperty("serverUrl", "localhost"));
+        TextField serverField = new TextField(serverUrl);
 
         Label portLabel = new Label("Server Port:");
-        Spinner<Integer> portSpinner = new Spinner<>(1, 65535, Integer.parseInt(config.getProperty("serverPort", "8080")));
+        Spinner<Integer> portSpinner = new Spinner<>(1, 65535, serverPort);
 
         content.getChildren().addAll(usernameLabel, usernameField, serverLabel, serverField, portLabel, portSpinner);
 
@@ -488,12 +436,11 @@ public class GDKApplication extends Application {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
-                config.setProperty("username", usernameField.getText());
-                config.setProperty("serverUrl", serverField.getText());
-                config.setProperty("serverPort", String.valueOf(portSpinner.getValue()));
-                saveConfig();
+                username = usernameField.getText();
+                serverUrl = serverField.getText();
+                serverPort = portSpinner.getValue();
                 if (logArea != null) {
-                    logArea.appendText("💾 Settings saved\n");
+                    logArea.appendText("💾 Settings updated (in-memory only)\n");
                 }
             }
             return null;

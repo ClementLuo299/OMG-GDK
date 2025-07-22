@@ -128,7 +128,6 @@ public class GDKGameLobbyController implements Initializable {
         config.setProperty("username", "GDK Developer");
         config.setProperty("serverUrl", "localhost");
         config.setProperty("serverPort", "8080");
-        config.setProperty("enableDebugMode", "true");
         saveConfig();
         Logging.info("📝 Created default configuration");
     }
@@ -317,7 +316,6 @@ public class GDKGameLobbyController implements Initializable {
         
         // Create game options
         GameOptions options = new GameOptions();
-        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
         options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
         options.setOption("serverPort", config.getProperty("serverPort", "8080"));
         
