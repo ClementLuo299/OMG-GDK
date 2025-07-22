@@ -6,10 +6,12 @@ import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
 import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
 import com.games.modules.tictactoe.TicTacToeModule;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.util.Map;
 
 /**
  * Main class for the TicTacToe game module.
@@ -122,6 +124,63 @@ public class Main implements GameModule {
     @Override
     public void loadGameState(GameState gameState) {
         ticTacToeModule.loadGameState(gameState);
+    }
+    
+    // ==================== ENHANCED SUPPORT METHODS ====================
+    
+    @Override
+    public GameMode[] getSupportedGameModes() {
+        return ticTacToeModule.getSupportedGameModes();
+    }
+    
+    @Override
+    public GameDifficulty[] getSupportedDifficulties() {
+        return ticTacToeModule.getSupportedDifficulties();
+    }
+    
+    @Override
+    public Map<GameMode, int[]> getSupportedPlayerCounts() {
+        return ticTacToeModule.getSupportedPlayerCounts();
+    }
+    
+    @Override
+    public GameMode getDefaultGameMode() {
+        return ticTacToeModule.getDefaultGameMode();
+    }
+    
+    @Override
+    public GameDifficulty getDefaultDifficulty() {
+        return ticTacToeModule.getDefaultDifficulty();
+    }
+    
+    @Override
+    public int getDefaultPlayerCount(GameMode gameMode) {
+        return ticTacToeModule.getDefaultPlayerCount(gameMode);
+    }
+    
+    @Override
+    public boolean supportsGameMode(GameMode gameMode) {
+        return ticTacToeModule.supportsGameMode(gameMode);
+    }
+    
+    @Override
+    public boolean supportsDifficulty(GameDifficulty difficulty) {
+        return ticTacToeModule.supportsDifficulty(difficulty);
+    }
+    
+    @Override
+    public boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
+        return ticTacToeModule.supportsPlayerCount(gameMode, playerCount);
+    }
+    
+    @Override
+    public boolean hasCustomSettings() {
+        return ticTacToeModule.hasCustomSettings();
+    }
+    
+    @Override
+    public GameSettings getCustomSettings() {
+        return ticTacToeModule.getCustomSettings();
     }
     
     // ==================== ADDITIONAL FUNCTIONALITY ====================

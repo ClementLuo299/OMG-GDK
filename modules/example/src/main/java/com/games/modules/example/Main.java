@@ -6,10 +6,12 @@ import com.gdk.shared.game.GameDifficulty;
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
 import com.gdk.shared.game.GameEventHandler;
+import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.util.Map;
 
 /**
  * Example game module - demonstrates the standardized Main class structure.
@@ -123,6 +125,89 @@ public class Main implements GameModule {
     @Override
     public void onGameClose() {
         Logging.info("🔒 " + GAME_NAME + " closing - cleaning up resources");
-    }   
-
+    }
+    
+    // ==================== ENHANCED SUPPORT METHODS ====================
+    
+    @Override
+    public GameMode[] getSupportedGameModes() {
+        // Delegate to ExampleGameModule for consistency
+        ExampleGameModule exampleModule = new ExampleGameModule();
+        return exampleModule.getSupportedGameModes();
+    }
+    
+    @Override
+    public GameDifficulty[] getSupportedDifficulties() {
+        // Delegate to ExampleGameModule for consistency
+        ExampleGameModule exampleModule = new ExampleGameModule();
+        return exampleModule.getSupportedDifficulties();
+    }
+    
+    @Override
+    public Map<GameMode, int[]> getSupportedPlayerCounts() {
+        // Delegate to ExampleGameModule for consistency
+        ExampleGameModule exampleModule = new ExampleGameModule();
+        return exampleModule.getSupportedPlayerCounts();
+    }
+    
+    @Override
+    public GameMode getDefaultGameMode() {
+        return GameMode.SINGLE_PLAYER;
+    }
+    
+    @Override
+    public GameDifficulty getDefaultDifficulty() {
+        return GameDifficulty.EASY;
+    }
+    
+    @Override
+    public int getDefaultPlayerCount(GameMode gameMode) {
+        return 1;
+    }
+    
+    @Override
+    public boolean supportsGameMode(GameMode gameMode) {
+        GameMode[] supportedModes = getSupportedGameModes();
+        for (GameMode mode : supportedModes) {
+            if (mode.equals(gameMode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean supportsDifficulty(GameDifficulty difficulty) {
+        GameDifficulty[] supportedDifficulties = getSupportedDifficulties();
+        for (GameDifficulty diff : supportedDifficulties) {
+            if (diff.equals(difficulty)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
+        Map<GameMode, int[]> supportedCounts = getSupportedPlayerCounts();
+        int[] counts = supportedCounts.get(gameMode);
+        if (counts != null) {
+            for (int count : counts) {
+                if (count == playerCount) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean hasCustomSettings() {
+        return false;
+    }
+    
+    @Override
+    public GameSettings getCustomSettings() {
+        return null;
+    }
 } 

@@ -12,6 +12,7 @@ import java.util.jar.Manifest;
 /**
  * Utility class for discovering and loading game modules.
  * Provides functionality to scan directories for game modules and load them dynamically.
+ * Supports both JAR files (production) and compiled classes (development).
  *
  * @authors Clement Luo
  * @date July 19, 2025
@@ -21,7 +22,7 @@ public class ModuleLoader {
     
     /**
      * Discovers game modules in the specified directory.
-     * Scans for JAR files and attempts to load GameModule implementations.
+     * Scans for JAR files and compiled classes, attempts to load GameModule implementations.
      * 
      * @param modulesDir The directory to scan for modules
      * @return List of discovered game modules
@@ -35,13 +36,132 @@ public class ModuleLoader {
             throw new IllegalArgumentException("Modules directory does not exist: " + modulesDir);
         }
         
+        // First, try to load from compiled classes (development mode)
+        List<GameModule> classModules = discoverModulesFromClasses(dir);
+        if (!classModules.isEmpty()) {
+            modules.addAll(classModules);
+        }
+        
+        // Then, try to load from JAR files (production mode)
+        List<GameModule> jarModules = discoverModulesFromJars(dir);
+        if (!jarModules.isEmpty()) {
+            modules.addAll(jarModules);
+        }
+        
+        return modules;
+    }
+    
+    /**
+     * Discovers game modules from compiled classes (development mode).
+     * 
+     * @param modulesDir The modules directory
+     * @return List of discovered game modules
+     */
+    private static List<GameModule> discoverModulesFromClasses(File modulesDir) {
+        List<GameModule> modules = new ArrayList<>();
+        
+        // Look for subdirectories that might contain modules
+        File[] subdirs = modulesDir.listFiles(File::isDirectory);
+        if (subdirs != null) {
+            for (File subdir : subdirs) {
+                try {
+                    GameModule module = loadModuleFromClasses(subdir);
+                    if (module != null) {
+                        modules.add(module);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Failed to load module from classes in " + subdir.getName() + ": " + e.getMessage());
+                }
+            }
+        }
+        
+        return modules;
+    }
+    
+    /**
+     * Loads a game module from compiled classes.
+     * 
+     * @param moduleDir The module directory containing compiled classes
+     * @return The loaded game module, or null if loading fails
+     */
+    private static GameModule loadModuleFromClasses(File moduleDir) {
+        try {
+            // Look for target/classes directory (Maven structure)
+            File classesDir = new File(moduleDir, "target/classes");
+            if (!classesDir.exists() || !classesDir.isDirectory()) {
+                return null;
+            }
+            
+            // Try to find the main class
+            String mainClassName = findMainClassInDirectory(classesDir);
+            if (mainClassName == null) {
+                return null;
+            }
+            
+            // Create a class loader for the classes directory
+            URLClassLoader classLoader = new URLClassLoader(
+                new URL[]{classesDir.toURI().toURL()},
+                ModuleLoader.class.getClassLoader()
+            );
+            
+            // Load the main class
+            Class<?> moduleClass = classLoader.loadClass(mainClassName);
+            
+            // Check if it implements GameModule
+            if (GameModule.class.isAssignableFrom(moduleClass)) {
+                // Create an instance
+                Object instance = moduleClass.getDeclaredConstructor().newInstance();
+                return (GameModule) instance;
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error loading module from classes in " + moduleDir.getName() + ": " + e.getMessage());
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Finds the main class in a compiled classes directory.
+     * 
+     * @param classesDir The classes directory
+     * @return The main class name, or null if not found
+     */
+    private static String findMainClassInDirectory(File classesDir) {
+        // Common main class names to look for
+        String[] mainClassNames = {
+            "com.games.modules.example.Main",
+            "com.games.modules.tictactoe.Main",
+            "Main"
+        };
+        
+        for (String className : mainClassNames) {
+            String classPath = className.replace('.', '/') + ".class";
+            File classFile = new File(classesDir, classPath);
+            if (classFile.exists()) {
+                return className;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Discovers game modules from JAR files (production mode).
+     * 
+     * @param modulesDir The modules directory
+     * @return List of discovered game modules
+     */
+    private static List<GameModule> discoverModulesFromJars(File modulesDir) {
+        List<GameModule> modules = new ArrayList<>();
+        
         // Scan for JAR files in the modules directory
-        File[] jarFiles = dir.listFiles((file, name) -> name.endsWith(".jar"));
+        File[] jarFiles = modulesDir.listFiles((file, name) -> name.endsWith(".jar"));
         
         if (jarFiles != null) {
             for (File jarFile : jarFiles) {
                 try {
-                    GameModule module = loadModule(jarFile);
+                    GameModule module = loadModuleFromJar(jarFile);
                     if (module != null) {
                         modules.add(module);
                     }
@@ -61,7 +181,7 @@ public class ModuleLoader {
      * @return The loaded game module, or null if loading fails
      * @throws Exception if there's an error during loading
      */
-    public static GameModule loadModule(File jarFile) throws Exception {
+    private static GameModule loadModuleFromJar(File jarFile) throws Exception {
         try (JarFile jar = new JarFile(jarFile)) {
             // Check if the JAR has a manifest with a main class
             Manifest manifest = jar.getManifest();

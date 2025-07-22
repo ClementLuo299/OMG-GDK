@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -29,6 +30,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
+
+// JSON parsing imports
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * GDK Game Picker Controller - Simplified game picker for the GDK.
@@ -58,6 +66,12 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button settingsButton;
     @FXML private TextArea logArea;
     
+    // New JSON data components
+    @FXML private TextArea jsonDataTextArea;
+    @FXML private Button clearJsonButton;
+    @FXML private Button validateJsonButton;
+    @FXML private Label jsonValidationLabel;
+    
     // ==================== DEPENDENCIES ====================
     
     private static final String CONFIG_FILE = "gdk-config.properties";
@@ -66,12 +80,16 @@ public class GDKGameLobbyController implements Initializable {
     private ObservableList<GameModule> availableGames;
     private GameModule selectedGame;
     private GDKApplication gdkApplication;
+    private ObjectMapper jsonMapper; // For JSON parsing and validation
     
     // ==================== INITIALIZATION ====================
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Logging.info("🎮 Initializing GDK Game Picker Controller");
+        
+        // Initialize JSON mapper
+        jsonMapper = new ObjectMapper();
         
         // Load configuration
         loadConfig();
@@ -258,6 +276,19 @@ public class GDKGameLobbyController implements Initializable {
         
         // Settings button
         settingsButton.setOnAction(e -> openGameSettings());
+        
+        // JSON data handling
+        clearJsonButton.setOnAction(e -> clearJsonData());
+        validateJsonButton.setOnAction(e -> validateJsonData());
+        
+        // Auto-validate JSON as user types
+        jsonDataTextArea.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.trim().isEmpty()) {
+                validateJsonData();
+            } else {
+                clearJsonValidation();
+            }
+        });
     }
     
     // ==================== GAME MANAGEMENT ====================
@@ -403,12 +434,21 @@ public class GDKGameLobbyController implements Initializable {
             return;
         }
 
+        // Get JSON data if provided
+        Map<String, Object> jsonData = getJsonData();
+        
         // Create game options
         GameOptions options = new GameOptions();
         options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
         options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
         options.setOption("serverPort", config.getProperty("serverPort", "8080"));
         options.setOption("difficulty", difficulty);
+        
+        // Add JSON data if provided
+        if (jsonData != null) {
+            options.setOption("customData", jsonData);
+            logArea.appendText("📦 Including custom JSON data with " + jsonData.size() + " fields\n");
+        }
 
         logArea.appendText("🚀 Launching " + selectedGame.getGameName() + " in " + gameMode.getDisplayName() + 
                           " mode with " + playerCount + " players (Difficulty: " + difficulty + ")\n");
@@ -416,7 +456,7 @@ public class GDKGameLobbyController implements Initializable {
         try {
             // Delegate to the GDK application to launch the game with proper event handling
             if (gdkApplication != null) {
-                gdkApplication.launchGame(selectedGame, gameMode, playerCount, difficulty);
+                gdkApplication.launchGame(selectedGame, gameMode, playerCount, difficulty, options);
             } else {
                 Logging.error("❌ GDK Application reference not set");
                 logArea.appendText("❌ Error: GDK Application not available\n");
@@ -496,6 +536,76 @@ public class GDKGameLobbyController implements Initializable {
         } catch (Exception e) {
             Logging.error("❌ Failed to open game settings: " + e.getMessage(), e);
             showError("Settings Error", "Failed to open game settings: " + e.getMessage());
+        }
+    }
+    
+    // ==================== JSON DATA HANDLING ====================
+    
+    /**
+     * Validates the JSON data entered by the user.
+     */
+    private void validateJsonData() {
+        String jsonText = jsonDataTextArea.getText().trim();
+        
+        if (jsonText.isEmpty()) {
+            clearJsonValidation();
+            return;
+        }
+        
+        try {
+            // Parse JSON to validate syntax
+            JsonNode jsonNode = jsonMapper.readTree(jsonText);
+            
+            // If we get here, JSON is valid
+            jsonValidationLabel.setText("✅ Valid JSON (" + jsonNode.size() + " top-level fields)");
+            jsonValidationLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+            
+            logArea.appendText("✅ JSON data validated successfully\n");
+            
+        } catch (JsonProcessingException e) {
+            // JSON is invalid
+            jsonValidationLabel.setText("❌ Invalid JSON: " + e.getMessage());
+            jsonValidationLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            
+            logArea.appendText("❌ JSON validation failed: " + e.getMessage() + "\n");
+        }
+    }
+    
+    /**
+     * Clears the JSON data text area.
+     */
+    private void clearJsonData() {
+        jsonDataTextArea.clear();
+        clearJsonValidation();
+        logArea.appendText("🗑️ JSON data cleared\n");
+    }
+    
+    /**
+     * Clears the JSON validation status.
+     */
+    private void clearJsonValidation() {
+        jsonValidationLabel.setText("");
+        jsonValidationLabel.setStyle("");
+    }
+    
+    /**
+     * Gets the parsed JSON data as a Map, or null if invalid.
+     * @return Map containing the JSON data, or null if invalid/empty
+     */
+    private Map<String, Object> getJsonData() {
+        String jsonText = jsonDataTextArea.getText().trim();
+        
+        if (jsonText.isEmpty()) {
+            return null;
+        }
+        
+        try {
+            // Parse JSON and convert to Map
+            JsonNode jsonNode = jsonMapper.readTree(jsonText);
+            return jsonMapper.convertValue(jsonNode, Map.class);
+        } catch (Exception e) {
+            Logging.error("❌ Failed to parse JSON data: " + e.getMessage());
+            return null;
         }
     }
 } 

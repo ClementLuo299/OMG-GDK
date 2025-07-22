@@ -297,6 +297,42 @@ public class ExampleGameModule implements GameModule {
             alert.showAndWait();
         });
         
+        // JSON Data button
+        javafx.scene.control.Button jsonDataButton = new javafx.scene.control.Button("📦 Show JSON Data");
+        jsonDataButton.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
+        jsonDataButton.setOnAction(e -> {
+            Logging.info("📦 Checking for custom JSON data...");
+            
+            if (gameOptions.hasOption("customData")) {
+                Object customData = gameOptions.getOption("customData", null);
+                Logging.info("📦 Found custom data: " + customData);
+                
+                String message = "Custom JSON Data Received:\n\n" + customData.toString();
+                
+                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+                alert.setTitle("JSON Data Information");
+                alert.setHeaderText("Custom Data from Launcher");
+                alert.setContentText(message);
+                alert.showAndWait();
+                
+                // Send an event with the custom data
+                eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
+                    com.gdk.shared.game.GameEvent.EventType.MOVE_MADE,
+                    getGameId(),
+                    "Custom JSON data received and processed",
+                    customData.toString()
+                ));
+            } else {
+                Logging.info("📦 No custom JSON data found");
+                
+                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+                alert.setTitle("JSON Data Information");
+                alert.setHeaderText("No Custom Data");
+                alert.setContentText("No custom JSON data was provided when launching this game.");
+                alert.showAndWait();
+            }
+        });
+        
         javafx.scene.control.Button backButton = new javafx.scene.control.Button("🔙 Back to Lobby");
         backButton.setStyle("-fx-background-color: #fd7e14; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         backButton.setOnAction(e -> {
@@ -319,7 +355,7 @@ public class ExampleGameModule implements GameModule {
         // Add all components
         root.getChildren().addAll(
             titleLabel, infoLabel,
-            startButton, moveButton, turnButton, messageButton, errorButton, endButton, difficultyButton, gameModeButton, backButton,
+            startButton, moveButton, turnButton, messageButton, errorButton, endButton, difficultyButton, gameModeButton, jsonDataButton, backButton,
             instructionsLabel
         );
         

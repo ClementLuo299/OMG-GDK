@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Simple Game Development Kit (GDK) Application.
@@ -136,18 +137,45 @@ public class GDKApplication extends Application {
      */
     private void createUI() {
         try {
-            // Load the GDK Game Lobby FXML
-            FXMLLoader loader = new FXMLLoader(GDKApplication.class.getResource("/GDKGameLobby.fxml"));
-            lobbyScene = new Scene(loader.load());
+            // Load the GDK Game Lobby FXML with more robust error handling
+            URL fxmlUrl = GDKApplication.class.getResource("/GDKGameLobby.fxml");
+            if (fxmlUrl == null) {
+                throw new RuntimeException("FXML resource not found: /GDKGameLobby.fxml");
+            }
+            
+            Logging.info("📂 Loading FXML from: " + fxmlUrl);
+            
+            // Try to load from classpath first, then fallback to file URL
+            FXMLLoader loader;
+            try {
+                loader = new FXMLLoader(GDKApplication.class.getResource("/GDKGameLobby.fxml"));
+                lobbyScene = new Scene(loader.load());
+            } catch (Exception e) {
+                Logging.warning("⚠️ Failed to load FXML from classpath, trying file path...");
+                // Fallback to direct file loading
+                File fxmlFile = new File("launcher/target/classes/GDKGameLobby.fxml");
+                if (!fxmlFile.exists()) {
+                    throw new RuntimeException("FXML file not found: " + fxmlFile.getAbsolutePath());
+                }
+                loader = new FXMLLoader(fxmlFile.toURI().toURL());
+                lobbyScene = new Scene(loader.load());
+            }
             
             // Apply GDK lobby CSS
-            lobbyScene.getStylesheets().add(GDKApplication.class.getResource("/gdk-lobby.css").toExternalForm());
+            URL cssUrl = GDKApplication.class.getResource("/gdk-lobby.css");
+            if (cssUrl != null) {
+                lobbyScene.getStylesheets().add(cssUrl.toExternalForm());
+                Logging.info("📂 CSS loaded from: " + cssUrl);
+            }
             
             // Get the controller and set the primary stage
             GDKGameLobbyController controller = loader.getController();
             if (controller != null) {
                 controller.setPrimaryStage(primaryStage);
                 controller.setGDKApplication(this);
+                Logging.info("✅ Controller initialized successfully");
+            } else {
+                Logging.warning("⚠️ Controller is null");
             }
             
             // Set the scene
@@ -316,6 +344,17 @@ public class GDKApplication extends Application {
      * This method is called by the FXML controller.
      */
     public void launchGame(GameModule selectedGame, GameMode gameMode, int playerCount, String difficulty) {
+        // Create default options and call the overloaded method
+        GameOptions options = new GameOptions();
+        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
+        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
+        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
+        options.setOption("difficulty", difficulty);
+        
+        launchGame(selectedGame, gameMode, playerCount, difficulty, options);
+    }
+    
+    public void launchGame(GameModule selectedGame, GameMode gameMode, int playerCount, String difficulty, GameOptions options) {
         if (selectedGame == null) {
             Logging.error("❌ No game selected for launch");
             return;
@@ -327,12 +366,11 @@ public class GDKApplication extends Application {
             return;
         }
 
-        // Create game options
-        GameOptions options = new GameOptions();
-        options.setOption("debugMode", config.getProperty("enableDebugMode", "true"));
-        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
-        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
-        options.setOption("difficulty", difficulty);
+        // Log custom data if present
+        if (options.hasOption("customData")) {
+            Object customData = options.getOption("customData", null);
+            Logging.info("📦 Launching with custom data: " + customData);
+        }
 
         Logging.info("🚀 Launching " + selectedGame.getGameName() + " in " + gameMode.getDisplayName() + " mode with " + playerCount + " players (Difficulty: " + difficulty + ")");
 

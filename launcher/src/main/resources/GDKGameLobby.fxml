@@ -80,6 +80,18 @@
                      styleClass="combo-box" prefWidth="300"/>
         </VBox>
         
+        <!-- JSON Data Input -->
+        <VBox spacing="5" alignment="CENTER">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Custom Data (JSON):" styleClass="field-label"/>
+                <Button fx:id="clearJsonButton" text="🗑️ Clear" styleClass="small-button"/>
+                <Button fx:id="validateJsonButton" text="✓ Validate" styleClass="small-button"/>
+            </HBox>
+            <TextArea fx:id="jsonDataTextArea" promptText="Enter JSON data to send to the game module...&#10;Example: {&quot;playerName&quot;: &quot;Player1&quot;, &quot;level&quot;: 5, &quot;settings&quot;: {&quot;sound&quot;: true}}" 
+                     styleClass="json-text-area" prefRowCount="4" wrapText="true"/>
+            <Label fx:id="jsonValidationLabel" text="" styleClass="validation-label"/>
+        </VBox>
+        
         <!-- Action Buttons -->
         <HBox spacing="10" alignment="CENTER">
             <Button fx:id="launchGameButton" text="🚀 Launch Game" 

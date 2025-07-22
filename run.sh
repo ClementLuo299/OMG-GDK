@@ -8,18 +8,18 @@ echo "🚀 Starting GDK..."
 NEED_BUILD=false
 
 # Check if compiled classes exist
-if [ ! -d "gdk-core/target/classes" ] || [ ! -d "modules/tictactoe/target/classes" ]; then
+if [ ! -d "launcher/target/classes" ] || [ ! -d "modules/tictactoe/target/classes" ]; then
     echo "📦 Building modules (classes missing)..."
     NEED_BUILD=true
 else
     # Check if source files are newer than compiled classes
-    GDK_CLASSES_TIME=$(stat -c %Y "gdk-core/target/classes" 2>/dev/null || echo 0)
+    LAUNCHER_CLASSES_TIME=$(stat -c %Y "launcher/target/classes" 2>/dev/null || echo 0)
     TICTACTOE_CLASSES_TIME=$(stat -c %Y "modules/tictactoe/target/classes" 2>/dev/null || echo 0)
     
     # Find newest source file
     NEWEST_SOURCE=$(find . -name "*.java" -o -name "*.fxml" -o -name "*.css" | xargs stat -c %Y 2>/dev/null | sort -n | tail -1)
     
-    if [ "$NEWEST_SOURCE" -gt "$GDK_CLASSES_TIME" ] || [ "$NEWEST_SOURCE" -gt "$TICTACTOE_CLASSES_TIME" ]; then
+    if [ "$NEWEST_SOURCE" -gt "$LAUNCHER_CLASSES_TIME" ] || [ "$NEWEST_SOURCE" -gt "$TICTACTOE_CLASSES_TIME" ]; then
         echo "📦 Building modules (source files changed)..."
         NEED_BUILD=true
     else
@@ -38,8 +38,8 @@ if [ "$NEED_BUILD" = true ]; then
 fi
 
 # Check if compiled classes exist after build
-if [ ! -d "gdk-core/target/classes" ]; then
-    echo "❌ Error: GDK Core classes not found at gdk-core/target/classes"
+if [ ! -d "launcher/target/classes" ]; then
+    echo "❌ Error: Launcher classes not found at launcher/target/classes"
     exit 1
 fi
 
@@ -50,5 +50,5 @@ fi
 
 # Run the GDK
 echo "🎮 Launching GDK..."
-cd gdk-core
+cd launcher
 mvn javafx:run -Djavafx.mainClass="com.GDKApplication" -Dexec.args="--modules-dir=../modules" -q 
