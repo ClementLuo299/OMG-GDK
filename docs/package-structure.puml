@@ -33,25 +33,18 @@ package "OMG-GDK" {
     }
     
     package "launcher" {
-        package "src/main/java/com" {
+        package "java" {
             file "GDKApplication.java"
             file "GDKGameLobbyController.java"
             file "GameSettingsDialog.java"
-            package "utils/error_handling" {
-                file "Dialog.java"
-                file "ErrorHandler.java"
-                file "SafeExecute.java"
-                package "enums" {
-                    file "ErrorCategory.java"
-                    file "ErrorSeverity.java"
-                }
-            }
         }
         
-        package "src/main/resources" {
+        package "resources" {
             file "GDKGameLobby.fxml"
             file "gdk-lobby.css"
         }
+        file "pom.xml"
+        file "gdk-config.properties"
     }
     
     package "modules" {
@@ -143,11 +136,12 @@ note right of gdk
 end note
 
 note right of launcher
-  **Launcher Application:**
-  • Main application entry point
-  • UI controllers
-  • Module discovery and loading
-  • Game lifecycle management
+  **Ultra-Simplified Launcher:**
+  • Removed complex error handling
+  • Kept only essential logging
+  • Clean, focused structure
+  • No package prefix (default package)
+  • Direct java/ and resources/ directories
 end note
 
 note right of modules

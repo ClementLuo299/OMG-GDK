@@ -1,4 +1,4 @@
-package com;
+
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;

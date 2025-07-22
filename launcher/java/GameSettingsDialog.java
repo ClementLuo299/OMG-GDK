@@ -1,4 +1,4 @@
-package com;
+
 
 import com.gdk.shared.settings.GameSetting;
 import com.gdk.shared.settings.GameSettings;
