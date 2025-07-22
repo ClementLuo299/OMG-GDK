@@ -64,7 +64,6 @@ public class GDKApplication extends Application {
             primaryStage.setHeight(900);
             primaryStage.setMinWidth(800);
             primaryStage.setMinHeight(600);
-            primaryStage.setMaximized(true);
             primaryStage.centerOnScreen();
             
             // Show the stage

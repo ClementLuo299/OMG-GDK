@@ -9,92 +9,73 @@
 <VBox fx:id="mainContainer" prefHeight="900.0" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="GDKGameLobbyController"
-      styleClass="game-picker-container" spacing="15" alignment="TOP_CENTER">
+      styleClass="game-picker-container" spacing="0" alignment="TOP_LEFT">
     
     <padding>
-        <Insets top="15" right="15" bottom="15" left="15"/>
+        <Insets top="0" right="0" bottom="0" left="0"/>
     </padding>
     
     <!-- Header -->
-    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="header" VBox.vgrow="NEVER">
-        <Button fx:id="backButton" text="← Back" styleClass="nav-button"/>
-        <Label fx:id="gameTitleLabel" text="GDK Game Picker" styleClass="main-title"/>
+    <HBox alignment="CENTER" spacing="20" styleClass="header" VBox.vgrow="NEVER">
+        <Button fx:id="exitButton" text="✕ Exit" styleClass="nav-button"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="gameTitleLabel" text="OMG Game Development Kit" styleClass="main-title"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Button fx:id="refreshButton" text="🔄 Refresh" styleClass="nav-button"/>
     </HBox>
     
     <!-- Main Content Area -->
-    <HBox spacing="20" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
+    <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
         
-        <!-- Left Panel - Game Info and Configuration -->
-        <VBox spacing="15" HBox.hgrow="ALWAYS" maxWidth="500" alignment="TOP_CENTER">
+        <!-- Centered Game Configuration Panel -->
+        <VBox styleClass="game-config-panel" spacing="15" alignment="TOP_CENTER" VBox.vgrow="ALWAYS" minWidth="500">
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20"/>
+            </padding>
             
-            <!-- Game Information -->
-            <VBox styleClass="game-info-panel" spacing="10" alignment="CENTER" VBox.vgrow="NEVER">
-                <padding>
-                    <Insets top="15" right="15" bottom="15" left="15"/>
-                </padding>
-                
-                <HBox alignment="CENTER" spacing="15">
-                    <ImageView fx:id="gameIconImageView" fitHeight="80" fitWidth="80" 
-                              styleClass="game-icon"/>
-                    <VBox spacing="5" alignment="CENTER">
-                        <Label fx:id="gameTitleLabel" text="Select a Game" 
-                               styleClass="game-title-large"/>
-                        <Label fx:id="gameDescriptionLabel" text="Choose a game from the dropdown to get started..." 
-                               styleClass="game-description" wrapText="true"/>
-                    </VBox>
-                </HBox>
+            <!-- Game Selection -->
+            <VBox spacing="5" alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+                <Label text="Select Game:" styleClass="field-label"/>
+                <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
+                         styleClass="combo-box" prefWidth="400"/>
             </VBox>
             
-            <!-- Game Configuration -->
-            <VBox styleClass="game-config-panel" spacing="15" alignment="CENTER" VBox.vgrow="ALWAYS">
-                <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
-                </padding>
-                
-                <Label text="Game Configuration" styleClass="section-title"/>
-                
-                <!-- Game Selection -->
-                <VBox spacing="5" alignment="CENTER" VBox.vgrow="NEVER">
-                    <Label text="Select Game:" styleClass="field-label"/>
-                    <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
-                             styleClass="combo-box" prefWidth="400"/>
-                </VBox>
-                
-                <!-- JSON Data Input -->
-                <VBox spacing="5" alignment="CENTER" VBox.vgrow="ALWAYS">
-                    <HBox alignment="CENTER_LEFT" spacing="10">
-                        <Label text="Game Configuration (JSON):" styleClass="field-label"/>
-                        <Button fx:id="clearJsonButton" text="🗑️ Clear" styleClass="small-button"/>
-                        <Button fx:id="validateJsonButton" text="✓ Validate" styleClass="small-button"/>
-                    </HBox>
-                    <TextArea fx:id="jsonDataTextArea" promptText="Enter JSON configuration here...&#10;Example:&#10;{&#10;  &quot;gameMode&quot;: &quot;SINGLE_PLAYER&quot;,&#10;  &quot;playerCount&quot;: 1,&#10;  &quot;difficulty&quot;: &quot;MEDIUM&quot;,&#10;  &quot;customSettings&quot;: {&#10;    &quot;soundEnabled&quot;: true,&#10;    &quot;maxTurns&quot;: 50&#10;  }&#10;}" 
-                             styleClass="json-text-area" VBox.vgrow="ALWAYS" wrapText="true"/>
-                    <Label fx:id="jsonValidationLabel" text="" styleClass="validation-label"/>
-                </VBox>
-                
-                <!-- Action Buttons -->
-                <HBox spacing="10" alignment="CENTER" VBox.vgrow="NEVER">
+            <!-- JSON Data Input -->
+            <VBox spacing="5" alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
+                <Label text="Game Configuration (JSON):" styleClass="field-label"/>
+                <TextArea fx:id="jsonDataTextArea" promptText="Enter JSON configuration here. (Resorts to default if invalid)" 
+                         styleClass="json-text-area" VBox.vgrow="ALWAYS" wrapText="true" minHeight="150"/>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Button fx:id="clearJsonButton" text="🗑️ Clear" styleClass="small-button"/>
+                    <Button fx:id="validateJsonButton" text="✓ Validate" styleClass="small-button"/>
+                    <Region HBox.hgrow="ALWAYS"/>
                     <Button fx:id="launchGameButton" text="🚀 Launch Game" 
-                            styleClass="primary-button"/>
+                            styleClass="primary-button" style="-fx-font-size: 11px; -fx-padding: 4 8; -fx-min-width: 60;"/>
                 </HBox>
             </VBox>
         </VBox>
         
-        <!-- Right Panel - Log Area -->
-        <VBox styleClass="log-panel" spacing="5" HBox.hgrow="ALWAYS" alignment="TOP_CENTER" minWidth="400">
-            <Label text="Activity Log" styleClass="section-title"/>
-            <TextArea fx:id="logArea" VBox.vgrow="ALWAYS" 
-                      styleClass="log-area" editable="false" wrapText="true"/>
+        <!-- Divider -->
+        <HBox alignment="CENTER" VBox.vgrow="NEVER">
+            <Region style="-fx-background-color: #dee2e6; -fx-min-height: 1; -fx-pref-width: 100%;"/>
+        </HBox>
+        
+        <!-- Message Area -->
+        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400">
+            <Label text="Messages" styleClass="section-title"/>
+            <TextArea fx:id="messageArea" VBox.vgrow="ALWAYS" 
+                      styleClass="message-area" editable="false" wrapText="true"/>
         </VBox>
-    </HBox>
+    </VBox>
     
     <!-- Status Bar -->
     <HBox alignment="CENTER_LEFT" spacing="20" styleClass="status-bar" VBox.vgrow="NEVER">
-        <Label text="GDK Game Picker - Ready to test games!" styleClass="status-text"/>
+        <padding>
+            <Insets top="10" right="15" bottom="10" left="15"/>
+        </padding>
+        <Label text="GDK Game Lobby" styleClass="status-text"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label text="Modules: 2 | Games: 2" styleClass="status-text"/>
+        <Label fx:id="statusLabel" text="Available Games: 0" styleClass="status-text"/>
     </HBox>
     
 </VBox> 

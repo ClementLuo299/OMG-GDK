@@ -23,6 +23,7 @@ import javafx.scene.paint.Color;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.io.File;
 import java.io.FileReader;
@@ -50,20 +51,20 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== FXML INJECTIONS ====================
     
     @FXML private VBox mainContainer;
-    @FXML private Button backButton;
+    @FXML private Button exitButton;
     @FXML private Button refreshButton;
     @FXML private Label gameTitleLabel;
-    @FXML private Label gameDescriptionLabel;
     @FXML private ImageView gameIconImageView;
     @FXML private ComboBox<GameModule> gameSelector;
     @FXML private Button launchGameButton;
-    @FXML private TextArea logArea;
+    @FXML private TextArea messageArea;
+    @FXML private Label statusLabel;
     
     // JSON data components
     @FXML private TextArea jsonDataTextArea;
     @FXML private Button clearJsonButton;
     @FXML private Button validateJsonButton;
-    @FXML private Label jsonValidationLabel;
+
     
     // ==================== DEPENDENCIES ====================
     
@@ -158,20 +159,19 @@ public class GDKGameLobbyController implements Initializable {
         gameSelector.setButtonCell(gameSelector.getCellFactory().call(null));
         
         // Setup JSON text area with placeholder
-        jsonDataTextArea.setPromptText("Enter JSON configuration here...\nExample:\n{\n  \"gameMode\": \"SINGLE_PLAYER\",\n  \"playerCount\": 1,\n  \"difficulty\": \"MEDIUM\",\n  \"customSettings\": {\n    \"soundEnabled\": true,\n    \"maxTurns\": 50\n  }\n}");
+        jsonDataTextArea.setPromptText("Enter JSON configuration here. (Resorts to default if invalid)");
         
-        // Setup log area with welcome message
-        logArea.setEditable(false);
-        logArea.setWrapText(true);
-        logArea.setPrefRowCount(10);
-        logArea.setStyle("-fx-font-family: 'Monaco', 'Consolas', monospace; -fx-font-size: 12px;");
+        // Setup message area
+        messageArea.setEditable(false);
+        messageArea.setWrapText(true);
+        messageArea.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
         
-        // Add welcome message to log
-        logArea.appendText("🎮 Welcome to GDK Game Picker!\n");
-        logArea.appendText("📋 Select a game module and configure it with JSON\n");
-        logArea.appendText("🚀 Use the Launch Game button to start playing\n");
-        logArea.appendText("📝 All activities will be logged here\n");
-        logArea.appendText("─".repeat(50) + "\n");
+        // Add welcome message to message area
+        addMessage("🎮 Welcome to GDK Game Picker!");
+        addMessage("📋 Select a game module and configure it with JSON");
+        addMessage("🚀 Use the Launch Game button to start playing");
+        addMessage("📝 All activities will be logged here");
+        addMessage("─".repeat(50));
         
         Logging.info("🎨 UI components initialized");
     }
@@ -186,6 +186,14 @@ public class GDKGameLobbyController implements Initializable {
         
         // Launch game handler
         launchGameButton.setOnAction(e -> launchGame());
+        
+        // Exit button handler
+        exitButton.setOnAction(e -> {
+            addLogMessage("👋 Exiting GDK Game Picker");
+            if (primaryStage != null) {
+                primaryStage.close();
+            }
+        });
         
         // Refresh games handler
         refreshButton.setOnAction(e -> {
@@ -212,7 +220,23 @@ public class GDKGameLobbyController implements Initializable {
     private void refreshGameList() {
         try {
             availableGames = FXCollections.observableArrayList();
-            List<GameModule> modules = ModuleLoader.discoverModules("../modules");
+            
+            // Try different possible paths for modules
+            String[] possiblePaths = {"../modules", "modules", "./modules"};
+            List<GameModule> modules = new ArrayList<>();
+            
+            for (String path : possiblePaths) {
+                try {
+                    addLogMessage("🔍 Searching for modules in: " + path);
+                    modules = ModuleLoader.discoverModules(path);
+                    if (!modules.isEmpty()) {
+                        addLogMessage("✅ Found modules in: " + path);
+                        break;
+                    }
+                } catch (Exception e) {
+                    addLogMessage("❌ Failed to search in " + path + ": " + e.getMessage());
+                }
+            }
             
             for (GameModule module : modules) {
                 availableGames.add(module);
@@ -230,6 +254,9 @@ public class GDKGameLobbyController implements Initializable {
                 addLogMessage("⚠️ No game modules found");
             }
             
+            // Update status bar with game count
+            statusLabel.setText("Available Games: " + availableGames.size());
+            
         } catch (Exception e) {
             Logging.error("❌ Failed to load game modules: " + e.getMessage(), e);
             addLogMessage("❌ Failed to load game modules: " + e.getMessage());
@@ -238,9 +265,6 @@ public class GDKGameLobbyController implements Initializable {
     
     private void updateGameInfo() {
         if (selectedGame != null) {
-            gameTitleLabel.setText(selectedGame.getGameName());
-            gameDescriptionLabel.setText(selectedGame.getGameDescription());
-            
             // Try to load game icon
             try {
                 String iconPath = selectedGame.getGameIconPath();
@@ -250,9 +274,6 @@ public class GDKGameLobbyController implements Initializable {
             } catch (Exception e) {
                 Logging.warning("⚠️ Could not load game icon: " + e.getMessage());
             }
-        } else {
-            gameTitleLabel.setText("No Game Selected");
-            gameDescriptionLabel.setText("Please select a game to launch");
         }
     }
     
@@ -324,13 +345,20 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
-     * Adds a timestamped message to the log area
+     * Adds a timestamped message to the message area
      */
     private void addLogMessage(String message) {
+        addMessage(message);
+    }
+    
+    /**
+     * Adds a message to the message area
+     */
+    private void addMessage(String message) {
         String timestamp = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
-        logArea.appendText("[" + timestamp + "] " + message + "\n");
+        messageArea.appendText("[" + timestamp + "] " + message + "\n");
         // Auto-scroll to bottom
-        logArea.setScrollTop(Double.MAX_VALUE);
+        messageArea.setScrollTop(Double.MAX_VALUE);
     }
     
     // ==================== JSON DATA HANDLING ====================
@@ -342,19 +370,16 @@ public class GDKGameLobbyController implements Initializable {
         String jsonText = jsonDataTextArea.getText().trim();
         
         if (jsonText.isEmpty()) {
-            jsonValidationLabel.setText("✅ JSON is empty (will use defaults)");
-            jsonValidationLabel.setStyle("-fx-text-fill: green;");
+            addMessage("✅ JSON is empty (will use defaults)");
             return;
         }
         
         try {
             jsonMapper.readTree(jsonText);
-            jsonValidationLabel.setText("✅ Valid JSON");
-            jsonValidationLabel.setStyle("-fx-text-fill: green;");
+            addMessage("✅ Valid JSON");
             addLogMessage("✅ JSON validation successful");
         } catch (JsonProcessingException e) {
-            jsonValidationLabel.setText("❌ Invalid JSON: " + e.getMessage());
-            jsonValidationLabel.setStyle("-fx-text-fill: red;");
+            addMessage("❌ Invalid JSON: " + e.getMessage());
             addLogMessage("❌ JSON validation failed: " + e.getMessage());
         }
     }
@@ -369,10 +394,11 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
-     * Clears the JSON validation label.
+     * Clears the JSON validation messages.
      */
     private void clearJsonValidation() {
-        jsonValidationLabel.setText("");
+        // Validation messages are now shown in the message area
+        // No need to clear anything specific for validation
     }
     
     /**
