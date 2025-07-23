@@ -323,12 +323,11 @@ public class GDKGameLobbyController implements Initializable {
         options.setOption("customData", jsonData);
         addLogMessage("📦 Including custom JSON data with " + jsonData.size() + " fields");
 
-        addLogMessage("🚀 Launching " + selectedGame.getGameName() + " in " + gameMode.getDisplayName() + 
-                          " mode with " + playerCount + " players");
+        addLogMessage("🚀 Launching " + selectedGame.getGameName());
 
         // Launch the game
         if (gdkApplication != null) {
-            gdkApplication.launchGame(selectedGame, gameMode, playerCount, "MEDIUM", options);
+            gdkApplication.launchGame(selectedGame);
         }
     }
     

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="10" styleClass="server-simulator" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ServerSimulatorController">
+   <children>
+      <Label text="Server Simulator" styleClass="title-label" />
+      
+      <VBox spacing="5" styleClass="message-section">
+         <Label text="Received Messages:" />
+         <TextArea fx:id="receivedMessagesArea" prefRowCount="8" editable="false" wrapText="true" styleClass="message-area" />
+      </VBox>
+      
+      <VBox spacing="5" styleClass="message-section">
+         <Label text="Send Message:" />
+         <HBox spacing="5">
+            <TextField fx:id="messageInput" promptText="Enter JSON message..." HBox.hgrow="ALWAYS" />
+            <Button fx:id="sendButton" text="Send" onAction="#handleSendMessage" />
+         </HBox>
+      </VBox>
+      
+      <HBox spacing="5" styleClass="button-section">
+         <Button fx:id="clearButton" text="Clear Messages" onAction="#handleClearMessages" />
+         <Button fx:id="closeButton" text="Close" onAction="#handleClose" />
+      </HBox>
+   </children>
+   <padding>
+      <Insets top="10" right="10" bottom="10" left="10" />
+   </padding>
+</VBox> 
