@@ -1,4 +1,4 @@
-package com.gdk.shared.settings;
+package gdk;
 
 import javafx.scene.control.Control;
 import javafx.scene.control.Spinner;

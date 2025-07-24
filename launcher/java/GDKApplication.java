@@ -1,7 +1,9 @@
-import com.gdk.shared.game.GameModule;
-import com.gdk.shared.game.GameMode;
-import com.gdk.shared.utils.error_handling.Logging;
 
+
+
+import gdk.GameModule;
+import gdk.GameMode;
+import gdk.Logging;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

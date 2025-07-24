@@ -1,13 +1,11 @@
 package example;
 
-import com.gdk.shared.game.GameModule;
-import com.gdk.shared.game.GameMode;
-
-import com.gdk.shared.game.GameOptions;
-import com.gdk.shared.game.GameState;
-
-import com.gdk.shared.settings.GameSettings;
-import com.gdk.shared.utils.error_handling.Logging;
+import gdk.GameModule;
+import gdk.GameMode;
+import gdk.GameOptions;
+import gdk.GameState;
+import gdk.GameSettings;
+import gdk.Logging;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

@@ -1,13 +1,11 @@
 package tictactoe;
 
-import com.gdk.shared.game.GameModule;
-import com.gdk.shared.game.GameMode;
-
-import com.gdk.shared.game.GameOptions;
-import com.gdk.shared.game.GameState;
-
-import com.gdk.shared.settings.GameSettings;
-import com.gdk.shared.utils.error_handling.Logging;
+import gdk.GameModule;
+import gdk.GameMode;
+import gdk.GameOptions;
+import gdk.GameState;
+import gdk.GameSettings;
+import gdk.Logging;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.util.Map;
@@ -188,7 +186,7 @@ public class GameMetadata implements GameModule {
     // ==================== GAME EXECUTION (DELEGATED) ====================
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
         // Delegate to the actual game implementation
         TicTacToeModule gameModule = new TicTacToeModule();
         return gameModule.launchGame(primaryStage, gameMode, playerCount, gameOptions, eventHandler);

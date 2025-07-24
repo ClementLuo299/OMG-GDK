@@ -1,6 +1,5 @@
-package com.gdk.shared.game;
+package gdk;
 
-import com.gdk.shared.settings.GameSettings;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 

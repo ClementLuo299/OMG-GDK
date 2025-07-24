@@ -1,4 +1,4 @@
-package com.gdk.shared.utils.error_handling;
+package gdk;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -1,6 +1,5 @@
-package com.gdk.shared.utils;
+package gdk;
 
-import com.gdk.shared.game.GameModule;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;

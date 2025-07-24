@@ -1,11 +1,12 @@
 
 
-import com.gdk.shared.game.GameModule;
-import com.gdk.shared.game.GameMode;
-import com.gdk.shared.game.GameOptions;
 
-import com.gdk.shared.utils.ModuleLoader;
-import com.gdk.shared.utils.error_handling.Logging;
+
+import gdk.GameModule;
+import gdk.GameMode;
+import gdk.GameOptions;
+import gdk.ModuleLoader;
+import gdk.Logging;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;

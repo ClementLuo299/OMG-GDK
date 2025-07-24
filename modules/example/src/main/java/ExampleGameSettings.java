@@ -1,6 +1,10 @@
 package example;
 
-import com.gdk.shared.settings.*;
+import gdk.GameSettings;
+import gdk.GameSetting;
+import gdk.BooleanSetting;
+import gdk.IntegerSetting;
+import gdk.StringSetting;
 
 import java.util.Arrays;
 import java.util.List;

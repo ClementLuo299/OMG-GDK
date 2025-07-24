@@ -1,4 +1,4 @@
-package com.gdk.shared.settings;
+package gdk;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;

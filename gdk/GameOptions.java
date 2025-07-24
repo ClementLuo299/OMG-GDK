@@ -1,4 +1,4 @@
-package com.gdk.shared.game;
+package gdk;
 
 import java.util.HashMap;
 import java.util.Map;

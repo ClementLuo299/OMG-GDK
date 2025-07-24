@@ -1,4 +1,4 @@
-package com.gdk.shared.settings;
+package gdk;
 
 import java.util.List;
 
