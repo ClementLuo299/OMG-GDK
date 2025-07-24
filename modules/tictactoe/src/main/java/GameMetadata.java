@@ -4,7 +4,7 @@ import gdk.GameModule;
 import gdk.GameMode;
 import gdk.GameOptions;
 import gdk.GameState;
-import gdk.GameSettings;
+
 import gdk.Logging;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -173,15 +173,7 @@ public class GameMetadata implements GameModule {
         return false;
     }
     
-    @Override
-    public boolean hasCustomSettings() {
-        return false;
-    }
-    
-    @Override
-    public GameSettings getCustomSettings() {
-        return null;
-    }
+
     
     // ==================== GAME EXECUTION (DELEGATED) ====================
     

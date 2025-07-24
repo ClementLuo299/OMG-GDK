@@ -3,9 +3,7 @@
 
 
 import gdk.GameModule;
-import gdk.GameMode;
-import gdk.GameOptions;
-import gdk.ModuleLoader;
+
 import gdk.Logging;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -289,23 +287,8 @@ public class GDKGameLobbyController implements Initializable {
             return;
         }
         
-        // Extract game mode and player count from JSON
-        String gameModeStr = (String) jsonData.getOrDefault("gameMode", "SINGLE_PLAYER");
-        Integer playerCount = (Integer) jsonData.getOrDefault("playerCount", 1);
-        
-        // Find the game mode
-        GameMode gameMode = null;
-        for (GameMode mode : selectedGame.getSupportedGameModes()) {
-            if (mode.getId().equals(gameModeStr)) {
-                gameMode = mode;
-                break;
-            }
-        }
-        
-        if (gameMode == null) {
-            gameMode = selectedGame.getDefaultGameMode();
-            addLogMessage("⚠️ Game mode '" + gameModeStr + "' not found, using default: " + gameMode.getDisplayName());
-        }
+        // Extract player count from JSON
+        Integer playerCount = (Integer) jsonData.getOrDefault("playerCount", selectedGame.getMinPlayers());
         
         // Validate player count
         if (playerCount < selectedGame.getMinPlayers() || playerCount > selectedGame.getMaxPlayers()) {
@@ -314,13 +297,7 @@ public class GDKGameLobbyController implements Initializable {
             return;
         }
         
-        // Create game options
-        GameOptions options = new GameOptions();
-        options.setOption("serverUrl", config.getProperty("serverUrl", "localhost"));
-        options.setOption("serverPort", config.getProperty("serverPort", "8080"));
-        
         // Add JSON data
-        options.setOption("customData", jsonData);
         addLogMessage("📦 Including custom JSON data with " + jsonData.size() + " fields");
 
         addLogMessage("🚀 Launching " + selectedGame.getGameName());

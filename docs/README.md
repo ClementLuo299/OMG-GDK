@@ -23,9 +23,9 @@ This directory contains PlantUML diagrams that visualize the OMG Game Developmen
 ### 3. **class-hierarchy.puml** - Class Hierarchy and Inheritance
 - **Purpose**: Shows inheritance relationships, interfaces, and class structures
 - **Key Elements**:
-  - Core interfaces (GameModule, GameEventHandler, GameSettings)
+  - Core interfaces (GameModule, GameEventHandler)
   - Core classes (GameMode, GameDifficulty, GameOptions, GameState, GameEvent)
-  - Settings system with abstract GameSetting and concrete implementations
+  - Configuration handled via JSON and GameOptions
   - Module implementations showing the pattern
 
 ### 4. **data-flow.puml** - Data Flow and Interactions

@@ -1,10 +1,6 @@
 package example;
 
 import gdk.GameModule;
-import gdk.GameMode;
-import gdk.GameOptions;
-import gdk.GameState;
-import gdk.GameSettings;
 import gdk.Logging;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -36,12 +32,9 @@ public class Main implements GameModule {
     // ==================== JSON COMMUNICATION & GAME CONTROL ====================
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
+    public Scene launchGame(Stage primaryStage, int playerCount, Object eventHandler) {
         try {
             Logging.info("🚀 Starting Example Game...");
-            
-            // Handle JSON data if present
-            handleJsonData(gameOptions);
             
             // Event system removed - use server simulator for communication
             
@@ -49,7 +42,7 @@ public class Main implements GameModule {
             if (gameModule == null) {
                 gameModule = new ExampleGameModule();
             }
-            Scene gameScene = gameModule.launchGame(primaryStage, gameMode, playerCount, gameOptions, eventHandler);
+            Scene gameScene = gameModule.launchGame(primaryStage, playerCount, eventHandler);
             
             Logging.info("✅ Example Game launched successfully");
             return gameScene;
@@ -80,43 +73,7 @@ public class Main implements GameModule {
         }
     }
     
-    @Override
-    public GameState getGameState() {
-        return metadata.getGameState();
-    }
-    
-    @Override
-    public void loadGameState(GameState gameState) {
-        try {
-            Logging.info("📂 Loading game state for Example Game");
-            metadata.loadGameState(gameState);
-            Logging.info("✅ Game state loaded successfully");
-        } catch (Exception e) {
-            Logging.error("❌ Error loading game state: " + e.getMessage(), e);
-        }
-    }
-    
     // ==================== JSON DATA HANDLING ====================
-    
-    /**
-     * Handles JSON data received from the launcher.
-     * @param gameOptions The game options containing JSON data
-     */
-    private void handleJsonData(GameOptions gameOptions) {
-        if (gameOptions != null && gameOptions.hasOption("customData")) {
-            Object customData = gameOptions.getOption("customData", null);
-            Logging.info("📦 Received JSON data: " + customData);
-            
-            // Process the JSON data as needed
-            if (customData instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> data = (Map<String, Object>) customData;
-                processJsonData(data);
-            }
-        } else {
-            Logging.info("📦 No JSON data received");
-        }
-    }
     
     /**
      * Processes the parsed JSON data.
@@ -219,52 +176,6 @@ public class Main implements GameModule {
     @Override
     public String getGameIconPath() {
         return metadata.getGameIconPath();
-    }
-    
-    @Override
-    public GameMode[] getSupportedGameModes() {
-        return metadata.getSupportedGameModes();
-    }
-    
-
-    
-    @Override
-    public Map<GameMode, int[]> getSupportedPlayerCounts() {
-        return metadata.getSupportedPlayerCounts();
-    }
-    
-    @Override
-    public GameMode getDefaultGameMode() {
-        return metadata.getDefaultGameMode();
-    }
-    
-
-    
-    @Override
-    public int getDefaultPlayerCount(GameMode gameMode) {
-        return metadata.getDefaultPlayerCount(gameMode);
-    }
-    
-    @Override
-    public boolean supportsGameMode(GameMode gameMode) {
-        return metadata.supportsGameMode(gameMode);
-    }
-    
-
-    
-    @Override
-    public boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
-        return metadata.supportsPlayerCount(gameMode, playerCount);
-    }
-    
-    @Override
-    public boolean hasCustomSettings() {
-        return metadata.hasCustomSettings();
-    }
-    
-    @Override
-    public GameSettings getCustomSettings() {
-        return metadata.getCustomSettings();
     }
     
     // ==================== UTILITY METHODS ====================

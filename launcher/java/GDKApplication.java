@@ -2,7 +2,7 @@
 
 
 import gdk.GameModule;
-import gdk.GameMode;
+
 import gdk.Logging;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -122,11 +122,10 @@ public class GDKApplication extends Application {
             // Create server simulator window
             createServerSimulator();
             
-            // Get default values from the game module
-            GameMode defaultGameMode = selectedGame.getDefaultGameMode();
-            int defaultPlayerCount = selectedGame.getDefaultPlayerCount(defaultGameMode);
+            // Get default player count from the game module
+            int defaultPlayerCount = selectedGame.getMinPlayers();
             
-            javafx.scene.Scene gameScene = selectedGame.launchGame(primaryStage, defaultGameMode, defaultPlayerCount, null, null);
+            javafx.scene.Scene gameScene = selectedGame.launchGame(primaryStage, defaultPlayerCount, null);
             if (gameScene != null) {
                 currentGame = selectedGame;
                 gameIsRunning = true;

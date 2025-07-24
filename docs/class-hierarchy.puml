@@ -6,133 +6,29 @@ package "Core Interfaces" {
     interface GameModule {
         +getGameId(): String
         +getGameName(): String
+        +launchGame(Stage, int, Object): Scene
+        +onGameClose(): void
         +getGameDescription(): String
         +getMinPlayers(): int
         +getMaxPlayers(): int
         +getEstimatedDuration(): int
-        +getDifficulty(): GameDifficulty
         +getGameCategory(): String
         +supportsOnlineMultiplayer(): boolean
         +supportsLocalMultiplayer(): boolean
         +supportsSinglePlayer(): boolean
+        +getGameIconPath(): String
         +getGameFxmlPath(): String
         +getGameCssPath(): String
-        +getGameIconPath(): String
-        +launchGame(Stage, GameMode, int, GameOptions, GameEventHandler): Scene
-        +onGameClose(): void
-        +getGameState(): GameState
-        +loadGameState(GameState): void
-        +getSupportedGameModes(): GameMode[]
-        +getSupportedDifficulties(): GameDifficulty[]
-        +getSupportedPlayerCounts(): Map<GameMode, int[]>
-        +getDefaultGameMode(): GameMode
-        +getDefaultDifficulty(): GameDifficulty
-        +getDefaultPlayerCount(GameMode): int
-        +supportsGameMode(GameMode): boolean
-        +supportsDifficulty(GameDifficulty): boolean
-        +supportsPlayerCount(GameMode, int): boolean
-        +hasCustomSettings(): boolean
-        +getCustomSettings(): GameSettings
     }
     
     interface GameEventHandler {
         +handleGameEvent(GameEvent): void
     }
     
-    interface GameSettings {
-        +getSettings(): List<GameSetting<?>>
-        +getSetting(String): GameSetting<?>
-        +validateSettings(): boolean
-        +resetToDefaults(): void
-    }
+
 }
 
 package "Core Classes" {
-    class GameMode {
-        -id: String
-        -displayName: String
-        -description: String
-        -icon: String
-        -colorCode: String
-        -properties: Map<String, Object>
-        --
-        +GameMode(String, String, String)
-        +getId(): String
-        +getDisplayName(): String
-        +getDescription(): String
-        +getCategory(): String
-        +getProperty(String): Object
-        +setProperty(String, Object): void
-        --
-        ' Static instances
-        +SINGLE_PLAYER: GameMode
-        +LOCAL_MULTIPLAYER: GameMode
-        +HOT_SEAT: GameMode
-        +PRACTICE: GameMode
-        +PUZZLE: GameMode
-        +CREATIVE: GameMode
-        +AI_VERSUS: GameMode
-        +AI_COOP: GameMode
-    }
-    
-    class GameDifficulty {
-        -id: String
-        -displayName: String
-        -description: String
-        -icon: String
-        -colorCode: String
-        -level: int
-        -properties: Map<String, Object>
-        --
-        +GameDifficulty(String, String, String, int)
-        +getId(): String
-        +getDisplayName(): String
-        +getDescription(): String
-        +getLevel(): int
-        +getProperty(String): Object
-        +setProperty(String, Object): void
-        --
-        ' Static instances
-        +EASY: GameDifficulty
-        +MEDIUM: GameDifficulty
-        +HARD: GameDifficulty
-        +EXPERT: GameDifficulty
-        +NIGHTMARE: GameDifficulty
-    }
-    
-    class GameOptions {
-        -options: Map<String, Object>
-        --
-        +GameOptions()
-        +setOption(String, Object): void
-        +getOption(String, Object): Object
-        +hasOption(String): boolean
-        +removeOption(String): void
-        +clearOptions(): void
-        +getAllOptions(): Map<String, Object>
-    }
-    
-    class GameState {
-        -gameId: String
-        -status: String
-        -gameMode: GameMode
-        -playerCount: int
-        -options: GameOptions
-        -stateData: Map<String, Object>
-        --
-        +GameState(String, String, GameMode, int, GameOptions)
-        +getGameId(): String
-        +getStatus(): String
-        +getGameMode(): GameMode
-        +getPlayerCount(): int
-        +getOptions(): GameOptions
-        +setStateValue(String, Object): void
-        +getStateValue(String): Object
-        +hasStateValue(String): boolean
-        +removeStateValue(String): void
-        +getAllStateData(): Map<String, Object>
-    }
-    
     class GameEvent {
         -eventType: EventType
         -gameId: String
@@ -156,62 +52,7 @@ package "Core Classes" {
     }
 }
 
-package "Settings System" {
-    abstract class GameSetting<T> {
-        -key: String
-        -displayName: String
-        -description: String
-        -defaultValue: T
-        -currentValue: T
-        -required: boolean
-        --
-        +GameSetting(String, String, String, T, boolean)
-        +getKey(): String
-        +getDisplayName(): String
-        +getDescription(): String
-        +getDefaultValue(): T
-        +getCurrentValue(): T
-        +setCurrentValue(T): void
-        +isRequired(): boolean
-        +isValid(): boolean
-        +resetToDefault(): void
-        --
-        +createControl(): Node
-        +updateValue(Node): void
-        +validateValue(T): boolean
-    }
-    
-    class BooleanSetting {
-        +BooleanSetting(String, String, String, boolean, boolean)
-        +createControl(): CheckBox
-        +updateValue(CheckBox): void
-        +validateValue(Boolean): boolean
-    }
-    
-    class IntegerSetting {
-        -minValue: int
-        -maxValue: int
-        --
-        +IntegerSetting(String, String, String, int, int, int, boolean)
-        +getMinValue(): int
-        +getMaxValue(): int
-        +createControl(): Spinner<Integer>
-        +updateValue(Spinner<Integer>): void
-        +validateValue(Integer): boolean
-    }
-    
-    class StringSetting {
-        -maxLength: int
-        -pattern: String
-        --
-        +StringSetting(String, String, String, String, int, String, boolean)
-        +getMaxLength(): int
-        +getPattern(): String
-        +createControl(): TextField
-        +updateValue(TextField): void
-        +validateValue(String): boolean
-    }
-}
+
 
 package "Module Implementations" {
     class ExampleMain {
@@ -234,9 +75,9 @@ package "Module Implementations" {
         +MAX_PLAYERS: int = 4
         +ESTIMATED_DURATION: int = 10
         --
-        +getSupportedGameModes(): GameMode[]
-        +getSupportedDifficulties(): GameDifficulty[]
-        +getSupportedPlayerCounts(): Map<GameMode, int[]>
+        +getMinPlayers(): int
+        +getMaxPlayers(): int
+        +getEstimatedDuration(): int
     }
     
     class ExampleGameModule {
@@ -252,8 +93,6 @@ package "Module Implementations" {
         +Main()
         +launchGame(...): Scene
         +onGameClose(): void
-        +handleJsonData(GameOptions): void
-        +processJsonData(Map<String, Object>): void
     }
     
     class TicTacToeGameMetadata {
@@ -265,14 +104,48 @@ package "Module Implementations" {
         +MAX_PLAYERS: int = 2
         +ESTIMATED_DURATION: int = 5
         --
-        +getSupportedGameModes(): GameMode[]
-        +getSupportedDifficulties(): GameDifficulty[]
-        +getSupportedPlayerCounts(): Map<GameMode, int[]>
+        +getMinPlayers(): int
+        +getMaxPlayers(): int
+        +getEstimatedDuration(): int
     }
     
     class TicTacToeModule {
         +launchGame(...): Scene
         +onGameClose(): void
+    }
+}
+
+package "Launcher" {
+    class GDKApplication {
+        -primaryStage: Stage
+        -lobbyScene: Scene
+        -currentGame: GameModule
+        +start(Stage): void
+        +stop(): void
+        +launchGame(GameModule): void
+    }
+    
+    class GDKGameLobbyController {
+        -availableGames: ObservableList<GameModule>
+        -selectedGame: GameModule
+        +initialize(URL, ResourceBundle): void
+        +refreshGameList(): void
+        +launchGame(): void
+    }
+    
+    class ModuleLoader {
+        +discoverModules(String): List<GameModule>
+        +loadModule(String): GameModule
+        +getModulePath(): String
+        +setModulePath(String): void
+    }
+    
+    class ServerSimulatorController {
+        -stage: Stage
+        -gdkApplication: GDKApplication
+        +setStage(Stage): void
+        +setGDKApplication(GDKApplication): void
+        +sendMessage(String): void
     }
 }
 
@@ -282,18 +155,12 @@ TicTacToeMain ..|> GameModule : implements
 ExampleGameMetadata ..|> GameModule : implements
 TicTacToeGameMetadata ..|> GameModule : implements
 
-BooleanSetting --|> GameSetting<Boolean>
-IntegerSetting --|> GameSetting<Integer>
-StringSetting --|> GameSetting<String>
-
 ' Composition relationships
 ExampleMain --> ExampleGameMetadata : delegates metadata
-ExampleMain --> ExampleGameModule : delegates execution
+ExampleMain --> ExampleGameModule : delegates game logic
 TicTacToeMain --> TicTacToeGameMetadata : delegates metadata
-TicTacToeMain --> TicTacToeModule : delegates execution
+TicTacToeMain --> TicTacToeModule : delegates game logic
 
-GameState --> GameOptions : contains
-GameState --> GameMode : references
 GameEvent --> GameMode : references
 
 @enduml 

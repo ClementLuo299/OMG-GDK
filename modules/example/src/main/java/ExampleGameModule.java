@@ -1,10 +1,6 @@
 package example;
 
 import gdk.GameModule;
-import gdk.GameMode;
-import gdk.GameOptions;
-import gdk.GameState;
-import gdk.GameSettings;
 import gdk.Logging;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -88,63 +84,25 @@ public class ExampleGameModule implements GameModule {
     // ==================== ENHANCED SUPPORT METHODS ====================
     // Example game demonstrates custom support configuration
     
-    @Override
-    public GameMode[] getSupportedGameModes() {
-        // Example game supports many modes for demonstration
-        return new GameMode[] {
-            GameMode.SINGLE_PLAYER,
-            GameMode.PRACTICE,
-            GameMode.LOCAL_MULTIPLAYER,
-            GameMode.HOT_SEAT,
-            GameMode.PUZZLE,
-            GameMode.CREATIVE,
-            GameMode.AI_VERSUS,
-            GameMode.AI_COOP
-        };
-    }
+
+    
+
+    
+
+    
+
+    
+
     
 
     
     @Override
-    public java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
-        java.util.Map<GameMode, int[]> playerCounts = new java.util.HashMap<>();
-        
-        // Example game supports various player counts for different modes
-        playerCounts.put(GameMode.SINGLE_PLAYER, new int[]{1, 1});
-        playerCounts.put(GameMode.PRACTICE, new int[]{1, 1});
-        playerCounts.put(GameMode.LOCAL_MULTIPLAYER, new int[]{2, 4});
-        playerCounts.put(GameMode.HOT_SEAT, new int[]{2, 4});
-        playerCounts.put(GameMode.PUZZLE, new int[]{1, 2});
-        playerCounts.put(GameMode.CREATIVE, new int[]{1, 4});
-        playerCounts.put(GameMode.AI_VERSUS, new int[]{1, 1});
-        playerCounts.put(GameMode.AI_COOP, new int[]{1, 1});
-        
-        return playerCounts;
-    }
-    
-    @Override
-    public GameMode getDefaultGameMode() {
-        return GameMode.SINGLE_PLAYER;
-    }
-    
-
-    
-    @Override
-    public int getDefaultPlayerCount(GameMode gameMode) {
-        // Example game defaults to 1 player for single player modes, 2 for multiplayer
-        if (gameMode == GameMode.LOCAL_MULTIPLAYER || gameMode == GameMode.HOT_SEAT) {
-            return 2;
-        }
-        return 1; // Single player modes default to 1
-    }
-    
-    @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
-        Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
+    public Scene launchGame(Stage primaryStage, int playerCount, Object eventHandler) {
+        Logging.info("🎮 Launching " + getGameName() + " with players: " + playerCount);
         
         try {
             // Create a simple test interface instead of loading FXML
-            return createTestInterface(primaryStage, gameMode, playerCount, gameOptions, eventHandler);
+            return createTestInterface(primaryStage, playerCount, eventHandler);
             
         } catch (Exception e) {
             Logging.error("❌ Failed to launch " + getGameName() + ": " + e.getMessage(), e);
@@ -155,19 +113,19 @@ public class ExampleGameModule implements GameModule {
     /**
      * Creates a simple test interface to demonstrate game communication.
      */
-    private Scene createTestInterface(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
+    private Scene createTestInterface(Stage primaryStage, int playerCount, Object eventHandler) {
         javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
         root.setPadding(new javafx.geometry.Insets(20));
         root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
         
         // Title
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("🧪 Game Communication Test");
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("�� Game Communication Test");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
         // Game info
-        String difficulty = (gameOptions != null) ? gameOptions.getStringOption("difficulty", "Medium") : "Medium";
+        String difficulty = "Medium"; // Default difficulty
         javafx.scene.control.Label infoLabel = new javafx.scene.control.Label(
-            "Game: " + getGameName() + " | Mode: " + gameMode.getDisplayName() + " | Players: " + playerCount + " | Difficulty: " + difficulty
+            "Game: " + getGameName() + " | Players: " + playerCount + " | Difficulty: " + difficulty
         );
         infoLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #495057;");
         
@@ -210,52 +168,20 @@ public class ExampleGameModule implements GameModule {
         
 
         
-        javafx.scene.control.Button gameModeButton = new javafx.scene.control.Button("🎮 Show Game Mode Info");
-        gameModeButton.setStyle("-fx-background-color: #20c997; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
-        gameModeButton.setOnAction(e -> {
-            Logging.info("🎮 Game Mode Info: " + gameMode.getDisplayName());
-            
-            String message = "Current Game Mode: " + gameMode.getDisplayName() + 
-                           "\nDescription: " + gameMode.getDescription() +
-                           "\nCategory: " + gameMode.getCategory() +
-                           "\nIcon: " + gameMode.getIcon() +
-                           "\nColor: " + gameMode.getColorCode();
-            
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-            alert.setTitle("Game Mode Information");
-            alert.setHeaderText("Game Mode Details");
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
-        
         // JSON Data button
         javafx.scene.control.Button jsonDataButton = new javafx.scene.control.Button("📦 Show JSON Data");
         jsonDataButton.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         jsonDataButton.setOnAction(e -> {
             Logging.info("📦 Checking for custom JSON data...");
             
-            if (gameOptions != null && gameOptions.hasOption("customData")) {
-                Object customData = gameOptions.getOption("customData", null);
-                Logging.info("📦 Found custom data: " + customData);
-                
-                String message = "Custom JSON Data Received:\n\n" + customData.toString();
-                
-                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-                alert.setTitle("JSON Data Information");
-                alert.setHeaderText("Custom Data from Launcher");
-                alert.setContentText(message);
-                alert.showAndWait();
-                
-                // Event system removed - use server simulator for communication
-            } else {
-                Logging.info("📦 No custom JSON data found");
-                
-                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-                alert.setTitle("JSON Data Information");
-                alert.setHeaderText("No Custom Data");
-                alert.setContentText("No custom JSON data was provided when launching this game.");
-                alert.showAndWait();
-            }
+            // No custom data available
+            Logging.info("📦 No custom JSON data found");
+            
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+            alert.setTitle("JSON Data Information");
+            alert.setHeaderText("No Custom Data");
+            alert.setContentText("No custom JSON data was provided when launching this game.");
+            alert.showAndWait();
         });
         
         javafx.scene.control.Button backButton = new javafx.scene.control.Button("🔙 Back to Lobby");
@@ -275,7 +201,7 @@ public class ExampleGameModule implements GameModule {
         // Add all components
         root.getChildren().addAll(
             titleLabel, infoLabel,
-            startButton, moveButton, turnButton, messageButton, errorButton, endButton, gameModeButton, jsonDataButton, backButton,
+            startButton, moveButton, turnButton, messageButton, errorButton, endButton, jsonDataButton, backButton,
             instructionsLabel
         );
         
@@ -304,53 +230,17 @@ public class ExampleGameModule implements GameModule {
         Logging.info("🔄 " + getGameName() + " closing - cleaning up resources");
     }
     
-    @Override
-    public GameState getGameState() {
-        GameOptions options = new GameOptions();
-        options.setOption("exampleOption", "exampleValue");
-        options.setOption("difficulty", "medium");
-        
-        GameState gameState = new GameState(GAME_ID, GAME_NAME, GameMode.LOCAL_MULTIPLAYER, 2, options);
-        
-        // Add example state data
-        gameState.setStateValue("exampleData", "This is example game data");
-        gameState.setStateValue("score", 0);
-        
-        return gameState;
-    }
-    
-    @Override
-    public void loadGameState(GameState gameState) {
-        Logging.info("📂 Loading Example Game state");
-        
-        if (gameState != null) {
-            String exampleData = gameState.getStringStateValue("exampleData", "No data");
-            int score = gameState.getIntStateValue("score", 0);
-            
-            Logging.info("📊 Loaded example game state - Data: " + exampleData + ", Score: " + score);
-        }
-    }
-    
-    // ==================== CUSTOM SETTINGS ====================
-    
-    @Override
-    public GameSettings getCustomSettings() {
-        return new ExampleGameSettings();
-    }
-    
     /**
      * Example game controller (placeholder).
      * In a real implementation, this would be a separate controller class.
      */
     public static class ExampleGameController {
         
-        public void initializeGame(GameMode gameMode, int playerCount, GameOptions gameOptions) {
+        public void initializeGame(int playerCount) {
             Logging.info("🎯 Initializing Example Game with " + playerCount + " players");
-            Logging.info("🎮 Game mode: " + gameMode.getDisplayName());
             
             // Example game initialization logic would go here
-            String exampleOption = (gameOptions != null) ? gameOptions.getStringOption("exampleOption", "default") : "default";
-            Logging.info("⚙️ Example option: " + exampleOption);
+            Logging.info("⚙️ Example option: default");
         }
     }
 } 

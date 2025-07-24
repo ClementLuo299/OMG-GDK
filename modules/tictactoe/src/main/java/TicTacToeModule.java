@@ -164,56 +164,55 @@ public class TicTacToeModule implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
-        Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
+    public Scene launchGame(Stage primaryStage, int playerCount, GameOptions gameOptions, Object eventHandler) {
+        Logging.info("🎮 Launching " + getGameName() + " with players: " + playerCount);
         
         try {
-            // Load the FXML file with proper class loader context
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource(getGameFxmlPath()));
-            loader.setClassLoader(getClass().getClassLoader());
-            loader.setControllerFactory(param -> {
-                try {
-                    return Class.forName(param.getName(), true, getClass().getClassLoader()).getDeclaredConstructor().newInstance();
-                } catch (Exception e) {
-                    Logging.error("❌ Failed to create controller: " + param.getName() + " - " + e.getMessage());
-                    return null;
+            // Try to load the FXML file
+            URL fxmlUrl = TicTacToeModule.class.getResource("/games/tictactoe/fxml/tictactoe.fxml");
+            
+            if (fxmlUrl != null) {
+                Logging.info("📂 Loading TicTacToe FXML from: " + fxmlUrl);
+                
+                FXMLLoader loader = new FXMLLoader(fxmlUrl);
+                Scene scene = new Scene(loader.load());
+                
+                // Apply CSS if available
+                URL cssUrl = TicTacToeModule.class.getResource("/games/tictactoe/css/tictactoe.css");
+                if (cssUrl != null) {
+                    scene.getStylesheets().add(cssUrl.toExternalForm());
+                    Logging.info("📂 CSS loaded from: " + cssUrl);
                 }
-            });
-            Scene scene = new Scene(loader.load());
-            
-            // Get the controller and initialize it
-            TicTacToeController controller = loader.getController();
-            if (controller != null) {
-                controller.setPrimaryStage(primaryStage);
-                controller.initializeGame(gameMode, playerCount, gameOptions);
-            }
-            
-            // Apply CSS if available
-            try {
-                String cssPath = getGameCssPath();
-                if (cssPath != null && !cssPath.isEmpty()) {
-                    scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+                
+                // Get controller and initialize
+                TicTacToeController controller = loader.getController();
+                if (controller != null) {
+                    controller.setPrimaryStage(primaryStage);
+                    controller.initializeGame(playerCount, gameOptions);
                 }
-            } catch (Exception e) {
-                Logging.warning("⚠️ Could not load CSS for " + getGameName() + ": " + e.getMessage());
+                
+                Logging.info("✅ TicTacToe loaded successfully");
+                return scene;
+                
+            } else {
+                Logging.warn("⚠️ TicTacToe FXML not found, using fallback");
+                
+                // Fallback to simple game scene
+                return createSimpleGameScene(primaryStage, playerCount, gameOptions);
             }
-            
-            Logging.info("✅ " + getGameName() + " launched successfully");
-            return scene;
             
         } catch (Exception e) {
-            Logging.error("❌ Failed to launch " + getGameName() + ": " + e.getMessage(), e);
+            Logging.error("❌ Failed to load TicTacToe: " + e.getMessage(), e);
             
             // Fallback to simple game scene
-            return createSimpleGameScene(primaryStage, gameMode, playerCount, gameOptions);
+            return createSimpleGameScene(primaryStage, playerCount, gameOptions);
         }
     }
     
     /**
      * Creates a simple game scene for TicTacToe as fallback.
      */
-    private Scene createSimpleGameScene(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions) {
+    private Scene createSimpleGameScene(Stage primaryStage, int playerCount, GameOptions gameOptions) {
         Logging.info("🎮 Creating simple TicTacToe game scene (fallback)");
         
         // Create a simple game board

@@ -30,13 +30,11 @@ public interface GameModule {
      * Launches the game.
      * 
      * @param primaryStage The primary JavaFX stage
-     * @param gameMode The game mode
      * @param playerCount Number of players
-     * @param gameOptions Additional game-specific options
      * @param eventHandler Event handler (can be null)
      * @return The game scene
      */
-    Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler);
+    Scene launchGame(Stage primaryStage, int playerCount, Object eventHandler);
     
     /**
      * Called when the game is being closed.
@@ -116,135 +114,27 @@ public interface GameModule {
         return true;
     }
     
-    // ==================== ENHANCED SUPPORT METHODS ====================
-    // These methods allow games to specify exactly what they support
-    
-    /**
-     * Gets the list of supported game modes for this game.
-     * @return Array of supported game modes
-     */
-    default GameMode[] getSupportedGameModes() {
-        // Default implementation based on the old boolean methods
-        java.util.List<GameMode> modes = new java.util.ArrayList<>();
-        
-        if (supportsSinglePlayer()) {
-            modes.add(GameMode.SINGLE_PLAYER);
-        }
-        if (supportsLocalMultiplayer()) {
-            modes.add(GameMode.LOCAL_MULTIPLAYER);
-        }
-        if (supportsOnlineMultiplayer()) {
-            modes.add(GameMode.ONLINE_MULTIPLAYER);
-        }
-        
-        return modes.toArray(new GameMode[0]);
-    }
+
     
 
     
-    /**
-     * Gets the supported player count ranges for each game mode.
-     * @return Map of game mode to player count range (min, max)
-     */
-    default java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
-        java.util.Map<GameMode, int[]> playerCounts = new java.util.HashMap<>();
-        
-        // Default implementation based on min/max players
-        int minPlayers = getMinPlayers();
-        int maxPlayers = getMaxPlayers();
-        
-        for (GameMode mode : getSupportedGameModes()) {
-            playerCounts.put(mode, new int[]{minPlayers, maxPlayers});
-        }
-        
-        return playerCounts;
-    }
-    
-    /**
-     * @return The default game mode
-     */
-    default GameMode getDefaultGameMode() {
-        GameMode[] supportedModes = getSupportedGameModes();
-        if (supportedModes.length > 0) {
-            return supportedModes[0];
-        }
-        return GameMode.SINGLE_PLAYER;
-    }
+
     
 
     
-    /**
-     * Gets the default player count for a specific game mode.
-     * @param gameMode The game mode
-     * @return The default player count for that mode
-     */
-    default int getDefaultPlayerCount(GameMode gameMode) {
-        java.util.Map<GameMode, int[]> playerCounts = getSupportedPlayerCounts();
-        int[] range = playerCounts.get(gameMode);
-        if (range != null) {
-            return range[0]; // Return minimum as default
-        }
-        return getMinPlayers();
-    }
-    
-    /**
-     * Checks if a specific game mode is supported.
-     * @param gameMode The game mode to check
-     * @return true if the game mode is supported
-     */
-    default boolean supportsGameMode(GameMode gameMode) {
-        for (GameMode supportedMode : getSupportedGameModes()) {
-            if (supportedMode.equals(gameMode)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
     
 
     
-    /**
-     * Checks if a specific player count is supported for a game mode.
-     * @param gameMode The game mode
-     * @param playerCount The player count to check
-     * @return true if the player count is supported for that mode
-     */
-    default boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
-        java.util.Map<GameMode, int[]> playerCounts = getSupportedPlayerCounts();
-        int[] range = playerCounts.get(gameMode);
-        if (range != null) {
-            return playerCount >= range[0] && playerCount <= range[1];
-        }
-        return false;
-    }
+
     
-    // ==================== CUSTOM SETTINGS SUPPORT ====================
+
     
-    /**
-     * Gets the custom settings for this game.
-     * Games can override this to provide custom configuration options.
-     * @return The game settings, or null if no custom settings
-     */
-    default GameSettings getCustomSettings() {
-        return null; // Default: no custom settings
-    }
+
     
-    /**
-     * Checks if this game has custom settings.
-     * @return true if the game has custom settings
-     */
-    default boolean hasCustomSettings() {
-        return getCustomSettings() != null;
-    }
+
     
-    /**
-     * Gets the number of custom settings for this game.
-     * @return The number of custom settings
-     */
-    default int getCustomSettingsCount() {
-        GameSettings settings = getCustomSettings();
-        return settings != null ? settings.getCustomSettings().size() : 0;
-    }
+
     
     /**
      * Gets the game's icon path (relative to resources).
@@ -268,21 +158,5 @@ public interface GameModule {
      */
     default String getGameCssPath() {
         return "/games/" + getGameId() + "/css/" + getGameId() + ".css";
-    }
-    
-    /**
-     * Gets the current game state for saving/loading.
-     * @return Game state object
-     */
-    default GameState getGameState() {
-        return new GameState(getGameId(), getGameName(), GameMode.LOCAL_MULTIPLAYER, 2, new GameOptions());
-    }
-    
-    /**
-     * Loads a saved game state.
-     * @param gameState The saved game state
-     */
-    default void loadGameState(GameState gameState) {
-        // Default empty implementation
     }
 } 

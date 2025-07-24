@@ -4,7 +4,7 @@ import gdk.GameModule;
 import gdk.GameMode;
 import gdk.GameOptions;
 import gdk.GameState;
-import gdk.GameSettings;
+
 import gdk.Logging;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -148,14 +148,7 @@ public class Main implements GameModule {
                 }
             }
             
-            if (data.containsKey("gameSettings")) {
-                Object settingsObj = data.get("gameSettings");
-                if (settingsObj instanceof Map) {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> settings = (Map<String, Object>) settingsObj;
-                    Logging.info("⚙️ Game settings from JSON: " + settings);
-                }
-            }
+            // Settings system removed - all configuration handled via JSON
             
         } catch (Exception e) {
             Logging.error("❌ Error processing JSON data: " + e.getMessage(), e);
@@ -267,15 +260,7 @@ public class Main implements GameModule {
         return metadata.supportsPlayerCount(gameMode, playerCount);
     }
     
-    @Override
-    public boolean hasCustomSettings() {
-        return metadata.hasCustomSettings();
-    }
-    
-    @Override
-    public GameSettings getCustomSettings() {
-        return metadata.getCustomSettings();
-    }
+
     
     // ==================== UTILITY METHODS ====================
     

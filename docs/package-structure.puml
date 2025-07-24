@@ -7,20 +7,12 @@ package "OMG-GDK" {
         package "src/main/java/com/gdk/shared" {
             package "game" {
                 file "GameModule.java"
-                file "GameMode.java"
-                file "GameDifficulty.java"
-                file "GameOptions.java"
-                file "GameState.java"
-                file "GameEvent.java"
-                file "GameEventHandler.java"
+                
             }
             
             package "settings" {
-                file "GameSettings.java"
-                file "GameSetting.java"
-                file "BooleanSetting.java"
-                file "IntegerSetting.java"
-                file "StringSetting.java"
+                
+                
             }
             
             package "utils" {
@@ -33,17 +25,10 @@ package "OMG-GDK" {
     }
     
     package "launcher" {
-        package "java" {
-            file "GDKApplication.java"
-            file "GDKGameLobbyController.java"
-        }
-        
-        package "resources" {
-            file "GDKGameLobby.fxml"
-            file "gdk-lobby.css"
-        }
-        file "pom.xml"
-        file "gdk-config.properties"
+        file "GDKApplication.java"
+        file "GDKGameLobbyController.java"
+        file "ModuleLoader.java"
+        file "ServerSimulatorController.java"
     }
     
     package "modules" {
@@ -52,7 +37,7 @@ package "OMG-GDK" {
                 file "Main.java"
                 file "GameMetadata.java"
                 file "ExampleGameModule.java"
-                file "ExampleGameSettings.java"
+                
                 file "CustomGameModesExample.java"
             }
             
