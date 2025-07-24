@@ -3,8 +3,7 @@
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
 import com.gdk.shared.game.GameOptions;
-import com.gdk.shared.game.GameEventHandler;
-import com.gdk.shared.game.GameEvent;
+
 import com.gdk.shared.utils.ModuleLoader;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.fxml.FXML;
@@ -43,7 +42,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited July 21, 2025
+ * @edited July 23, 2025
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {

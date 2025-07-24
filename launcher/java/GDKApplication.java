@@ -1,7 +1,5 @@
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
-import com.gdk.shared.game.GameEvent;
-import com.gdk.shared.game.GameEventHandler;
 import com.gdk.shared.utils.error_handling.Logging;
 
 import javafx.application.Application;
@@ -11,7 +9,6 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.function.Consumer;
 
 /**
  * Simple Game Development Kit (GDK) Application.
@@ -19,16 +16,16 @@ import java.util.function.Consumer;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited July 22, 2025
+ * @edited July 23, 2025
  * @since 1.0
  */
 public class GDKApplication extends Application {
     
-    private Stage primaryStage;
-    private Scene lobbyScene;
-    private GameModule currentGame;
-    private boolean gameIsRunning = false;
-    private Stage serverStage;
+    private Stage primaryStage; // The main stage for the GDK application
+    private Scene lobbyScene; // The scene for the GDK lobby
+    private GameModule currentGame; // The currently running game module
+    private boolean gameIsRunning = false; // Whether a game is currently running
+    private Stage serverStage; // The stage for the server simulator
     private ServerSimulatorController serverController;
 
     @Override
@@ -123,11 +120,11 @@ public class GDKApplication extends Application {
             // Create server simulator window
             createServerSimulator();
             
-            // Create game event handler that points to the GDK application
-            GameEventHandler eventHandler = this::handleGameEvent;
-            Logging.info("🎮 Created event handler for " + selectedGame.getGameName() + " - handler: " + (eventHandler != null ? "valid" : "null"));
+            // Get default values from the game module
+            GameMode defaultGameMode = selectedGame.getDefaultGameMode();
+            int defaultPlayerCount = selectedGame.getDefaultPlayerCount(defaultGameMode);
             
-            javafx.scene.Scene gameScene = selectedGame.launchGame(primaryStage, null, 0, null, eventHandler);
+            javafx.scene.Scene gameScene = selectedGame.launchGame(primaryStage, defaultGameMode, defaultPlayerCount, null, null);
             if (gameScene != null) {
                 currentGame = selectedGame;
                 gameIsRunning = true;
@@ -190,7 +187,9 @@ public class GDKApplication extends Application {
             // Handle window close
             serverStage.setOnCloseRequest(event -> {
                 Logging.info("🔒 Server Simulator window closing");
-                serverController.onClose();
+                if (serverController != null) {
+                    serverController.onClose();
+                }
                 serverStage = null;
                 serverController = null;
             });
@@ -225,68 +224,36 @@ public class GDKApplication extends Application {
     
 
 
-    /**
-     * Handles game events from running games.
-     * This method is called by games to communicate state changes.
-     */
-    private void handleGameEvent(GameEvent event) {
-        Logging.info("🎮 Game Event: " + event.getEventType() + " - " + event.getMessage());
-        
-        switch (event.getEventType()) {
-            case BACK_TO_LOBBY_REQUESTED:
-                Logging.info("🔙 GDK received BACK_TO_LOBBY_REQUESTED event");
-                Logging.info("🔙 Current game state - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getGameName() : "null"));
-                returnToLobby();
-                break;
-            case GAME_ENDED:
-                gameIsRunning = false;
-                currentGame = null;
-                Logging.info("🎮 Game ended, ready for new game");
-                break;
-            case ERROR_OCCURRED:
-                Logging.error("❌ Game Error: " + event.getMessage());
-                break;
-            default:
-                // Log other events
-                Logging.info("🎮 " + event.getMessage());
-                break;
-        }
-    }
+
     
     /**
      * Returns to the GDK lobby from a running game.
      */
     private void returnToLobby() {
-        Logging.info("🔙 returnToLobby() called - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getGameName() : "null") + ", lobbyScene: " + (lobbyScene != null ? "exists" : "null"));
+        Logging.info("🔙 Returning to GDK lobby");
         
-        if (gameIsRunning && currentGame != null) {
-            Logging.info("🔙 Returning to GDK lobby");
-            
-            // Clean up current game
+        // Clean up current game
+        if (currentGame != null) {
             currentGame.onGameClose();
-            gameIsRunning = false;
             currentGame = null;
-            
-            // Close server simulator
-            if (serverStage != null) {
-                Logging.info("🔒 Closing server simulator");
-                serverStage.close();
-                serverStage = null;
-                serverController = null;
-            }
-            
-            // Return to lobby scene - ensure we're on the JavaFX Application Thread
-            if (lobbyScene != null) {
-                javafx.application.Platform.runLater(() -> {
-                    primaryStage.setScene(lobbyScene);
-                    primaryStage.setTitle("OMG Game Development Kit");
-                    Logging.info("✅ Returned to GDK lobby");
-                });
-            } else {
-                Logging.error("❌ lobbyScene is null - cannot return to lobby");
-            }
-        } else {
-            Logging.warning("⚠️ Cannot return to lobby - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? "exists" : "null"));
+        }
+        gameIsRunning = false;
+        
+        // Close server simulator
+        if (serverStage != null) {
+            Logging.info("🔒 Closing server simulator");
+            serverStage.close();
+            serverStage = null;
+            serverController = null;
+        }
+        
+        // Return to lobby scene
+        if (lobbyScene != null) {
+            javafx.application.Platform.runLater(() -> {
+                primaryStage.setScene(lobbyScene);
+                primaryStage.setTitle("OMG Game Development Kit");
+                Logging.info("✅ Returned to GDK lobby");
+            });
         }
     }
     

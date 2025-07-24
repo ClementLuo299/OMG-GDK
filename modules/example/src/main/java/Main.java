@@ -2,10 +2,10 @@ package example;
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
-import com.gdk.shared.game.GameDifficulty;
+
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
-import com.gdk.shared.game.GameEventHandler;
+
 import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.scene.Scene;
@@ -38,19 +38,14 @@ public class Main implements GameModule {
     // ==================== JSON COMMUNICATION & GAME CONTROL ====================
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
         try {
             Logging.info("🚀 Starting Example Game...");
             
             // Handle JSON data if present
             handleJsonData(gameOptions);
             
-            // Log game start event
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.GAME_STARTED,
-                getGameId(),
-                "Example Game started with " + playerCount + " players in " + gameMode.getDisplayName() + " mode"
-            ));
+            // Event system removed - use server simulator for communication
             
             // Initialize game module lazily and delegate to it for actual game execution
             if (gameModule == null) {
@@ -64,12 +59,7 @@ public class Main implements GameModule {
         } catch (Exception e) {
             Logging.error("❌ Error launching Example Game: " + e.getMessage(), e);
             
-            // Send error event
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.ERROR_OCCURRED,
-                getGameId(),
-                "Failed to launch Example Game: " + e.getMessage()
-            ));
+            // Event system removed - use server simulator for communication
             
             return null;
         }
@@ -115,7 +105,7 @@ public class Main implements GameModule {
      * @param gameOptions The game options containing JSON data
      */
     private void handleJsonData(GameOptions gameOptions) {
-        if (gameOptions.hasOption("customData")) {
+        if (gameOptions != null && gameOptions.hasOption("customData")) {
             Object customData = gameOptions.getOption("customData", null);
             Logging.info("📦 Received JSON data: " + customData);
             
@@ -196,10 +186,7 @@ public class Main implements GameModule {
         return metadata.getEstimatedDuration();
     }
     
-    @Override
-    public GameDifficulty getDifficulty() {
-        return metadata.getDifficulty();
-    }
+
     
     @Override
     public String getGameCategory() {
@@ -241,10 +228,7 @@ public class Main implements GameModule {
         return metadata.getSupportedGameModes();
     }
     
-    @Override
-    public GameDifficulty[] getSupportedDifficulties() {
-        return metadata.getSupportedDifficulties();
-    }
+
     
     @Override
     public Map<GameMode, int[]> getSupportedPlayerCounts() {
@@ -256,10 +240,7 @@ public class Main implements GameModule {
         return metadata.getDefaultGameMode();
     }
     
-    @Override
-    public GameDifficulty getDefaultDifficulty() {
-        return metadata.getDefaultDifficulty();
-    }
+
     
     @Override
     public int getDefaultPlayerCount(GameMode gameMode) {
@@ -271,10 +252,7 @@ public class Main implements GameModule {
         return metadata.supportsGameMode(gameMode);
     }
     
-    @Override
-    public boolean supportsDifficulty(GameDifficulty difficulty) {
-        return metadata.supportsDifficulty(difficulty);
-    }
+
     
     @Override
     public boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
@@ -326,7 +304,7 @@ public class Main implements GameModule {
             Logging.info("📝 Description: " + main.getGameDescription());
             Logging.info("👥 Players: " + main.getMinPlayers() + "-" + main.getMaxPlayers());
             Logging.info("⏱️ Duration: " + main.getEstimatedDuration() + " minutes");
-            Logging.info("🎯 Difficulty: " + main.getDifficulty());
+
             Logging.info("📂 Category: " + main.getGameCategory());
             
         } catch (Exception e) {

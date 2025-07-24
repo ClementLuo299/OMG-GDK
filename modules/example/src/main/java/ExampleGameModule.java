@@ -2,11 +2,10 @@ package example;
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
-import com.gdk.shared.game.GameDifficulty;
+
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
-import com.gdk.shared.game.GameEventHandler;
-import com.gdk.shared.game.GameEvent;
+
 import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.application.Platform;
@@ -66,10 +65,7 @@ public class ExampleGameModule implements GameModule {
         return 15; // 15 minutes
     }
     
-    @Override
-    public GameDifficulty getDifficulty() {
-        return GameDifficulty.EASY;
-    }
+
     
     @Override
     public String getGameCategory() {
@@ -109,17 +105,7 @@ public class ExampleGameModule implements GameModule {
         };
     }
     
-    @Override
-    public GameDifficulty[] getSupportedDifficulties() {
-        // Example game supports all difficulty levels
-        return new GameDifficulty[] {
-            GameDifficulty.EASY,
-            GameDifficulty.MEDIUM,
-            GameDifficulty.HARD,
-            GameDifficulty.EXPERT,
-            GameDifficulty.NIGHTMARE
-        };
-    }
+
     
     @Override
     public java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
@@ -143,10 +129,7 @@ public class ExampleGameModule implements GameModule {
         return GameMode.SINGLE_PLAYER;
     }
     
-    @Override
-    public GameDifficulty getDefaultDifficulty() {
-        return GameDifficulty.MEDIUM;
-    }
+
     
     @Override
     public int getDefaultPlayerCount(GameMode gameMode) {
@@ -158,7 +141,7 @@ public class ExampleGameModule implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
         Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
         
         try {
@@ -174,7 +157,7 @@ public class ExampleGameModule implements GameModule {
     /**
      * Creates a simple test interface to demonstrate game communication.
      */
-    private Scene createTestInterface(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
+    private Scene createTestInterface(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
         javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
         root.setPadding(new javafx.geometry.Insets(20));
         root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
@@ -184,7 +167,7 @@ public class ExampleGameModule implements GameModule {
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
         // Game info
-        String difficulty = gameOptions.getStringOption("difficulty", "Medium");
+        String difficulty = (gameOptions != null) ? gameOptions.getStringOption("difficulty", "Medium") : "Medium";
         javafx.scene.control.Label infoLabel = new javafx.scene.control.Label(
             "Game: " + getGameName() + " | Mode: " + gameMode.getDisplayName() + " | Players: " + playerCount + " | Difficulty: " + difficulty
         );
@@ -194,100 +177,40 @@ public class ExampleGameModule implements GameModule {
         javafx.scene.control.Button startButton = new javafx.scene.control.Button("🚀 Start Game");
         startButton.setStyle("-fx-background-color: #28a745; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         startButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.GAME_STARTED,
-                getGameId(),
-                "Example game started with " + playerCount + " players in " + gameMode.getDisplayName() + " mode"
-            ));
+            // Event system removed - use server simulator for communication
         });
         
         javafx.scene.control.Button moveButton = new javafx.scene.control.Button("🎯 Make Move");
         moveButton.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         moveButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.MOVE_MADE,
-                getGameId(),
-                "Player made a test move",
-                "Test move data"
-            ));
+            // Event system removed - use server simulator for communication
         });
         
         javafx.scene.control.Button turnButton = new javafx.scene.control.Button("🔄 Change Turn");
         turnButton.setStyle("-fx-background-color: #ffc107; -fx-text-fill: #212529; -fx-padding: 10 20; -fx-cursor: hand;");
         turnButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.PLAYER_TURN_CHANGED,
-                getGameId(),
-                "Turn changed to next player"
-            ));
+            // Event system removed - use server simulator for communication
         });
         
         javafx.scene.control.Button messageButton = new javafx.scene.control.Button("💬 Send Message");
         messageButton.setStyle("-fx-background-color: #6f42c1; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         messageButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.MOVE_MADE,
-                getGameId(),
-                "Test message from example game: " + java.time.LocalTime.now()
-            ));
+            // Event system removed - use server simulator for communication
         });
         
         javafx.scene.control.Button errorButton = new javafx.scene.control.Button("❌ Simulate Error");
         errorButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         errorButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.ERROR_OCCURRED,
-                getGameId(),
-                "Simulated error for testing error handling"
-            ));
+            // Event system removed - use server simulator for communication
         });
         
         javafx.scene.control.Button endButton = new javafx.scene.control.Button("🏁 End Game");
         endButton.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         endButton.setOnAction(e -> {
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.GAME_ENDED,
-                getGameId(),
-                "Example game ended - test completed"
-            ));
+            // Event system removed - use server simulator for communication
         });
         
-        javafx.scene.control.Button difficultyButton = new javafx.scene.control.Button("🎯 Show Difficulty Info");
-        difficultyButton.setStyle("-fx-background-color: #6f42c1; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
-        difficultyButton.setOnAction(e -> {
-            String currentDifficultyName = gameOptions.getStringOption("difficulty", "Medium");
-            Logging.info("🎯 Difficulty Info: " + currentDifficultyName);
-            
-            // Find the corresponding GameDifficulty enum
-            GameDifficulty currentDifficulty = null;
-            GameDifficulty[] difficulties = {
-                GameDifficulty.EASY,
-                GameDifficulty.MEDIUM,
-                GameDifficulty.HARD,
-                GameDifficulty.EXPERT,
-                GameDifficulty.NIGHTMARE,
-                GameDifficulty.CUSTOM
-            };
-            for (GameDifficulty diff : difficulties) {
-                if (diff.getDisplayName().equals(currentDifficultyName)) {
-                    currentDifficulty = diff;
-                    break;
-                }
-            }
-            
-            if (currentDifficulty != null) {
-                String message = "Current Difficulty: " + currentDifficulty.getDisplayName() + 
-                               "\nDescription: " + currentDifficulty.getDescription() +
-                               "\nNumeric Value: " + currentDifficulty.getLevel() +
-                               "\nColor: " + currentDifficulty.getColorCode();
-                
-                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-                alert.setTitle("Difficulty Information");
-                alert.setHeaderText("Game Difficulty Details");
-                alert.setContentText(message);
-                alert.showAndWait();
-            }
-        });
+
         
         javafx.scene.control.Button gameModeButton = new javafx.scene.control.Button("🎮 Show Game Mode Info");
         gameModeButton.setStyle("-fx-background-color: #20c997; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
@@ -313,7 +236,7 @@ public class ExampleGameModule implements GameModule {
         jsonDataButton.setOnAction(e -> {
             Logging.info("📦 Checking for custom JSON data...");
             
-            if (gameOptions.hasOption("customData")) {
+            if (gameOptions != null && gameOptions.hasOption("customData")) {
                 Object customData = gameOptions.getOption("customData", null);
                 Logging.info("📦 Found custom data: " + customData);
                 
@@ -325,13 +248,7 @@ public class ExampleGameModule implements GameModule {
                 alert.setContentText(message);
                 alert.showAndWait();
                 
-                // Send an event with the custom data
-                eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                    com.gdk.shared.game.GameEvent.EventType.MOVE_MADE,
-                    getGameId(),
-                    "Custom JSON data received and processed",
-                    customData.toString()
-                ));
+                // Event system removed - use server simulator for communication
             } else {
                 Logging.info("📦 No custom JSON data found");
                 
@@ -347,12 +264,7 @@ public class ExampleGameModule implements GameModule {
         backButton.setStyle("-fx-background-color: #fd7e14; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         backButton.setOnAction(e -> {
             Logging.info("🔙 Back to Lobby button clicked in Example Game");
-            eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-                com.gdk.shared.game.GameEvent.EventType.BACK_TO_LOBBY_REQUESTED,
-                getGameId(),
-                "User requested to return to lobby"
-            ));
-            Logging.info("🔙 BACK_TO_LOBBY_REQUESTED event sent from Example Game");
+            // Event system removed - use server simulator for communication
         });
         
         // Instructions
@@ -365,16 +277,11 @@ public class ExampleGameModule implements GameModule {
         // Add all components
         root.getChildren().addAll(
             titleLabel, infoLabel,
-            startButton, moveButton, turnButton, messageButton, errorButton, endButton, difficultyButton, gameModeButton, jsonDataButton, backButton,
+            startButton, moveButton, turnButton, messageButton, errorButton, endButton, gameModeButton, jsonDataButton, backButton,
             instructionsLabel
         );
         
-        // Send game started event immediately
-        eventHandler.handleGameEvent(new com.gdk.shared.game.GameEvent(
-            com.gdk.shared.game.GameEvent.EventType.GAME_STARTED,
-            getGameId(),
-            "Example game test interface loaded"
-        ));
+        // Event system removed - use server simulator for communication
         
         return new javafx.scene.Scene(root, 450, 500);
     }
@@ -444,7 +351,7 @@ public class ExampleGameModule implements GameModule {
             Logging.info("🎮 Game mode: " + gameMode.getDisplayName());
             
             // Example game initialization logic would go here
-            String exampleOption = gameOptions.getStringOption("exampleOption", "default");
+            String exampleOption = (gameOptions != null) ? gameOptions.getStringOption("exampleOption", "default") : "default";
             Logging.info("⚙️ Example option: " + exampleOption);
         }
     }

@@ -2,10 +2,10 @@ package example;
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
-import com.gdk.shared.game.GameDifficulty;
+
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
-import com.gdk.shared.game.GameEventHandler;
+
 import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.scene.Scene;
@@ -66,10 +66,7 @@ public class GameMetadata implements GameModule {
         return ESTIMATED_DURATION;
     }
     
-    @Override
-    public GameDifficulty getDifficulty() {
-        return GameDifficulty.EASY;
-    }
+
     
     @Override
     public String getGameCategory() {
@@ -122,16 +119,7 @@ public class GameMetadata implements GameModule {
         };
     }
     
-    @Override
-    public GameDifficulty[] getSupportedDifficulties() {
-        return new GameDifficulty[] {
-            GameDifficulty.EASY,
-            GameDifficulty.MEDIUM,
-            GameDifficulty.HARD,
-            GameDifficulty.EXPERT,
-            GameDifficulty.NIGHTMARE
-        };
-    }
+
     
     @Override
     public Map<GameMode, int[]> getSupportedPlayerCounts() {
@@ -157,10 +145,7 @@ public class GameMetadata implements GameModule {
         return GameMode.SINGLE_PLAYER;
     }
     
-    @Override
-    public GameDifficulty getDefaultDifficulty() {
-        return GameDifficulty.EASY;
-    }
+
     
     @Override
     public int getDefaultPlayerCount(GameMode gameMode) {
@@ -180,16 +165,7 @@ public class GameMetadata implements GameModule {
         return false;
     }
     
-    @Override
-    public boolean supportsDifficulty(GameDifficulty difficulty) {
-        GameDifficulty[] supportedDifficulties = getSupportedDifficulties();
-        for (GameDifficulty diff : supportedDifficulties) {
-            if (diff.equals(difficulty)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
     
     @Override
     public boolean supportsPlayerCount(GameMode gameMode, int playerCount) {
@@ -218,7 +194,7 @@ public class GameMetadata implements GameModule {
     // ==================== GAME EXECUTION (DELEGATED) ====================
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
         // Delegate to the actual game implementation
         ExampleGameModule gameModule = new ExampleGameModule();
         return gameModule.launchGame(primaryStage, gameMode, playerCount, gameOptions, eventHandler);

@@ -2,10 +2,10 @@ package tictactoe;
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
-import com.gdk.shared.game.GameDifficulty;
+
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
-import com.gdk.shared.game.GameEventHandler;
+
 import com.gdk.shared.settings.GameSettings;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.scene.Scene;
@@ -66,10 +66,7 @@ public class GameMetadata implements GameModule {
         return ESTIMATED_DURATION;
     }
     
-    @Override
-    public GameDifficulty getDifficulty() {
-        return GameDifficulty.EASY;
-    }
+
     
     @Override
     public String getGameCategory() {
@@ -119,15 +116,7 @@ public class GameMetadata implements GameModule {
         };
     }
     
-    @Override
-    public GameDifficulty[] getSupportedDifficulties() {
-        return new GameDifficulty[] {
-            GameDifficulty.EASY,    // Random AI moves
-            GameDifficulty.MEDIUM,  // Basic AI strategy
-            GameDifficulty.HARD,    // Advanced AI strategy
-            GameDifficulty.EXPERT   // Perfect AI (unbeatable)
-        };
-    }
+
     
     @Override
     public Map<GameMode, int[]> getSupportedPlayerCounts() {
@@ -150,10 +139,7 @@ public class GameMetadata implements GameModule {
         return GameMode.SINGLE_PLAYER;
     }
     
-    @Override
-    public GameDifficulty getDefaultDifficulty() {
-        return GameDifficulty.MEDIUM;
-    }
+
     
     @Override
     public int getDefaultPlayerCount(GameMode gameMode) {
@@ -173,16 +159,7 @@ public class GameMetadata implements GameModule {
         return false;
     }
     
-    @Override
-    public boolean supportsDifficulty(GameDifficulty difficulty) {
-        GameDifficulty[] supportedDifficulties = getSupportedDifficulties();
-        for (GameDifficulty diff : supportedDifficulties) {
-            if (diff.equals(difficulty)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
     
     @Override
     public boolean supportsPlayerCount(GameMode gameMode, int playerCount) {

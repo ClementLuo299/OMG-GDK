@@ -10,8 +10,7 @@ import java.time.format.DateTimeFormatter;
 
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
-import com.gdk.shared.game.GameEventHandler;
-import com.gdk.shared.game.GameEvent;
+
 import com.gdk.shared.game.GameMode;
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.collections.FXCollections;
@@ -110,7 +109,7 @@ public class TicTacToeController implements Initializable {
     private int playerCount;
     private GameOptions gameOptions;
     private Stage primaryStage;
-    private GameEventHandler eventHandler;
+
 
     /**
      * Initialize the controller.
@@ -185,9 +184,7 @@ public class TicTacToeController implements Initializable {
         this.primaryStage = primaryStage;
     }
     
-    public void setEventHandler(GameEventHandler eventHandler) {
-        this.eventHandler = eventHandler;
-    }
+
     
     /**
      * Initialize the game with parameters from the game module framework
@@ -348,16 +345,7 @@ public class TicTacToeController implements Initializable {
             Logging.info("⏸️ Timer stopped");
         }
         
-        // Send event to GDK to handle the return to lobby
-        if (eventHandler != null) {
-            eventHandler.handleGameEvent(new GameEvent(
-                GameEvent.EventType.BACK_TO_LOBBY_REQUESTED,
-                "tictactoe",
-                "User requested return to GDK lobby"
-            ));
-            } else {
-            Logging.warning("⚠️ No event handler available, cannot return to lobby");
-        }
+        // Event system removed - use server simulator for communication
     }
 
     /**

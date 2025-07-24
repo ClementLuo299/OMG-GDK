@@ -28,16 +28,16 @@ public interface GameModule {
     String getGameName();
     
     /**
-     * Launches the game with single-point communication.
+     * Launches the game.
      * 
      * @param primaryStage The primary JavaFX stage
      * @param gameMode The game mode
      * @param playerCount Number of players
      * @param gameOptions Additional game-specific options
-     * @param eventHandler Single communication channel for game events
+     * @param eventHandler Event handler (can be null)
      * @return The game scene
      */
-    Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler);
+    Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler);
     
     /**
      * Called when the game is being closed.
@@ -83,13 +83,7 @@ public interface GameModule {
         return 10;
     }
     
-    /**
-     * Gets the difficulty level of the game.
-     * @return Game difficulty
-     */
-    default GameDifficulty getDifficulty() {
-        return GameDifficulty.MEDIUM;
-    }
+
     
     /**
      * Gets the category of the game.
@@ -147,18 +141,7 @@ public interface GameModule {
         return modes.toArray(new GameMode[0]);
     }
     
-    /**
-     * Gets the list of supported difficulty levels for this game.
-     * @return Array of supported difficulty levels
-     */
-    default GameDifficulty[] getSupportedDifficulties() {
-        // Default to common difficulties
-        return new GameDifficulty[] {
-            GameDifficulty.EASY,
-            GameDifficulty.MEDIUM,
-            GameDifficulty.HARD
-        };
-    }
+
     
     /**
      * Gets the supported player count ranges for each game mode.
@@ -189,13 +172,7 @@ public interface GameModule {
         return GameMode.SINGLE_PLAYER;
     }
     
-    /**
-     * Gets the default difficulty for this game.
-     * @return The default difficulty
-     */
-    default GameDifficulty getDefaultDifficulty() {
-        return getDifficulty(); // Use the existing method
-    }
+
     
     /**
      * Gets the default player count for a specific game mode.
@@ -225,19 +202,7 @@ public interface GameModule {
         return false;
     }
     
-    /**
-     * Checks if a specific difficulty is supported.
-     * @param difficulty The difficulty to check
-     * @return true if the difficulty is supported
-     */
-    default boolean supportsDifficulty(GameDifficulty difficulty) {
-        for (GameDifficulty supportedDifficulty : getSupportedDifficulties()) {
-            if (supportedDifficulty.equals(difficulty)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
     
     /**
      * Checks if a specific player count is supported for a game mode.

@@ -2,10 +2,10 @@ package tictactoe;
 
 import com.gdk.shared.game.GameModule;
 import com.gdk.shared.game.GameMode;
-import com.gdk.shared.game.GameDifficulty;
+
 import com.gdk.shared.game.GameOptions;
 import com.gdk.shared.game.GameState;
-import com.gdk.shared.game.GameEventHandler;
+
 import com.gdk.shared.utils.error_handling.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -55,10 +55,7 @@ public class TicTacToeModule implements GameModule {
         return 5; // 5 minutes
     }
     
-    @Override
-    public GameDifficulty getDifficulty() {
-        return GameDifficulty.MEDIUM;
-    }
+
     
     @Override
     public String getGameCategory() {
@@ -96,16 +93,7 @@ public class TicTacToeModule implements GameModule {
         };
     }
     
-    @Override
-    public GameDifficulty[] getSupportedDifficulties() {
-        // TicTacToe AI can have different difficulty levels
-        return new GameDifficulty[] {
-            GameDifficulty.EASY,
-            GameDifficulty.MEDIUM,
-            GameDifficulty.HARD,
-            GameDifficulty.EXPERT
-        };
-    }
+
     
     @Override
     public java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
@@ -127,10 +115,7 @@ public class TicTacToeModule implements GameModule {
         return GameMode.LOCAL_MULTIPLAYER; // Classic 2-player mode
     }
     
-    @Override
-    public GameDifficulty getDefaultDifficulty() {
-        return GameDifficulty.MEDIUM; // Balanced AI difficulty
-    }
+
     
     @Override
     public int getDefaultPlayerCount(GameMode gameMode) {
@@ -181,7 +166,7 @@ public class TicTacToeModule implements GameModule {
     }
     
     @Override
-    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, GameEventHandler eventHandler) {
+    public Scene launchGame(Stage primaryStage, GameMode gameMode, int playerCount, GameOptions gameOptions, Object eventHandler) {
         Logging.info("🎮 Launching " + getGameName() + " with mode: " + gameMode.getDisplayName() + ", players: " + playerCount);
         
         try {
@@ -203,7 +188,6 @@ public class TicTacToeModule implements GameModule {
             TicTacToeController controller = loader.getController();
             if (controller != null) {
                 controller.setPrimaryStage(primaryStage);
-                controller.setEventHandler(eventHandler);
                 controller.initializeGame(gameMode, playerCount, gameOptions);
             }
             
