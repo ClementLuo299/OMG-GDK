@@ -61,121 +61,14 @@ public class Main implements GameModule {
         try {
             Logging.info("🔒 Example Game closing - cleaning up resources");
             
-            // Clean up game resources
+            // Clean up any resources
             if (gameModule != null) {
                 gameModule.onGameClose();
             }
             
-            Logging.info("✅ Example Game cleanup completed");
-            
         } catch (Exception e) {
-            Logging.error("❌ Error during Example Game cleanup: " + e.getMessage(), e);
+            Logging.error("❌ Error during game close: " + e.getMessage(), e);
         }
-    }
-    
-    // ==================== JSON DATA HANDLING ====================
-    
-    /**
-     * Processes the parsed JSON data.
-     * @param data The parsed JSON data as a Map
-     */
-    private void processJsonData(Map<String, Object> data) {
-        try {
-            // Example JSON processing
-            if (data.containsKey("playerName")) {
-                String playerName = (String) data.get("playerName");
-                Logging.info("👤 Player name from JSON: " + playerName);
-            }
-            
-            if (data.containsKey("level")) {
-                Object levelObj = data.get("level");
-                if (levelObj instanceof Number) {
-                    int level = ((Number) levelObj).intValue();
-                    Logging.info("📊 Level from JSON: " + level);
-                }
-            }
-            
-            if (data.containsKey("settings")) {
-                Object settingsObj = data.get("settings");
-                if (settingsObj instanceof Map) {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> settings = (Map<String, Object>) settingsObj;
-                    Logging.info("⚙️ Settings from JSON: " + settings);
-                }
-            }
-            
-        } catch (Exception e) {
-            Logging.error("❌ Error processing JSON data: " + e.getMessage(), e);
-        }
-    }
-    
-    // ==================== METADATA DELEGATION ====================
-    
-    @Override
-    public String getGameId() {
-        return metadata.getGameId();
-    }
-    
-    @Override
-    public String getGameName() {
-        return metadata.getGameName();
-    }
-    
-    @Override
-    public String getGameDescription() {
-        return metadata.getGameDescription();
-    }
-    
-    @Override
-    public int getMinPlayers() {
-        return metadata.getMinPlayers();
-    }
-    
-    @Override
-    public int getMaxPlayers() {
-        return metadata.getMaxPlayers();
-    }
-    
-    @Override
-    public int getEstimatedDuration() {
-        return metadata.getEstimatedDuration();
-    }
-    
-
-    
-    @Override
-    public String getGameCategory() {
-        return metadata.getGameCategory();
-    }
-    
-    @Override
-    public boolean supportsOnlineMultiplayer() {
-        return metadata.supportsOnlineMultiplayer();
-    }
-    
-    @Override
-    public boolean supportsLocalMultiplayer() {
-        return metadata.supportsLocalMultiplayer();
-    }
-    
-    @Override
-    public boolean supportsSinglePlayer() {
-        return metadata.supportsSinglePlayer();
-    }
-    
-    @Override
-    public String getGameFxmlPath() {
-        return metadata.getGameFxmlPath();
-    }
-    
-    @Override
-    public String getGameCssPath() {
-        return metadata.getGameCssPath();
-    }
-    
-    @Override
-    public String getGameIconPath() {
-        return metadata.getGameIconPath();
     }
     
     // ==================== UTILITY METHODS ====================
@@ -209,12 +102,7 @@ public class Main implements GameModule {
         try {
             Main main = new Main();
             Logging.info("✅ Example Game module initialized successfully");
-            Logging.info("🎮 Game: " + main.getGameName());
-            Logging.info("📝 Description: " + main.getGameDescription());
-            Logging.info("👥 Players: " + main.getMinPlayers() + "-" + main.getMaxPlayers());
-            Logging.info("⏱️ Duration: " + main.getEstimatedDuration() + " minutes");
-
-            Logging.info("📂 Category: " + main.getGameCategory());
+            Logging.info("🎮 Game: Example Game");
             
         } catch (Exception e) {
             Logging.error("❌ Failed to initialize Example Game module: " + e.getMessage(), e);

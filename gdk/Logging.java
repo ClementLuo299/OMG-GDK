@@ -9,12 +9,12 @@ import java.time.format.DateTimeFormatter;
  *
  * @authors Clement Luo
  * @date July 19, 2025
+ * @edited July 24, 2025
  * @since 1.0
  */
 public class Logging {
     
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final boolean DEBUG_MODE = System.getProperty("gdk.debug", "false").equals("true");
     
     /**
      * Logs an informational message.
@@ -50,13 +50,11 @@ public class Logging {
     }
     
     /**
-     * Logs a debug message (only if debug mode is enabled).
+     * Logs a debug message.
      * @param message The message to log
      */
     public static void debug(String message) {
-        if (DEBUG_MODE) {
-            log("DEBUG", message, null);
-        }
+        log("DEBUG", message, null);
     }
     
     /**
@@ -70,18 +68,16 @@ public class Logging {
         String threadName = Thread.currentThread().getName();
         
         StringBuilder logEntry = new StringBuilder();
-        logEntry.append("[").append(timestamp).append("] ");
-        logEntry.append("[").append(threadName).append("] ");
-        logEntry.append("[").append(level).append("] ");
-        logEntry.append(message);
+        logEntry.append("[").append(timestamp).append("] "); // Timestamp
+        logEntry.append("[").append(threadName).append("] "); // Thread name
+        logEntry.append("[").append(level).append("] "); // Log level
+        logEntry.append(message); // Message
         
         System.out.println(logEntry.toString());
         
         if (exception != null) {
             System.err.println("Exception: " + exception.getMessage());
-            if (DEBUG_MODE) {
-                exception.printStackTrace();
-            }
+            exception.printStackTrace();
         }
     }
 } 

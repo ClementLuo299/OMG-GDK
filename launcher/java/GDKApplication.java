@@ -116,23 +116,23 @@ public class GDKApplication extends Application {
             return;
         }
 
-        Logging.info("🚀 Launching " + selectedGame.getGameName());
+        Logging.info("🚀 Launching " + selectedGame.getClass().getSimpleName());
 
         try {
             // Create server simulator window
             createServerSimulator();
             
             // Get default player count from the game module
-            int defaultPlayerCount = selectedGame.getMinPlayers();
+            int defaultPlayerCount = 2; // Default to 2 players, game data handled via JSON
             
             javafx.scene.Scene gameScene = selectedGame.launchGame(primaryStage, defaultPlayerCount, null);
             if (gameScene != null) {
                 currentGame = selectedGame;
                 gameIsRunning = true;
                 primaryStage.setScene(gameScene);
-                primaryStage.setTitle(selectedGame.getGameName() + " - GDK");
+                primaryStage.setTitle(selectedGame.getClass().getSimpleName() + " - GDK");
                 Logging.info("🎮 Game launched successfully - GDK event handler connected");
-                Logging.info("🎮 Current state - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getGameName() : "null"));
+                Logging.info("🎮 Current state - gameIsRunning: " + gameIsRunning + ", currentGame: " + (currentGame != null ? currentGame.getClass().getSimpleName() : "null"));
             } else {
                 Logging.error("❌ Failed to launch game - null scene returned");
             }
@@ -170,7 +170,7 @@ public class GDKApplication extends Application {
             // Create stage
             serverStage = new Stage();
             serverStage.setScene(serverScene);
-            serverStage.setTitle("Server Simulator - " + (currentGame != null ? currentGame.getGameName() : "Game"));
+            serverStage.setTitle("Server Simulator - " + (currentGame != null ? currentGame.getClass().getSimpleName() : "Game"));
             serverStage.setWidth(400);
             serverStage.setHeight(500);
             serverStage.setMinWidth(350);
@@ -219,7 +219,7 @@ public class GDKApplication extends Application {
         // This would be implemented based on how games expect to receive server messages
         if (currentGame != null) {
             // Example: currentGame.handleServerMessage(message);
-            Logging.info("🎮 Forwarding server message to game: " + currentGame.getGameName());
+            Logging.info("🎮 Forwarding server message to game: " + currentGame.getClass().getSimpleName());
         }
     }
     

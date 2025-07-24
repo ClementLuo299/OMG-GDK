@@ -34,6 +34,7 @@ import java.util.HashMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import javafx.application.Platform;
 
 /**
  * GDK Game Picker Controller - Simplified game picker for the GDK.
@@ -82,6 +83,9 @@ public class GDKGameLobbyController implements Initializable {
         
         // Initialize JSON mapper
         jsonMapper = new ObjectMapper();
+        
+        // Initialize available games list
+        availableGames = FXCollections.observableArrayList();
         
         // Load configuration
         loadConfig();
@@ -140,7 +144,7 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     private void setupUI() {
-        // Setup game selector
+        // Setup game selector with custom cell factory
         gameSelector.setCellFactory(param -> new ListCell<GameModule>() {
             @Override
             protected void updateItem(GameModule item, boolean empty) {
@@ -148,7 +152,7 @@ public class GDKGameLobbyController implements Initializable {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item.getGameName());
+                    setText(item.getClass().getSimpleName()); // Use class name instead of getGameName()
                 }
             }
         });
@@ -178,30 +182,28 @@ public class GDKGameLobbyController implements Initializable {
         gameSelector.setOnAction(e -> {
             selectedGame = gameSelector.getValue();
             updateGameInfo();
-            addLogMessage("🎮 Selected game: " + (selectedGame != null ? selectedGame.getGameName() : "None"));
+            addLogMessage("🎮 Selected game: " + (selectedGame != null ? selectedGame.getClass().getSimpleName() : "None"));
         });
         
-        // Launch game handler
+        // Launch game button
         launchGameButton.setOnAction(e -> launchGame());
         
-        // Exit button handler
-        exitButton.setOnAction(e -> {
-            addLogMessage("👋 Exiting GDK Game Picker");
-            if (primaryStage != null) {
-                primaryStage.close();
-            }
-        });
-        
-        // Refresh games handler
+        // Refresh button
         refreshButton.setOnAction(e -> {
+            addLogMessage("🔄 Refreshing game list...");
             refreshGameList();
-            addLogMessage("🔄 Refreshed game list");
         });
         
-        // JSON validation handler
+        // Exit button
+        exitButton.setOnAction(e -> {
+            Logging.info("🔒 GDK Game Lobby closing");
+            Platform.exit();
+        });
+        
+        // JSON validation button
         validateJsonButton.setOnAction(e -> validateJsonData());
         
-        // Clear JSON handler
+        // Clear JSON button
         clearJsonButton.setOnAction(e -> clearJsonData());
         
         // JSON text change handler
@@ -216,61 +218,39 @@ public class GDKGameLobbyController implements Initializable {
     
     private void refreshGameList() {
         try {
-            availableGames = FXCollections.observableArrayList();
+            availableGames.clear();
             
-            // Try different possible paths for modules
-            String[] possiblePaths = {"../modules", "modules", "./modules"};
-            List<GameModule> modules = new ArrayList<>();
+            // Get modules directory from config
+            String modulesDir = config.getProperty("modulesDir", "modules");
+            Logging.info("📂 Scanning for modules in: " + modulesDir);
             
-            for (String path : possiblePaths) {
-                try {
-                    addLogMessage("🔍 Searching for modules in: " + path);
-                    modules = ModuleLoader.discoverModules(path);
-                    if (!modules.isEmpty()) {
-                        addLogMessage("✅ Found modules in: " + path);
-                        break;
-                    }
-                } catch (Exception e) {
-                    addLogMessage("❌ Failed to search in " + path + ": " + e.getMessage());
-                }
-            }
+            // Discover modules
+            List<GameModule> discoveredModules = ModuleLoader.discoverModules(modulesDir);
             
-            for (GameModule module : modules) {
+            for (GameModule module : discoveredModules) {
                 availableGames.add(module);
-                Logging.info("📦 Loaded game module: " + module.getGameName());
+                Logging.info("📦 Loaded game module: " + module.getClass().getSimpleName());
             }
             
+            // Set items for the game selector
             gameSelector.setItems(availableGames);
             
-            if (!availableGames.isEmpty()) {
-                gameSelector.setValue(availableGames.get(0));
-                selectedGame = availableGames.get(0);
-                updateGameInfo();
-                addLogMessage("✅ Loaded " + availableGames.size() + " game modules");
+            if (availableGames.isEmpty()) {
+                addLogMessage("⚠️ No game modules found in " + modulesDir);
             } else {
-                addLogMessage("⚠️ No game modules found");
+                addLogMessage("✅ Found " + availableGames.size() + " game module(s)");
             }
             
-            // Update status bar with game count
-            statusLabel.setText("Available Games: " + availableGames.size());
-            
         } catch (Exception e) {
-            Logging.error("❌ Failed to load game modules: " + e.getMessage(), e);
-            addLogMessage("❌ Failed to load game modules: " + e.getMessage());
+            Logging.error("❌ Error refreshing game list: " + e.getMessage(), e);
+            addLogMessage("❌ Error refreshing game list: " + e.getMessage());
         }
     }
     
     private void updateGameInfo() {
         if (selectedGame != null) {
-            // Try to load game icon
-            try {
-                String iconPath = selectedGame.getGameIconPath();
-                if (iconPath != null && !iconPath.isEmpty()) {
-                    // Load icon logic here if needed
-                }
-            } catch (Exception e) {
-                Logging.warning("⚠️ Could not load game icon: " + e.getMessage());
-            }
+            // Game data will be handled via JSON
+            // Icon loading can be done through JSON configuration
         }
     }
     
@@ -287,20 +267,20 @@ public class GDKGameLobbyController implements Initializable {
             return;
         }
         
-        // Extract player count from JSON
-        Integer playerCount = (Integer) jsonData.getOrDefault("playerCount", selectedGame.getMinPlayers());
+        // Extract player count from JSON (default to 2 if not specified)
+        Integer playerCount = (Integer) jsonData.getOrDefault("playerCount", 2);
         
-        // Validate player count
-        if (playerCount < selectedGame.getMinPlayers() || playerCount > selectedGame.getMaxPlayers()) {
+        // Validate player count (basic validation, detailed validation handled by game)
+        if (playerCount < 1 || playerCount > 10) {
             showError("Invalid Player Count", 
-                "This game supports " + selectedGame.getMinPlayers() + "-" + selectedGame.getMaxPlayers() + " players.");
+                "Player count must be between 1 and 10. Please check your JSON configuration.");
             return;
         }
         
         // Add JSON data
         addLogMessage("📦 Including custom JSON data with " + jsonData.size() + " fields");
 
-        addLogMessage("🚀 Launching " + selectedGame.getGameName());
+        addLogMessage("🚀 Launching " + selectedGame.getClass().getSimpleName());
 
         // Launch the game
         if (gdkApplication != null) {
