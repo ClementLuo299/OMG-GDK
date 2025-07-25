@@ -56,8 +56,8 @@ public class Start {
             // Initialize ViewModel
             GDKViewModel viewModel = initializeViewModel();
             
-            // Configure stage
-            configureStage();
+            // Configure stage and set the scene
+            configureStage(lobbyScene);
             
             Logging.info("✅ GDK startup completed successfully");
             
@@ -191,7 +191,7 @@ public class Start {
     /**
      * Configures the primary stage
      */
-    private void configureStage() {
+    private void configureStage(Scene lobbyScene) {
         Logging.info("⚙️ Configuring primary stage");
         
         primaryStage.setTitle("OMG Game Development Kit");
@@ -199,6 +199,9 @@ public class Start {
         primaryStage.setHeight(900);
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
+        
+        // Set the scene on the primary stage
+        primaryStage.setScene(lobbyScene);
         
         Logging.info("✅ Primary stage configured successfully");
     }

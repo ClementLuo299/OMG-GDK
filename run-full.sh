@@ -6,6 +6,7 @@ mvn clean install -DskipTests
 
 # Get the paths to the built JARs
 LAUNCHER_JAR="launcher/target/launcher-1.0.0.jar"
+EXAMPLE_JAR="modules/example/target/example-module-1.0.0.jar"
 TICTACTOE_JAR="modules/tictactoe/target/tictactoe-module-1.0.0.jar"
 
 # Check if JARs exist
@@ -13,7 +14,10 @@ if [ ! -f "$LAUNCHER_JAR" ]; then
     echo "Error: Launcher JAR not found at $LAUNCHER_JAR"
     exit 1
 fi
-
+if [ ! -f "$EXAMPLE_JAR" ]; then
+    echo "Error: Example module JAR not found at $EXAMPLE_JAR"
+    exit 1
+fi
 if [ ! -f "$TICTACTOE_JAR" ]; then
     echo "Error: TicTacToe module JAR not found at $TICTACTOE_JAR"
     exit 1
@@ -22,4 +26,4 @@ fi
 # Run the GDK using Maven exec plugin with JavaFX
 echo "Running GDK with modules..."
 cd launcher
-mvn javafx:run -Djavafx.mainClass="com.GDKApplication" -Dexec.args="--modules-dir=../modules" 
+mvn javafx:run -Djavafx.mainClass="GDKApplication" -Dexec.args="--modules-dir=../modules" 
