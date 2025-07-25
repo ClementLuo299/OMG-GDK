@@ -1,10 +1,6 @@
-
-
-
-
 import gdk.GameModule;
-
 import gdk.Logging;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -22,11 +18,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Properties;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -42,39 +33,47 @@ import javafx.application.Platform;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited July 23, 2025
+ * @edited July 25, 2025
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
 
     // ==================== FXML INJECTIONS ====================
     
+    // Main UI components
     @FXML private VBox mainContainer;
-    @FXML private Button exitButton;
-    @FXML private Button refreshButton;
     @FXML private Label gameTitleLabel;
     @FXML private ImageView gameIconImageView;
-    @FXML private ComboBox<GameModule> gameSelector;
-    @FXML private Button launchGameButton;
-    @FXML private TextArea messageArea;
     @FXML private Label statusLabel;
     
-    // JSON data components
-    @FXML private TextArea jsonDataTextArea;
-    @FXML private Button clearJsonButton;
-    @FXML private Button validateJsonButton;
-
+    // Game selection components
+    @FXML private ComboBox<GameModule> gameSelector;
+    @FXML private Button launchGameButton;
+    @FXML private Button refreshButton;
     
+    // Message and logging components
+    @FXML private TextArea messageArea;
+    
+    // JSON configuration components
+    @FXML private TextArea jsonDataTextArea;
+    @FXML private Button validateJsonButton;
+    @FXML private Button clearJsonButton;
+    
+    // Application control components
+    @FXML private Button exitButton;
+
     // ==================== DEPENDENCIES ====================
     
-    private static final String CONFIG_FILE = "gdk-config.properties";
-    private static Properties config;
     private Stage primaryStage;
+    private GDKApplication gdkApplication;
+    private GDKViewModel viewModel;
+    
+    // Game management
     private ObservableList<GameModule> availableGames;
     private GameModule selectedGame;
-    private GDKApplication gdkApplication;
-    private GDKViewModel viewModel; // The ViewModel that handles business logic
-    private ObjectMapper jsonMapper; // For JSON parsing and validation
+    
+    // JSON processing
+    private ObjectMapper jsonMapper;
     
     // ==================== INITIALIZATION ====================
     
@@ -82,23 +81,27 @@ public class GDKGameLobbyController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Logging.info("🎮 Initializing GDK Game Picker Controller");
         
-        // Initialize JSON mapper
-        jsonMapper = new ObjectMapper();
-        
-        // Initialize available games list
-        availableGames = FXCollections.observableArrayList();
-        
-        // Load configuration
-        loadConfig();
-        
-        // Initialize UI components
+        initializeDependencies();
         setupUI();
         setupEventHandlers();
-        
-        // Load available games
-        refreshGameList();
+        loadInitialData();
         
         Logging.info("✅ GDK Game Picker Controller initialized successfully");
+    }
+    
+    /**
+     * Initialize all dependencies and data structures
+     */
+    private void initializeDependencies() {
+        jsonMapper = new ObjectMapper();
+        availableGames = FXCollections.observableArrayList();
+    }
+    
+    /**
+     * Load initial data and perform startup tasks
+     */
+    private void loadInitialData() {
+        refreshGameList();
     }
     
     // ==================== SETUP METHODS ====================
@@ -110,126 +113,127 @@ public class GDKGameLobbyController implements Initializable {
     public void setGDKApplication(GDKApplication gdkApplication) {
         this.gdkApplication = gdkApplication;
     }
-
+    
     public void setViewModel(GDKViewModel viewModel) {
         this.viewModel = viewModel;
     }
     
-    private void loadConfig() {
-        config = new Properties();
-        File configFile = new File(CONFIG_FILE);
-        
-        if (configFile.exists()) {
-            try (FileReader reader = new FileReader(configFile)) {
-                config.load(reader);
-                Logging.info("📂 Loaded configuration from " + CONFIG_FILE);
-            } catch (IOException e) {
-                Logging.error("❌ Failed to load config: " + e.getMessage());
-            }
-        } else {
-            createDefaultConfig();
-        }
-    }
+    // ==================== UI SETUP ====================
     
-    private void createDefaultConfig() {
-        config.setProperty("username", "GDK Developer");
-        config.setProperty("serverUrl", "localhost");
-        config.setProperty("serverPort", "8080");
-        saveConfig();
-        Logging.info("📝 Created default configuration");
-    }
-    
-    private void saveConfig() {
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-            config.store(writer, "GDK Configuration");
-            Logging.info("💾 Configuration saved");
-        } catch (IOException e) {
-            Logging.error("❌ Failed to save config: " + e.getMessage());
-        }
-    }
-    
+    /**
+     * Setup all UI components and their properties
+     */
     private void setupUI() {
-        // Setup game selector with custom cell factory
+        setupGameSelector();
+        setupMessageArea();
+        setupJsonComponents();
+        
+        Logging.info("🎨 UI components initialized");
+    }
+    
+    /**
+     * Setup the game selector ComboBox with custom cell factory
+     */
+    private void setupGameSelector() {
         gameSelector.setCellFactory(param -> new ListCell<GameModule>() {
             @Override
             protected void updateItem(GameModule item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setText(null);
+                    setText("Select a game...");
                 } else {
-                    setText(item.getClass().getSimpleName()); // Use class name instead of getGameName()
+                    setText(item.getClass().getSimpleName());
                 }
             }
         });
         
         gameSelector.setButtonCell(gameSelector.getCellFactory().call(null));
-        
-        // Setup JSON text area with placeholder
-        jsonDataTextArea.setPromptText("Enter JSON configuration here. (Resorts to default if invalid)");
-        
-        // Setup message area
+    }
+    
+    /**
+     * Setup the message area for logging
+     */
+    private void setupMessageArea() {
         messageArea.setEditable(false);
         messageArea.setWrapText(true);
         messageArea.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
         
-        // Add welcome message to message area
+        // Add welcome message
         addMessage("🎮 Welcome to GDK Game Picker!");
-        addMessage("📋 Select a game module and configure it with JSON");
-        addMessage("🚀 Use the Launch Game button to start playing");
-        addMessage("📝 All activities will be logged here");
-        addMessage("─".repeat(50));
-        
-        Logging.info("🎨 UI components initialized");
     }
     
+    /**
+     * Setup JSON-related components
+     */
+    private void setupJsonComponents() {
+        // JSON components are already defined in FXML
+        // Additional setup can be added here if needed
+    }
+    
+    // ==================== EVENT HANDLERS ====================
+    
+    /**
+     * Setup all event handlers for UI components
+     */
     private void setupEventHandlers() {
-        // Game selection handler
+        setupGameSelectionHandler();
+        setupButtonHandlers();
+        setupJsonHandlers();
+        
+        Logging.info("🎯 Event handlers configured");
+    }
+    
+    /**
+     * Setup game selection event handler
+     */
+    private void setupGameSelectionHandler() {
         gameSelector.setOnAction(e -> {
             selectedGame = gameSelector.getValue();
             updateGameInfo();
             addLogMessage("🎮 Selected game: " + (selectedGame != null ? selectedGame.getClass().getSimpleName() : "None"));
         });
-        
-        // Launch game button
+    }
+    
+    /**
+     * Setup button event handlers
+     */
+    private void setupButtonHandlers() {
         launchGameButton.setOnAction(e -> launchGame());
-        
-        // Refresh button
         refreshButton.setOnAction(e -> {
             addLogMessage("🔄 Refreshing game list...");
             refreshGameList();
         });
-        
-        // Exit button
         exitButton.setOnAction(e -> {
             Logging.info("🔒 GDK Game Lobby closing");
             Platform.exit();
         });
-        
-        // JSON validation button
+    }
+    
+    /**
+     * Setup JSON-related event handlers
+     */
+    private void setupJsonHandlers() {
         validateJsonButton.setOnAction(e -> validateJsonData());
-        
-        // Clear JSON button
         clearJsonButton.setOnAction(e -> clearJsonData());
         
-        // JSON text change handler
+        // Auto-clear validation on text change
         jsonDataTextArea.textProperty().addListener((obs, oldVal, newVal) -> {
             clearJsonValidation();
         });
-        
-        Logging.info("🎯 Event handlers configured");
     }
     
     // ==================== GAME MANAGEMENT ====================
     
+    /**
+     * Refresh the list of available games by scanning modules directory
+     */
     private void refreshGameList() {
         try {
             availableGames.clear();
             
-            // Get modules directory from config
-            String modulesDir = config.getProperty("modulesDir", "modules");
+            String modulesDir = GDKApplication.MODULES_DIR;
             Logging.info("📂 Scanning for modules in: " + modulesDir);
             
-            // Discover modules
             List<GameModule> discoveredModules = ModuleLoader.discoverModules(modulesDir);
             
             for (GameModule module : discoveredModules) {
@@ -237,7 +241,6 @@ public class GDKGameLobbyController implements Initializable {
                 Logging.info("📦 Loaded game module: " + module.getClass().getSimpleName());
             }
             
-            // Set items for the game selector
             gameSelector.setItems(availableGames);
             
             if (availableGames.isEmpty()) {
@@ -252,6 +255,9 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
     
+    /**
+     * Update game information display when a game is selected
+     */
     private void updateGameInfo() {
         if (selectedGame != null) {
             // Game data will be handled via JSON
@@ -259,76 +265,53 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
     
+    /**
+     * Launch the currently selected game with JSON configuration
+     */
     private void launchGame() {
         if (selectedGame == null) {
             showError("No Game Selected", "Please select a game to launch.");
             return;
         }
 
-        // Get JSON data
         Map<String, Object> jsonData = getJsonData();
         if (jsonData == null) {
             showError("Invalid JSON", "Please enter valid JSON configuration.");
             return;
         }
         
-        // Extract player count from JSON (default to 2 if not specified)
-        Integer playerCount = (Integer) jsonData.getOrDefault("playerCount", 2);
-        
-        // Validate player count (basic validation, detailed validation handled by game)
-        if (playerCount < 1 || playerCount > 10) {
-            showError("Invalid Player Count", 
-                "Player count must be between 1 and 10. Please check your JSON configuration.");
+        if (!validatePlayerCount(jsonData)) {
             return;
         }
         
-        // Add JSON data
         addLogMessage("📦 Including custom JSON data with " + jsonData.size() + " fields");
-
         addLogMessage("🚀 Launching " + selectedGame.getClass().getSimpleName());
 
-        // Launch the game using ViewModel
         if (viewModel != null) {
             viewModel.handleLaunchGame(selectedGame);
-        } else if (gdkApplication != null) {
-            // Fallback to direct application call
-            gdkApplication.launchGame(selectedGame);
         } else {
-            showError("Application Error", "Neither ViewModel nor GDK Application reference is available.");
+            showError("Application Error", "ViewModel reference is not available.");
         }
     }
     
-    // ==================== UTILITY METHODS ====================
-    
-    private void showError(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-    
     /**
-     * Adds a timestamped message to the message area
+     * Validate player count from JSON data
      */
-    private void addLogMessage(String message) {
-        addMessage(message);
-    }
-    
-    /**
-     * Adds a message to the message area
-     */
-    private void addMessage(String message) {
-        String timestamp = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
-        messageArea.appendText("[" + timestamp + "] " + message + "\n");
-        // Auto-scroll to bottom
-        messageArea.setScrollTop(Double.MAX_VALUE);
+    private boolean validatePlayerCount(Map<String, Object> jsonData) {
+        Integer playerCount = (Integer) jsonData.getOrDefault("playerCount", 2);
+        
+        if (playerCount < 1 || playerCount > 10) {
+            showError("Invalid Player Count", 
+                "Player count must be between 1 and 10. Please check your JSON configuration.");
+            return false;
+        }
+        return true;
     }
     
     // ==================== JSON DATA HANDLING ====================
     
     /**
-     * Validates the JSON data entered by the user.
+     * Validate the JSON data entered by the user
      */
     private void validateJsonData() {
         String jsonText = jsonDataTextArea.getText().trim();
@@ -349,7 +332,7 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
-     * Clears the JSON data text area.
+     * Clear the JSON data text area
      */
     private void clearJsonData() {
         jsonDataTextArea.clear();
@@ -358,15 +341,15 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
-     * Clears the JSON validation messages.
+     * Clear JSON validation messages (placeholder for future implementation)
      */
     private void clearJsonValidation() {
-        // Validation messages are now shown in the message area
-        // No need to clear anything specific for validation
+        // Validation messages are shown in the message area
+        // No specific clearing needed for now
     }
     
     /**
-     * Gets the parsed JSON data from the text area.
+     * Parse JSON data from the text area
      * @return Map containing the JSON data, or null if invalid
      */
     private Map<String, Object> getJsonData() {
@@ -384,5 +367,37 @@ public class GDKGameLobbyController implements Initializable {
             Logging.error("❌ Failed to parse JSON: " + e.getMessage());
             return null;
         }
+    }
+    
+    // ==================== MESSAGING & LOGGING ====================
+    
+    /**
+     * Add a timestamped log message to the message area
+     */
+    private void addLogMessage(String message) {
+        addMessage(message);
+    }
+    
+    /**
+     * Add a message to the message area with timestamp
+     */
+    private void addMessage(String message) {
+        String timestamp = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+        messageArea.appendText("[" + timestamp + "] " + message + "\n");
+        // Auto-scroll to bottom
+        messageArea.setScrollTop(Double.MAX_VALUE);
+    }
+    
+    // ==================== UTILITY METHODS ====================
+    
+    /**
+     * Show an error dialog with the given title and content
+     */
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 } 

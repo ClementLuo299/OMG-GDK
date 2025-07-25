@@ -14,7 +14,7 @@ import java.net.URL;
  *
  * @authors Clement Luo
  * @date July 24, 2025
- * @edited July 24, 2025
+ * @edited July 25, 2025
  * @since 1.0
  */
 public class GDKViewModel {
@@ -175,8 +175,8 @@ public class GDKViewModel {
      */
     private void refreshGameList() {
         try {
-            // Get modules directory from config
-            String modulesDir = "../modules";
+            // Get modules directory from GDKApplication constants
+            String modulesDir = GDKApplication.MODULES_DIR;
             Logging.info("📂 Scanning for modules in: " + modulesDir);
             
             // Discover modules
@@ -208,7 +208,7 @@ public class GDKViewModel {
     private void createServerSimulator() {
         try {
             // Load the server simulator FXML
-            URL fxmlUrl = GDKApplication.class.getResource("/ServerSimulator.fxml");
+            URL fxmlUrl = GDKApplication.class.getResource("/server-simulator/ServerSimulator.fxml");
             if (fxmlUrl == null) {
                 throw new RuntimeException("Server Simulator FXML resource not found");
             }
@@ -218,7 +218,7 @@ public class GDKViewModel {
             Scene serverScene = new Scene(loader.load());
             
             // Apply CSS styling
-            URL cssUrl = GDKApplication.class.getResource("/server-simulator.css");
+            URL cssUrl = GDKApplication.class.getResource("/server-simulator/server-simulator.css");
             if (cssUrl != null) {
                 serverScene.getStylesheets().add(cssUrl.toExternalForm());
             }
