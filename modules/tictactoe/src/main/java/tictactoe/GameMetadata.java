@@ -51,13 +51,13 @@ public class GameMetadata implements GameModule {
     }
     
     @Override
-    public void onGameClose() {
+    public void stopGame() {
         try {
             Logging.info("🔒 TicTacToe closing via GameMetadata - cleaning up resources");
             
             // Clean up game resources
             if (gameModule != null) {
-                gameModule.onGameClose();
+                gameModule.stopGame();
             }
             
             Logging.info("✅ TicTacToe cleanup completed via GameMetadata");

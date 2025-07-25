@@ -34,7 +34,7 @@ public class ExampleGameModule implements GameModule {
     }
     
     @Override
-    public void onGameClose() {
+    public void stopGame() {
         Logging.info("🔄 " + GAME_NAME + " closing - cleaning up resources");
     }
     
@@ -87,13 +87,13 @@ public class ExampleGameModule implements GameModule {
         
         closeButton.setOnAction(e -> {
             Logging.info("🔒 Closing Example Game");
-            onGameClose();
+            stopGame();
             Platform.exit();
         });
         
         backButton.setOnAction(e -> {
             Logging.info("🔙 Returning to lobby from Example Game");
-            onGameClose();
+            stopGame();
         });
         
         // Add components to root

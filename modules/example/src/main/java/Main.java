@@ -45,13 +45,13 @@ public class Main implements GameModule {
     }
     
     @Override
-    public void onGameClose() {
+    public void stopGame() {
         try {
             Logging.info("🔒 Example Game closing - cleaning up resources");
             
             // Clean up any resources
             if (gameModule != null) {
-                gameModule.onGameClose();
+                gameModule.stopGame();
             }
             
         } catch (Exception e) {

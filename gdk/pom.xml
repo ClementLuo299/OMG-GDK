@@ -56,6 +56,6 @@
     </dependencies>
     
     <build>
-        <sourceDirectory>.</sourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
     </build>
 </project> 

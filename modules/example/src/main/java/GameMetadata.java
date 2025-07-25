@@ -30,7 +30,7 @@ public class GameMetadata implements GameModule {
     }
     
     @Override
-    public void onGameClose() {
+    public void stopGame() {
         Logging.info("🔒 " + GAME_NAME + " closing - cleaning up resources");
     }
 } 

@@ -272,7 +272,7 @@ public class GDKViewModel {
         // Clean up current game resources
         if (currentGame != null) {
             Logging.info("🎮 Closing game: " + currentGame.getClass().getSimpleName());
-            currentGame.onGameClose();
+            currentGame.stopGame();
             currentGame = null;
         }
         gameIsRunning.set(false);

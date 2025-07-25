@@ -274,7 +274,7 @@ public class TicTacToeController implements Initializable {
     private void onBackButtonClicked() {
         Logging.info("🔙 Returning to lobby from TicTacToe");
         if (gameModule != null) {
-            gameModule.onGameClose();
+            gameModule.stopGame();
         }
     }
     

@@ -33,7 +33,7 @@ public class TicTacToeModule implements GameModule {
     }
     
     @Override
-    public void onGameClose() {
+    public void stopGame() {
         Logging.info("🔄 " + GAME_NAME + " closing - cleaning up resources");
     }
     
@@ -148,12 +148,12 @@ public class TicTacToeModule implements GameModule {
         
         closeButton.setOnAction(e -> {
             Logging.info("🔒 Closing TicTacToe Game");
-            onGameClose();
+            stopGame();
         });
         
         backButton.setOnAction(e -> {
             Logging.info("🔙 Returning to lobby from TicTacToe Game");
-            onGameClose();
+            stopGame();
         });
         
         // Add components to root

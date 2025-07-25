@@ -146,7 +146,7 @@ public class Stop {
             if (viewModel != null && viewModel.getCurrentGame() != null) {
                 GameModule currentGame = viewModel.getCurrentGame();
                 Logging.info("🎮 Force closing game: " + currentGame.getClass().getSimpleName());
-                currentGame.onGameClose();
+                currentGame.stopGame();
             }
             
             // Force close server simulator
@@ -171,7 +171,7 @@ public class Stop {
             Logging.info("🎮 Cleaning up current game: " + currentGame.getClass().getSimpleName());
             
             try {
-                currentGame.onGameClose();
+                currentGame.stopGame();
                 Logging.info("✅ Game cleanup completed");
             } catch (Exception e) {
                 Logging.error("❌ Error cleaning up game: " + e.getMessage(), e);

@@ -26,7 +26,7 @@ public interface GameModule {
      * Called when the game is being closed.
      * Use this to clean up resources.
      */
-    default void onGameClose() {
+    default void stopGame() {
         // Default empty implementation
     }
 } 
