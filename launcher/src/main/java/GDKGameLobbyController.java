@@ -3,7 +3,6 @@ import gdk.Logging;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
@@ -436,7 +435,7 @@ public class GDKGameLobbyController implements Initializable {
 
     // ==================== UTILITY METHODS ====================
     
-    /**
+        /**
      * Add a message to the user message area.
      * 
      * This method adds a timestamped message to the message area
@@ -460,10 +459,10 @@ public class GDKGameLobbyController implements Initializable {
      * @param errorMessage The error message to display
      */
     private void showErrorDialog(String dialogTitle, String errorMessage) {
-        Alert errorDialog = new Alert(Alert.AlertType.ERROR);
+        javafx.scene.control.Alert errorDialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
         errorDialog.setTitle(dialogTitle);
         errorDialog.setHeaderText(null);
         errorDialog.setContentText(errorMessage);
         errorDialog.showAndWait();
     }
-} 
+}  

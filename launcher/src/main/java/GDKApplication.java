@@ -3,8 +3,8 @@ import gdk.Logging;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-
 import javafx.scene.control.Alert;
+
 import javafx.stage.Stage;
 
 /**
@@ -58,10 +58,10 @@ public class GDKApplication extends Application {
         this.primaryApplicationStage = primaryStage;
         
         try {
-            initializeGDKApplication();
-            performGDKStartup();
+            new Startup(primaryApplicationStage).start();
         } catch (Exception startupError) {
-            handleStartupFailure(startupError);
+            Logging.error("❌ Failed to start GDK application: " + startupError.getMessage(), startupError);
+            displayErrorDialog("Startup Error", null, "Failed to start GDK application: " + startupError.getMessage());
         }
     }
 
@@ -75,61 +75,26 @@ public class GDKApplication extends Application {
     public void stop() {
         Logging.info("🔄 GDK application shutdown completed");
     }
-
-    // ==================== APPLICATION STARTUP METHODS ====================
-    
-    /**
-     * Initialize the GDK application with basic logging.
-     * 
-     * This method sets up the initial application state and logs
-     * the startup process for debugging purposes.
-     */
-    private void initializeGDKApplication() {
-        Logging.info("🔄 Initializing GDK application");
-    }
-    
-    /**
-     * Perform the main GDK startup process.
-     * 
-     * This method delegates the startup logic to the Startup class,
-     * which handles UI initialization, ViewModel setup, and stage configuration.
-     */
-    private void performGDKStartup() {
-        new Startup(primaryApplicationStage).start();
-    }
-    
-    /**
-     * Handle startup failures by logging errors and showing user-friendly dialogs.
-     * 
-     * @param startupError The exception that occurred during startup
-     */
-    private void handleStartupFailure(Exception startupError) {
-        Logging.error("❌ Failed to start GDK application: " + startupError.getMessage(), startupError);
-        displayErrorDialog("Startup Error", "Failed to start GDK application: " + startupError.getMessage());
-    }
-
-    // ==================== USER INTERFACE METHODS ====================
     
     /**
      * Display an error dialog to the user.
      * 
      * This method creates and shows a modal error dialog with the specified
-     * title and content. It's used to inform users about critical errors
+     * title, header, and content. It's used to inform users about errors
      * that prevent the application from functioning properly.
      * 
      * @param dialogTitle The title of the error dialog
-     * @param errorMessage The error message to display
+     * @param headerText The header text (can be null)
+     * @param contentText The error message to display
      */
-    private void displayErrorDialog(String dialogTitle, String errorMessage) {
+    private static void displayErrorDialog(String dialogTitle, String headerText, String contentText) {
         Alert errorDialog = new Alert(Alert.AlertType.ERROR);
         errorDialog.setTitle(dialogTitle);
-        errorDialog.setHeaderText(null);
-        errorDialog.setContentText(errorMessage);
+        errorDialog.setHeaderText(headerText);
+        errorDialog.setContentText(contentText);
         errorDialog.showAndWait();
     }
 
-    // ==================== APPLICATION ENTRY POINT ====================
-    
     /**
      * Main entry point for the GDK application.
      * 
@@ -141,32 +106,10 @@ public class GDKApplication extends Application {
      */
     public static void main(String[] commandLineArguments) {
         try {
-            launchJavaFXApplication(commandLineArguments);
+            launch(commandLineArguments);
         } catch (Exception fatalError) {
-            handleFatalApplicationError(fatalError);
+            Logging.error("❌ Fatal application error: " + fatalError.getMessage(), fatalError);
+            displayErrorDialog("Fatal Application Error", "The application cannot start", "A fatal error occurred: " + fatalError.getMessage());
         }
-    }
-    
-    /**
-     * Launch the JavaFX application with the provided arguments.
-     * 
-     * @param commandLineArguments The command line arguments to pass to JavaFX
-     */
-    private static void launchJavaFXApplication(String[] commandLineArguments) {
-        launch(commandLineArguments);
-    }
-    
-    /**
-     * Handle fatal application errors that occur during startup.
-     * 
-     * This method logs the error details and prints them to the console
-     * for debugging purposes when the application cannot start properly.
-     * 
-     * @param fatalError The fatal exception that occurred
-     */
-    private static void handleFatalApplicationError(Exception fatalError) {
-        Logging.error("❌ Fatal application error: " + fatalError.getMessage(), fatalError);
-        System.err.println("Fatal application error: " + fatalError.getMessage());
-        fatalError.printStackTrace();
     }
 } 
