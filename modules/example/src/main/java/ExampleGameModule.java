@@ -23,15 +23,12 @@ public class ExampleGameModule implements GameModule {
     private static final String GAME_NAME = "Example Game";
     
     @Override
-    public Scene launchGame(Stage primaryStage, int playerCount, Object eventHandler) {
-        Logging.info("🎮 Launching " + GAME_NAME + " with players: " + playerCount);
-        
+    public Scene launchGame(Stage primaryStage) {
+        Logging.info("🎮 Launching Example Game");
         try {
-            // Create a simple test interface instead of loading FXML
-            return createTestInterface(primaryStage, playerCount, eventHandler);
-            
+            return createTestInterface(primaryStage);
         } catch (Exception e) {
-            Logging.error("❌ Failed to launch " + GAME_NAME + ": " + e.getMessage(), e);
+            Logging.error("❌ Failed to launch Example Game: " + e.getMessage(), e);
             return null;
         }
     }
@@ -46,19 +43,20 @@ public class ExampleGameModule implements GameModule {
     /**
      * Creates a simple test interface to demonstrate game communication.
      */
-    private Scene createTestInterface(Stage primaryStage, int playerCount, Object eventHandler) {
+    private Scene createTestInterface(Stage primaryStage) {
         javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
         root.setPadding(new javafx.geometry.Insets(20));
         root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
         
         // Title
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label(" Game Communication Test");
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("🎮 Game Communication Test");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
         // Game info
+        int playerCount = 2; // Default for display
         String difficulty = "Medium"; // Default difficulty
         javafx.scene.control.Label infoLabel = new javafx.scene.control.Label(
-            "Game: " + GAME_NAME + " | Players: " + playerCount + " | Difficulty: " + difficulty
+            "Game: Example Game | Players: " + playerCount + " | Difficulty: " + difficulty
         );
         infoLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6c757d;");
         
@@ -76,10 +74,7 @@ public class ExampleGameModule implements GameModule {
         // Event handlers
         jsonDataButton.setOnAction(e -> {
             Logging.info("📦 Checking for custom JSON data...");
-            
-            // No custom data available
             Logging.info("📦 No custom JSON data found");
-            
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
             alert.setTitle("JSON Data Information");
             alert.setHeaderText("No Custom Data");
@@ -91,15 +86,14 @@ public class ExampleGameModule implements GameModule {
         closeButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px;");
         
         closeButton.setOnAction(e -> {
-            Logging.info("🔒 Closing " + GAME_NAME);
+            Logging.info("🔒 Closing Example Game");
             onGameClose();
             Platform.exit();
         });
         
         backButton.setOnAction(e -> {
-            Logging.info("🔙 Returning to lobby from " + GAME_NAME);
+            Logging.info("🔙 Returning to lobby from Example Game");
             onGameClose();
-            // The launcher will handle returning to the lobby
         });
         
         // Add components to root
@@ -107,17 +101,21 @@ public class ExampleGameModule implements GameModule {
             titleLabel,
             infoLabel,
             statusLabel,
-            new javafx.scene.control.Separator(),
             jsonDataButton,
             backButton,
             closeButton
         );
         
         // Create scene
-        Scene scene = new Scene(root, 500, 400);
+        Scene scene = new Scene(root, 400, 300);
         scene.getStylesheets().add(getClass().getResource("/games/example/css/example.css").toExternalForm());
         
-        Logging.info("✅ " + GAME_NAME + " test interface created successfully");
+        // Configure stage
+        primaryStage.setTitle("Example Game - GDK Test");
+        primaryStage.setMinWidth(400);
+        primaryStage.setMinHeight(300);
+        
+        Logging.info("✅ Example Game interface created successfully");
         return scene;
     }
 } 

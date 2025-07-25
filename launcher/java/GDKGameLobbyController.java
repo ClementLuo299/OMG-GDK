@@ -73,6 +73,7 @@ public class GDKGameLobbyController implements Initializable {
     private ObservableList<GameModule> availableGames;
     private GameModule selectedGame;
     private GDKApplication gdkApplication;
+    private GDKViewModel viewModel; // The ViewModel that handles business logic
     private ObjectMapper jsonMapper; // For JSON parsing and validation
     
     // ==================== INITIALIZATION ====================
@@ -108,6 +109,10 @@ public class GDKGameLobbyController implements Initializable {
     
     public void setGDKApplication(GDKApplication gdkApplication) {
         this.gdkApplication = gdkApplication;
+    }
+
+    public void setViewModel(GDKViewModel viewModel) {
+        this.viewModel = viewModel;
     }
     
     private void loadConfig() {
@@ -282,9 +287,14 @@ public class GDKGameLobbyController implements Initializable {
 
         addLogMessage("🚀 Launching " + selectedGame.getClass().getSimpleName());
 
-        // Launch the game
-        if (gdkApplication != null) {
+        // Launch the game using ViewModel
+        if (viewModel != null) {
+            viewModel.handleLaunchGame(selectedGame);
+        } else if (gdkApplication != null) {
+            // Fallback to direct application call
             gdkApplication.launchGame(selectedGame);
+        } else {
+            showError("Application Error", "Neither ViewModel nor GDK Application reference is available.");
         }
     }
     

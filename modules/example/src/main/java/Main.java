@@ -32,26 +32,14 @@ public class Main implements GameModule {
     // ==================== JSON COMMUNICATION & GAME CONTROL ====================
     
     @Override
-    public Scene launchGame(Stage primaryStage, int playerCount, Object eventHandler) {
+    public Scene launchGame(Stage primaryStage) {
         try {
-            Logging.info("🚀 Starting Example Game...");
-            
-            // Event system removed - use server simulator for communication
-            
-            // Initialize game module lazily and delegate to it for actual game execution
             if (gameModule == null) {
                 gameModule = new ExampleGameModule();
             }
-            Scene gameScene = gameModule.launchGame(primaryStage, playerCount, eventHandler);
-            
-            Logging.info("✅ Example Game launched successfully");
-            return gameScene;
-            
+            return gameModule.launchGame(primaryStage);
         } catch (Exception e) {
-            Logging.error("❌ Error launching Example Game: " + e.getMessage(), e);
-            
-            // Event system removed - use server simulator for communication
-            
+            Logging.error("❌ Failed to launch Example Game: " + e.getMessage(), e);
             return null;
         }
     }

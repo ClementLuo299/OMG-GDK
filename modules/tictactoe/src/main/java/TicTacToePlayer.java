@@ -29,6 +29,14 @@ public class TicTacToePlayer {
     }
     
     /**
+     * Gets the player's name (alias for getUsername).
+     * @return The player's name
+     */
+    public String getName() {
+        return username;
+    }
+    
+    /**
      * Gets the player's symbol (X or O).
      * @return The player's symbol
      */

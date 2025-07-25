@@ -9,21 +9,19 @@ import javafx.stage.Stage;
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited July 21, 2025
+ * @edited July 24, 2025
  * @since 1.0
  */
 public interface GameModule {
     
     /**
      * Launches the game.
-     * 
+     *
      * @param primaryStage The primary JavaFX stage
-     * @param playerCount Number of players
-     * @param eventHandler Event handler (can be null)
      * @return The game scene
      */
-    Scene launchGame(Stage primaryStage, int playerCount, Object eventHandler);
-    
+    Scene launchGame(Stage primaryStage);
+
     /**
      * Called when the game is being closed.
      * Use this to clean up resources.

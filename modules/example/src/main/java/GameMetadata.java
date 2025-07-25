@@ -24,10 +24,9 @@ public class GameMetadata implements GameModule {
     private static final String GAME_NAME = "Example Game";
     
     @Override
-    public Scene launchGame(Stage primaryStage, int playerCount, Object eventHandler) {
-        // Delegate to the actual game implementation
+    public Scene launchGame(Stage primaryStage) {
         ExampleGameModule gameModule = new ExampleGameModule();
-        return gameModule.launchGame(primaryStage, playerCount, eventHandler);
+        return gameModule.launchGame(primaryStage);
     }
     
     @Override

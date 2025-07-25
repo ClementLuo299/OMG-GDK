@@ -26,6 +26,19 @@ public class TicTacToeGame {
     private TicTacToePlayer winner;
 
     /**
+     * Creates a new TicTacToe game with default players.
+     */
+    public TicTacToeGame() {
+        this.players = List.of(
+            new TicTacToePlayer("Player 1", "X"),
+            new TicTacToePlayer("Player 2", "O")
+        );
+        this.board = "123456789";
+        this.currentPlayer = players.get(0); // Player 1 starts
+        this.winner = null;
+    }
+    
+    /**
      * Creates a new TicTacToe game.
      * 
      * @param players List of players, should contain exactly 2 players
@@ -207,5 +220,90 @@ public class TicTacToeGame {
         this.board = "123456789";
         this.currentPlayer = players.get(0);
         this.winner = null;
+    }
+    
+    /**
+     * Checks if a move is valid at the given position.
+     * @param position The position to check (0-8)
+     * @return true if the move is valid, false otherwise
+     */
+    public boolean isValidMove(int position) {
+        if (position < 0 || position > 8) {
+            return false; // Invalid position
+        }
+        
+        // Check if position is already taken
+        return this.board.charAt(position) != PLAYER_ONE_CHAR && 
+               this.board.charAt(position) != PLAYER_TWO_CHAR;
+    }
+    
+    /**
+     * Makes a move at the given position with the given symbol.
+     * @param position The position to place the mark (0-8)
+     * @param symbol The symbol to place (X or O)
+     * @return true if the move was successful, false otherwise
+     */
+    public boolean makeMove(int position, String symbol) {
+        if (!isValidMove(position)) {
+            return false;
+        }
+        
+        char mark = symbol.equals("X") ? PLAYER_ONE_CHAR : PLAYER_TWO_CHAR;
+        this.board = this.board.substring(0, position) + mark + this.board.substring(position + 1);
+        
+        // Check for win
+        TicTacToePlayer winCheck = checkWinner();
+        if (winCheck != null) {
+            this.winner = winCheck;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Checks if the given symbol has won.
+     * @param symbol The symbol to check (X or O)
+     * @return true if the symbol has won, false otherwise
+     */
+    public boolean checkWin(String symbol) {
+        char mark = symbol.equals("X") ? PLAYER_ONE_CHAR : PLAYER_TWO_CHAR;
+        
+        // Check rows
+        if (checkLine(0, 1, 2) && getMarkAtPosition(0) == mark) return true;
+        if (checkLine(3, 4, 5) && getMarkAtPosition(3) == mark) return true;
+        if (checkLine(6, 7, 8) && getMarkAtPosition(6) == mark) return true;
+        
+        // Check columns
+        if (checkLine(0, 3, 6) && getMarkAtPosition(0) == mark) return true;
+        if (checkLine(1, 4, 7) && getMarkAtPosition(1) == mark) return true;
+        if (checkLine(2, 5, 8) && getMarkAtPosition(2) == mark) return true;
+        
+        // Check diagonals
+        if (checkLine(0, 4, 8) && getMarkAtPosition(0) == mark) return true;
+        if (checkLine(2, 4, 6) && getMarkAtPosition(2) == mark) return true;
+        
+        return false;
+    }
+    
+    /**
+     * Checks if the board is full (draw).
+     * @return true if the board is full, false otherwise
+     */
+    public boolean isBoardFull() {
+        for (int i = 0; i < 9; i++) {
+            if (this.board.charAt(i) != PLAYER_ONE_CHAR && this.board.charAt(i) != PLAYER_TWO_CHAR) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Gets the mark at the given position.
+     * @param position The position to check (0-8)
+     * @return The mark at the position
+     */
+    private char getMarkAtPosition(int position) {
+        return this.board.charAt(position);
     }
 }

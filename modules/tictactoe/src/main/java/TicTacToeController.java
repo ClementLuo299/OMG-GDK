@@ -8,9 +8,6 @@ import java.util.ResourceBundle;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-import gdk.GameOptions;
-import gdk.GameState;
-import gdk.GameMode;
 import gdk.Logging;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -98,155 +95,113 @@ public class TicTacToeController implements Initializable {
     private ObservableList<String> moveHistory = FXCollections.observableArrayList();
     private String matchId;
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-    
-    // Timer variables
     private javafx.animation.Timeline moveTimer;
     private int timeRemaining = 30;
-    
-    // Game module integration
-    private GameMode gameMode;
-    private int playerCount;
-    private GameOptions gameOptions;
+    private int playerCount = 2; // Default to 2 players
     private Stage primaryStage;
+    private TicTacToeModule gameModule;
 
-
-    /**
-     * Initialize the controller.
-     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Store all the board buttons in a list for easier access
-        boardButtons = new ArrayList<>();
-        boardButtons.add(btn00);
-        boardButtons.add(btn01);
-        boardButtons.add(btn02);
-        boardButtons.add(btn10);
-        boardButtons.add(btn11);
-        boardButtons.add(btn12);
-        boardButtons.add(btn20);
-        boardButtons.add(btn21);
-        boardButtons.add(btn22);
+        Logging.info("🎮 Initializing TicTacToe Controller");
         
-        // Initialize players with proper error handling
         try {
-            // Create Player objects with simple usernames
-            player1 = new TicTacToePlayer("Player 1", "X");
-            player2 = new TicTacToePlayer("Player 2", "O");
+            // Initialize board buttons list
+            boardButtons = Arrays.asList(btn00, btn01, btn02, btn10, btn11, btn12, btn20, btn21, btn22);
             
-            // Apply color effects to avatar images
-            if (player1Avatar != null) {
-                player1Avatar.setEffect(new javafx.scene.effect.ColorAdjust(0, 0.5, 0, -0.2)); // Blue tint
-            }
+            // Set up move history
+            moveHistoryList.setItems(moveHistory);
             
-            if (player2Avatar != null) {
-                player2Avatar.setEffect(new javafx.scene.effect.ColorAdjust(0.7, 0.5, 0, 0)); // Red tint
-            }
+            // Set up chat
+            setupChat();
+            
+            // Initialize game with default settings
+            initializeGame();
+            
+            // Set up event handlers
+            setupEventHandlers();
+            
+            Logging.info("✅ TicTacToe Controller initialized successfully");
+            
         } catch (Exception e) {
-            Logging.error("Error initializing game: " + e.getMessage(), e);
+            Logging.error("❌ Error initializing TicTacToe Controller: " + e.getMessage(), e);
         }
-
-        // Initialize player information
-        player1Name.setText(player1.getUsername());
-        player2Name.setText(player2.getUsername());
-        player1Score.setText("Score: " + player1ScoreCount);
-        player2Score.setText("Score: " + player2ScoreCount);
-        
-        // Generate a random match ID
-        matchId = "M" + (10000 + (int)(Math.random() * 90000));
-        matchIdLabel.setText(matchId);
-        
-        // Set up chat functionality
-        setupChat();
-        
-        // Set up move history
-        moveHistoryList.setItems(moveHistory);
-        
-        // Initialize move count
-        updateMoveCount();
-        
-        // Set up chat status
-        if (chatStatusLabel != null) {
-            chatStatusLabel.setText("Online");
-        }
-        
-        // Initialize timer
-        setupMoveTimer();
-        
-        // Start a new game
-        startNewGame();
     }
     
     /**
-     * Set the primary stage for navigation
+     * Sets the primary stage
      */
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }
     
-
-    
     /**
-     * Initialize the game with parameters from the game module framework
+     * Sets the game module reference
      */
-    public void initializeGame(GameMode gameMode, int playerCount, GameOptions gameOptions) {
-        this.gameMode = gameMode;
-        this.playerCount = playerCount;
-        this.gameOptions = gameOptions;
-        
-        // Initialize players
-        player1 = new TicTacToePlayer("Player 1", "X");
-        player2 = new TicTacToePlayer("Player 2", "O");
-        
-        Logging.info("🎯 Initializing TicTacToe game with " + playerCount + " players, mode: " + gameMode.getDisplayName());
-        
-        // Apply any game-specific options
-        if (gameOptions != null) {
-            int timeLimit = gameOptions.getIntOption("timeLimit", 30);
-            timeRemaining = timeLimit;
-            updateTimerDisplay();
-        }
-        
-        // Start the game
-        startNewGame();
+    public void setGameModule(TicTacToeModule gameModule) {
+        this.gameModule = gameModule;
     }
     
     /**
-     * Set up chat functionality
+     * Initializes the game with default settings
+     */
+    public void initializeGame() {
+        try {
+            Logging.info("🎮 Initializing TicTacToe game");
+            
+            // Create players
+            player1 = new TicTacToePlayer("Player 1", "X");
+            player2 = new TicTacToePlayer("Player 2", "O");
+            currentPlayer = player1;
+            
+            // Create game instance
+            game = new TicTacToeGame();
+            
+            // Set up UI
+            updatePlayerLabels();
+            highlightCurrentPlayer();
+            
+            // Start new game
+            startNewGame();
+            
+            Logging.info("✅ TicTacToe game initialized successfully");
+            
+        } catch (Exception e) {
+            Logging.error("❌ Error initializing TicTacToe game: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Sets up chat functionality
      */
     private void setupChat() {
-        // Disable text area editing
-        chatMessagesArea.setEditable(false);
-        
-        // Add initial message
-        addSystemMessage("Game started. Have fun!");
-        
-        // Set up enter key press handling for chat input
         chatInputField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 sendChatMessage();
             }
         });
+        
+        addSystemMessage("Welcome to Tic Tac Toe! Players take turns placing X and O on the board.");
     }
     
     /**
-     * Add a system message to the chat
+     * Adds a system message to the chat
      */
     private void addSystemMessage(String message) {
-        String timeStamp = LocalTime.now().format(timeFormatter);
-        chatMessagesArea.appendText("[" + timeStamp + "] System: " + message + "\n");
+        String timestamp = LocalTime.now().format(timeFormatter);
+        chatMessagesArea.appendText("[" + timestamp + "] System: " + message + "\n");
     }
     
     /**
-     * Add a player message to the chat
+     * Adds a player message to the chat
      */
     private void addPlayerMessage(TicTacToePlayer player, String message) {
-        String timeStamp = LocalTime.now().format(timeFormatter);
-        String playerName = player.getUsername();
-        chatMessagesArea.appendText("[" + timeStamp + "] " + playerName + ": " + message + "\n");
+        String timestamp = LocalTime.now().format(timeFormatter);
+        chatMessagesArea.appendText("[" + timestamp + "] " + player.getName() + ": " + message + "\n");
     }
     
     /**
-     * Send a chat message
+     * Handles send message button click
      */
     @FXML
     private void onSendMessageClicked() {
@@ -254,7 +209,7 @@ public class TicTacToeController implements Initializable {
     }
     
     /**
-     * Process and send the chat message
+     * Sends a chat message
      */
     private void sendChatMessage() {
         String message = chatInputField.getText().trim();
@@ -265,330 +220,276 @@ public class TicTacToeController implements Initializable {
     }
     
     /**
-     * Add a move to the move history
+     * Adds a move to the history
      */
     private void addMoveToHistory(TicTacToePlayer player, int row, int col) {
-        String playerName = player.getUsername();
-        String symbol = player.getSymbol();
-        String move = playerName + " (" + symbol + ") → Row " + (row + 1) + ", Col " + (col + 1);
+        String timestamp = LocalTime.now().format(timeFormatter);
+        String move = "[" + timestamp + "] " + player.getName() + " placed " + player.getSymbol() + " at (" + row + "," + col + ")";
         moveHistory.add(move);
-        
-        // Scroll to the latest move
         moveHistoryList.scrollTo(moveHistory.size() - 1);
-        
-        // Update move count
-        updateMoveCount();
     }
-
+    
     /**
-     * Handle board button clicks.
+     * Handles board button clicks
      */
     @FXML
     private void onBoardButtonClicked(javafx.event.ActionEvent event) {
-        if (!gameInProgress) {
-            showAlert("Game not started", "Please start a new game first.");
-            return;
-        }
-
+        if (!gameInProgress) return;
+        
         Button clickedButton = (Button) event.getSource();
         int position = getBoardPosition(clickedButton);
-
-        // Ensure the button hasn't been played yet
-        if (clickedButton.getText().isEmpty()) {
+        
+        if (game.isValidMove(position)) {
             makeMove(clickedButton, position);
+        } else {
+            showAlert("Invalid Move", "That position is already taken!");
         }
     }
-
+    
     /**
-     * Handle the forfeit game button click.
+     * Handles forfeit game button click
      */
     @FXML
     private void onForfeitGameClicked() {
-        if (!gameInProgress) {
-            showAlert("Game not started", "No active game to forfeit.");
-            return;
+        if (gameInProgress) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Forfeit Game");
+            alert.setHeaderText("Are you sure you want to forfeit?");
+            alert.setContentText("This will end the current game.");
+            
+            alert.showAndWait().ifPresent(response -> {
+                if (response == javafx.scene.control.ButtonType.OK) {
+                    Logging.info("🏳️ Game forfeited by " + currentPlayer.getName());
+                    addSystemMessage(currentPlayer.getName() + " forfeited the game!");
+                    handleGameWon();
+                }
+            });
         }
-        
-        // Current player forfeits
-        TicTacToePlayer winner = (currentPlayer == player1) ? player2 : player1;
-        
-        // Update score
-        if (winner == player1) {
-            player1ScoreCount++;
-            statusLabel.setText("Player 2 forfeited. Player 1 wins!");
-            addSystemMessage(currentPlayer.getUsername() + " forfeited the game.");
-        } else {
-            player2ScoreCount++;
-            statusLabel.setText("Player 1 forfeited. Player 2 wins!");
-            addSystemMessage(currentPlayer.getUsername() + " forfeited the game.");
-        }
-        
-        updateScoreLabels();
-        gameInProgress = false;
-        
-        // Return to GDK after forfeit
-        Logging.info("🏳️ Game forfeited - requesting return to GDK");
-        onBackButtonClicked();
     }
-
+    
     /**
-     * Handle the back button click to return to the GDK.
+     * Handles back button click
      */
     @FXML
     private void onBackButtonClicked() {
-        Logging.info("🔙 Back button clicked - requesting return to GDK");
-        
-        // Stop any active timers
-        if (moveTimer != null) {
-            moveTimer.stop();
-            Logging.info("⏸️ Timer stopped");
+        Logging.info("🔙 Returning to lobby from TicTacToe");
+        if (gameModule != null) {
+            gameModule.onGameClose();
         }
-        
-        // Event system removed - use server simulator for communication
     }
-
+    
     /**
-     * Handle the new game button click.
+     * Handles new game button click
      */
     @FXML
     private void onNewGameClicked() {
         startNewGame();
     }
-
+    
     /**
-     * Start a new game by resetting the board and initializing game state.
+     * Starts a new game
      */
     private void startNewGame() {
-        // Reset UI
-        for (Button button : boardButtons) {
-            button.setText("");
-            button.getStyleClass().remove("x");
-            button.getStyleClass().remove("o");
-            button.getStyleClass().remove("winning");
-        }
-
-        // Initialize game with players
-        game = new TicTacToeGame(Arrays.asList(player1, player2));
+        Logging.info("🔄 Starting new TicTacToe game");
         
-        // Set player1 as the starting player
+        // Reset game state
+        game = new TicTacToeGame();
+        gameInProgress = true;
         currentPlayer = player1;
         
-        // Update UI with current game state
-        statusLabel.setText("Game started!");
-        if (currentPlayerLabel != null) {
-            currentPlayerLabel.setText("Player 1 (X)");
+        // Clear board
+        for (Button button : boardButtons) {
+            button.setText("");
+            button.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         }
-        gameInProgress = true;
         
-        // Clear move history for new game
-        moveHistory.clear();
-        updateMoveCount();
-        addSystemMessage("New game started.");
-        
-        // Restart timer
-        restartTimer();
-        
-        // Highlight current player's info
+        // Update UI
+        statusLabel.setText("Game in progress");
+        currentPlayerLabel.setText("Current Player: " + currentPlayer.getName());
         highlightCurrentPlayer();
+        
+        // Clear move history
+        moveHistory.clear();
+        addSystemMessage("New game started! " + currentPlayer.getName() + " goes first.");
+        
+        // Start timer
+        startTimer();
+        
+        Logging.info("✅ New TicTacToe game started");
     }
-
+    
     /**
-     * Make a move on the board.
-     * 
-     * @param button The button that was clicked
-     * @param position The board position (0-8)
+     * Makes a move on the board
      */
     private void makeMove(Button button, int position) {
-        // Update game state
-        game.place(currentPlayer, position);
+        // Make the move
+        game.makeMove(position, currentPlayer.getSymbol());
+        button.setText(currentPlayer.getSymbol());
         
-        // Add move to history
+        // Style the button based on player
+        if (currentPlayer == player1) {
+            button.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
+        } else {
+            button.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #dc3545;");
+        }
+        
+        // Add to move history
         int row = position / 3;
         int col = position % 3;
         addMoveToHistory(currentPlayer, row, col);
         
-        // Update UI
-        if (currentPlayer == player1) {
-            button.setText("X");
-            button.getStyleClass().add("x");
-        } else {
-            button.setText("O");
-            button.getStyleClass().add("o");
-        }
-        
-        // Get the winner from the game
-        TicTacToePlayer winner = game.getWinner();
-        
-        // Check for game end
-        if (winner != null) {
+        // Check for win or draw
+        if (game.checkWin(currentPlayer.getSymbol())) {
             handleGameWon();
-        } else if (game.isDrawn()) {
+        } else if (game.isBoardFull()) {
             handleGameDraw();
         } else {
             // Switch players
             currentPlayer = (currentPlayer == player1) ? player2 : player1;
-            
-            // Update turn indicators
-            statusLabel.setText((currentPlayer == player1) ? "Player 1's turn" : "Player 2's turn");
-            if (currentPlayerLabel != null) {
-                currentPlayerLabel.setText((currentPlayer == player1) ? "Player 1 (X)" : "Player 2 (O)");
-            }
-            
-            // Reset the timer for the new player's turn
-            restartTimer();
-            
-            // Highlight current player's info
+            currentPlayerLabel.setText("Current Player: " + currentPlayer.getName());
             highlightCurrentPlayer();
+            
+            // Restart timer
+            restartTimer();
         }
     }
-
+    
     /**
-     * Highlight the current player's info panel
+     * Highlights the current player
      */
     private void highlightCurrentPlayer() {
         if (currentPlayer == player1) {
-            player1Name.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-player-x-color;");
-            player2Name.setStyle("-fx-font-weight: normal; -fx-text-fill: -fx-text-color;");
+            player1Name.setStyle("-fx-font-weight: bold; -fx-text-fill: #007bff;");
+            player2Name.setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
         } else {
-            player1Name.setStyle("-fx-font-weight: normal; -fx-text-fill: -fx-text-color;");
-            player2Name.setStyle("-fx-font-weight: bold; -fx-text-fill: -fx-player-o-color;");
+            player1Name.setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+            player2Name.setStyle("-fx-font-weight: bold; -fx-text-fill: #dc3545;");
         }
     }
-
+    
     /**
-     * Handle game won event.
+     * Handles game won
      */
     private void handleGameWon() {
-        TicTacToePlayer winner = game.getWinner();
-        
-        // Pause the timer
-        pauseTimer();
+        gameInProgress = false;
         
         // Update score
-        if (winner == player1) {
+        if (currentPlayer == player1) {
             player1ScoreCount++;
-            statusLabel.setText("Player 1 wins!");
-            if (currentPlayerLabel != null) {
-                currentPlayerLabel.setText("Player 1 (X)");
-            }
-            addSystemMessage("Player 1 wins the game!");
         } else {
             player2ScoreCount++;
-            statusLabel.setText("Player 2 wins!");
-            if (currentPlayerLabel != null) {
-                currentPlayerLabel.setText("Player 2 (O)");
-            }
-            addSystemMessage("Player 2 wins the game!");
         }
         
         updateScoreLabels();
+        
+        // Highlight winning combination
         highlightWinningCombination();
-        gameInProgress = false;
-    }
-
-    /**
-     * Handle game draw event.
-     */
-    private void handleGameDraw() {
-        // Pause the timer
+        
+        // Show win message
+        String message = currentPlayer.getName() + " wins!";
+        statusLabel.setText(message);
+        addSystemMessage(message);
+        
+        showAlert("Game Over", message);
+        
+        // Stop timer
         pauseTimer();
         
-        statusLabel.setText("Game ended in a draw!");
-        if (currentPlayerLabel != null) {
-            currentPlayerLabel.setText("Draw!");
-        }
-        gameInProgress = false;
-        addSystemMessage("Game ended in a draw!");
+        Logging.info("🏆 " + message);
     }
-
+    
     /**
-     * Update score labels with current scores.
+     * Handles game draw
+     */
+    private void handleGameDraw() {
+        gameInProgress = false;
+        
+        String message = "It's a draw!";
+        statusLabel.setText(message);
+        addSystemMessage(message);
+        
+        showAlert("Game Over", message);
+        
+        // Stop timer
+        pauseTimer();
+        
+        Logging.info("🤝 " + message);
+    }
+    
+    /**
+     * Updates score labels
      */
     private void updateScoreLabels() {
-        player1Score.setText("Score: " + player1ScoreCount);
-        player2Score.setText("Score: " + player2ScoreCount);
+        player1Score.setText(String.valueOf(player1ScoreCount));
+        player2Score.setText(String.valueOf(player2ScoreCount));
     }
-
+    
     /**
-     * Highlight the winning combination on the board.
+     * Highlights the winning combination
      */
     private void highlightWinningCombination() {
-        // Get the winning positions based on the current board state
         List<Integer> winningPositions = getWinningPositions();
-        
-        if (winningPositions != null && !winningPositions.isEmpty()) {
-            for (Integer position : winningPositions) {
-                boardButtons.get(position).getStyleClass().add("winning");
-            }
+        for (int position : winningPositions) {
+            boardButtons.get(position).setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #28a745; -fx-background-color: #d4edda;");
         }
     }
     
     /**
-     * Calculate the winning positions based on the current game state.
-     * 
-     * @return List of positions (0-8) that form the winning line, or null if no winning line
+     * Gets the winning positions
      */
     private List<Integer> getWinningPositions() {
-        TicTacToePlayer winner = game.getWinner();
-        
-        if (winner == null) {
-            return null;
-        }
-        
-        String board = game.getBoard();
         List<Integer> positions = new ArrayList<>();
+        String board = game.getBoard();
         
         // Check rows
-        if (checkLine(board, 0, 1, 2, positions)) return positions;
-        if (checkLine(board, 3, 4, 5, positions)) return positions;
-        if (checkLine(board, 6, 7, 8, positions)) return positions;
+        for (int i = 0; i < 9; i += 3) {
+            if (checkLine(board, i, i + 1, i + 2, positions)) {
+                return positions;
+            }
+        }
         
         // Check columns
-        if (checkLine(board, 0, 3, 6, positions)) return positions;
-        if (checkLine(board, 1, 4, 7, positions)) return positions;
-        if (checkLine(board, 2, 5, 8, positions)) return positions;
+        for (int i = 0; i < 3; i++) {
+            if (checkLine(board, i, i + 3, i + 6, positions)) {
+                return positions;
+            }
+        }
         
         // Check diagonals
-        if (checkLine(board, 0, 4, 8, positions)) return positions;
-        if (checkLine(board, 2, 4, 6, positions)) return positions;
+        if (checkLine(board, 0, 4, 8, positions)) {
+            return positions;
+        }
+        if (checkLine(board, 2, 4, 6, positions)) {
+            return positions;
+        }
         
-        return null;
+        return positions;
     }
     
     /**
-     * Check if a line forms a winning combination and add positions to the list if it does.
-     * 
-     * @param board The game board
-     * @param pos1 First position
-     * @param pos2 Second position
-     * @param pos3 Third position
-     * @param positions List to add winning positions to
-     * @return true if this line is a winning line
+     * Checks if a line has the same symbol
      */
     private boolean checkLine(String board, int pos1, int pos2, int pos3, List<Integer> positions) {
-        char c1 = board.charAt(pos1);
-        char c2 = board.charAt(pos2);
-        char c3 = board.charAt(pos3);
-        
-        if ((c1 == 'X' || c1 == 'O') && c1 == c2 && c2 == c3) {
+        char symbol = board.charAt(pos1);
+        if (symbol != ' ' && symbol == board.charAt(pos2) && symbol == board.charAt(pos3)) {
+            positions.clear();
             positions.add(pos1);
             positions.add(pos2);
             positions.add(pos3);
             return true;
         }
-        
         return false;
     }
-
+    
     /**
-     * Get the board position (0-8) from a button.
+     * Gets the board position from a button
      */
     private int getBoardPosition(Button button) {
         return boardButtons.indexOf(button);
     }
-
+    
     /**
-     * Show an alert dialog.
+     * Shows an alert dialog
      */
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -597,73 +498,58 @@ public class TicTacToeController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
+    
     /**
-     * Sets the match ID for this game session
-     * @param matchId The match ID to set
+     * Sets the match ID
      */
     public void setMatchId(String matchId) {
         this.matchId = matchId;
         if (matchIdLabel != null) {
-            matchIdLabel.setText(matchId);
+            matchIdLabel.setText("Match ID: " + matchId);
         }
     }
-
+    
     /**
-     * Set up the move timer
+     * Sets up the move timer
      */
     private void setupMoveTimer() {
-        if (moveTimer != null) {
-            moveTimer.stop();
-        }
-        
-        timeRemaining = 30;
-        updateTimerDisplay();
-        
         moveTimer = new javafx.animation.Timeline(
             new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1), event -> {
                 timeRemaining--;
                 updateTimerDisplay();
-                
                 if (timeRemaining <= 0) {
-                    // Time's up for current player - optional: auto forfeit or skip turn
-                    addSystemMessage("Time's up for " + currentPlayer.getUsername() + "!");
-                    restartTimer();
+                    pauseTimer();
+                    addSystemMessage("Time's up! " + currentPlayer.getName() + " loses by timeout.");
+                    handleGameWon();
                 }
             })
         );
-        
         moveTimer.setCycleCount(javafx.animation.Animation.INDEFINITE);
     }
     
     /**
-     * Update the timer display
+     * Updates the timer display
      */
     private void updateTimerDisplay() {
         if (timerLabel != null) {
-            String timeText = String.format("%02d:%02d", timeRemaining / 60, timeRemaining % 60);
-            timerLabel.setText(timeText);
-            
-            // Change color when time is running low
-            if (timeRemaining <= 10) {
-                timerLabel.setStyle("-fx-text-fill: -fx-danger-color; -fx-font-weight: bold;");
-            } else {
-                timerLabel.setStyle("-fx-text-fill: -fx-accent-color; -fx-font-weight: bold;");
-            }
+            timerLabel.setText("Time: " + timeRemaining + "s");
         }
     }
     
     /**
-     * Start the move timer
+     * Starts the timer
      */
     private void startTimer() {
-        if (moveTimer != null) {
-            moveTimer.play();
+        if (moveTimer == null) {
+            setupMoveTimer();
         }
+        timeRemaining = 30;
+        updateTimerDisplay();
+        moveTimer.play();
     }
     
     /**
-     * Pause the move timer
+     * Pauses the timer
      */
     private void pauseTimer() {
         if (moveTimer != null) {
@@ -672,23 +558,47 @@ public class TicTacToeController implements Initializable {
     }
     
     /**
-     * Restart the timer with full time
+     * Restarts the timer
      */
     private void restartTimer() {
+        timeRemaining = 30;
+        updateTimerDisplay();
         if (moveTimer != null) {
-            moveTimer.stop();
-            timeRemaining = 30;
-            updateTimerDisplay();
             moveTimer.play();
         }
     }
     
     /**
-     * Update the move count display
+     * Updates the move count display
      */
     private void updateMoveCount() {
         if (moveCountLabel != null) {
             moveCountLabel.setText("Moves: " + moveHistory.size());
         }
+    }
+    
+    /**
+     * Updates player labels
+     */
+    private void updatePlayerLabels() {
+        if (player1Name != null) {
+            player1Name.setText(player1.getName());
+        }
+        if (player2Name != null) {
+            player2Name.setText(player2.getName());
+        }
+        if (player1Score != null) {
+            player1Score.setText(String.valueOf(player1ScoreCount));
+        }
+        if (player2Score != null) {
+            player2Score.setText(String.valueOf(player2ScoreCount));
+        }
+    }
+    
+    /**
+     * Sets up event handlers
+     */
+    private void setupEventHandlers() {
+        // Add any additional event handlers here
     }
 } 

@@ -1,13 +1,11 @@
 package tictactoe;
 
 import gdk.GameModule;
-import gdk.GameMode;
-import gdk.GameOptions;
-import gdk.GameState;
 import gdk.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.net.URL;
 
 /**
  * TicTacToe game module implementation.
@@ -24,256 +22,160 @@ public class TicTacToeModule implements GameModule {
     private static final String GAME_DESCRIPTION = "Classic 3x3 grid game for two players";
     
     @Override
-    public String getGameId() {
-        return GAME_ID;
-    }
-    
-    @Override
-    public String getGameName() {
-        return GAME_NAME;
-    }
-    
-    @Override
-    public String getGameDescription() {
-        return GAME_DESCRIPTION;
-    }
-    
-    @Override
-    public int getMinPlayers() {
-        return 2;
-    }
-    
-    @Override
-    public int getMaxPlayers() {
-        return 2;
-    }
-    
-    @Override
-    public int getEstimatedDuration() {
-        return 5; // 5 minutes
-    }
-    
-
-    
-    @Override
-    public String getGameCategory() {
-        return "Classic";
-    }
-    
-    @Override
-    public boolean supportsOnlineMultiplayer() {
-        return true;
-    }
-    
-    @Override
-    public boolean supportsLocalMultiplayer() {
-        return true;
-    }
-    
-    @Override
-    public boolean supportsSinglePlayer() {
-        return true; // vs AI
-    }
-    
-    // ==================== ENHANCED SUPPORT METHODS ====================
-    // TicTacToe has specific support requirements
-    
-    @Override
-    public GameMode[] getSupportedGameModes() {
-        // TicTacToe is a 2-player game, so it supports specific modes
-        return new GameMode[] {
-            GameMode.SINGLE_PLAYER,    // vs AI
-            GameMode.LOCAL_MULTIPLAYER, // 2 players on same device
-            GameMode.HOT_SEAT,         // Turn-based on same device
-            GameMode.AI_VERSUS,        // vs AI with different difficulty
-            GameMode.PRACTICE,         // Practice mode
-            GameMode.TUTORIAL          // Learn the game
-        };
-    }
-    
-
-    
-    @Override
-    public java.util.Map<GameMode, int[]> getSupportedPlayerCounts() {
-        java.util.Map<GameMode, int[]> playerCounts = new java.util.HashMap<>();
-        
-        // TicTacToe is always 2 players (or 1 vs AI)
-        playerCounts.put(GameMode.SINGLE_PLAYER, new int[]{1, 1});
-        playerCounts.put(GameMode.LOCAL_MULTIPLAYER, new int[]{2, 2});
-        playerCounts.put(GameMode.HOT_SEAT, new int[]{2, 2});
-        playerCounts.put(GameMode.AI_VERSUS, new int[]{1, 1});
-        playerCounts.put(GameMode.PRACTICE, new int[]{1, 1});
-        playerCounts.put(GameMode.TUTORIAL, new int[]{1, 1});
-        
-        return playerCounts;
-    }
-    
-    @Override
-    public GameMode getDefaultGameMode() {
-        return GameMode.LOCAL_MULTIPLAYER; // Classic 2-player mode
-    }
-    
-
-    
-    @Override
-    public int getDefaultPlayerCount(GameMode gameMode) {
-        // TicTacToe defaults to 2 players for multiplayer modes
-        if (gameMode == GameMode.LOCAL_MULTIPLAYER || gameMode == GameMode.HOT_SEAT) {
-            return 2;
+    public Scene launchGame(Stage primaryStage) {
+        Logging.info("🎮 Launching TicTacToe Game");
+        try {
+            return createGameScene(primaryStage);
+        } catch (Exception e) {
+            Logging.error("❌ Failed to launch TicTacToe Game: " + e.getMessage(), e);
+            return null;
         }
-        return 1; // Single player modes default to 1
-    }
-    
-    @Override
-    public String getGameFxmlPath() {
-        return "/games/tictactoe/fxml/tictactoe.fxml";
-    }
-    
-    @Override
-    public String getGameCssPath() {
-        return "/games/tictactoe/css/tictactoe.css";
-    }
-    
-    @Override
-    public String getGameIconPath() {
-        return "/games/tictactoe/icons/tic_tac_toe_icon.png";
     }
     
     @Override
     public void onGameClose() {
-        Logging.info("🔄 " + getGameName() + " closing - cleaning up resources");
+        Logging.info("🔄 " + GAME_NAME + " closing - cleaning up resources");
     }
     
-    @Override
-    public GameState getGameState() {
-        // This would be implemented to save the current game state
-        // For now, return a basic game state
-        GameOptions options = new GameOptions();
-        options.setOption("boardSize", 3);
-        options.setOption("aiDifficulty", "medium");
-        options.setOption("timeLimit", 30);
-        
-        GameState gameState = new GameState(GAME_ID, GAME_NAME, GameMode.LOCAL_MULTIPLAYER, 2, options);
-        
-        // Add game-specific state data
-        gameState.setStateValue("currentPlayer", "X");
-        gameState.setStateValue("movesCount", 0);
-        gameState.setStateValue("gameBoard", new String[3][3]); // 3x3 board
-        
-        return gameState;
-    }
+    // ==================== PRIVATE METHODS ====================
     
-    @Override
-    public Scene launchGame(Stage primaryStage, int playerCount, GameOptions gameOptions, Object eventHandler) {
-        Logging.info("🎮 Launching " + getGameName() + " with players: " + playerCount);
-        
+    /**
+     * Creates the main game scene for TicTacToe
+     */
+    private Scene createGameScene(Stage primaryStage) {
         try {
-            // Try to load the FXML file
-            URL fxmlUrl = TicTacToeModule.class.getResource("/games/tictactoe/fxml/tictactoe.fxml");
-            
-            if (fxmlUrl != null) {
-                Logging.info("📂 Loading TicTacToe FXML from: " + fxmlUrl);
-                
-                FXMLLoader loader = new FXMLLoader(fxmlUrl);
-                Scene scene = new Scene(loader.load());
-                
-                // Apply CSS if available
-                URL cssUrl = TicTacToeModule.class.getResource("/games/tictactoe/css/tictactoe.css");
-                if (cssUrl != null) {
-                    scene.getStylesheets().add(cssUrl.toExternalForm());
-                    Logging.info("📂 CSS loaded from: " + cssUrl);
-                }
-                
-                // Get controller and initialize
-                TicTacToeController controller = loader.getController();
-                if (controller != null) {
-                    controller.setPrimaryStage(primaryStage);
-                    controller.initializeGame(playerCount, gameOptions);
-                }
-                
-                Logging.info("✅ TicTacToe loaded successfully");
-                return scene;
-                
-            } else {
-                Logging.warn("⚠️ TicTacToe FXML not found, using fallback");
-                
-                // Fallback to simple game scene
-                return createSimpleGameScene(primaryStage, playerCount, gameOptions);
+            // Load the FXML file
+            URL fxmlUrl = getClass().getResource("/games/tictactoe/fxml/tictactoe.fxml");
+            if (fxmlUrl == null) {
+                Logging.warning("⚠️ FXML file not found, creating simple interface");
+                return createSimpleGameScene(primaryStage);
             }
             
-        } catch (Exception e) {
-            Logging.error("❌ Failed to load TicTacToe: " + e.getMessage(), e);
+            // Load the FXML and create the scene
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Scene scene = new Scene(loader.load());
             
-            // Fallback to simple game scene
-            return createSimpleGameScene(primaryStage, playerCount, gameOptions);
+            // Apply CSS styling
+            URL cssUrl = getClass().getResource("/games/tictactoe/css/tictactoe.css");
+            if (cssUrl != null) {
+                scene.getStylesheets().add(cssUrl.toExternalForm());
+            }
+            
+            // Get the controller and set up references
+            TicTacToeController controller = loader.getController();
+            if (controller != null) {
+                controller.setGameModule(this);
+                Logging.info("✅ TicTacToe controller initialized successfully");
+            }
+            
+            // Configure stage
+            primaryStage.setTitle("Tic Tac Toe - GDK");
+            primaryStage.setMinWidth(400);
+            primaryStage.setMinHeight(500);
+            
+            Logging.info("✅ TicTacToe game scene created successfully");
+            return scene;
+            
+        } catch (Exception e) {
+            Logging.error("❌ Failed to load TicTacToe FXML: " + e.getMessage(), e);
+            return createSimpleGameScene(primaryStage);
         }
     }
     
     /**
-     * Creates a simple game scene for TicTacToe as fallback.
+     * Creates a simple game scene as fallback
      */
-    private Scene createSimpleGameScene(Stage primaryStage, int playerCount, GameOptions gameOptions) {
-        Logging.info("🎮 Creating simple TicTacToe game scene (fallback)");
+    private Scene createSimpleGameScene(Stage primaryStage) {
+        javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
+        root.setPadding(new javafx.geometry.Insets(20));
+        root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
         
-        // Create a simple game board
-        javafx.scene.layout.GridPane gameBoard = new javafx.scene.layout.GridPane();
-        gameBoard.setHgap(5);
-        gameBoard.setVgap(5);
-        gameBoard.setAlignment(javafx.geometry.Pos.CENTER);
+        // Title
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("⭕ Tic Tac Toe");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
-        // Create 3x3 grid of buttons
+        // Game info
+        javafx.scene.control.Label infoLabel = new javafx.scene.control.Label(
+            "Classic 3x3 grid game for two players"
+        );
+        infoLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #6c757d;");
+        
+        // Status
+        javafx.scene.control.Label statusLabel = new javafx.scene.control.Label("🎮 TicTacToe is running!");
+        statusLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #28a745; -fx-font-weight: bold;");
+        
+        // Simple game grid (3x3 buttons)
+        javafx.scene.layout.GridPane gameGrid = new javafx.scene.layout.GridPane();
+        gameGrid.setHgap(5);
+        gameGrid.setVgap(5);
+        gameGrid.setAlignment(javafx.geometry.Pos.CENTER);
+        
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                javafx.scene.control.Button button = new javafx.scene.control.Button("");
-                button.setPrefSize(80, 80);
-                button.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-                
-                final int finalRow = row;
-                final int finalCol = col;
-                button.setOnAction(e -> {
-                    if (button.getText().isEmpty()) {
-                        button.setText("X");
-                        Logging.info("🎮 Player X placed at [" + finalRow + "," + finalCol + "]");
+                javafx.scene.control.Button cell = new javafx.scene.control.Button("");
+                cell.setMinSize(60, 60);
+                cell.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+                cell.setOnAction(e -> {
+                    if (cell.getText().isEmpty()) {
+                        cell.setText("X");
+                        cell.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
                     }
                 });
-                
-                gameBoard.add(button, col, row);
+                gameGrid.add(cell, col, row);
             }
         }
         
-        // Create title
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("Tic Tac Toe");
-        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-padding: 20px;");
+        // Buttons
+        javafx.scene.control.Button resetButton = new javafx.scene.control.Button("🔄 Reset Game");
+        resetButton.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px;");
         
-        // Create back button
-        javafx.scene.control.Button backButton = new javafx.scene.control.Button("← Back to GDK");
-        backButton.setOnAction(e -> {
-            Logging.info("🔄 Returning to GDK from " + getGameName());
-            primaryStage.close();
+        javafx.scene.control.Button backButton = new javafx.scene.control.Button("🔙 Back to Lobby");
+        backButton.setStyle("-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px;");
+        
+        javafx.scene.control.Button closeButton = new javafx.scene.control.Button("❌ Close Game");
+        closeButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px;");
+        
+        // Event handlers
+        resetButton.setOnAction(e -> {
+            Logging.info("🔄 Resetting TicTacToe game");
+            for (javafx.scene.Node node : gameGrid.getChildren()) {
+                if (node instanceof javafx.scene.control.Button) {
+                    ((javafx.scene.control.Button) node).setText("");
+                    node.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+                }
+            }
         });
         
-        // Create main layout
-        javafx.scene.layout.VBox mainLayout = new javafx.scene.layout.VBox(20);
-        mainLayout.setAlignment(javafx.geometry.Pos.CENTER);
-        mainLayout.setPadding(new javafx.geometry.Insets(20));
-        mainLayout.getChildren().addAll(titleLabel, gameBoard, backButton);
+        closeButton.setOnAction(e -> {
+            Logging.info("🔒 Closing TicTacToe Game");
+            onGameClose();
+        });
         
-        Scene scene = new Scene(mainLayout, 400, 500);
+        backButton.setOnAction(e -> {
+            Logging.info("🔙 Returning to lobby from TicTacToe Game");
+            onGameClose();
+        });
         
-        Logging.info("✅ Simple " + getGameName() + " scene created successfully");
+        // Add components to root
+        root.getChildren().addAll(
+            titleLabel,
+            infoLabel,
+            statusLabel,
+            gameGrid,
+            resetButton,
+            backButton,
+            closeButton
+        );
+        
+        // Create scene
+        Scene scene = new Scene(root, 400, 500);
+        
+        // Configure stage
+        primaryStage.setTitle("Tic Tac Toe - GDK");
+        primaryStage.setMinWidth(400);
+        primaryStage.setMinHeight(500);
+        
+        Logging.info("✅ TicTacToe simple interface created successfully");
         return scene;
-    }
-    
-    @Override
-    public void loadGameState(GameState gameState) {
-        Logging.info("📂 Loading TicTacToe game state");
-        
-        if (gameState != null) {
-            // Load game-specific state data
-            String currentPlayer = gameState.getStringStateValue("currentPlayer", "X");
-            int movesCount = gameState.getIntStateValue("movesCount", 0);
-            
-            Logging.info("📊 Loaded game state - Current player: " + currentPlayer + ", Moves: " + movesCount);
-        }
     }
 } 

@@ -13,7 +13,7 @@
 
     <artifactId>gdk</artifactId>
     <name>GDK Library</name>
-    <description>Game Development Kit library with shared enums, interfaces, and utilities</description>
+    <description>Game Development Kit library with shared, interfaces and utilities</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
