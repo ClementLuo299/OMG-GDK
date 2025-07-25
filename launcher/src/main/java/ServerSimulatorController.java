@@ -2,147 +2,284 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import gdk.Logging;
-
 import java.util.function.Consumer;
 
 /**
- * Controller for the Server Simulator window.
- * Allows sending and receiving JSON messages to simulate server communication.
+ * Controller for the Server Simulator window interface.
+ * 
+ * This class manages the server simulator interface that allows users to
+ * send and receive JSON messages to simulate server communication with
+ * running games. It provides a simple messaging interface for testing
+ * game-server communication protocols.
+ * 
+ * Key responsibilities:
+ * - Manage the server simulator user interface
+ * - Handle message sending and receiving
+ * - Provide real-time message display with timestamps
+ * - Coordinate with the main GDK application
+ * - Handle window lifecycle and cleanup
+ *
+ * @authors Clement Luo
+ * @date July 25, 2025
+ * @since 1.0
  */
 public class ServerSimulatorController {
     
-    @FXML private VBox root;
-    @FXML private TextArea receivedMessagesArea;
-    @FXML private TextField messageInput;
-    @FXML private Button sendButton;
-    @FXML private Button clearButton;
-    @FXML private Button closeButton;
+    // ==================== FXML INJECTIONS ====================
     
-    private Stage stage;
-    private Consumer<String> messageHandler;
+    /**
+     * Root container for the server simulator interface
+     */
+    @FXML private VBox rootContainer;
+    
+    /**
+     * Text area for displaying received and sent messages
+     */
+    @FXML private TextArea receivedMessagesDisplayArea;
+    
+    /**
+     * Text field for entering messages to send
+     */
+    @FXML private TextField messageInputField;
+    
+    /**
+     * Button for sending messages
+     */
+    @FXML private Button sendMessageButton;
+    
+    /**
+     * Button for clearing all messages from the display
+     */
+    @FXML private Button clearMessagesButton;
+    
+    /**
+     * Button for closing the server simulator window
+     */
+    @FXML private Button closeWindowButton;
+    
+    // ==================== DEPENDENCIES ====================
+    
+    /**
+     * The stage hosting the server simulator window
+     */
+    private Stage serverSimulatorStage;
+    
+    /**
+     * Handler for processing messages sent to games
+     */
+    private Consumer<String> gameMessageHandler;
+    
+    /**
+     * Reference to the main GDK application for coordination
+     */
     private GDKApplication gdkApplication;
+
+    // ==================== INITIALIZATION ====================
     
+    /**
+     * Initialize the server simulator controller when FXML is loaded.
+     * 
+     * This method is called automatically by JavaFX when the FXML
+     * file is loaded. It sets up the user interface components and
+     * configures event handlers for user interactions.
+     */
     @FXML
     public void initialize() {
         Logging.info("🔧 Server Simulator Controller initialized");
         
-        // Set up message input handling
-        messageInput.setOnAction(event -> handleSendMessage());
-        
-        // Disable send button initially
-        sendButton.setDisable(true);
-        messageInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            sendButton.setDisable(newValue == null || newValue.trim().isEmpty());
+        setupMessageInputHandling();
+        setupSendButtonStateManagement();
+    }
+    
+    /**
+     * Set up message input handling for the text field.
+     * 
+     * This method configures the message input field to respond
+     * to Enter key presses for quick message sending.
+     */
+    private void setupMessageInputHandling() {
+        messageInputField.setOnAction(event -> handleSendMessageAction());
+    }
+    
+    /**
+     * Set up send button state management based on input content.
+     * 
+     * This method configures the send button to be enabled only
+     * when there is valid text in the input field.
+     */
+    private void setupSendButtonStateManagement() {
+        sendMessageButton.setDisable(true);
+        messageInputField.textProperty().addListener((observable, oldValue, newValue) -> {
+            sendMessageButton.setDisable(newValue == null || newValue.trim().isEmpty());
         });
     }
+
+    // ==================== SETUP METHODS ====================
     
     /**
-     * Sets the stage reference for window management.
+     * Set the stage reference for window management.
+     * 
+     * @param serverSimulatorStage The stage hosting the server simulator window
      */
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    public void setStage(Stage serverSimulatorStage) {
+        this.serverSimulatorStage = serverSimulatorStage;
     }
     
     /**
-     * Sets the GDK application reference for coordination.
+     * Set the GDK application reference for coordination.
+     * 
+     * @param gdkApplication The main GDK application instance
      */
     public void setGDKApplication(GDKApplication gdkApplication) {
         this.gdkApplication = gdkApplication;
     }
     
     /**
-     * Sets the message handler for sending messages to the game.
+     * Set the message handler for sending messages to games.
+     * 
+     * @param gameMessageHandler The handler for processing messages sent to games
      */
-    public void setMessageHandler(Consumer<String> messageHandler) {
-        this.messageHandler = messageHandler;
+    public void setMessageHandler(Consumer<String> gameMessageHandler) {
+        this.gameMessageHandler = gameMessageHandler;
         Logging.info("🔧 Server Simulator message handler set");
     }
+
+    // ==================== MESSAGE HANDLING ====================
     
     /**
-     * Adds a received message to the display area.
-     */
-    public void addReceivedMessage(String message) {
-        if (receivedMessagesArea != null) {
-            String timestamp = java.time.LocalTime.now().toString();
-            String formattedMessage = "[" + timestamp + "] " + message + "\n";
-            
-            javafx.application.Platform.runLater(() -> {
-                receivedMessagesArea.appendText(formattedMessage);
-                // Auto-scroll to bottom
-                receivedMessagesArea.setScrollTop(Double.MAX_VALUE);
-            });
-        }
-    }
-    
-    /**
-     * Handles sending a message to the game.
+     * Handle the send message action initiated by the user.
+     * 
+     * This method processes the message from the input field, sends it
+     * to the game via the message handler, and updates the display.
      */
     @FXML
-    private void handleSendMessage() {
-        String message = messageInput.getText().trim();
-        if (!message.isEmpty() && messageHandler != null) {
+    private void handleSendMessageAction() {
+        String messageText = messageInputField.getText().trim();
+        if (!messageText.isEmpty() && gameMessageHandler != null) {
             try {
-                Logging.info("📤 Server Simulator sending message: " + message);
-                messageHandler.accept(message);
+                sendMessageToGame(messageText);
+                addSentMessageToDisplay(messageText);
+                clearMessageInputField();
                 
-                // Add to received messages area as "sent"
-                String timestamp = java.time.LocalTime.now().toString();
-                String formattedMessage = "[" + timestamp + "] SENT: " + message + "\n";
-                receivedMessagesArea.appendText(formattedMessage);
-                receivedMessagesArea.setScrollTop(Double.MAX_VALUE);
-                
-                // Clear input
-                messageInput.clear();
-                
-            } catch (Exception e) {
-                Logging.error("❌ Error sending message: " + e.getMessage());
-                addReceivedMessage("ERROR: " + e.getMessage());
+            } catch (Exception messageError) {
+                Logging.error("❌ Error sending message: " + messageError.getMessage());
+                addReceivedMessageToDisplay("ERROR: " + messageError.getMessage());
             }
         }
     }
     
     /**
-     * Handles clearing all messages.
+     * Send a message to the game via the message handler.
+     * 
+     * @param messageText The message text to send to the game
+     */
+    private void sendMessageToGame(String messageText) {
+        Logging.info("📤 Server Simulator sending message: " + messageText);
+        gameMessageHandler.accept(messageText);
+    }
+    
+    /**
+     * Add a sent message to the display area with timestamp.
+     * 
+     * @param messageText The message text that was sent
+     */
+    private void addSentMessageToDisplay(String messageText) {
+        String currentTimestamp = java.time.LocalTime.now().toString();
+        String formattedMessage = "[" + currentTimestamp + "] SENT: " + messageText + "\n";
+        receivedMessagesDisplayArea.appendText(formattedMessage);
+        receivedMessagesDisplayArea.setScrollTop(Double.MAX_VALUE);
+    }
+    
+    /**
+     * Clear the message input field after sending.
+     * 
+     * This method clears the input field to prepare for the next message.
+     */
+    private void clearMessageInputField() {
+        messageInputField.clear();
+    }
+    
+    /**
+     * Add a received message to the display area with timestamp.
+     * 
+     * This method adds a message to the display area with proper
+     * timestamp formatting and ensures the display scrolls to show
+     * the latest message.
+     * 
+     * @param messageText The message text to display
+     */
+    public void addReceivedMessageToDisplay(String messageText) {
+        if (receivedMessagesDisplayArea != null) {
+            String currentTimestamp = java.time.LocalTime.now().toString();
+            String formattedMessage = "[" + currentTimestamp + "] " + messageText + "\n";
+            
+            javafx.application.Platform.runLater(() -> {
+                receivedMessagesDisplayArea.appendText(formattedMessage);
+                receivedMessagesDisplayArea.setScrollTop(Double.MAX_VALUE);
+            });
+        }
+    }
+
+    // ==================== USER INTERFACE ACTIONS ====================
+    
+    /**
+     * Handle the clear messages action initiated by the user.
+     * 
+     * This method clears all messages from the display area
+     * and provides user feedback about the action.
      */
     @FXML
-    private void handleClearMessages() {
-        if (receivedMessagesArea != null) {
-            receivedMessagesArea.clear();
+    private void handleClearMessagesAction() {
+        if (receivedMessagesDisplayArea != null) {
+            receivedMessagesDisplayArea.clear();
             Logging.info("🧹 Server Simulator messages cleared");
         }
     }
     
     /**
-     * Handles closing the server simulator window.
+     * Handle the close window action initiated by the user.
+     * 
+     * This method closes the server simulator window and
+     * logs the action for debugging purposes.
      */
     @FXML
-    private void handleClose() {
+    private void handleCloseWindowAction() {
         Logging.info("🔒 Server Simulator window closing");
-        if (stage != null) {
-            stage.close();
+        if (serverSimulatorStage != null) {
+            serverSimulatorStage.close();
         }
     }
+
+    // ==================== UTILITY METHODS ====================
     
     /**
-     * Gets the root VBox for scene creation.
+     * Get the root VBox container for scene creation.
+     * 
+     * This method provides access to the root container for
+     * creating the server simulator scene.
+     * 
+     * @return The root VBox container
      */
-    public VBox getRoot() {
-        return root;
+    public VBox getRootContainer() {
+        return rootContainer;
     }
     
     /**
-     * Called when the window is about to close.
+     * Called when the server simulator window is about to close.
+     * 
+     * This method performs cleanup operations when the server
+     * simulator window is closing, including notifying the
+     * main GDK application if necessary.
      */
     public void onClose() {
         Logging.info("🔒 Server Simulator cleanup");
         // Notify GDK application that server simulator is closing
         if (gdkApplication != null) {
             // This could trigger game cleanup if needed
+            // Currently not implemented but available for future use
         }
     }
 } 
