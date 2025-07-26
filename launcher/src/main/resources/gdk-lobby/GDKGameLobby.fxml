@@ -17,11 +17,11 @@
     
     <!-- Header -->
     <HBox alignment="CENTER" spacing="20" styleClass="header" VBox.vgrow="NEVER">
-        <Button fx:id="exitButton" text="✕ Exit" styleClass="nav-button"/>
+        <Button fx:id="exitButton" text="Exit" styleClass="nav-button"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Label fx:id="gameTitleLabel" text="OMG Game Development Kit" styleClass="main-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="refreshButton" text="🔄 Refresh" styleClass="nav-button"/>
+        <Button fx:id="refreshButton" text="Refresh" styleClass="nav-button"/>
     </HBox>
     
     <!-- Main Content Area -->
@@ -46,10 +46,10 @@
                 <TextArea fx:id="jsonDataTextArea" promptText="Enter JSON configuration here. (Resorts to default if invalid)" 
                          styleClass="json-text-area" VBox.vgrow="ALWAYS" wrapText="true" minHeight="150"/>
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Button fx:id="clearJsonButton" text="🗑️ Clear" styleClass="small-button"/>
-                    <Button fx:id="validateJsonButton" text="✓ Validate" styleClass="small-button"/>
+                    <Button fx:id="clearJsonButton" text="Clear" styleClass="small-button"/>
+                    <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="launchGameButton" text="🚀 Launch Game" 
+                    <Button fx:id="launchGameButton" text="Launch Game" 
                             styleClass="primary-button" style="-fx-font-size: 11px; -fx-padding: 4 8; -fx-min-width: 60;"/>
                 </HBox>
             </VBox>

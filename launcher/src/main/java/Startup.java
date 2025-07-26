@@ -84,11 +84,12 @@ public class Startup {
             wireUpControllerWithViewModel(mainLobbyScene, applicationViewModel);
             
             // Step 5: Display the application to the user
-            displayApplicationToUser();
+            primaryApplicationStage.show();
             
             Logging.info("✅ GDK application startup completed successfully");
         } catch (Exception startupError) {
-            handleStartupProcessError(startupError);
+            Logging.error("❌ GDK application startup failed: " + startupError.getMessage(), startupError);
+            throw new RuntimeException("Failed to start GDK application", startupError);
         }
     }
 
@@ -98,95 +99,47 @@ public class Startup {
      * Initialize the main user interface components.
      * 
      * This method loads the FXML layout, applies CSS styling, and
-     * sets up the main controller for the lobby interface.
+     * sets up the lobby controller with necessary references.
      * 
-     * @return The configured Scene for the main lobby interface
+     * @return The initialized Scene object
      */
     private Scene initializeMainUserInterface() {
         Logging.info("🎨 Initializing main user interface components");
         
         try {
-            Scene mainLobbyScene = loadFXMLSceneFromResources();
-            applyCSSStylingToScene(mainLobbyScene);
-            setupLobbyController();
+            // Load FXML scene from resources
+            URL fxmlResourceUrl = GDKApplication.class.getResource("/gdk-lobby/GDKGameLobby.fxml");
+            if (fxmlResourceUrl == null) {
+                throw new RuntimeException("FXML resource not found: /gdk-lobby/GDKGameLobby.fxml");
+            }
+            
+            Logging.info("📂 Loading FXML from: " + fxmlResourceUrl);
+            FXMLLoader fxmlLoader = new FXMLLoader(fxmlResourceUrl);
+            Scene mainLobbyScene = new Scene(fxmlLoader.load());
+            
+            // Store the controller reference for later use
+            this.lobbyController = fxmlLoader.getController();
+            
+            // Apply CSS styling to the scene
+            URL cssResourceUrl = GDKApplication.class.getResource("/gdk-lobby/gdk-lobby.css");
+            if (cssResourceUrl != null) {
+                mainLobbyScene.getStylesheets().add(cssResourceUrl.toExternalForm());
+                Logging.info("📂 CSS styling loaded from: " + cssResourceUrl);
+            }
+            
+            // Set up the lobby controller with necessary references
+            if (this.lobbyController != null) {
+                Logging.info("✅ Lobby controller initialized successfully");
+            } else {
+                throw new RuntimeException("Lobby controller is null - FXML loading may have failed");
+            }
             
             Logging.info("✅ Main user interface loaded successfully");
             return mainLobbyScene;
         } catch (Exception uiInitializationError) {
-            handleUserInterfaceInitializationError(uiInitializationError);
-            return null; // This will never be reached due to exception being thrown
+            Logging.error("❌ Failed to load main user interface: " + uiInitializationError.getMessage(), uiInitializationError);
+            throw new RuntimeException("Failed to initialize main user interface", uiInitializationError);
         }
-    }
-    
-    /**
-     * Load the FXML scene from application resources.
-     * 
-     * @return The loaded Scene object
-     * @throws Exception if FXML loading fails
-     */
-    private Scene loadFXMLSceneFromResources() throws Exception {
-        URL fxmlResourceUrl = getFXMLResourceUrl();
-        Logging.info("📂 Loading FXML from: " + fxmlResourceUrl);
-        
-        FXMLLoader fxmlLoader = new FXMLLoader(fxmlResourceUrl);
-        Scene loadedScene = new Scene(fxmlLoader.load());
-        
-        // Store the controller reference for later use
-        this.lobbyController = fxmlLoader.getController();
-        
-        return loadedScene;
-    }
-    
-    /**
-     * Get the FXML resource URL for the main lobby interface.
-     * 
-     * @return The URL to the FXML resource
-     * @throws RuntimeException if the FXML resource cannot be found
-     */
-    private URL getFXMLResourceUrl() {
-        URL fxmlResourceUrl = GDKApplication.class.getResource("/gdk-lobby/GDKGameLobby.fxml");
-        if (fxmlResourceUrl == null) {
-            throw new RuntimeException("FXML resource not found: /gdk-lobby/GDKGameLobby.fxml");
-        }
-        return fxmlResourceUrl;
-    }
-    
-    /**
-     * Apply CSS styling to the main lobby scene.
-     * 
-     * @param mainLobbyScene The scene to apply CSS to
-     */
-    private void applyCSSStylingToScene(Scene mainLobbyScene) {
-        URL cssResourceUrl = GDKApplication.class.getResource("/gdk-lobby/gdk-lobby.css");
-        if (cssResourceUrl != null) {
-            mainLobbyScene.getStylesheets().add(cssResourceUrl.toExternalForm());
-            Logging.info("📂 CSS styling loaded from: " + cssResourceUrl);
-        }
-    }
-    
-    /**
-     * Set up the lobby controller with necessary references.
-     * 
-     * This method configures the controller with the primary stage
-     * and validates that the controller was properly loaded.
-     */
-    private void setupLobbyController() {
-        if (this.lobbyController != null) {
-            this.lobbyController.setPrimaryStage(primaryApplicationStage);
-            Logging.info("✅ Lobby controller initialized successfully");
-        } else {
-            throw new RuntimeException("Lobby controller is null - FXML loading may have failed");
-        }
-    }
-    
-    /**
-     * Handle errors that occur during user interface initialization.
-     * 
-     * @param uiInitializationError The exception that occurred
-     */
-    private void handleUserInterfaceInitializationError(Exception uiInitializationError) {
-        Logging.error("❌ Failed to load main user interface: " + uiInitializationError.getMessage(), uiInitializationError);
-        throw new RuntimeException("Failed to initialize main user interface", uiInitializationError);
     }
     
     // ==================== VIEWMODEL INITIALIZATION ====================
@@ -203,43 +156,18 @@ public class Startup {
         Logging.info("🧠 Initializing application ViewModel");
         
         try {
-            GDKViewModel applicationViewModel = createNewViewModelInstance();
-            configureViewModelWithStage(applicationViewModel);
+            // Create a new ViewModel instance with the module loader
+            GDKViewModel applicationViewModel = new GDKViewModel(gameModuleLoader);
+            
+            // Configure the ViewModel with the primary application stage
+            applicationViewModel.setPrimaryStage(primaryApplicationStage);
             
             Logging.info("✅ Application ViewModel initialized successfully");
             return applicationViewModel;
         } catch (Exception viewModelInitializationError) {
-            handleViewModelInitializationError(viewModelInitializationError);
-            return null; // This will never be reached due to exception being thrown
+            Logging.error("❌ Failed to initialize ViewModel: " + viewModelInitializationError.getMessage(), viewModelInitializationError);
+            throw new RuntimeException("Failed to initialize ViewModel", viewModelInitializationError);
         }
-    }
-    
-    /**
-     * Create a new ViewModel instance with the module loader.
-     * 
-     * @return A new ViewModel instance
-     */
-    private GDKViewModel createNewViewModelInstance() {
-        return new GDKViewModel(gameModuleLoader);
-    }
-    
-    /**
-     * Configure the ViewModel with the primary application stage.
-     * 
-     * @param applicationViewModel The ViewModel to configure
-     */
-    private void configureViewModelWithStage(GDKViewModel applicationViewModel) {
-        applicationViewModel.setPrimaryStage(primaryApplicationStage);
-    }
-    
-    /**
-     * Handle errors that occur during ViewModel initialization.
-     * 
-     * @param viewModelInitializationError The exception that occurred
-     */
-    private void handleViewModelInitializationError(Exception viewModelInitializationError) {
-        Logging.error("❌ Failed to initialize ViewModel: " + viewModelInitializationError.getMessage(), viewModelInitializationError);
-        throw new RuntimeException("Failed to initialize ViewModel", viewModelInitializationError);
     }
     
     // ==================== STAGE CONFIGURATION ====================
@@ -255,33 +183,17 @@ public class Startup {
     private void configurePrimaryApplicationStage(Scene mainLobbyScene) {
         Logging.info("⚙️ Configuring primary application stage");
         
-        setStageProperties();
-        setSceneOnStage(mainLobbyScene);
-        
-        Logging.info("✅ Primary application stage configured successfully");
-    }
-    
-    /**
-     * Set the basic properties of the primary stage.
-     * 
-     * This includes the window title, initial size, and minimum
-     * dimensions to ensure the application is usable.
-     */
-    private void setStageProperties() {
+        // Set the basic properties of the primary stage
         primaryApplicationStage.setTitle("OMG Game Development Kit");
         primaryApplicationStage.setWidth(1200);
         primaryApplicationStage.setHeight(900);
         primaryApplicationStage.setMinWidth(800);
         primaryApplicationStage.setMinHeight(600);
-    }
-    
-    /**
-     * Set the main lobby scene on the primary stage.
-     * 
-     * @param mainLobbyScene The scene to display
-     */
-    private void setSceneOnStage(Scene mainLobbyScene) {
+        
+        // Set the main lobby scene on the primary stage
         primaryApplicationStage.setScene(mainLobbyScene);
+        
+        Logging.info("✅ Primary application stage configured successfully");
     }
     
     // ==================== COMPONENT WIRING ====================
@@ -304,43 +216,7 @@ public class Startup {
                 Logging.warning("⚠️ Lobby controller not found for wiring");
             }
         } catch (Exception wiringError) {
-            handleControllerWiringError(wiringError);
+            Logging.error("❌ Error wiring up controller: " + wiringError.getMessage(), wiringError);
         }
-    }
-    
-    /**
-     * Handle errors that occur during controller wiring.
-     * 
-     * @param wiringError The exception that occurred
-     */
-    private void handleControllerWiringError(Exception wiringError) {
-        Logging.error("❌ Error wiring up controller: " + wiringError.getMessage(), wiringError);
-    }
-    
-    // ==================== APPLICATION DISPLAY ====================
-    
-    /**
-     * Display the application to the user.
-     * 
-     * This method makes the primary stage visible, effectively
-     * showing the application window to the user.
-     */
-    private void displayApplicationToUser() {
-        primaryApplicationStage.show();
-    }
-    
-    // ==================== ERROR HANDLING ====================
-    
-    /**
-     * Handle errors that occur during the startup process.
-     * 
-     * This method logs the error details and re-throws the exception
-     * to ensure the application fails fast if startup cannot complete.
-     * 
-     * @param startupError The exception that occurred during startup
-     */
-    private void handleStartupProcessError(Exception startupError) {
-        Logging.error("❌ GDK application startup failed: " + startupError.getMessage(), startupError);
-        throw new RuntimeException("Failed to start GDK application", startupError);
     }
 } 

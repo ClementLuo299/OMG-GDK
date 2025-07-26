@@ -8,11 +8,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javafx.application.Platform;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -39,6 +38,7 @@ import javafx.collections.ObservableList;
  *
  * @authors Clement Luo
  * @date July 25, 2025
+ * @edited July 25, 2025
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -55,8 +55,8 @@ public class GDKGameLobbyController implements Initializable {
     
     // JSON Configuration Components
     @FXML private TextArea jsonDataTextArea;
-    @FXML private Button validateJsonButton;
     @FXML private Button clearJsonButton;
+    @FXML private Button sendMessageButton;
     
     // Application Control Components
     @FXML private Button exitButton;
@@ -98,35 +98,23 @@ public class GDKGameLobbyController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Logging.info("🎮 Initializing GDK Game Picker Controller");
         
-        initializeDependencies();
+        // Step 1: Initialize the data structures
+        availableGameModules = FXCollections.observableArrayList();
+        jsonDataMapper = new ObjectMapper();
+        
+        // Step 2: Set up the user interface
         setupUserInterface();
+
+        // Step 3: Set up the event handlers
         setupEventHandlers();
+        
+        // Step 4: Refresh the game list on startup
+        refreshAvailableGameModules();
         
         Logging.info("✅ GDK Game Picker Controller initialized successfully");
     }
-    
-    /**
-     * Initialize all dependencies and data structures.
-     * 
-     * This method sets up the internal data structures and dependencies
-     * required for the controller to function properly.
-     */
-    private void initializeDependencies() {
-        availableGameModules = FXCollections.observableArrayList();
-        jsonDataMapper = new ObjectMapper();
-    }
 
-    // ==================== SETUP METHODS ====================
-    
-    /**
-     * Set the primary stage reference for this controller.
-     * 
-     * @param primaryStage The primary application stage
-     */
-    public void setPrimaryStage(Stage primaryStage) {
-        // This method is called by the Startup class but not currently used
-        // It's kept for potential future use
-    }
+    // ==================== DEPENDENCY INJECTION ====================
     
     /**
      * Set the ViewModel reference for this controller.
@@ -146,46 +134,45 @@ public class GDKGameLobbyController implements Initializable {
      * of all UI components in the lobby interface.
      */
     private void setupUserInterface() {
-        setupGameSelectorComponent();
-        setupMessageAreaComponent();
+        // Game Selector Setup
         
-        Logging.info("🎨 UI components initialized");
-    }
-    
-    /**
-     * Set up the game selector ComboBox component.
-     * 
-     * This method configures the game selector with proper cell factory
-     * for displaying game module names in a user-friendly format.
-     */
-    private void setupGameSelectorComponent() {
+        // Configure the ComboBox to display game module names in a user-friendly format
+        // This creates a custom cell factory that shows the class name of each game module
         gameSelector.setCellFactory(param -> new ListCell<GameModule>() {
             @Override
             protected void updateItem(GameModule gameModule, boolean empty) {
                 super.updateItem(gameModule, empty);
                 if (empty || gameModule == null) {
+                    // Show placeholder text when no game is selected
                     setText("Select a game...");
                 } else {
+                    // Display the simple class name of the game module (e.g., "ExampleGameModule")
                     setText(gameModule.getClass().getSimpleName());
                 }
             }
         });
         
+        // Apply the same cell factory to the button cell (the part that shows the selected item)
+        // This ensures consistent display between the dropdown list and the selected item
         gameSelector.setButtonCell(gameSelector.getCellFactory().call(null));
-    }
-    
-    /**
-     * Set up the message area component.
-     * 
-     * This method configures the message area for displaying
-     * user feedback and application status messages.
-     */
-    private void setupMessageAreaComponent() {
+        
+        // Message Area Setup
+        
+        // Make the message area read-only so users can't edit the displayed messages
         messageArea.setEditable(false);
+        
+        // Enable text wrapping so long messages don't extend beyond the visible area
         messageArea.setWrapText(true);
+        
+        // Apply consistent styling to the message area for better readability
+        // Uses a modern font stack with fallbacks and appropriate size
         messageArea.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
         
+        // Display a welcome message to inform users they're in the right place
         addUserMessage("🎮 Welcome to GDK Game Picker!");
+        
+        // Log successful UI initialization for debugging purposes
+        Logging.info("🎨 UI components initialized");
     }
 
     // ==================== EVENT HANDLER SETUP ====================
@@ -197,58 +184,43 @@ public class GDKGameLobbyController implements Initializable {
      * components in the lobby interface.
      */
     private void setupEventHandlers() {
-        setupGameSelectionEventHandler();
-        setupButtonEventHandlers();
-        setupJsonConfigurationEventHandlers();
+        // Game Selection Handler
+        // When user selects a game from the dropdown, update the selected game and show feedback
+        gameSelector.setOnAction(event -> {
+            selectedGameModule = gameSelector.getValue(); // Store the selected game module
+            String selectedGameName = selectedGameModule != null ? 
+                selectedGameModule.getClass().getSimpleName() : "None"; // Get display name
+            addUserMessage("🎮 Selected game: " + selectedGameName); // Show user feedback
+        });
+        
+        // Button Event Handlers
+        // Launch button: Start the selected game with validation
+        launchGameButton.setOnAction(event -> launchSelectedGame());
+        
+        // Refresh button: Reload the list of available games
+        refreshButton.setOnAction(event -> {
+            messageArea.clear(); // Clear the message area first
+            addUserMessage("🔄 Refreshing game list..."); // Show user feedback
+            refreshAvailableGameModules(); // Reload games from modules directory
+        });
+        
+        // Exit button: Close the entire application
+        exitButton.setOnAction(event -> {
+            Logging.info("🔒 GDK Game Lobby closing"); // Log the action
+            Platform.exit(); // Terminate the JavaFX application
+        });
+        
+        // JSON Configuration Handlers
+        // Clear button: Remove all JSON input
+        clearJsonButton.setOnAction(event -> clearJsonConfigurationData());
+        
+        // Send message button: Send a test message
+        sendMessageButton.setOnAction(event -> sendMessage());
         
         Logging.info("🎯 Event handlers configured");
     }
-    
-    /**
-     * Set up the game selection event handler.
-     * 
-     * This method configures what happens when the user selects
-     * a game from the ComboBox.
-     */
-    private void setupGameSelectionEventHandler() {
-        gameSelector.setOnAction(event -> {
-            selectedGameModule = gameSelector.getValue();
-            String selectedGameName = selectedGameModule != null ? 
-                selectedGameModule.getClass().getSimpleName() : "None";
-            addUserMessage("🎮 Selected game: " + selectedGameName);
-        });
-    }
-    
-    /**
-     * Set up event handlers for all buttons in the interface.
-     * 
-     * This method configures the launch, refresh, and exit buttons
-     * with their respective actions.
-     */
-    private void setupButtonEventHandlers() {
-        launchGameButton.setOnAction(event -> launchSelectedGame());
-        refreshButton.setOnAction(event -> {
-            addUserMessage("🔄 Refreshing game list...");
-            refreshAvailableGameModules();
-        });
-        exitButton.setOnAction(event -> {
-            Logging.info("🔒 GDK Game Lobby closing");
-            Platform.exit();
-        });
-    }
-    
-    /**
-     * Set up event handlers for JSON configuration components.
-     * 
-     * This method configures the validate and clear buttons
-     * for the JSON configuration area.
-     */
-    private void setupJsonConfigurationEventHandlers() {
-        validateJsonButton.setOnAction(event -> validateJsonConfigurationData());
-        clearJsonButton.setOnAction(event -> clearJsonConfigurationData());
-    }
 
-    // ==================== GAME MANAGEMENT ====================
+    // ==================== GAME MODULE MANAGEMENT ====================
     
     /**
      * Refresh the list of available game modules.
@@ -258,20 +230,26 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void refreshAvailableGameModules() {
         try {
+            // Clear existing game modules to start fresh
             availableGameModules.clear();
             
+            // Get the path to the modules directory from application constants
             String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
             Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
             
+            // Use the ModuleLoader to discover all available game modules
             List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
             
+            // Add each discovered module to our observable list
             for (GameModule gameModule : discoveredGameModules) {
-                availableGameModules.add(gameModule);
+                availableGameModules.add(gameModule); // Add to observable list for UI binding
                 Logging.info("📦 Loaded game module: " + gameModule.getClass().getSimpleName());
             }
             
+            // Update the ComboBox with the new list of games
             gameSelector.setItems(availableGameModules);
             
+            // Provide user feedback about the discovery results
             if (availableGameModules.isEmpty()) {
                 addUserMessage("⚠️ No game modules found in " + modulesDirectoryPath);
             } else {
@@ -279,10 +257,13 @@ public class GDKGameLobbyController implements Initializable {
             }
             
         } catch (Exception moduleDiscoveryError) {
+            // Handle any errors during module discovery
             Logging.error("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage(), moduleDiscoveryError);
             addUserMessage("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage());
         }
     }
+
+    // ==================== GAME LAUNCHING ====================
     
     /**
      * Launch the currently selected game with validation.
@@ -291,112 +272,71 @@ public class GDKGameLobbyController implements Initializable {
      * then delegates the actual launching to the ViewModel.
      */
     private void launchSelectedGame() {
-        if (!validateGameSelection()) {
-            return;
+        // Step 1: Validate that a game is selected
+        if (selectedGameModule == null) {
+            showErrorDialog("No Game Selected", "Please select a game to launch."); // Show error to user
+            return; // Exit early if no game is selected
         }
 
-        Map<String, Object> jsonConfigurationData = validateAndGetJsonConfigurationData();
-        if (jsonConfigurationData == null) {
-            return;
-        }
-        
-        if (!validatePlayerCountInConfiguration(jsonConfigurationData)) {
-            return;
-        }
-        
-        logGameLaunchInformation(jsonConfigurationData);
-        launchGameWithViewModel();
-    }
-    
-    /**
-     * Validate that a game module is selected for launching.
-     * 
-     * @return true if a game is selected, false otherwise
-     */
-    private boolean validateGameSelection() {
-        if (selectedGameModule == null) {
-            showErrorDialog("No Game Selected", "Please select a game to launch.");
-            return false;
-        }
-        return true;
-    }
-    
-    /**
-     * Validate and retrieve JSON configuration data.
-     * 
-     * @return The parsed JSON configuration data, or null if invalid
-     */
-    private Map<String, Object> validateAndGetJsonConfigurationData() {
+        // Step 2: Parse and validate JSON syntax
         Map<String, Object> jsonConfigurationData = parseJsonConfigurationData();
         if (jsonConfigurationData == null) {
-            showErrorDialog("Invalid JSON", "Please enter valid JSON configuration.");
-            return null;
-        }
-        return jsonConfigurationData;
-    }
-    
-    /**
-     * Log information about the game being launched.
-     * 
-     * @param jsonConfigurationData The JSON configuration data being used
-     */
-    private void logGameLaunchInformation(Map<String, Object> jsonConfigurationData) {
-        addUserMessage("📦 Including custom JSON data with " + jsonConfigurationData.size() + " fields");
-        addUserMessage("🚀 Launching " + selectedGameModule.getClass().getSimpleName());
-    }
-    
-    /**
-     * Launch the game using the ViewModel.
-     * 
-     * This method delegates the actual game launching to the ViewModel
-     * and handles any errors that might occur.
-     */
-    private void launchGameWithViewModel() {
-        if (applicationViewModel != null) {
-            applicationViewModel.handleLaunchGame(selectedGameModule);
+            // Check if it's due to invalid JSON syntax (not empty input)
+            String jsonText = jsonDataTextArea.getText().trim();
+            if (!jsonText.isEmpty()) {
+                showErrorDialog("Invalid JSON", "Please enter valid JSON configuration."); // Show error to user
+                return; // Exit early if JSON syntax is invalid
+            }
+            // If JSON is empty, continue with null data (let game decide)
+            addUserMessage("📦 No JSON data provided (game will use its own defaults)");
         } else {
-            showErrorDialog("Application Error", "ViewModel reference is not available.");
+            // Log information about the JSON data being included
+            addUserMessage("📦 Including custom JSON data with " + jsonConfigurationData.size() + " fields");
         }
-    }
-    
-    /**
-     * Validate the player count in the JSON configuration.
-     * 
-     * @param jsonConfigurationData The JSON configuration data to validate
-     * @return true if the player count is valid, false otherwise
-     */
-    private boolean validatePlayerCountInConfiguration(Map<String, Object> jsonConfigurationData) {
-        Integer playerCount = (Integer) jsonConfigurationData.getOrDefault("playerCount", 2);
         
-        if (playerCount < 1 || playerCount > 10) {
-            showErrorDialog("Invalid Player Count", 
-                "Player count must be between 1 and 10. Please check your JSON configuration.");
-            return false;
+        addUserMessage("🚀 Launching " + selectedGameModule.getClass().getSimpleName());
+        
+        // Step 5: Launch the game using the ViewModel
+        if (applicationViewModel != null) {
+            applicationViewModel.handleLaunchGame(selectedGameModule); // Delegate to ViewModel
+        } else {
+            showErrorDialog("Application Error", "ViewModel reference is not available."); // Show error if ViewModel is missing
         }
-        return true;
     }
 
     // ==================== JSON CONFIGURATION HANDLING ====================
     
     /**
-     * Validate the JSON configuration data entered by the user.
+     * Send the JSON text field content as a message to the selected game module.
      * 
-     * This method checks if the JSON text is valid and provides
-     * user feedback about the validation result.
+     * This method validates JSON syntax and sends the content to the selected game module.
      */
-    private void validateJsonConfigurationData() {
-        String jsonConfigurationText = jsonDataTextArea.getText().trim();
-        
-        if (jsonConfigurationText.isEmpty()) {
-            addUserMessage("✅ JSON is empty (will use defaults)");
+    private void sendMessage() {
+        // Check if a game module is selected
+        if (selectedGameModule == null) {
+            addUserMessage("⚠️ Please select a game module first before sending a message");
             return;
         }
         
+        // Get the content from the JSON text area
+        String jsonContent = jsonDataTextArea.getText().trim();
+        String gameModuleName = selectedGameModule.getClass().getSimpleName();
+        
+        if (jsonContent.isEmpty()) {
+            // If the JSON field is empty, send a placeholder message
+            addUserMessage("💬 No content to send to " + gameModuleName + " (JSON field is empty)");
+            return;
+        }
+        
+        // Validate JSON syntax before sending
         try {
-            jsonDataMapper.readTree(jsonConfigurationText);
-            addUserMessage("✅ Valid JSON");
+            // Attempt to parse the JSON to validate its syntax
+            jsonDataMapper.readTree(jsonContent);
+            // If parsing succeeds, send the message
+            addUserMessage("💬 Sending to " + gameModuleName + ": " + jsonContent);
         } catch (JsonProcessingException jsonProcessingError) {
-            addUserMessage("❌ Invalid JSON: " + jsonProcessingError.getMessage());
+            // If JSON is invalid, notify the user and don't send
+            addUserMessage("❌ Invalid JSON syntax - message not sent");
         }
     }
     
@@ -407,35 +347,42 @@ public class GDKGameLobbyController implements Initializable {
      * user feedback about the action.
      */
     private void clearJsonConfigurationData() {
+        // Remove all text from the JSON configuration text area
         jsonDataTextArea.clear();
+        
+        // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON data");
     }
     
     /**
      * Parse the JSON configuration data from the text area.
      * 
-     * @return The parsed JSON data as a Map, or null if parsing fails
+     * @return The parsed JSON data as a Map, or null if parsing fails or input is empty
      */
     private Map<String, Object> parseJsonConfigurationData() {
+        // Get the JSON text from the text area and remove leading/trailing whitespace
         String jsonConfigurationText = jsonDataTextArea.getText().trim();
         
+        // If JSON is empty, return null (let the game decide what to do)
         if (jsonConfigurationText.isEmpty()) {
-            return new HashMap<>();
+            return null;
         }
         
         try {
+            // Parse the JSON text into a Map<String, Object> for easy access
             @SuppressWarnings("unchecked")
             Map<String, Object> configurationData = jsonDataMapper.readValue(jsonConfigurationText, Map.class);
-            return configurationData;
+            return configurationData; // Return the parsed configuration
         } catch (JsonProcessingException jsonProcessingError) {
+            // Log the parsing error for debugging
             Logging.error("❌ Failed to parse JSON: " + jsonProcessingError.getMessage());
-            return null;
+            return null; // Return null to indicate parsing failure
         }
     }
 
     // ==================== UTILITY METHODS ====================
     
-        /**
+    /**
      * Add a message to the user message area.
      * 
      * This method adds a timestamped message to the message area
@@ -444,8 +391,13 @@ public class GDKGameLobbyController implements Initializable {
      * @param userMessage The message to display to the user
      */
     private void addUserMessage(String userMessage) {
+        // Create a timestamp in HH:mm:ss format for the message
         String timestamp = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+        
+        // Append the timestamped message to the message area with a newline
         messageArea.appendText("[" + timestamp + "] " + userMessage + "\n");
+        
+        // Auto-scroll to the bottom to show the latest message
         messageArea.setScrollTop(Double.MAX_VALUE);
     }
     
@@ -459,10 +411,15 @@ public class GDKGameLobbyController implements Initializable {
      * @param errorMessage The error message to display
      */
     private void showErrorDialog(String dialogTitle, String errorMessage) {
+        // Create a new error alert dialog
         javafx.scene.control.Alert errorDialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-        errorDialog.setTitle(dialogTitle);
-        errorDialog.setHeaderText(null);
-        errorDialog.setContentText(errorMessage);
+        
+        // Set the dialog properties
+        errorDialog.setTitle(dialogTitle); // Set the window title
+        errorDialog.setHeaderText(null); // No header text for cleaner appearance
+        errorDialog.setContentText(errorMessage); // Set the main error message
+        
+        // Display the dialog and wait for user to close it
         errorDialog.showAndWait();
     }
 }  
