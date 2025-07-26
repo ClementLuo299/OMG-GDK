@@ -1,113 +1,112 @@
-# Game Modules Directory
+# Game Modules
 
-This directory contains all the external game modules for the OMG Platform. Each module is a self-contained game that can be dynamically loaded by the platform.
+This directory contains game modules that integrate with the GDK (Game Development Kit).
 
-## 📁 Module Structure
+## Module Structure
 
-Each game module follows this structure:
+Each game module must follow this structure:
+
 ```
-modules/
-├── [game-name]/
-│   ├── src/main/java/com/games/modules/[game-name]/
-│   │   └── Main.java
-│   ├── src/main/resources/games/[game-name]/
-│   │   ├── css/
-│   │   ├── fxml/
-│   │   └── icons/
-│   └── README.md
+module-name/
+├── pom.xml
+├── README.md
+├── src/
+│   └── main/
+│       ├── java/
+│       │   ├── Main.java              # REQUIRED: Main game module class
+│       │   ├── Metadata.java          # REQUIRED: Metadata class
+│       │   └── ...                    # Other game classes
+│       └── resources/
+│           └── games/
+│               └── modulename/
+│                   ├── css/
+│                   ├── fxml/
+│                   └── icons/
 ```
 
-## 🎮 Available Games
+## Required Files
 
-### Core Games
-- **TicTacToe** - Classic X's and O's game
-- **Example Game** - Template game for development
+### 1. Main.java (REQUIRED)
+- Must implement `gdk.GameModule` interface
+- Must have a constructor that creates the metadata instance
+- Must implement `getMetadata()` method
+- **Standardized naming**: Always named `Main.java`
 
-## 🎯 Game Categories
+### 2. Metadata.java (REQUIRED)
+- Must extend `gdk.GameMetadata`
+- Must implement all abstract methods
+- Provides all game information for the GDK
+- **Standardized naming**: Always named `Metadata.java`
 
-- **Classic**: TicTacToe
-- **Template**: Example Game
+## Metadata Requirements
 
-## 📊 Game Statistics
+Every game module must provide a metadata class that extends `gdk.GameMetadata` and implements:
 
-- **Total Games**: 2
-- **Single Player**: 2 games
-- **Local Multiplayer**: 2 games
-- **Online Multiplayer**: 2 games
-- **Average Duration**: 15-20 minutes
-- **Player Range**: 1-8 players
-
-## 🔧 Technical Details
-
-### Module Loading
-- Games are discovered automatically from the `modules/` directory
-- Each module must implement the `GameModule` interface
-- Modules are loaded asynchronously during startup
-- Failed modules are logged but don't prevent other games from loading
-
-### Layout Support
-- Games are displayed in a responsive grid layout
-- 3 games per row by default
-- Vertical scrolling for multiple rows
-- Responsive design for different screen sizes
-
-### Game Features
-- Dynamic game discovery
-- Multiple game modes (Single, Local, Online)
-- Configurable player counts
-- Estimated duration tracking
-- Difficulty levels
-- Category classification
-
-## 🚀 Adding New Games
-
-To add a new game:
-
-1. Create a new directory in `modules/`
-2. Follow the standard module structure
-3. Implement the `GameModule` interface in your `Main.java` class
-4. Implement required methods
-5. Add resources (FXML, CSS, icons) as needed
-6. Test the module discovery
-
-## 📝 Module Requirements
-
-Each game module must implement:
-- `getGameId()` - Unique identifier
-- `getGameName()` - Display name
+### Basic Information
+- `getGameName()` - Display name shown in UI
+- `getGameVersion()` - Version string
 - `getGameDescription()` - Game description
-- `getGameCategory()` - Game category
-- `getMinPlayers()` / `getMaxPlayers()` - Player count
-- `getEstimatedDuration()` - Game duration
-- `getDifficulty()` - Game difficulty
-- Support flags for different game modes
+- `getGameAuthor()` - Author name
 
-## 🎨 UI Integration
+### Game Modes
+- `supportsSinglePlayer()` - Whether single player is supported
+- `supportsMultiPlayer()` - Whether multi player is supported
+- `supportsAIOpponent()` - Whether AI opponents are supported
+- `supportsTournament()` - Whether tournament mode is supported
 
-- Games use JavaFX for UI
-- FXML files for layout
-- CSS for styling
-- Icons for visual representation
-- Responsive design principles
+### Requirements
+- `getMinPlayers()` - Minimum number of players
+- `getMaxPlayers()` - Maximum number of players
+- `getMinDifficulty()` - Minimum difficulty level
+- `getMaxDifficulty()` - Maximum difficulty level
+- `getEstimatedDurationMinutes()` - Estimated game duration
+- `getRequiredResources()` - List of required resources
 
-## 🔍 Discovery Process
+## Example Implementation
 
-1. Platform scans `modules/` directory
-2. Identifies directories as potential modules
-3. Looks for `Main.java` classes
-4. Instantiates and validates modules
-5. Registers valid modules with GameDiscoveryService
-6. Updates UI with discovered games
+```java
+// Metadata.java
+public class Metadata extends GameMetadata {
+    @Override
+    public String getGameName() {
+        return "My Awesome Game";
+    }
+    
+    @Override
+    public String getGameVersion() {
+        return "1.0.0";
+    }
+    
+    // ... implement all other methods
+}
 
-## 📈 Performance
+// Main.java
+public class Main implements GameModule {
+    private final Metadata metadata;
+    
+    public Main() {
+        this.metadata = new Metadata();
+    }
+    
+    @Override
+    public Metadata getMetadata() {
+        return metadata;
+    }
+    
+    // ... implement other GameModule methods
+}
+```
 
-- Asynchronous discovery prevents UI blocking
-- Lazy loading of game resources
-- Efficient memory usage
-- Fast startup times
-- Scalable architecture
+## Benefits
 
----
+- **Organized Code**: Metadata is separated from game logic
+- **Reusable**: Metadata class can be used by multiple components
+- **Consistent**: All games follow the same metadata structure
+- **Extensible**: Easy to add new metadata fields
+- **Type Safe**: Compile-time checking of metadata requirements
+- **Standardized**: Consistent naming across all modules
 
-*Last updated: January 2025*
-*Total modules: 2* 
+## Available Modules
+
+- **example**: Simple example game for testing
+- **tictactoe**: Classic Tic Tac Toe game 

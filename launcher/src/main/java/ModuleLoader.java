@@ -1,4 +1,5 @@
 import gdk.GameModule;
+import gdk.Logging;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -98,6 +99,7 @@ public class ModuleLoader {
                     GameModule module = loadModuleFromClasses(subdir);
                     if (module != null) {
                         modules.add(module);
+                        Logging.info("📦 Loaded game module: " + module.getGameName() + " (" + module.getClass().getSimpleName() + ")");
                     }
                 } catch (Exception e) {
                     System.err.println("Failed to load module from classes in " + subdir.getName() + ": " + e.getMessage());
@@ -224,6 +226,7 @@ public class ModuleLoader {
                     GameModule module = loadModuleFromJar(jarFile);
                     if (module != null) {
                         modules.add(module);
+                        Logging.info("📦 Loaded game module: " + module.getGameName() + " (" + module.getClass().getSimpleName() + ")");
                     }
                 } catch (Exception e) {
                     System.err.println("Failed to load module from " + jarFile.getName() + ": " + e.getMessage());

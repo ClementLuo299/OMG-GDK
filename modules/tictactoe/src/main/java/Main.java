@@ -15,11 +15,17 @@ import java.net.URL;
  * @date January 2025
  * @since 1.0
  */
-public class TicTacToeModule implements GameModule {
+public class Main implements GameModule {
     
     private static final String GAME_ID = "tictactoe";
-    private static final String GAME_NAME = "Tic Tac Toe";
-    private static final String GAME_DESCRIPTION = "Classic 3x3 grid game for two players";
+    private final Metadata metadata;
+    
+    /**
+     * Constructor for Main.
+     */
+    public Main() {
+        this.metadata = new Metadata();
+    }
     
     @Override
     public Scene launchGame(Stage primaryStage) {
@@ -34,7 +40,27 @@ public class TicTacToeModule implements GameModule {
     
     @Override
     public void stopGame() {
-        Logging.info("🔄 " + GAME_NAME + " closing - cleaning up resources");
+        Logging.info("🔄 " + metadata.getGameName() + " closing - cleaning up resources");
+    }
+    
+    @Override
+    public java.util.Map<String, Object> handleMessage(java.util.Map<String, Object> message) {
+        if (message == null) {
+            return null;
+        }
+        
+        String function = (String) message.get("function");
+        if ("metadata".equals(function)) {
+            Logging.info("📋 Returning metadata for TicTacToe Game");
+            return metadata.toMap();
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public Metadata getMetadata() {
+        return metadata;
     }
     
     // ==================== PRIVATE METHODS ====================

@@ -99,7 +99,7 @@ public class TicTacToeController implements Initializable {
     private int timeRemaining = 30;
     private int playerCount = 2; // Default to 2 players
     private Stage primaryStage;
-    private TicTacToeModule gameModule;
+    private Main gameModule;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -138,7 +138,7 @@ public class TicTacToeController implements Initializable {
     /**
      * Sets the game module reference
      */
-    public void setGameModule(TicTacToeModule gameModule) {
+    public void setGameModule(Main gameModule) {
         this.gameModule = gameModule;
     }
     

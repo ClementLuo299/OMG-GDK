@@ -98,17 +98,17 @@ public class GDKGameLobbyController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Logging.info("🎮 Initializing GDK Game Picker Controller");
         
-        // Step 1: Initialize the data structures
-        availableGameModules = FXCollections.observableArrayList();
+        // Initialize dependencies
         jsonDataMapper = new ObjectMapper();
+        availableGameModules = FXCollections.observableArrayList();
         
-        // Step 2: Set up the user interface
+        // Set up the UI components
         setupUserInterface();
-
-        // Step 3: Set up the event handlers
+        
+        // Set up event handlers
         setupEventHandlers();
         
-        // Step 4: Refresh the game list on startup
+        // Refresh the game list on startup
         refreshAvailableGameModules();
         
         Logging.info("✅ GDK Game Picker Controller initialized successfully");
@@ -136,8 +136,8 @@ public class GDKGameLobbyController implements Initializable {
     private void setupUserInterface() {
         // Game Selector Setup
         
-        // Configure the ComboBox to display game module names in a user-friendly format
-        // This creates a custom cell factory that shows the class name of each game module
+        // Configure the ComboBox to display game module names from metadata
+        // This creates a custom cell factory that shows the game name of each game module
         gameSelector.setCellFactory(param -> new ListCell<GameModule>() {
             @Override
             protected void updateItem(GameModule gameModule, boolean empty) {
@@ -146,8 +146,8 @@ public class GDKGameLobbyController implements Initializable {
                     // Show placeholder text when no game is selected
                     setText("Select a game...");
                 } else {
-                    // Display the simple class name of the game module (e.g., "ExampleGameModule")
-                    setText(gameModule.getClass().getSimpleName());
+                    // Display the game name from the GameModule interface
+                    setText(gameModule.getGameName());
                 }
             }
         });
@@ -189,7 +189,7 @@ public class GDKGameLobbyController implements Initializable {
         gameSelector.setOnAction(event -> {
             selectedGameModule = gameSelector.getValue(); // Store the selected game module
             String selectedGameName = selectedGameModule != null ? 
-                selectedGameModule.getClass().getSimpleName() : "None"; // Get display name
+                selectedGameModule.getGameName() : "None"; // Get game name from interface
             addUserMessage("🎮 Selected game: " + selectedGameName); // Show user feedback
         });
         
@@ -243,7 +243,9 @@ public class GDKGameLobbyController implements Initializable {
             // Add each discovered module to our observable list
             for (GameModule gameModule : discoveredGameModules) {
                 availableGameModules.add(gameModule); // Add to observable list for UI binding
-                Logging.info("📦 Loaded game module: " + gameModule.getClass().getSimpleName());
+                String gameName = gameModule.getGameName();
+                String className = gameModule.getClass().getSimpleName();
+                Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
             }
             
             // Update the ComboBox with the new list of games
@@ -294,7 +296,7 @@ public class GDKGameLobbyController implements Initializable {
             addUserMessage("📦 Including custom JSON data with " + jsonConfigurationData.size() + " fields");
         }
         
-        addUserMessage("🚀 Launching " + selectedGameModule.getClass().getSimpleName());
+        addUserMessage("🚀 Launching " + selectedGameModule.getGameName());
         
         // Step 5: Launch the game using the ViewModel
         if (applicationViewModel != null) {
@@ -310,6 +312,7 @@ public class GDKGameLobbyController implements Initializable {
      * Send the JSON text field content as a message to the selected game module.
      * 
      * This method validates JSON syntax and sends the content to the selected game module.
+     * It also handles metadata requests and displays the response.
      */
     private void sendMessage() {
         // Check if a game module is selected
@@ -320,7 +323,7 @@ public class GDKGameLobbyController implements Initializable {
         
         // Get the content from the JSON text area
         String jsonContent = jsonDataTextArea.getText().trim();
-        String gameModuleName = selectedGameModule.getClass().getSimpleName();
+        String gameModuleName = selectedGameModule.getGameName();
         
         if (jsonContent.isEmpty()) {
             // If the JSON field is empty, send a placeholder message
@@ -331,12 +334,28 @@ public class GDKGameLobbyController implements Initializable {
         // Validate JSON syntax before sending
         try {
             // Attempt to parse the JSON to validate its syntax
-            jsonDataMapper.readTree(jsonContent);
-            // If parsing succeeds, send the message
+            Map<String, Object> messageData = jsonDataMapper.readValue(jsonContent, Map.class);
+            
+            // Display the message being sent
             addUserMessage("💬 Sending to " + gameModuleName + ": " + jsonContent);
+            
+            // Send the message to the game module
+            Map<String, Object> response = selectedGameModule.handleMessage(messageData);
+            
+            // Handle the response if there is one
+            if (response != null) {
+                String responseJson = jsonDataMapper.writeValueAsString(response);
+                addUserMessage("📋 Response from " + gameModuleName + ": " + responseJson);
+            } else {
+                addUserMessage("📭 No response from " + gameModuleName);
+            }
+            
         } catch (JsonProcessingException jsonProcessingError) {
             // If JSON is invalid, notify the user and don't send
             addUserMessage("❌ Invalid JSON syntax - message not sent");
+        } catch (Exception e) {
+            // Handle any other errors
+            addUserMessage("❌ Error sending message: " + e.getMessage());
         }
     }
     
@@ -411,15 +430,10 @@ public class GDKGameLobbyController implements Initializable {
      * @param errorMessage The error message to display
      */
     private void showErrorDialog(String dialogTitle, String errorMessage) {
-        // Create a new error alert dialog
-        javafx.scene.control.Alert errorDialog = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-        
-        // Set the dialog properties
-        errorDialog.setTitle(dialogTitle); // Set the window title
-        errorDialog.setHeaderText(null); // No header text for cleaner appearance
-        errorDialog.setContentText(errorMessage); // Set the main error message
-        
-        // Display the dialog and wait for user to close it
-        errorDialog.showAndWait();
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        alert.setTitle(dialogTitle);
+        alert.setHeaderText(null);
+        alert.setContentText(errorMessage);
+        alert.showAndWait();
     }
 }  
