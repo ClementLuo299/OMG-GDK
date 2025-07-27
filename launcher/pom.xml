@@ -91,12 +91,31 @@
         </dependency>
         
         <!-- Java WebSocket for WebSocket functionality -->
-        <dependency>
-            <groupId>org.java-websocket</groupId>
-            <artifactId>Java-WebSocket</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-    </dependencies>
+                       <dependency>
+                   <groupId>org.java-websocket</groupId>
+                   <artifactId>Java-WebSocket</artifactId>
+                   <version>1.5.3</version>
+               </dependency>
+               
+               <!-- JFoenix for Material Design UI components including toggle switches -->
+               <dependency>
+                   <groupId>com.jfoenix</groupId>
+                   <artifactId>jfoenix</artifactId>
+                   <version>9.0.10</version>
+               </dependency>
+               
+               <!-- RichTextFX for professional code editor functionality -->
+               <dependency>
+                   <groupId>org.fxmisc.richtext</groupId>
+                   <artifactId>richtextfx</artifactId>
+                   <version>0.11.0</version>
+               </dependency>
+               
+
+               
+
+               
+           </dependencies>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>

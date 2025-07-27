@@ -7,12 +7,20 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
+import com.jfoenix.controls.JFXToggleButton;
 import javafx.stage.Stage;
 import javafx.application.Platform;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -51,12 +59,15 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button refreshButton;
     
     // Message and Logging Components
-    @FXML private TextArea messageArea;
+    @FXML private ScrollPane messageScrollPane;
+    @FXML private VBox messageContainer;
     
     // JSON Configuration Components
-    @FXML private TextArea jsonDataTextArea;
+    @FXML private launcher.ProfessionalJsonEditor jsonDataTextArea;
     @FXML private Button clearJsonButton;
+    @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
+    @FXML private JFXToggleButton jsonPersistenceToggle;
     
     // Application Control Components
     @FXML private Button exitButton;
@@ -82,6 +93,18 @@ public class GDKGameLobbyController implements Initializable {
      * JSON mapper for parsing and validating JSON configuration data
      */
     private ObjectMapper jsonDataMapper;
+    
+    // ==================== JSON PERSISTENCE ====================
+    
+    /**
+     * File path for saving JSON content
+     */
+    private static final String JSON_PERSISTENCE_FILE = "gdk-json-persistence.txt";
+    
+    /**
+     * File path for saving persistence toggle state
+     */
+    private static final String PERSISTENCE_TOGGLE_FILE = "gdk-persistence-toggle.txt";
 
     // ==================== INITIALIZATION ====================
     
@@ -107,6 +130,9 @@ public class GDKGameLobbyController implements Initializable {
         
         // Set up event handlers
         setupEventHandlers();
+        
+        // Load saved JSON content and toggle state
+        loadPersistenceSettings();
         
         // Refresh the game list on startup
         refreshAvailableGameModules();
@@ -158,15 +184,9 @@ public class GDKGameLobbyController implements Initializable {
         
         // Message Area Setup
         
-        // Make the message area read-only so users can't edit the displayed messages
-        messageArea.setEditable(false);
-        
-        // Enable text wrapping so long messages don't extend beyond the visible area
-        messageArea.setWrapText(true);
-        
-        // Apply consistent styling to the message area for better readability
+        // Apply consistent styling to the message container for better readability
         // Uses a modern font stack with fallbacks and appropriate size
-        messageArea.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
+        messageContainer.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
         
         // Display a welcome message to inform users they're in the right place
         addUserMessage("🎮 Welcome to GDK Game Picker!");
@@ -199,7 +219,7 @@ public class GDKGameLobbyController implements Initializable {
         
         // Refresh button: Reload the list of available games
         refreshButton.setOnAction(event -> {
-            messageArea.clear(); // Clear the message area first
+            messageContainer.getChildren().clear(); // Clear the message container first
             addUserMessage("🔄 Refreshing game list..."); // Show user feedback
             refreshAvailableGameModules(); // Reload games from modules directory
         });
@@ -207,6 +227,7 @@ public class GDKGameLobbyController implements Initializable {
         // Exit button: Close the entire application
         exitButton.setOnAction(event -> {
             Logging.info("🔒 GDK Game Lobby closing"); // Log the action
+            onApplicationShutdown(); // Save settings before exit
             Platform.exit(); // Terminate the JavaFX application
         });
         
@@ -214,8 +235,37 @@ public class GDKGameLobbyController implements Initializable {
         // Clear button: Remove all JSON input
         clearJsonButton.setOnAction(event -> clearJsonConfigurationData());
         
+        // Metadata request button: Fill JSON with metadata request
+        metadataRequestButton.setOnAction(event -> fillMetadataRequest());
+        
         // Send message button: Send a test message
         sendMessageButton.setOnAction(event -> sendMessage());
+        
+        // Persistence Toggle Handler
+        // Save toggle state when changed and clear save file if disabled
+        jsonPersistenceToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            boolean isEnabled = newValue;
+            savePersistenceToggleState();
+            
+            if (!isEnabled) {
+                // Clear the save file when persistence is disabled
+                clearJsonPersistenceFile();
+                addUserMessage("📋 JSON persistence disabled");
+            } else {
+                addUserMessage("📋 JSON persistence enabled");
+            }
+        });
+        
+        // JSON Text Area Change Handler
+        // Save JSON content when modified (with debouncing)
+        jsonDataTextArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Use Platform.runLater to debounce rapid changes
+            Platform.runLater(() -> {
+                if (jsonPersistenceToggle.isSelected()) {
+                    saveJsonContent();
+                }
+            });
+        });
         
         Logging.info("🎯 Event handlers configured");
     }
@@ -321,8 +371,8 @@ public class GDKGameLobbyController implements Initializable {
             return;
         }
         
-        // Get the content from the JSON text area
-        String jsonContent = jsonDataTextArea.getText().trim();
+        // Get the content from the JSON input area
+        String jsonContent = jsonDataTextArea.getInputText().trim();
         String gameModuleName = selectedGameModule.getGameName();
         
         if (jsonContent.isEmpty()) {
@@ -336,16 +386,18 @@ public class GDKGameLobbyController implements Initializable {
             // Attempt to parse the JSON to validate its syntax
             Map<String, Object> messageData = jsonDataMapper.readValue(jsonContent, Map.class);
             
-            // Display the message being sent
-            addUserMessage("💬 Sending to " + gameModuleName + ": " + jsonContent);
-            
             // Send the message to the game module
             Map<String, Object> response = selectedGameModule.handleMessage(messageData);
             
             // Handle the response if there is one
             if (response != null) {
-                String responseJson = jsonDataMapper.writeValueAsString(response);
-                addUserMessage("📋 Response from " + gameModuleName + ": " + responseJson);
+                String responseJson = formatJsonResponse(response);
+                
+                // Display in the output area
+                jsonDataTextArea.setOutputText(responseJson);
+                
+                // Add status message to message area
+                addUserMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");
             } else {
                 addUserMessage("📭 No response from " + gameModuleName);
             }
@@ -366,11 +418,48 @@ public class GDKGameLobbyController implements Initializable {
      * user feedback about the action.
      */
     private void clearJsonConfigurationData() {
-        // Remove all text from the JSON configuration text area
-        jsonDataTextArea.clear();
+        // Remove all text from the JSON input area
+        jsonDataTextArea.clearInput();
         
         // Provide user feedback about the action
-        addUserMessage("🗑️ Cleared JSON data");
+        addUserMessage("🗑️ Cleared JSON input data");
+    }
+    
+    /**
+     * Fill the JSON text area with a metadata request.
+     * 
+     * This method automatically fills the JSON input area with
+     * a standard metadata request that can be sent to game modules.
+     */
+    private void fillMetadataRequest() {
+        // Create a standard metadata request JSON
+        String metadataRequest = "{\n  \"function\": \"metadata\"\n}";
+        
+        // Set the JSON input area content
+        jsonDataTextArea.setInputText(metadataRequest);
+        
+        // Provide user feedback about the action
+        addUserMessage("📋 Filled JSON input with metadata request");
+    }
+    
+    /**
+     * Format a JSON response for better display in the message area.
+     * 
+     * @param response The response map to format
+     * @return A formatted JSON string with proper indentation
+     */
+    private String formatJsonResponse(Map<String, Object> response) {
+        try {
+            // Use pretty printing for better readability
+            return jsonDataMapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            // Fallback to simple formatting if pretty printing fails
+            try {
+                return jsonDataMapper.writeValueAsString(response);
+            } catch (JsonProcessingException ex) {
+                return "Error formatting response: " + ex.getMessage();
+            }
+        }
     }
     
     /**
@@ -413,12 +502,21 @@ public class GDKGameLobbyController implements Initializable {
         // Create a timestamp in HH:mm:ss format for the message
         String timestamp = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
         
-        // Append the timestamped message to the message area with a newline
-        messageArea.appendText("[" + timestamp + "] " + userMessage + "\n");
+        // Create a simple text label for regular messages
+        javafx.scene.control.Label messageLabel = new javafx.scene.control.Label("[" + timestamp + "] " + userMessage);
+        messageLabel.setWrapText(true);
+        messageLabel.getStyleClass().add("simple-message");
+        
+        // Add the message to the container
+        messageContainer.getChildren().add(messageLabel);
         
         // Auto-scroll to the bottom to show the latest message
-        messageArea.setScrollTop(Double.MAX_VALUE);
+        Platform.runLater(() -> {
+            messageScrollPane.setVvalue(1.0);
+        });
     }
+    
+
     
     /**
      * Show an error dialog to the user.
@@ -435,5 +533,135 @@ public class GDKGameLobbyController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(errorMessage);
         alert.showAndWait();
+    }
+    
+    // ==================== JSON PERSISTENCE METHODS ====================
+    
+    /**
+     * Load saved JSON content and persistence toggle state on startup.
+     */
+    private void loadPersistenceSettings() {
+        try {
+            // Load persistence toggle state
+            loadPersistenceToggleState();
+            
+            // Load saved JSON content if persistence is enabled
+            if (jsonPersistenceToggle.isSelected()) {
+                loadSavedJsonContent();
+            }
+            
+        } catch (Exception e) {
+            Logging.error("❌ Error loading persistence settings: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Load the persistence toggle state from file.
+     */
+    private void loadPersistenceToggleState() {
+        try {
+            Path toggleFile = Paths.get(PERSISTENCE_TOGGLE_FILE);
+            if (Files.exists(toggleFile)) {
+                String toggleState = Files.readString(toggleFile).trim();
+                boolean isEnabled = Boolean.parseBoolean(toggleState);
+                jsonPersistenceToggle.setSelected(isEnabled);
+                Logging.info("📋 Loaded persistence toggle state: " + (isEnabled ? "enabled" : "disabled"));
+            } else {
+                // Default to enabled if no saved state
+                jsonPersistenceToggle.setSelected(true);
+                Logging.info("📋 No saved persistence toggle state found, defaulting to enabled");
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error loading persistence toggle state: " + e.getMessage(), e);
+            // Default to enabled on error
+            jsonPersistenceToggle.setSelected(true);
+        }
+    }
+    
+    /**
+     * Load saved JSON content from file.
+     */
+    private void loadSavedJsonContent() {
+        try {
+            Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
+            if (Files.exists(jsonFile)) {
+                String savedJson = Files.readString(jsonFile);
+                jsonDataTextArea.setInputText(savedJson);
+                addUserMessage("📋 Restored saved JSON content to input area");
+                Logging.info("📋 Loaded saved JSON content from file");
+            } else {
+                Logging.info("📋 No saved JSON content found");
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error loading saved JSON content: " + e.getMessage(), e);
+            addUserMessage("❌ Error loading saved JSON content");
+        }
+    }
+    
+    /**
+     * Save JSON content to file if persistence is enabled.
+     */
+    private void saveJsonContent() {
+        if (!jsonPersistenceToggle.isSelected()) {
+            return; // Don't save if persistence is disabled
+        }
+        
+        try {
+            String jsonContent = jsonDataTextArea.getInputText();
+            Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
+            Files.writeString(jsonFile, jsonContent);
+            Logging.info("📋 Saved JSON input content to file");
+        } catch (Exception e) {
+            Logging.error("❌ Error saving JSON content: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Save persistence toggle state to file.
+     */
+    private void savePersistenceToggleState() {
+        try {
+            boolean isEnabled = jsonPersistenceToggle.isSelected();
+            Path toggleFile = Paths.get(PERSISTENCE_TOGGLE_FILE);
+            Files.writeString(toggleFile, String.valueOf(isEnabled));
+            Logging.info("📋 Saved persistence toggle state: " + (isEnabled ? "enabled" : "disabled"));
+        } catch (Exception e) {
+            Logging.error("❌ Error saving persistence toggle state: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Clear the JSON persistence file.
+     * 
+     * This method removes the saved JSON content file when
+     * persistence is disabled.
+     */
+    private void clearJsonPersistenceFile() {
+        try {
+            Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
+            if (Files.exists(jsonFile)) {
+                Files.delete(jsonFile);
+                Logging.info("🗑️ Cleared JSON persistence file");
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error clearing JSON persistence file: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Handle application shutdown and save settings.
+     */
+    public void onApplicationShutdown() {
+        try {
+            // Save JSON content if persistence is enabled
+            saveJsonContent();
+            
+            // Save persistence toggle state
+            savePersistenceToggleState();
+            
+            Logging.info("📋 Application settings saved successfully");
+        } catch (Exception e) {
+            Logging.error("❌ Error saving application settings: " + e.getMessage(), e);
+        }
     }
 }  

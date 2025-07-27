@@ -4,7 +4,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
+<?import launcher.ProfessionalJsonEditor?>
 
 <VBox fx:id="mainContainer" prefHeight="900.0" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
@@ -42,16 +44,23 @@
             
             <!-- JSON Data Input -->
             <VBox spacing="5" alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
-                <Label text="Game Configuration (JSON):" styleClass="field-label"/>
-                <TextArea fx:id="jsonDataTextArea" promptText="Enter JSON configuration here. (Resorts to default if invalid)" 
-                         styleClass="json-text-area" VBox.vgrow="ALWAYS" wrapText="true" minHeight="150"/>
+                <fx:define>
+                    <ProfessionalJsonEditor fx:id="jsonDataTextArea"/>
+                </fx:define>
+                <fx:reference source="jsonDataTextArea"/>
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Button fx:id="clearJsonButton" text="Clear" styleClass="small-button"/>
+                    <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
                     <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
                     <Region HBox.hgrow="ALWAYS"/>
                     <Button fx:id="launchGameButton" text="Launch Game" 
                             styleClass="primary-button" style="-fx-font-size: 11px; -fx-padding: 4 8; -fx-min-width: 60;"/>
                 </HBox>
+                               <!-- JSON Persistence Toggle -->
+               <HBox alignment="CENTER_LEFT" spacing="2" VBox.vgrow="NEVER" style="-fx-min-height: 20; -fx-max-height: 20;">
+                   <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
+                   <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true" styleClass="jfoenix-toggle"/>
+               </HBox>
             </VBox>
         </VBox>
         
@@ -63,8 +72,9 @@
         <!-- Message Area -->
         <VBox styleClass="message-panel" spacing="5" VBox.vgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400">
             <Label text="Messages" styleClass="section-title"/>
-            <TextArea fx:id="messageArea" VBox.vgrow="ALWAYS" 
-                      styleClass="message-area" editable="false" wrapText="true"/>
+            <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane">
+                <VBox fx:id="messageContainer" spacing="5" styleClass="message-container"/>
+            </ScrollPane>
         </VBox>
     </VBox>
     
