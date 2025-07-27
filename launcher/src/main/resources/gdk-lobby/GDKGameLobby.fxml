@@ -30,7 +30,7 @@
     <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
         
         <!-- Centered Game Configuration Panel -->
-        <VBox styleClass="game-config-panel" spacing="15" alignment="TOP_CENTER" VBox.vgrow="ALWAYS" minWidth="500">
+        <VBox styleClass="game-config-panel" spacing="15" alignment="TOP_CENTER" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" minWidth="500">
             <padding>
                 <Insets top="10" right="20" bottom="10" left="20"/>
             </padding>
@@ -47,7 +47,7 @@
                 <fx:define>
                     <ProfessionalJsonEditor fx:id="jsonDataTextArea"/>
                 </fx:define>
-                <fx:reference source="jsonDataTextArea"/>
+                <fx:reference source="jsonDataTextArea" VBox.vgrow="ALWAYS"/>
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Button fx:id="clearJsonButton" text="Clear" styleClass="small-button"/>
                     <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
@@ -70,7 +70,7 @@
         </HBox>
         
         <!-- Message Area -->
-        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400">
+        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400">
             <Label text="Messages" styleClass="section-title"/>
             <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane">
                 <VBox fx:id="messageContainer" spacing="5" styleClass="message-container"/>

@@ -90,14 +90,12 @@ public class ProfessionalJsonEditor extends VBox {
         // Create the input code area
         this.inputCodeArea = new CodeArea();
         this.inputCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(inputCodeArea));
-        this.inputCodeArea.setPrefHeight(200);
         this.inputCodeArea.setMinHeight(150);
         this.inputCodeArea.getStyleClass().add("json-code-area");
         
         // Create the output code area
         this.outputCodeArea = new CodeArea();
         this.outputCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(outputCodeArea));
-        this.outputCodeArea.setPrefHeight(200);
         this.outputCodeArea.setMinHeight(150);
         this.outputCodeArea.getStyleClass().add("json-code-area");
         this.outputCodeArea.setEditable(false); // Read-only for output
