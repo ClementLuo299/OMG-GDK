@@ -1,4 +1,4 @@
-package tictactoe;
+
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.ResourceBundle;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-import gdk.Logging;
+// Removed GDK dependency - all logging should go through Main class
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -99,12 +99,10 @@ public class TicTacToeController implements Initializable {
     private int timeRemaining = 30;
     private int playerCount = 2; // Default to 2 players
     private Stage primaryStage;
-    private Main gameModule;
+    private Object gameModule; // Reference to Main class, but typed as Object to avoid GDK dependency
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Logging.info("🎮 Initializing TicTacToe Controller");
-        
         try {
             // Initialize board buttons list
             boardButtons = Arrays.asList(btn00, btn01, btn02, btn10, btn11, btn12, btn20, btn21, btn22);
@@ -121,10 +119,9 @@ public class TicTacToeController implements Initializable {
             // Set up event handlers
             setupEventHandlers();
             
-            Logging.info("✅ TicTacToe Controller initialized successfully");
-            
         } catch (Exception e) {
-            Logging.error("❌ Error initializing TicTacToe Controller: " + e.getMessage(), e);
+            // Logging should be handled by Main class
+            System.err.println("Error initializing TicTacToe Controller: " + e.getMessage());
         }
     }
     
@@ -138,7 +135,7 @@ public class TicTacToeController implements Initializable {
     /**
      * Sets the game module reference
      */
-    public void setGameModule(Main gameModule) {
+    public void setGameModule(Object gameModule) {
         this.gameModule = gameModule;
     }
     
@@ -147,8 +144,6 @@ public class TicTacToeController implements Initializable {
      */
     public void initializeGame() {
         try {
-            Logging.info("🎮 Initializing TicTacToe game");
-            
             // Create players
             player1 = new TicTacToePlayer("Player 1", "X");
             player2 = new TicTacToePlayer("Player 2", "O");
@@ -164,10 +159,9 @@ public class TicTacToeController implements Initializable {
             // Start new game
             startNewGame();
             
-            Logging.info("✅ TicTacToe game initialized successfully");
-            
         } catch (Exception e) {
-            Logging.error("❌ Error initializing TicTacToe game: " + e.getMessage(), e);
+            // Logging should be handled by Main class
+            System.err.println("Error initializing TicTacToe game: " + e.getMessage());
         }
     }
     
@@ -259,7 +253,7 @@ public class TicTacToeController implements Initializable {
             
             alert.showAndWait().ifPresent(response -> {
                 if (response == javafx.scene.control.ButtonType.OK) {
-                    Logging.info("🏳️ Game forfeited by " + currentPlayer.getName());
+                    // Logging should be handled by Main class
                     addSystemMessage(currentPlayer.getName() + " forfeited the game!");
                     handleGameWon();
                 }
@@ -272,9 +266,13 @@ public class TicTacToeController implements Initializable {
      */
     @FXML
     private void onBackButtonClicked() {
-        Logging.info("🔙 Returning to lobby from TicTacToe");
         if (gameModule != null) {
-            gameModule.stopGame();
+            // Use reflection to call stopGame method to avoid GDK dependency
+            try {
+                gameModule.getClass().getMethod("stopGame").invoke(gameModule);
+            } catch (Exception e) {
+                System.err.println("Error calling stopGame: " + e.getMessage());
+            }
         }
     }
     
@@ -290,8 +288,6 @@ public class TicTacToeController implements Initializable {
      * Starts a new game
      */
     private void startNewGame() {
-        Logging.info("🔄 Starting new TicTacToe game");
-        
         // Reset game state
         game = new TicTacToeGame();
         gameInProgress = true;
@@ -314,8 +310,6 @@ public class TicTacToeController implements Initializable {
         
         // Start timer
         startTimer();
-        
-        Logging.info("✅ New TicTacToe game started");
     }
     
     /**
@@ -395,7 +389,7 @@ public class TicTacToeController implements Initializable {
         // Stop timer
         pauseTimer();
         
-        Logging.info("🏆 " + message);
+        // Logging should be handled by Main class
     }
     
     /**
@@ -413,7 +407,7 @@ public class TicTacToeController implements Initializable {
         // Stop timer
         pauseTimer();
         
-        Logging.info("🤝 " + message);
+        // Logging should be handled by Main class
     }
     
     /**

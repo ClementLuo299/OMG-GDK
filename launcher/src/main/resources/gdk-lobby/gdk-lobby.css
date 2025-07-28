@@ -316,7 +316,9 @@
     -fx-background-radius: 10;
     -fx-padding: 15;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3);
+    -fx-pref-height: 300px;
     -fx-min-height: 200px;
+    -fx-max-height: 400px;
     -fx-pref-width: 100%;
     -fx-min-width: 500px;
 }
@@ -710,6 +712,7 @@
     -fx-border-color: #17a2b8;
     -fx-border-width: 1;
     -fx-border-radius: 5;
+    -fx-pref-height: 250px;
     -fx-min-height: 150px;
 }
 
@@ -782,6 +785,7 @@
 
 /* ==================== PROFESSIONAL JSON EDITOR STYLING ==================== */
 
+/* Professional JSON Editor */
 .professional-json-editor {
     -fx-background-color: #ffffff;
     -fx-border-color: #d1d5db;

@@ -35,14 +35,23 @@ public class ModuleLoader {
         List<GameModule> modules = new ArrayList<>();
         File dir = new File(modulesDir);
         
-        // Try to load from compiled classes (development mode)
+        Logging.info("🔍 Starting module discovery in: " + modulesDir);
+        
+        // First, try to load from compiled classes (development mode - prioritized)
         List<GameModule> classModules = discoverModulesFromClasses(dir);
+        Logging.info("📦 Found " + classModules.size() + " module(s) from compiled classes");
         modules.addAll(classModules);
         
-        // Try to load from JAR files (production mode)
-        List<GameModule> jarModules = discoverModulesFromJars(dir);
-        modules.addAll(jarModules);
+        // Only load from JAR files if no modules found from classes (fallback for speed)
+        if (classModules.isEmpty()) {
+            List<GameModule> jarModules = discoverModulesFromJars(dir);
+            Logging.info("📦 Found " + jarModules.size() + " module(s) from JAR files (fallback)");
+            modules.addAll(jarModules);
+        } else {
+            Logging.info("⏭️ Skipping JAR discovery (using compiled classes)");
+        }
         
+        Logging.info("✅ Total modules discovered: " + modules.size());
         return modules;
     }
     
@@ -99,10 +108,9 @@ public class ModuleLoader {
                     GameModule module = loadModuleFromClasses(subdir);
                     if (module != null) {
                         modules.add(module);
-                        Logging.info("📦 Loaded game module: " + module.getGameName() + " (" + module.getClass().getSimpleName() + ")");
                     }
                 } catch (Exception e) {
-                    System.err.println("Failed to load module from classes in " + subdir.getName() + ": " + e.getMessage());
+                    Logging.error("Failed to load module from classes in " + subdir.getName() + ": " + e.getMessage(), e);
                 }
             }
         }
@@ -118,23 +126,62 @@ public class ModuleLoader {
      */
     private static GameModule loadModuleFromClasses(File moduleDir) {
         try {
+            // First check if source code exists (fast check)
+            if (!hasMainSourceFile(moduleDir)) {
+                return null; // Skip if no source code
+            }
+            
             File classesDir = findClassesDirectory(moduleDir);
             if (classesDir == null) {
-                return null;
+                return null; // No compiled classes, skip silently
             }
             
             String mainClassName = findMainClassInDirectory(classesDir);
             if (mainClassName == null) {
-                return null;
+                return null; // No Main class, skip silently
             }
             
-            return createModuleInstance(classesDir, mainClassName);
+            // Try to create the module instance - this validates it implements GameModule
+            GameModule module = createModuleInstance(classesDir, mainClassName);
+            if (module == null) {
+                Logging.info("Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
+                return null; // Main class exists but doesn't implement GameModule
+            }
+            
+            return module;
             
         } catch (Exception e) {
-            System.err.println("Error loading module from classes in " + moduleDir.getName() + ": " + e.getMessage());
+            Logging.error("Error loading module from classes in " + moduleDir.getName() + ": " + e.getMessage(), e);
         }
         
         return null;
+    }
+    
+    /**
+     * Checks if a module has a Main.java source file
+     */
+    private static boolean hasMainSourceFile(File moduleDir) {
+        // Check for Main.java directly in src/main/java/ (simplified structure)
+        File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
+        if (mainJavaFile.exists()) {
+            return true;
+        }
+        
+        // Check for Main.java in any subdirectory of src/main/java/ (legacy support)
+        File srcDir = new File(moduleDir, "src/main/java");
+        if (srcDir.exists()) {
+            File[] subdirs = srcDir.listFiles(File::isDirectory);
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    File mainInSubdir = new File(subdir, "Main.java");
+                    if (mainInSubdir.exists()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
     }
     
     /**

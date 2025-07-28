@@ -70,7 +70,7 @@
         </HBox>
         
         <!-- Message Area -->
-        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400">
+        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400">
             <Label text="Messages" styleClass="section-title"/>
             <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane">
                 <VBox fx:id="messageContainer" spacing="5" styleClass="message-container"/>

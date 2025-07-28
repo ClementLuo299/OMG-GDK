@@ -1,4 +1,4 @@
-package example;
+
 
 import gdk.GameModule;
 import gdk.Logging;

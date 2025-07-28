@@ -1,4 +1,4 @@
-package example;
+
 
 import gdk.GameMetadata;
 import java.util.Arrays;

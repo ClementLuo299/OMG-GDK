@@ -1,10 +1,12 @@
 import gdk.GameModule;
 import gdk.Logging;
+import launcher.ProfessionalJsonEditor;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ScrollPane;
@@ -23,9 +25,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,7 +69,7 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private VBox messageContainer;
     
     // JSON Configuration Components
-    @FXML private launcher.ProfessionalJsonEditor jsonDataTextArea;
+    @FXML private ProfessionalJsonEditor jsonDataTextArea;
     @FXML private Button clearJsonButton;
     @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
@@ -71,6 +77,7 @@ public class GDKGameLobbyController implements Initializable {
     
     // Application Control Components
     @FXML private Button exitButton;
+    @FXML private Label statusLabel;
 
     // ==================== DEPENDENCIES ====================
     
@@ -88,6 +95,23 @@ public class GDKGameLobbyController implements Initializable {
      * The currently selected game module for launching
      */
     private GameModule selectedGameModule;
+    
+    /**
+     * Track the previous module count to detect removals
+     */
+    private int previousModuleCount = 0;
+    
+    /**
+     * Track removed module names to avoid recompilation messages
+     */
+    private Set<String> removedModuleNames = new HashSet<>();
+    
+    /**
+     * Message queue system to prevent spam
+     */
+    private Queue<String> messageQueue = new LinkedList<>();
+    private boolean messageTimerRunning = false;
+    private static final long MESSAGE_INTERVAL_MS = 250;
     
     /**
      * JSON mapper for parsing and validating JSON configuration data
@@ -136,6 +160,9 @@ public class GDKGameLobbyController implements Initializable {
         
         // Refresh the game list on startup
         refreshAvailableGameModules();
+        
+        // Initialize the status label
+        updateGameCountStatus();
         
         Logging.info("✅ GDK Game Picker Controller initialized successfully");
     }
@@ -219,10 +246,26 @@ public class GDKGameLobbyController implements Initializable {
         
         // Refresh button: Reload the list of available games
         refreshButton.setOnAction(event -> {
-            messageContainer.getChildren().clear(); // Clear the message container first
-            addUserMessage("🔄 Refreshing game list..."); // Show user feedback
-            refreshAvailableGameModules(); // Reload games from modules directory
+            // Clear the message container immediately
+            messageContainer.getChildren().clear();
+            
+            // Add a small delay to show the user that reload was triggered
+            Platform.runLater(() -> {
+                try {
+                    Thread.sleep(250); // 250ms delay
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                addUserMessage("🔄 Reload in progress..."); // Show progress indicator
+                
+                // Run the refresh in a background thread to keep UI responsive
+                new Thread(() -> {
+                    refreshAvailableGameModules(); // Reload games from modules directory
+                }).start();
+            });
         });
+        
+
         
         // Exit button: Close the entire application
         exitButton.setOnAction(event -> {
@@ -280,12 +323,34 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void refreshAvailableGameModules() {
         try {
+            // Store previous module names for removal detection
+            Set<String> previousModuleNames = new HashSet<>();
+            if (previousModuleCount > 0) {
+                for (GameModule module : availableGameModules) {
+                    previousModuleNames.add(module.getGameName());
+                }
+            }
+            
             // Clear existing game modules to start fresh
             availableGameModules.clear();
             
+            // Clear the currently selected game module since we're refreshing
+            selectedGameModule = null;
+            
             // Get the path to the modules directory from application constants
             String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
-            Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
+            
+            // Detect disabled/removed modules before recompilation
+            if (previousModuleCount == 0) {
+                // First load - detect pre-disabled modules
+                detectDisabledModulesBeforeRecompilation(modulesDirectoryPath);
+            } else {
+                // Subsequent loads - detect newly removed modules
+                detectNewlyRemovedModules(previousModuleNames);
+            }
+            
+            // Check and recompile only modules that need it (source code changed)
+            checkAndRecompileModules(modulesDirectoryPath);
             
             // Use the ModuleLoader to discover all available game modules
             List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
@@ -299,22 +364,339 @@ public class GDKGameLobbyController implements Initializable {
             }
             
             // Update the ComboBox with the new list of games
+            Logging.info("🔄 Updating ComboBox with " + availableGameModules.size() + " modules");
             gameSelector.setItems(availableGameModules);
             
-            // Provide user feedback about the discovery results
+            // Clear the ComboBox selection since we refreshed
+            gameSelector.getSelectionModel().clearSelection();
+            
+            // Force UI refresh on the JavaFX Application Thread
+            Platform.runLater(() -> {
+                // Update the status label with the new count
+                updateGameCountStatus();
+                
+                // Force ComboBox to refresh its display
+                gameSelector.requestLayout();
+            });
+            
+            // Check for module changes and provide user feedback
+            int currentModuleCount = availableGameModules.size();
+            
             if (availableGameModules.isEmpty()) {
                 addUserMessage("⚠️ No game modules found in " + modulesDirectoryPath);
+            } else if (previousModuleCount > 0) {
+                // Check for module changes (additions/removals)
+                Set<String> currentModuleNames = new HashSet<>();
+                for (GameModule module : availableGameModules) {
+                    currentModuleNames.add(module.getGameName());
+                }
+                
+                // Find removed module names
+                Set<String> removedNames = new HashSet<>(previousModuleNames);
+                removedNames.removeAll(currentModuleNames);
+                
+                // Find added module names
+                Set<String> addedNames = new HashSet<>(currentModuleNames);
+                addedNames.removeAll(previousModuleNames);
+                
+                // Add removed names to tracking set
+                removedModuleNames.addAll(removedNames);
+                
+                // Show specific removal messages
+                for (String removedName : removedNames) {
+                    addUserMessage("⚠️ Game module '" + removedName + "' was removed or disabled");
+                }
+                
+                // Show specific addition messages
+                for (String addedName : addedNames) {
+                    addUserMessage("✅ New game module '" + addedName + "' was added");
+                }
+                
+                addUserMessage("✅ Reload completed - " + currentModuleCount + " modules available");
+            } else if (previousModuleCount == 0) {
+                // First time loading - check for disabled modules that exist but aren't loaded
+                checkForDisabledModulesOnFirstLoad(modulesDirectoryPath, currentModuleCount);
             } else {
-                addUserMessage("✅ Found " + availableGameModules.size() + " game module(s)");
+                addUserMessage("✅ Reload completed - " + currentModuleCount + " modules available");
             }
+            
+            // Update the previous count for next comparison
+            previousModuleCount = currentModuleCount;
             
         } catch (Exception moduleDiscoveryError) {
             // Handle any errors during module discovery
             Logging.error("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage(), moduleDiscoveryError);
             addUserMessage("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage());
         }
+        }
+    
+    /**
+     * Detect disabled modules before recompilation on first load
+     * @param modulesDirectoryPath Path to the modules directory
+     */
+    private void detectDisabledModulesBeforeRecompilation(String modulesDirectoryPath) {
+        try {
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue; // Skip non-module directories
+                    }
+                    
+                    File pomFile = new File(subdir, "pom.xml");
+                    if (pomFile.exists()) {
+                        // Check if Main.java exists and is valid
+                        File mainJavaFile = new File(subdir, "src/main/java/Main.java");
+                        if (!mainJavaFile.exists()) {
+                            // Check for Main.java in any subdirectory of src/main/java/ (legacy support)
+                            File srcDir = new File(subdir, "src/main/java");
+                            if (srcDir.exists()) {
+                                File[] subdirs2 = srcDir.listFiles(File::isDirectory);
+                                if (subdirs2 != null) {
+                                    for (File subdir2 : subdirs2) {
+                                        File mainInSubdir = new File(subdir2, "Main.java");
+                                        if (mainInSubdir.exists()) {
+                                            mainJavaFile = mainInSubdir;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // If no Main.java found or it's commented out, mark as disabled
+                        if (!mainJavaFile.exists() || isFileCommentedOut(mainJavaFile)) {
+                            removedModuleNames.add(subdir.getName());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error detecting disabled modules: " + e.getMessage(), e);
+        }
     }
+    
+    /**
+     * Check if a file is effectively commented out (all content is comments or empty)
+     * @param file The file to check
+     * @return true if the file is commented out
+     */
+    private boolean isFileCommentedOut(File file) {
+        try {
+            if (!file.exists()) return true;
+            
+            String content = Files.readString(file.toPath()).trim();
+            if (content.isEmpty()) return true;
+            
+            // Check if all non-empty lines are comments
+            String[] lines = content.split("\n");
+            for (String line : lines) {
+                String trimmed = line.trim();
+                if (!trimmed.isEmpty() && !trimmed.startsWith("//") && !trimmed.startsWith("/*") && !trimmed.startsWith("*")) {
+                    return false; // Found non-comment content
+                }
+            }
+            return true; // All lines are comments or empty
+        } catch (Exception e) {
+            return true; // If we can't read it, assume it's disabled
+        }
+    }
+    
+    /**
+     * Detect newly removed modules and add them to the removed tracking set
+     * @param previousModuleNames Set of previously loaded module names
+     */
+    private void detectNewlyRemovedModules(Set<String> previousModuleNames) {
+        try {
+            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue; // Skip non-module directories
+                    }
+                    
+                    // Check if this module was previously loaded but isn't now
+                    if (previousModuleNames.contains(subdir.getName())) {
+                        // Check if the module directory still exists but module isn't loaded
+                        File pomFile = new File(subdir, "pom.xml");
+                        if (pomFile.exists()) {
+                            // Check if Main.java exists and is valid
+                            File mainJavaFile = new File(subdir, "src/main/java/Main.java");
+                            if (!mainJavaFile.exists()) {
+                                // Check for Main.java in any subdirectory of src/main/java/ (legacy support)
+                                File srcDir = new File(subdir, "src/main/java");
+                                if (srcDir.exists()) {
+                                    File[] subdirs2 = srcDir.listFiles(File::isDirectory);
+                                    if (subdirs2 != null) {
+                                        for (File subdir2 : subdirs2) {
+                                            File mainInSubdir = new File(subdir2, "Main.java");
+                                            if (mainInSubdir.exists()) {
+                                                mainJavaFile = mainInSubdir;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // If no Main.java found or it's commented out, mark as removed
+                            if (!mainJavaFile.exists() || isFileCommentedOut(mainJavaFile)) {
+                                removedModuleNames.add(subdir.getName());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error detecting newly removed modules: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Check for disabled modules on first load and add them to removed tracking
+     * @param modulesDirectoryPath Path to the modules directory
+     * @param currentModuleCount Current number of loaded modules
+     */
+    private void checkForDisabledModulesOnFirstLoad(String modulesDirectoryPath, int currentModuleCount) {
+        // Show completion message
+        addUserMessage("✅ Loaded " + currentModuleCount + " game module(s)");
+    }
+    
+    // ==================== MODULE COMPILATION ====================
+    
+    /**
+     * Checks and recompiles only modules that need it (source code changed)
+     * @param modulesDirectoryPath Path to the modules directory
+     */
+    private void checkAndRecompileModules(String modulesDirectoryPath) {
+        try {
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue; // Skip non-module directories
+                    }
+                    
+                    File pomFile = new File(subdir, "pom.xml");
+                    if (pomFile.exists()) {
+                        // Skip recompilation messages for removed modules
+                        if (!removedModuleNames.contains(subdir.getName())) {
+                            checkAndRecompileModule(subdir);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            addUserMessage("❌ Error checking modules: " + e.getMessage());
+            Logging.error("❌ Error checking modules: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Checks if a module needs recompilation and recompiles if needed
+     * @param moduleDir The module directory to check
+     */
+    private void checkAndRecompileModule(File moduleDir) {
+        try {
+            String moduleName = moduleDir.getName();
+            
+            // Check if Main.java exists in source (using same logic as ModuleLoader)
+            
+            // Check for Main.java directly in src/main/java/ (simplified structure)
+            File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
+            if (!mainJavaFile.exists()) {
+                // Check for Main.java in any subdirectory of src/main/java/ (legacy support)
+                File srcDir = new File(moduleDir, "src/main/java");
+                if (srcDir.exists()) {
+                    File[] subdirs = srcDir.listFiles(File::isDirectory);
+                    if (subdirs != null) {
+                        for (File subdir : subdirs) {
+                            File mainInSubdir = new File(subdir, "Main.java");
+                            if (mainInSubdir.exists()) {
+                                mainJavaFile = mainInSubdir;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // If no Main.java found, skip this module
+            if (!mainJavaFile.exists()) {
+                return;
+            }
+            
+            // Check if the Main class implements GameModule interface
+            // This is done during module loading, not during compilation check
+            
+            // Check if compiled classes exist
+            File targetClassesDir = new File(moduleDir, "target/classes");
+            File mainClassFile = new File(targetClassesDir, "Main.class");
+            
+            // Check if source is newer than compiled classes
+            boolean needsRecompilation = !mainClassFile.exists() || 
+                                       mainJavaFile.lastModified() > mainClassFile.lastModified();
+            
+            if (needsRecompilation) {
+                recompileModule(moduleDir);
+            }
+            // No message for modules that are up to date
+            
+            // Note: GameModule interface validation happens during module loading,
+            // not during compilation check. A module may compile successfully but
+            // still not implement the required interface.
+            
+        } catch (Exception e) {
+            addUserMessage("❌ Error checking module " + moduleDir.getName() + ": " + e.getMessage());
+            Logging.error("❌ Error checking module " + moduleDir.getName() + ": " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Recompiles a single module
+     * @param moduleDir The module directory to recompile
+     */
+    private void recompileModule(File moduleDir) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("mvn", "compile", "-q");
+            pb.directory(moduleDir);
+            pb.redirectErrorStream(true);
+            
+            Process process = pb.start();
+            int exitCode = process.waitFor();
+            
+            if (exitCode != 0) {
+                addUserMessage("⚠️ Module compilation failed for " + moduleDir.getName() + " (exit code: " + exitCode + ")");
+            }
+            // No success message for successful compilation
+        } catch (Exception e) {
+            addUserMessage("❌ Error recompiling module " + moduleDir.getName() + ": " + e.getMessage());
+            Logging.error("❌ Error recompiling module " + moduleDir.getName() + ": " + e.getMessage(), e);
+        }
+    }
+    
 
+    
+    // ==================== UI UPDATES ====================
+    
+    /**
+     * Update the game count status label
+     */
+    private void updateGameCountStatus() {
+        if (statusLabel != null) {
+            int count = availableGameModules.size();
+            statusLabel.setText("Available Games: " + count);
+            Logging.info("📊 UI Status updated: " + count + " games available");
+        }
+    }
+    
     // ==================== GAME LAUNCHING ====================
     
     /**
@@ -491,14 +873,55 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== UTILITY METHODS ====================
     
     /**
-     * Add a message to the user message area.
+     * Add a message to the user message area with queue system.
      * 
-     * This method adds a timestamped message to the message area
-     * for user feedback and debugging purposes.
+     * This method adds a message to a queue and displays messages
+     * one by one every 250ms to prevent message spam while ensuring
+     * all messages are shown.
      * 
      * @param userMessage The message to display to the user
      */
     private void addUserMessage(String userMessage) {
+        // Add message to queue
+        messageQueue.offer(userMessage);
+        
+        // Start the message timer if it's not already running
+        if (!messageTimerRunning) {
+            startMessageTimer();
+        }
+    }
+    
+    /**
+     * Start the message timer to process queued messages
+     */
+    private void startMessageTimer() {
+        messageTimerRunning = true;
+        
+        // Create a timer that runs every 250ms
+        new Thread(() -> {
+            while (!messageQueue.isEmpty()) {
+                try {
+                    Thread.sleep(MESSAGE_INTERVAL_MS);
+                    
+                    // Process one message from the queue
+                    String message = messageQueue.poll();
+                    if (message != null) {
+                        Platform.runLater(() -> displayMessage(message));
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+            messageTimerRunning = false;
+        }).start();
+    }
+    
+    /**
+     * Display a single message to the user interface
+     * @param userMessage The message to display
+     */
+    private void displayMessage(String userMessage) {
         // Create a timestamp in HH:mm:ss format for the message
         String timestamp = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
         
@@ -511,9 +934,7 @@ public class GDKGameLobbyController implements Initializable {
         messageContainer.getChildren().add(messageLabel);
         
         // Auto-scroll to the bottom to show the latest message
-        Platform.runLater(() -> {
-            messageScrollPane.setVvalue(1.0);
-        });
+        messageScrollPane.setVvalue(1.0);
     }
     
 
