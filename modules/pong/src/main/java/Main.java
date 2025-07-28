@@ -1,39 +1,48 @@
-import gdk.GameModule;
-import gdk.GameMetadata;
+// import gdk.GameModule;
+// import gdk.GameMetadata;
+// import javafx.scene.Scene;
+// import javafx.scene.control.Label;
+// import javafx.scene.layout.VBox;
+// import javafx.stage.Stage;
+// import java.util.Map;
 
-public class Main implements GameModule {
+// public class Main implements GameModule {
     
-    @Override
-    public GameMetadata getMetadata() {
-        return new GameMetadata(
-            "Pong Classic",
-            "The original arcade tennis game",
-            "1.0.0",
-            "pong"
-        );
-    }
+//     private final Metadata metadata;
     
-    @Override
-    public void startGame() {
-        System.out.println("🏓 Starting Pong Classic...");
-        // Placeholder for pong game logic
-    }
+//     public Main() {
+//         this.metadata = new Metadata();
+//     }
     
-    @Override
-    public void stopGame() {
-        System.out.println("🏓 Stopping Pong Classic...");
-        // Placeholder for cleanup logic
-    }
+//     @Override
+//     public GameMetadata getMetadata() {
+//         return metadata;
+//     }
     
-    @Override
-    public void pauseGame() {
-        System.out.println("🏓 Pausing Pong Classic...");
-        // Placeholder for pause logic
-    }
-    
-    @Override
-    public void resumeGame() {
-        System.out.println("🏓 Resuming Pong Classic...");
-        // Placeholder for resume logic
-    }
-} 
+//     @Override
+//     public Scene launchGame(Stage primaryStage) {
+//         System.out.println("🏓 Starting Pong Classic...");
+        
+//         // Create a simple placeholder scene
+//         VBox root = new VBox(10);
+//         root.getStyleClass().add("game-container");
+        
+//         Label titleLabel = new Label("🏓 Pong Classic");
+//         titleLabel.getStyleClass().add("game-title");
+        
+//         Label descriptionLabel = new Label("The original arcade tennis game");
+//         descriptionLabel.getStyleClass().add("game-description");
+        
+//         Label placeholderLabel = new Label("Game implementation coming soon...");
+//         placeholderLabel.getStyleClass().add("placeholder");
+        
+//         root.getChildren().addAll(titleLabel, descriptionLabel, placeholderLabel);
+        
+//         Scene scene = new Scene(root, 800, 600);
+        
+//         primaryStage.setTitle("Pong Classic");
+//         primaryStage.setScene(scene);
+        
+//         return scene;
+//     }
+// } 

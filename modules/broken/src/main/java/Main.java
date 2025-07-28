@@ -4,7 +4,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.Map;
 
 public class Main implements GameModule {
     
@@ -21,48 +20,31 @@ public class Main implements GameModule {
     
     @Override
     public Scene launchGame(Stage primaryStage) {
-        System.out.println("🧱 Starting Breakout Bricks...");
+        System.out.println("🚫 Starting Broken Game...");
         
         // Create a simple placeholder scene
         VBox root = new VBox(10);
         root.getStyleClass().add("game-container");
         
-        Label titleLabel = new Label("🧱 Breakout Bricks");
+        Label titleLabel = new Label("🚫 Broken Game");
         titleLabel.getStyleClass().add("game-title");
         
-        Label descriptionLabel = new Label("Smash bricks with a bouncing ball and paddle");
+        Label descriptionLabel = new Label("This game is missing required methods");
         descriptionLabel.getStyleClass().add("game-description");
         
-        Label placeholderLabel = new Label("Game implementation coming soon...");
+        Label placeholderLabel = new Label("This module should not be detected!");
         placeholderLabel.getStyleClass().add("placeholder");
         
         root.getChildren().addAll(titleLabel, descriptionLabel, placeholderLabel);
         
         Scene scene = new Scene(root, 800, 600);
         
-        primaryStage.setTitle("Breakout Bricks");
+        primaryStage.setTitle("Broken Game");
         primaryStage.setScene(scene);
         
         return scene;
     }
     
-    @Override
-    public void stopGame() {
-        System.out.println("🔄 Breakout Bricks closing - cleaning up resources");
-    }
-    
-    @Override
-    public Map<String, Object> handleMessage(Map<String, Object> message) {
-        if (message == null) {
-            return null;
-        }
-        
-        String function = (String) message.get("function");
-        if ("metadata".equals(function)) {
-            System.out.println("📋 Returning metadata for Breakout Bricks");
-            return metadata.toMap();
-        }
-        
-        return null;
-    }
+    // Missing: stopGame() method
+    // Missing: handleMessage() method
 } 

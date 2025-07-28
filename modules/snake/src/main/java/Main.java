@@ -1,39 +1,49 @@
-import gdk.GameModule;
-import gdk.GameMetadata;
+// import gdk.GameModule;
+// import gdk.GameMetadata;
+// import javafx.scene.Scene;
+// import javafx.scene.control.Label;
+// import javafx.scene.layout.VBox;
+// import javafx.stage.Stage;
+// import java.util.Map;
 
-public class Main implements GameModule {
+// public class Main implements GameModule {
     
-    @Override
-    public GameMetadata getMetadata() {
-        return new GameMetadata(
-            "Snake Game",
-            "Classic snake game with modern graphics",
-            "1.0.0",
-            "snake"
-        );
-    }
+//     private final Metadata metadata;
     
-    @Override
-    public void startGame() {
-        System.out.println("🐍 Starting Snake Game...");
-        // Placeholder for snake game logic
-    }
+//     public Main() {
+//         this.metadata = new Metadata();
+//     }
     
-    @Override
-    public void stopGame() {
-        System.out.println("🐍 Stopping Snake Game...");
-        // Placeholder for cleanup logic
-    }
+//     @Override
+//     public GameMetadata getMetadata() {
+//         return metadata;
+//     }
     
-    @Override
-    public void pauseGame() {
-        System.out.println("🐍 Pausing Snake Game...");
-        // Placeholder for pause logic
-    }
-    
-    @Override
-    public void resumeGame() {
-        System.out.println("🐍 Resuming Snake Game...");
-        // Placeholder for resume logic
-    }
-} 
+//     @Override
+//     public Scene launchGame(Stage primaryStage) {
+//         System.out.println("🐍 Starting Snake Game...");
+        
+//         // Create a simple placeholder scene
+//         VBox root = new VBox(10);
+//         root.getStyleClass().add("game-container");
+        
+//         Label titleLabel = new Label("🐍 Snake Game");
+//         titleLabel.getStyleClass().add("game-title");
+        
+//         Label descriptionLabel = new Label("Classic snake game with modern graphics");
+//         descriptionLabel.getStyleClass().add("game-description");
+        
+//         Label placeholderLabel = new Label("Game implementation coming soon...");
+//         placeholderLabel.getStyleClass().add("placeholder");
+        
+//         root.getChildren().addAll(titleLabel, descriptionLabel, placeholderLabel);
+        
+//         Scene scene = new Scene(root, 800, 600);
+//         scene.getStylesheets().add(getClass().getResource("/games/snake/css/snake.css").toExternalForm());
+        
+//         primaryStage.setTitle("Snake Game");
+//         primaryStage.setScene(scene);
+        
+//         return scene;
+//     }
+// } 

@@ -113,6 +113,9 @@ public class GDKGameLobbyController implements Initializable {
     private boolean messageTimerRunning = false;
     private static final long MESSAGE_INTERVAL_MS = 250;
     
+    // Flag to prevent persistence messages during startup loading
+    private boolean isLoadingPersistenceSettings = false;
+    
     /**
      * JSON mapper for parsing and validating JSON configuration data
      */
@@ -287,6 +290,11 @@ public class GDKGameLobbyController implements Initializable {
         // Persistence Toggle Handler
         // Save toggle state when changed and clear save file if disabled
         jsonPersistenceToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            // Skip messages during startup loading
+            if (isLoadingPersistenceSettings) {
+                return;
+            }
+            
             boolean isEnabled = newValue;
             savePersistenceToggleState();
             
@@ -963,6 +971,9 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void loadPersistenceSettings() {
         try {
+            // Set flag to prevent persistence messages during loading
+            isLoadingPersistenceSettings = true;
+            
             // Load persistence toggle state
             loadPersistenceToggleState();
             
@@ -971,8 +982,13 @@ public class GDKGameLobbyController implements Initializable {
                 loadSavedJsonContent();
             }
             
+            // Clear flag after loading is complete
+            isLoadingPersistenceSettings = false;
+            
         } catch (Exception e) {
             Logging.error("❌ Error loading persistence settings: " + e.getMessage(), e);
+            // Clear flag even on error
+            isLoadingPersistenceSettings = false;
         }
     }
     
@@ -986,11 +1002,11 @@ public class GDKGameLobbyController implements Initializable {
                 String toggleState = Files.readString(toggleFile).trim();
                 boolean isEnabled = Boolean.parseBoolean(toggleState);
                 jsonPersistenceToggle.setSelected(isEnabled);
-                Logging.info("📋 Loaded persistence toggle state: " + (isEnabled ? "enabled" : "disabled"));
+                // No startup message - only show when setting changes
             } else {
                 // Default to enabled if no saved state
                 jsonPersistenceToggle.setSelected(true);
-                Logging.info("📋 No saved persistence toggle state found, defaulting to enabled");
+                // No startup message - only show when setting changes
             }
         } catch (Exception e) {
             Logging.error("❌ Error loading persistence toggle state: " + e.getMessage(), e);
@@ -1008,10 +1024,9 @@ public class GDKGameLobbyController implements Initializable {
             if (Files.exists(jsonFile)) {
                 String savedJson = Files.readString(jsonFile);
                 jsonDataTextArea.setInputText(savedJson);
-                addUserMessage("📋 Restored saved JSON content to input area");
-                Logging.info("📋 Loaded saved JSON content from file");
+                // No startup message - only show when setting changes
             } else {
-                Logging.info("📋 No saved JSON content found");
+                // No startup message - only show when setting changes
             }
         } catch (Exception e) {
             Logging.error("❌ Error loading saved JSON content: " + e.getMessage(), e);

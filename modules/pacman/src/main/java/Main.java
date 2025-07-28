@@ -1,39 +1,68 @@
 import gdk.GameModule;
 import gdk.GameMetadata;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import java.util.Map;
 
 public class Main implements GameModule {
     
-    @Override
-    public GameMetadata getMetadata() {
-        return new GameMetadata(
-            "Pac-Man Adventure",
-            "Eat dots and avoid ghosts in this classic maze game",
-            "1.0.0",
-            "pacman"
-        );
+    private final Metadata metadata;
+    
+    public Main() {
+        this.metadata = new Metadata();
     }
     
     @Override
-    public void startGame() {
+    public GameMetadata getMetadata() {
+        return metadata;
+    }
+    
+    @Override
+    public Scene launchGame(Stage primaryStage) {
         System.out.println("👻 Starting Pac-Man Adventure...");
-        // Placeholder for pac-man game logic
+        
+        // Create a simple placeholder scene
+        VBox root = new VBox(10);
+        root.getStyleClass().add("game-container");
+        
+        Label titleLabel = new Label("👻 Pac-Man Adventure");
+        titleLabel.getStyleClass().add("game-title");
+        
+        Label descriptionLabel = new Label("Eat dots and avoid ghosts in this classic maze game");
+        descriptionLabel.getStyleClass().add("game-description");
+        
+        Label placeholderLabel = new Label("Game implementation coming soon...");
+        placeholderLabel.getStyleClass().add("placeholder");
+        
+        root.getChildren().addAll(titleLabel, descriptionLabel, placeholderLabel);
+        
+        Scene scene = new Scene(root, 800, 600);
+        
+        primaryStage.setTitle("Pac-Man Adventure");
+        primaryStage.setScene(scene);
+        
+        return scene;
     }
     
     @Override
     public void stopGame() {
-        System.out.println("👻 Stopping Pac-Man Adventure...");
-        // Placeholder for cleanup logic
+        System.out.println("🔄 Pac-Man Adventure closing - cleaning up resources");
     }
     
     @Override
-    public void pauseGame() {
-        System.out.println("👻 Pausing Pac-Man Adventure...");
-        // Placeholder for pause logic
-    }
-    
-    @Override
-    public void resumeGame() {
-        System.out.println("👻 Resuming Pac-Man Adventure...");
-        // Placeholder for resume logic
+    public Map<String, Object> handleMessage(Map<String, Object> message) {
+        if (message == null) {
+            return null;
+        }
+        
+        String function = (String) message.get("function");
+        if ("metadata".equals(function)) {
+            System.out.println("📋 Returning metadata for Pac-Man Adventure");
+            return metadata.toMap();
+        }
+        
+        return null;
     }
 } 

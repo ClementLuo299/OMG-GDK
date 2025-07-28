@@ -6,7 +6,7 @@ public class Metadata extends GameMetadata {
     
     @Override
     public String getGameName() {
-        return "Breakout Bricks";
+        return "Broken Game";
     }
     
     @Override
@@ -16,7 +16,7 @@ public class Metadata extends GameMetadata {
     
     @Override
     public String getGameDescription() {
-        return "Smash bricks with a bouncing ball and paddle";
+        return "This game is missing required methods";
     }
     
     @Override
@@ -66,11 +66,11 @@ public class Metadata extends GameMetadata {
     
     @Override
     public int getEstimatedDurationMinutes() {
-        return 6;
+        return 5;
     }
     
     @Override
     public List<String> getRequiredResources() {
-        return Arrays.asList("keyboard", "mouse");
+        return Arrays.asList("keyboard");
     }
 } 

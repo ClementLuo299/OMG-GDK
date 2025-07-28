@@ -163,7 +163,7 @@ public class ModuleLoader {
     private static boolean hasMainSourceFile(File moduleDir) {
         // Check for Main.java directly in src/main/java/ (simplified structure)
         File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
-        if (mainJavaFile.exists()) {
+        if (mainJavaFile.exists() && !isFileCommentedOut(mainJavaFile)) {
             return true;
         }
         
@@ -174,7 +174,7 @@ public class ModuleLoader {
             if (subdirs != null) {
                 for (File subdir : subdirs) {
                     File mainInSubdir = new File(subdir, "Main.java");
-                    if (mainInSubdir.exists()) {
+                    if (mainInSubdir.exists() && !isFileCommentedOut(mainInSubdir)) {
                         return true;
                     }
                 }
@@ -182,6 +182,32 @@ public class ModuleLoader {
         }
         
         return false;
+    }
+    
+    /**
+     * Check if a file is effectively commented out (all content is comments or empty)
+     * @param file The file to check
+     * @return true if the file is commented out
+     */
+    private static boolean isFileCommentedOut(File file) {
+        try {
+            if (!file.exists()) return true;
+            
+            String content = java.nio.file.Files.readString(file.toPath()).trim();
+            if (content.isEmpty()) return true;
+            
+            // Check if all non-empty lines are comments
+            String[] lines = content.split("\n");
+            for (String line : lines) {
+                String trimmed = line.trim();
+                if (!trimmed.isEmpty() && !trimmed.startsWith("//") && !trimmed.startsWith("/*") && !trimmed.startsWith("*")) {
+                    return false; // Found non-comment content
+                }
+            }
+            return true; // All lines are comments or empty
+        } catch (Exception e) {
+            return true; // If we can't read it, assume it's disabled
+        }
     }
     
     /**
@@ -207,11 +233,55 @@ public class ModuleLoader {
         Class<?> moduleClass = classLoader.loadClass(mainClassName);
         
         if (GameModule.class.isAssignableFrom(moduleClass)) {
-            Object instance = moduleClass.getDeclaredConstructor().newInstance();
-            return (GameModule) instance;
+            // Validate that the module implements all required methods
+            if (validateGameModuleMethods(moduleClass)) {
+                Object instance = moduleClass.getDeclaredConstructor().newInstance();
+                return (GameModule) instance;
+            } else {
+                Logging.info("Module " + mainClassName + " implements GameModule but is missing required methods");
+                return null;
+            }
         }
         
         return null;
+    }
+    
+    /**
+     * Validates that a GameModule class implements all required methods
+     * @param moduleClass The class to validate
+     * @return true if all required methods are implemented
+     */
+    private static boolean validateGameModuleMethods(Class<?> moduleClass) {
+        try {
+            // Check for required methods
+            boolean hasLaunchGame = hasMethod(moduleClass, "launchGame", javafx.stage.Stage.class);
+            boolean hasStopGame = hasMethod(moduleClass, "stopGame");
+            boolean hasHandleMessage = hasMethod(moduleClass, "handleMessage", java.util.Map.class);
+            boolean hasGetMetadata = hasMethod(moduleClass, "getMetadata");
+            
+            // All methods must be present for a valid game module
+            return hasLaunchGame && hasStopGame && hasHandleMessage && hasGetMetadata;
+            
+        } catch (Exception e) {
+            Logging.error("Error validating GameModule methods: " + e.getMessage(), e);
+            return false;
+        }
+    }
+    
+    /**
+     * Checks if a class has a specific method
+     * @param clazz The class to check
+     * @param methodName The method name
+     * @param parameterTypes The parameter types (can be empty for no parameters)
+     * @return true if the method exists
+     */
+    private static boolean hasMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        try {
+            clazz.getDeclaredMethod(methodName, parameterTypes);
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
     }
     
     // ==================== CLASS DISCOVERY ====================
@@ -315,8 +385,14 @@ public class ModuleLoader {
         Class<?> moduleClass = classLoader.loadClass(mainClass);
         
         if (GameModule.class.isAssignableFrom(moduleClass)) {
-            Object instance = moduleClass.getDeclaredConstructor().newInstance();
-            return (GameModule) instance;
+            // Validate that the module implements all required methods
+            if (validateGameModuleMethods(moduleClass)) {
+                Object instance = moduleClass.getDeclaredConstructor().newInstance();
+                return (GameModule) instance;
+            } else {
+                Logging.info("JAR module " + mainClass + " implements GameModule but is missing required methods");
+                return null;
+            }
         }
         
         return null;

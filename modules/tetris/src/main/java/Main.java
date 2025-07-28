@@ -1,39 +1,48 @@
-import gdk.GameModule;
-import gdk.GameMetadata;
+// import gdk.GameModule;
+// import gdk.GameMetadata;
+// import javafx.scene.Scene;
+// import javafx.scene.control.Label;
+// import javafx.scene.layout.VBox;
+// import javafx.stage.Stage;
+// import java.util.Map;
 
-public class Main implements GameModule {
+// public class Main implements GameModule {
     
-    @Override
-    public GameMetadata getMetadata() {
-        return new GameMetadata(
-            "Tetris Blocks",
-            "The classic falling blocks puzzle game",
-            "1.0.0",
-            "tetris"
-        );
-    }
+//     private final Metadata metadata;
     
-    @Override
-    public void startGame() {
-        System.out.println("🧱 Starting Tetris Blocks...");
-        // Placeholder for tetris game logic
-    }
+//     public Main() {
+//         this.metadata = new Metadata();
+//     }
     
-    @Override
-    public void stopGame() {
-        System.out.println("🧱 Stopping Tetris Blocks...");
-        // Placeholder for cleanup logic
-    }
+//     @Override
+//     public GameMetadata getMetadata() {
+//         return metadata;
+//     }
     
-    @Override
-    public void pauseGame() {
-        System.out.println("🧱 Pausing Tetris Blocks...");
-        // Placeholder for pause logic
-    }
-    
-    @Override
-    public void resumeGame() {
-        System.out.println("🧱 Resuming Tetris Blocks...");
-        // Placeholder for resume logic
-    }
-} 
+//     @Override
+//     public Scene launchGame(Stage primaryStage) {
+//         System.out.println("🧱 Starting Tetris Blocks...");
+        
+//         // Create a simple placeholder scene
+//         VBox root = new VBox(10);
+//         root.getStyleClass().add("game-container");
+        
+//         Label titleLabel = new Label("🧱 Tetris Blocks");
+//         titleLabel.getStyleClass().add("game-title");
+        
+//         Label descriptionLabel = new Label("The classic falling blocks puzzle game");
+//         descriptionLabel.getStyleClass().add("game-description");
+        
+//         Label placeholderLabel = new Label("Game implementation coming soon...");
+//         placeholderLabel.getStyleClass().add("placeholder");
+        
+//         root.getChildren().addAll(titleLabel, descriptionLabel, placeholderLabel);
+        
+//         Scene scene = new Scene(root, 800, 600);
+        
+//         primaryStage.setTitle("Tetris Blocks");
+//         primaryStage.setScene(scene);
+        
+//         return scene;
+//     }
+// } 
