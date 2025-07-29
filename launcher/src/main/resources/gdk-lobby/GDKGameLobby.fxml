@@ -35,12 +35,15 @@
                 <Insets top="10" right="20" bottom="10" left="20"/>
             </padding>
             
-            <!-- Game Selection -->
-            <VBox spacing="5" alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+            <!-- Game Selection and Launch Button -->
+            <HBox alignment="CENTER_LEFT" spacing="20" VBox.vgrow="NEVER">
                 <Label text="Select Game:" styleClass="field-label"/>
                 <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
                          styleClass="combo-box" prefWidth="400"/>
-            </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="launchGameButton" text="Launch Game" 
+                        styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only;"/>
+            </HBox>
             
             <!-- JSON Data Input -->
             <VBox spacing="5" alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
@@ -48,14 +51,22 @@
                     <ProfessionalJsonEditor fx:id="jsonDataTextArea"/>
                 </fx:define>
                 <fx:reference source="jsonDataTextArea" VBox.vgrow="ALWAYS"/>
-                <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Button fx:id="clearJsonButton" text="Clear" styleClass="small-button"/>
-                    <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
-                    <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="launchGameButton" text="Launch Game" 
-                            styleClass="primary-button" style="-fx-font-size: 11px; -fx-padding: 4 8; -fx-min-width: 60;"/>
-                </HBox>
+                <GridPane fx:id="buttonGrid" styleClass="button-grid">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="80" prefWidth="80"/>
+                        <ColumnConstraints hgrow="NEVER" minWidth="120" prefWidth="120"/>
+                        <ColumnConstraints hgrow="NEVER" minWidth="100" prefWidth="100"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
+                        <ColumnConstraints hgrow="NEVER" minWidth="100" prefWidth="100"/>
+                        <ColumnConstraints hgrow="NEVER"/>
+                    </columnConstraints>
+                    
+                    <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <Button fx:id="clearOutputButton" text="Clear Output" styleClass="small-button" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                </GridPane>
+
                                <!-- JSON Persistence Toggle -->
                <HBox alignment="CENTER_LEFT" spacing="2" VBox.vgrow="NEVER" style="-fx-min-height: 20; -fx-max-height: 20;">
                    <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>

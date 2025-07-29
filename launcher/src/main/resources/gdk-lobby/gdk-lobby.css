@@ -509,6 +509,7 @@
     -fx-effect: dropshadow(gaussian, rgba(108, 117, 125, 0.3), 3, 0, 0, 1);
 }
 
+
 .validation-label {
     -fx-font-size: 10px;
     -fx-font-weight: bold;
@@ -939,4 +940,9 @@
     -fx-border-width: 0 1 0 0;
 }
 
- 
+/* Grid Layout for Button Positioning */
+.button-grid {
+    -fx-hgap: 10;
+    -fx-vgap: 5;
+    -fx-padding: 5;
+}

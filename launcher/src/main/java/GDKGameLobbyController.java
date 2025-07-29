@@ -70,7 +70,8 @@ public class GDKGameLobbyController implements Initializable {
     
     // JSON Configuration Components
     @FXML private ProfessionalJsonEditor jsonDataTextArea;
-    @FXML private Button clearJsonButton;
+    @FXML private Button clearInputButton;
+    @FXML private Button clearOutputButton;
     @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
     @FXML private JFXToggleButton jsonPersistenceToggle;
@@ -161,8 +162,8 @@ public class GDKGameLobbyController implements Initializable {
         // Load saved JSON content and toggle state
         loadPersistenceSettings();
         
-        // Refresh the game list on startup
-        refreshAvailableGameModules();
+        // Refresh the game list on startup (fast mode - skip compilation checks)
+        refreshAvailableGameModulesFast();
         
         // Initialize the status label
         updateGameCountStatus();
@@ -278,8 +279,11 @@ public class GDKGameLobbyController implements Initializable {
         });
         
         // JSON Configuration Handlers
-        // Clear button: Remove all JSON input
-        clearJsonButton.setOnAction(event -> clearJsonConfigurationData());
+        // Clear input button: Remove all JSON input
+        clearInputButton.setOnAction(event -> clearJsonInputData());
+        
+        // Clear output button: Remove all JSON output
+        clearOutputButton.setOnAction(event -> clearJsonOutputData());
         
         // Metadata request button: Fill JSON with metadata request
         metadataRequestButton.setOnAction(event -> fillMetadataRequest());
@@ -329,8 +333,81 @@ public class GDKGameLobbyController implements Initializable {
      * This method scans the modules directory for available game modules
      * and updates the UI accordingly with proper error handling.
      */
-    private void refreshAvailableGameModules() {
+    /**
+     * Fast refresh that skips compilation checks for faster startup
+     */
+    private void refreshAvailableGameModulesFast() {
         try {
+            // Store previous module names for removal detection
+            Set<String> previousModuleNames = new HashSet<>();
+            if (previousModuleCount > 0) {
+                for (GameModule module : availableGameModules) {
+                    previousModuleNames.add(module.getGameName());
+                }
+            }
+            
+            // Clear existing game modules to start fresh
+            availableGameModules.clear();
+            
+            // Clear the currently selected game module since we're refreshing
+            selectedGameModule = null;
+            
+            // Get the path to the modules directory from application constants
+            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            
+            // Skip compilation checks on startup for speed
+            // Just discover modules from existing compiled classes
+            
+            // Use the ModuleLoader to discover all available game modules
+            List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
+            
+            // Add each discovered module to our observable list
+            for (GameModule gameModule : discoveredGameModules) {
+                availableGameModules.add(gameModule); // Add to observable list for UI binding
+                String gameName = gameModule.getGameName();
+                String className = gameModule.getClass().getSimpleName();
+                Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
+            }
+            
+            // Update the ComboBox with the new list of games
+            Logging.info("🔄 Updating ComboBox with " + availableGameModules.size() + " modules");
+            gameSelector.setItems(availableGameModules);
+            
+            // Clear the ComboBox selection since we refreshed
+            gameSelector.getSelectionModel().clearSelection();
+            
+            // Force UI refresh on the JavaFX Application Thread
+            Platform.runLater(() -> {
+                // Update the status label with the new count
+                updateGameCountStatus();
+                
+                // Force ComboBox to refresh its display
+                gameSelector.requestLayout();
+            });
+            
+            // Check for module changes and provide user feedback
+            int currentModuleCount = availableGameModules.size();
+            
+            if (availableGameModules.isEmpty()) {
+                addUserMessage("⚠️ No game modules found in " + modulesDirectoryPath);
+            } else {
+                // First time loading - show completion message
+                addUserMessage("✅ Loaded " + currentModuleCount + " game module(s)");
+            }
+            
+            // Update the previous count for next comparison
+            previousModuleCount = currentModuleCount;
+            
+        } catch (Exception e) {
+            addUserMessage("❌ Error refreshing game modules: " + e.getMessage());
+            Logging.error("❌ Error refreshing game modules: " + e.getMessage(), e);
+        }
+    }
+    
+    private void refreshAvailableGameModules() {
+        // Run module discovery in background thread to avoid blocking UI
+        new Thread(() -> {
+            try {
             // Store previous module names for removal detection
             Set<String> previousModuleNames = new HashSet<>();
             if (previousModuleCount > 0) {
@@ -357,8 +434,11 @@ public class GDKGameLobbyController implements Initializable {
                 detectNewlyRemovedModules(previousModuleNames);
             }
             
-            // Check and recompile only modules that need it (source code changed)
-            checkAndRecompileModules(modulesDirectoryPath);
+            // Skip compilation checks on startup for faster loading
+            // Only recompile if this is not the first load
+            if (previousModuleCount > 0) {
+                checkAndRecompileModules(modulesDirectoryPath);
+            }
             
             // Use the ModuleLoader to discover all available game modules
             List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
@@ -434,9 +514,12 @@ public class GDKGameLobbyController implements Initializable {
         } catch (Exception moduleDiscoveryError) {
             // Handle any errors during module discovery
             Logging.error("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage(), moduleDiscoveryError);
-            addUserMessage("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage());
+            Platform.runLater(() -> {
+                addUserMessage("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage());
+            });
         }
-        }
+        }).start();
+    }
     
     /**
      * Detect disabled modules before recompilation on first load
@@ -457,25 +540,9 @@ public class GDKGameLobbyController implements Initializable {
                     if (pomFile.exists()) {
                         // Check if Main.java exists and is valid
                         File mainJavaFile = new File(subdir, "src/main/java/Main.java");
-                        if (!mainJavaFile.exists()) {
-                            // Check for Main.java in any subdirectory of src/main/java/ (legacy support)
-                            File srcDir = new File(subdir, "src/main/java");
-                            if (srcDir.exists()) {
-                                File[] subdirs2 = srcDir.listFiles(File::isDirectory);
-                                if (subdirs2 != null) {
-                                    for (File subdir2 : subdirs2) {
-                                        File mainInSubdir = new File(subdir2, "Main.java");
-                                        if (mainInSubdir.exists()) {
-                                            mainJavaFile = mainInSubdir;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
                         
-                        // If no Main.java found or it's commented out, mark as disabled
-                        if (!mainJavaFile.exists() || isFileCommentedOut(mainJavaFile)) {
+                        // If no Main.java found, mark as disabled
+                        if (!mainJavaFile.exists()) {
                             removedModuleNames.add(subdir.getName());
                         }
                     }
@@ -486,31 +553,7 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
     
-    /**
-     * Check if a file is effectively commented out (all content is comments or empty)
-     * @param file The file to check
-     * @return true if the file is commented out
-     */
-    private boolean isFileCommentedOut(File file) {
-        try {
-            if (!file.exists()) return true;
-            
-            String content = Files.readString(file.toPath()).trim();
-            if (content.isEmpty()) return true;
-            
-            // Check if all non-empty lines are comments
-            String[] lines = content.split("\n");
-            for (String line : lines) {
-                String trimmed = line.trim();
-                if (!trimmed.isEmpty() && !trimmed.startsWith("//") && !trimmed.startsWith("/*") && !trimmed.startsWith("*")) {
-                    return false; // Found non-comment content
-                }
-            }
-            return true; // All lines are comments or empty
-        } catch (Exception e) {
-            return true; // If we can't read it, assume it's disabled
-        }
-    }
+
     
     /**
      * Detect newly removed modules and add them to the removed tracking set
@@ -535,25 +578,9 @@ public class GDKGameLobbyController implements Initializable {
                         if (pomFile.exists()) {
                             // Check if Main.java exists and is valid
                             File mainJavaFile = new File(subdir, "src/main/java/Main.java");
-                            if (!mainJavaFile.exists()) {
-                                // Check for Main.java in any subdirectory of src/main/java/ (legacy support)
-                                File srcDir = new File(subdir, "src/main/java");
-                                if (srcDir.exists()) {
-                                    File[] subdirs2 = srcDir.listFiles(File::isDirectory);
-                                    if (subdirs2 != null) {
-                                        for (File subdir2 : subdirs2) {
-                                            File mainInSubdir = new File(subdir2, "Main.java");
-                                            if (mainInSubdir.exists()) {
-                                                mainJavaFile = mainInSubdir;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                             
-                            // If no Main.java found or it's commented out, mark as removed
-                            if (!mainJavaFile.exists() || isFileCommentedOut(mainJavaFile)) {
+                            // If no Main.java found, mark as removed
+                            if (!mainJavaFile.exists()) {
                                 removedModuleNames.add(subdir.getName());
                             }
                         }
@@ -617,24 +644,8 @@ public class GDKGameLobbyController implements Initializable {
             
             // Check if Main.java exists in source (using same logic as ModuleLoader)
             
-            // Check for Main.java directly in src/main/java/ (simplified structure)
+            // Check for Main.java directly in src/main/java/ (standardized structure)
             File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
-            if (!mainJavaFile.exists()) {
-                // Check for Main.java in any subdirectory of src/main/java/ (legacy support)
-                File srcDir = new File(moduleDir, "src/main/java");
-                if (srcDir.exists()) {
-                    File[] subdirs = srcDir.listFiles(File::isDirectory);
-                    if (subdirs != null) {
-                        for (File subdir : subdirs) {
-                            File mainInSubdir = new File(subdir, "Main.java");
-                            if (mainInSubdir.exists()) {
-                                mainJavaFile = mainInSubdir;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
             
             // If no Main.java found, skip this module
             if (!mainJavaFile.exists()) {
@@ -802,17 +813,39 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
-     * Clear the JSON configuration data text area.
+     * Clear the JSON input data text area.
      * 
      * This method clears the JSON input area and provides
      * user feedback about the action.
      */
-    private void clearJsonConfigurationData() {
+    private void clearJsonInputData() {
         // Remove all text from the JSON input area
         jsonDataTextArea.clearInput();
         
         // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON input data");
+    }
+    
+    private void clearJsonOutputData() {
+        // Remove all text from the JSON output area
+        jsonDataTextArea.clearOutput();
+        
+        // Provide user feedback about the action
+        addUserMessage("🗑️ Cleared JSON output data");
+    }
+    
+    /**
+     * Clear the JSON output data text area.
+     * 
+     * This method clears the JSON output area and provides
+     * user feedback about the action.
+     */
+    private void clearJsonConfigurationData() {
+        // Remove all text from the JSON output area
+        jsonDataTextArea.clearOutput();
+        
+        // Provide user feedback about the action
+        addUserMessage("🗑️ Cleared JSON output data");
     }
     
     /**

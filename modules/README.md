@@ -4,16 +4,9 @@ This directory contains all the game modules for the OMG Game Development Kit (G
 
 ## Available Modules
 
-### Core Modules
+### Available Modules
 - **example** - Example game module demonstrating GDK integration
 - **tictactoe** - Classic Tic Tac Toe game
-
-### Classic Arcade Games
-- **snake** - Classic Snake game with modern graphics
-- **pong** - The original arcade tennis game
-- **tetris** - The classic falling blocks puzzle game
-- **pacman** - Eat dots and avoid ghosts in this classic maze game
-- **breakout** - Smash bricks with a bouncing ball and paddle
 
 ## Module Structure
 

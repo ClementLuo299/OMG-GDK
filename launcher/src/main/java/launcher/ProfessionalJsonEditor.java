@@ -163,6 +163,7 @@ public class ProfessionalJsonEditor extends VBox {
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
         
         VBox.setVgrow(codeArea, Priority.ALWAYS);
+        
         container.getChildren().addAll(titleLabel, codeArea);
         
         return container;
