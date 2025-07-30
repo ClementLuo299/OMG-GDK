@@ -663,21 +663,22 @@
 }
 
 .json-string {
-    -fx-fill: #388e3c;
-}
-
-.json-number {
-    -fx-fill: #f57c00;
-}
-
-.json-boolean {
-    -fx-fill: #7b1fa2;
+    -fx-fill: #22863a;
     -fx-font-weight: bold;
 }
 
-.json-null {
-    -fx-fill: #d32f2f;
-    -fx-font-style: italic;
+.json-literal {
+    -fx-fill: #005cc5;
+    -fx-font-weight: bold;
+}
+
+.json-number {
+    -fx-fill: #005cc5;
+}
+
+.json-punctuation {
+    -fx-fill: #24292e;
+    -fx-font-weight: bold;
 }
 
 /* JSON Formatted Display */
@@ -945,4 +946,24 @@
     -fx-hgap: 10;
     -fx-vgap: 5;
     -fx-padding: 5;
+}
+
+/* CodeArea styling */
+.code-area {
+    -fx-font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    -fx-font-size: 12px;
+    -fx-background-color: #f6f8fa;
+    -fx-text-fill: #24292e;
+}
+
+.code-area .paragraph-box:has-caret {
+    -fx-background-color: #f1f8ff;
+}
+
+/* Line numbers */
+.lineno {
+    -fx-background-color: #f1f3f4;
+    -fx-text-fill: #5f6368;
+    -fx-font-size: 11px;
+    -fx-padding: 0 8 0 8;
 }

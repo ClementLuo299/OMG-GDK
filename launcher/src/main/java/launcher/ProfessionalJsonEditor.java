@@ -5,6 +5,7 @@ package launcher;
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -77,78 +78,99 @@ public class ProfessionalJsonEditor extends VBox {
         + "|(?<COMMA>" + COMMA_PATTERN + ")"
     );
     
+    public enum Mode {
+        INPUT,
+        OUTPUT,
+        BOTH
+    }
+
+    private final Mode mode;
+
     /**
-     * Creates a new professional JSON editor with dual text areas.
+     * Creates a new professional JSON editor with dual text areas (default BOTH mode).
      */
     public ProfessionalJsonEditor() {
+        this(Mode.BOTH);
+    }
+
+    /**
+     * Creates a new professional JSON editor with the specified mode.
+     */
+    public ProfessionalJsonEditor(Mode mode) {
+        this.mode = mode;
         this.setSpacing(0);
         this.setPadding(new Insets(5));
         this.getStyleClass().add("professional-json-editor");
-        
+
         // Initialize text properties
         this.inputTextProperty = new SimpleStringProperty("");
         this.outputTextProperty = new SimpleStringProperty("");
-        
+
         // Create the input code area
         this.inputCodeArea = new CodeArea();
         this.inputCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(inputCodeArea));
         this.inputCodeArea.setMinHeight(150);
         this.inputCodeArea.getStyleClass().add("json-code-area");
-        
+
         // Create the output code area
         this.outputCodeArea = new CodeArea();
         this.outputCodeArea.setParagraphGraphicFactory(LineNumberFactory.get(outputCodeArea));
         this.outputCodeArea.setMinHeight(150);
         this.outputCodeArea.getStyleClass().add("json-code-area");
         this.outputCodeArea.setEditable(false); // Read-only for output
-        
+
         // Set up syntax highlighting for both areas
         setupSyntaxHighlighting(inputCodeArea);
         setupSyntaxHighlighting(outputCodeArea);
-        
+
         // Set up context menus
         setupContextMenu(inputCodeArea, true);
         setupContextMenu(outputCodeArea, false);
-        
+
         // Set up keyboard shortcuts
         setupKeyboardShortcuts();
-        
-        // Create toolbar with save/load buttons
-        createToolbar();
-        
+
         // Set up bidirectional binding for input area
         this.inputTextProperty.addListener((observable, oldValue, newValue) -> {
             if (!newValue.equals(inputCodeArea.getText())) {
                 inputCodeArea.replaceText(newValue);
             }
         });
-        
         this.inputCodeArea.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.equals(inputTextProperty.get())) {
                 inputTextProperty.set(newValue);
             }
         });
-        
         // Set up binding for output area
         this.outputTextProperty.addListener((observable, oldValue, newValue) -> {
             if (!newValue.equals(outputCodeArea.getText())) {
                 outputCodeArea.replaceText(newValue);
             }
         });
-        
-        // Create split pane for the two areas
-        SplitPane splitPane = new SplitPane();
-        splitPane.setDividerPositions(0.5);
-        
-        // Create labeled containers for each area
-        VBox inputContainer = createLabeledContainer("JSON Input", inputCodeArea);
-        VBox outputContainer = createLabeledContainer("JSON Output", outputCodeArea);
-        
-        splitPane.getItems().addAll(inputContainer, outputContainer);
-        
-        // Add the split pane to the layout
-        VBox.setVgrow(splitPane, Priority.ALWAYS);
-        this.getChildren().add(splitPane);
+
+        // Add only the relevant editor(s) and toolbar(s)
+        if (mode == Mode.BOTH) {
+            // Create toolbar with save/load buttons for both
+            createToolbar();
+            // Create split pane for the two areas
+            SplitPane splitPane = new SplitPane();
+            splitPane.setDividerPositions(0.5);
+            VBox inputContainer = createLabeledContainer("JSON Input", inputCodeArea);
+            VBox outputContainer = createLabeledContainer("JSON Output", outputCodeArea);
+            splitPane.getItems().addAll(inputContainer, outputContainer);
+            VBox.setVgrow(splitPane, Priority.ALWAYS);
+            this.getChildren().add(splitPane);
+        } else if (mode == Mode.INPUT) {
+            createToolbarInputOnly();
+            VBox inputContainer = createLabeledContainer("JSON Input", inputCodeArea);
+            VBox.setVgrow(inputContainer, Priority.ALWAYS);
+            this.getChildren().add(inputContainer);
+        } else if (mode == Mode.OUTPUT) {
+            createToolbarOutputOnly();
+            VBox outputContainer = createLabeledContainer("JSON Output", outputCodeArea);
+            VBox.setVgrow(outputContainer, Priority.ALWAYS);
+            this.getChildren().add(outputContainer);
+        }
     }
     
     /**
@@ -300,10 +322,7 @@ public class ProfessionalJsonEditor extends VBox {
         saveOutputButton.setTooltip(new Tooltip("Save output JSON to file"));
         saveOutputButton.setOnAction(e -> saveToFile(outputCodeArea, "Save Output JSON"));
         
-        // Clear output button
-        Button clearOutputButton = new Button("🗑️ Clear Output");
-        clearOutputButton.setTooltip(new Tooltip("Clear output area"));
-        clearOutputButton.setOnAction(e -> outputCodeArea.clear());
+
         
         // Format button
         Button formatButton = new Button("✨ Format");
@@ -312,12 +331,49 @@ public class ProfessionalJsonEditor extends VBox {
         
         toolbar.getChildren().addAll(
             saveInputButton, loadInputButton, 
-            saveOutputButton, clearOutputButton, 
             formatButton
         );
         
+        // Add spacer to push save output button to the right
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        toolbar.getChildren().add(spacer);
+        
+        // Add save output button to the right
+        toolbar.getChildren().add(saveOutputButton);
+        
         // Add toolbar to the top of the editor
         this.getChildren().add(0, toolbar);
+    }
+
+    // Toolbar for input-only mode
+    private void createToolbarInputOnly() {
+        HBox toolbar = new HBox(8);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+        toolbar.setPadding(new Insets(0, 0, 8, 0));
+        Button saveInputButton = new Button("💾 Save Input");
+        saveInputButton.setTooltip(new Tooltip("Save input JSON to file"));
+        saveInputButton.setOnAction(e -> saveToFile(inputCodeArea, "Save Input JSON"));
+        Button loadInputButton = new Button("📂 Load Input");
+        loadInputButton.setTooltip(new Tooltip("Load input JSON from file"));
+        loadInputButton.setOnAction(e -> loadFromFile(inputCodeArea, "Load Input JSON"));
+        Button formatButton = new Button("✨ Format");
+        formatButton.setTooltip(new Tooltip("Format JSON (Ctrl+Shift+F)"));
+        formatButton.setOnAction(e -> formatJson(inputCodeArea));
+        toolbar.getChildren().addAll(saveInputButton, loadInputButton, formatButton);
+        this.getChildren().add(toolbar);
+    }
+
+    // Toolbar for output-only mode
+    private void createToolbarOutputOnly() {
+        HBox toolbar = new HBox(8);
+        toolbar.setAlignment(Pos.CENTER_LEFT);
+        toolbar.setPadding(new Insets(0, 0, 8, 0));
+        Button saveOutputButton = new Button("💾 Save Output");
+        saveOutputButton.setTooltip(new Tooltip("Save output JSON to file"));
+        saveOutputButton.setOnAction(e -> saveToFile(outputCodeArea, "Save Output JSON"));
+        toolbar.getChildren().add(saveOutputButton);
+        this.getChildren().add(toolbar);
     }
     
     /**

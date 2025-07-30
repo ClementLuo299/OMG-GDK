@@ -2,10 +2,13 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+<?import org.fxmisc.richtext.CodeArea?>
+<?import org.fxmisc.richtext.LineNumberFactory?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
-<?import com.jfoenix.controls.JFXToggleButton?>
-<?import javafx.geometry.Insets?>
 <?import launcher.ProfessionalJsonEditor?>
 
 <VBox fx:id="mainContainer" prefHeight="900.0" prefWidth="1200.0" 
@@ -45,34 +48,36 @@
                         styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only;"/>
             </HBox>
             
-            <!-- JSON Data Input -->
-            <VBox spacing="5" alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
-                <fx:define>
-                    <ProfessionalJsonEditor fx:id="jsonDataTextArea"/>
-                </fx:define>
-                <fx:reference source="jsonDataTextArea" VBox.vgrow="ALWAYS"/>
-                <GridPane fx:id="buttonGrid" styleClass="button-grid">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="NEVER" minWidth="80" prefWidth="80"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="120" prefWidth="120"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="100" prefWidth="100"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="100" prefWidth="100"/>
-                        <ColumnConstraints hgrow="NEVER"/>
-                    </columnConstraints>
-                    
-                    <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                    <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <Button fx:id="clearOutputButton" text="Clear Output" styleClass="small-button" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
-                </GridPane>
-
-                               <!-- JSON Persistence Toggle -->
-               <HBox alignment="CENTER_LEFT" spacing="2" VBox.vgrow="NEVER" style="-fx-min-height: 20; -fx-max-height: 20;">
-                   <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
-                   <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true" styleClass="jfoenix-toggle"/>
-               </HBox>
-            </VBox>
+            <!-- JSON Input and Output Sections -->
+            <HBox spacing="20" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                
+                <!-- JSON Input Section -->
+                <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" styleClass="json-section">
+                    <Label text="JSON Input" styleClass="section-title"/>
+                    <CodeArea fx:id="jsonInputArea" VBox.vgrow="ALWAYS" promptText="Enter JSON input here..."/>
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="button-grid">
+                        <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button"/>
+                        <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
+                        <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
+                    </HBox>
+                </VBox>
+                
+                <!-- JSON Output Section -->
+                <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" styleClass="json-section">
+                    <Label text="JSON Output" styleClass="section-title"/>
+                    <CodeArea fx:id="jsonOutputArea" VBox.vgrow="ALWAYS" promptText="JSON output will appear here..." editable="false"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="button-grid">
+                        <Button fx:id="clearOutputButton2" text="Clear Output" styleClass="small-button"/>
+                    </HBox>
+                </VBox>
+                
+            </HBox>
+            
+            <!-- JSON Persistence Toggle -->
+            <HBox alignment="CENTER_LEFT" spacing="2" VBox.vgrow="NEVER" style="-fx-min-height: 20; -fx-max-height: 20;">
+                <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
+                <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true" styleClass="jfoenix-toggle"/>
+            </HBox>
         </VBox>
         
         <!-- Divider -->
