@@ -4,8 +4,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
-<?import org.fxmisc.richtext.CodeArea?>
-<?import org.fxmisc.richtext.LineNumberFactory?>
+
+
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
@@ -48,29 +48,15 @@
                         styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only;"/>
             </HBox>
             
-            <!-- JSON Input and Output Sections -->
-            <HBox spacing="20" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
-                
-                <!-- JSON Input Section -->
-                <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" styleClass="json-section">
-                    <Label text="JSON Input" styleClass="section-title"/>
-                    <CodeArea fx:id="jsonInputArea" VBox.vgrow="ALWAYS" promptText="Enter JSON input here..."/>
-                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="button-grid">
-                        <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button"/>
-                        <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
-                        <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
-                    </HBox>
-                </VBox>
-                
-                <!-- JSON Output Section -->
-                <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" styleClass="json-section">
-                    <Label text="JSON Output" styleClass="section-title"/>
-                    <CodeArea fx:id="jsonOutputArea" VBox.vgrow="ALWAYS" promptText="JSON output will appear here..." editable="false"/>
-                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="button-grid">
-                        <Button fx:id="clearOutputButton2" text="Clear Output" styleClass="small-button"/>
-                    </HBox>
-                </VBox>
-                
+            <!-- Professional JSON Editor -->
+            <ProfessionalJsonEditor fx:id="jsonEditor" VBox.vgrow="ALWAYS"/>
+            
+            <!-- Control Buttons -->
+            <HBox spacing="10" alignment="CENTER_LEFT" VBox.vgrow="NEVER" styleClass="button-grid">
+                <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button"/>
+                <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
+                <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
+                <Button fx:id="clearOutputButton2" text="Clear Output" styleClass="small-button"/>
             </HBox>
             
             <!-- JSON Persistence Toggle -->

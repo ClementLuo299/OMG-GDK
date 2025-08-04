@@ -35,15 +35,7 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
-import org.fxmisc.richtext.model.StyleSpans;
-import org.fxmisc.richtext.model.StyleSpansBuilder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.Collection;
-import java.util.Collections;
-import java.time.Duration;
+
 
 /**
  * Controller for the GDK Game Lobby interface.
@@ -78,10 +70,9 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private VBox messageContainer;
     
     // JSON Configuration Components
-    @FXML private CodeArea jsonInputArea;
-    @FXML private CodeArea jsonOutputArea;
+    @FXML private ProfessionalJsonEditor jsonEditor;
     @FXML private Button clearInputButton;
-    @FXML private Button clearOutputButton;
+
     @FXML private Button clearOutputButton2;
     @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
@@ -179,11 +170,8 @@ public class GDKGameLobbyController implements Initializable {
         // Initialize the status label
         updateGameCountStatus();
         
-        // Setup JSON syntax highlighting for input area
-        setupJsonSyntaxHighlighting(jsonInputArea);
-        
-        // Setup JSON syntax highlighting for output area
-        setupJsonSyntaxHighlighting(jsonOutputArea);
+        // Note: TextArea doesn't support syntax highlighting like CodeArea
+        // JSON syntax highlighting removed for compatibility
         
         Logging.info("✅ GDK Game Picker Controller initialized successfully");
     }
@@ -300,7 +288,7 @@ public class GDKGameLobbyController implements Initializable {
         clearInputButton.setOnAction(event -> clearJsonInputData());
         
         // Clear output button: Remove all JSON output
-        clearOutputButton.setOnAction(event -> clearJsonOutputData());
+
         // Metadata request button: Fill JSON with metadata request
         metadataRequestButton.setOnAction(event -> fillMetadataRequest());
         
@@ -329,7 +317,7 @@ public class GDKGameLobbyController implements Initializable {
         
         // JSON Text Area Change Handler
         // Save JSON content when modified (with debouncing)
-        jsonInputArea.textProperty().addListener((observable, oldValue, newValue) -> {
+        jsonEditor.inputTextProperty().addListener((observable, oldValue, newValue) -> {
             // Use Platform.runLater to debounce rapid changes
             Platform.runLater(() -> {
                 if (jsonPersistenceToggle.isSelected()) {
@@ -751,7 +739,7 @@ public class GDKGameLobbyController implements Initializable {
         Map<String, Object> jsonConfigurationData = parseJsonConfigurationData();
         if (jsonConfigurationData == null) {
             // Check if it's due to invalid JSON syntax (not empty input)
-            String jsonText = jsonInputArea.getText().trim();
+            String jsonText = jsonEditor.getInputText().trim();
             if (!jsonText.isEmpty()) {
                 showErrorDialog("Invalid JSON", "Please enter valid JSON configuration."); // Show error to user
                 return; // Exit early if JSON syntax is invalid
@@ -789,7 +777,7 @@ public class GDKGameLobbyController implements Initializable {
         }
         
         // Get the content from the JSON input area
-        String jsonContent = jsonInputArea.getText().trim();
+        String jsonContent = jsonEditor.getInputText().trim();
         String gameModuleName = selectedGameModule.getGameName();
         
         if (jsonContent.isEmpty()) {
@@ -811,7 +799,7 @@ public class GDKGameLobbyController implements Initializable {
                 String responseJson = formatJsonResponse(response);
                 
                 // Display in the output area
-                jsonOutputArea.replaceText(responseJson);
+                jsonEditor.setOutputText(responseJson);
                 
                 // Add status message to message area
                 addUserMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");
@@ -836,7 +824,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void clearJsonInputData() {
         // Remove all text from the JSON input area
-        jsonInputArea.clear();
+        jsonEditor.clearInput();
         
         // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON input data");
@@ -844,7 +832,7 @@ public class GDKGameLobbyController implements Initializable {
     
     private void clearJsonOutputData() {
         // Remove all text from the JSON output area
-        jsonOutputArea.replaceText("");
+        jsonEditor.clearOutput();
         
         // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON output data");
@@ -858,7 +846,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void clearJsonConfigurationData() {
         // Remove all text from the JSON output area
-        jsonOutputArea.replaceText("");
+        jsonEditor.clearOutput();
         
         // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON output data");
@@ -875,7 +863,7 @@ public class GDKGameLobbyController implements Initializable {
         String metadataRequest = "{\n  \"function\": \"metadata\"\n}";
         
         // Set the JSON input area content
-        jsonInputArea.replaceText(metadataRequest);
+        jsonEditor.setInputText(metadataRequest);
         
         // Provide user feedback about the action
         addUserMessage("📋 Filled JSON input with metadata request");
@@ -908,7 +896,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private Map<String, Object> parseJsonConfigurationData() {
         // Get the JSON text from the text area and remove leading/trailing whitespace
-        String jsonConfigurationText = jsonInputArea.getText().trim();
+        String jsonConfigurationText = jsonEditor.getInputText().trim();
         
         // If JSON is empty, return null (let the game decide what to do)
         if (jsonConfigurationText.isEmpty()) {
@@ -1072,7 +1060,7 @@ public class GDKGameLobbyController implements Initializable {
             Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
             if (Files.exists(jsonFile)) {
                 String savedJson = Files.readString(jsonFile);
-                jsonInputArea.replaceText(savedJson);
+                jsonEditor.setInputText(savedJson);
                 // No startup message - only show when setting changes
             } else {
                 // No startup message - only show when setting changes
@@ -1092,7 +1080,7 @@ public class GDKGameLobbyController implements Initializable {
         }
         
         try {
-            String jsonContent = jsonInputArea.getText();
+            String jsonContent = jsonEditor.getInputText();
             Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
             Files.writeString(jsonFile, jsonContent);
             Logging.info("📋 Saved JSON input content to file");
@@ -1150,50 +1138,4 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
 
-    private void setupJsonSyntaxHighlighting(CodeArea codeArea) {
-        // Add line numbers
-        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-        
-        // Setup JSON syntax highlighting
-        codeArea.multiPlainChanges()
-                .successionEnds(Duration.ofMillis(500))
-                .subscribe(ignore -> codeArea.setStyleSpans(0, computeHighlighting(codeArea.getText())));
-    }
-    
-    private StyleSpans<Collection<String>> computeHighlighting(String text) {
-        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-        
-        // JSON syntax highlighting patterns
-        Pattern jsonPattern = Pattern.compile(
-            "(\"[^\"]*\")|" +  // strings
-            "(\\b(true|false|null)\\b)|" +  // literals
-            "(\\b\\d+\\b)|" +  // numbers
-            "([{}[\\],:])"  // punctuation
-        );
-        
-        Matcher matcher = jsonPattern.matcher(text);
-        int lastKwEnd = 0;
-        
-        while (matcher.find()) {
-            String styleClass = null;
-            if (matcher.group(1) != null) {
-                styleClass = "json-string";
-            } else if (matcher.group(2) != null) {
-                styleClass = "json-literal";
-            } else if (matcher.group(3) != null) {
-                styleClass = "json-number";
-            } else if (matcher.group(4) != null) {
-                styleClass = "json-punctuation";
-            }
-            
-            if (styleClass != null) {
-                spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
-                spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
-                lastKwEnd = matcher.end();
-            }
-        }
-        
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-        return spansBuilder.create();
-    }
 }  
