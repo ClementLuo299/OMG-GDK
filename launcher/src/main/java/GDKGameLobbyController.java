@@ -7,7 +7,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ListCell;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
@@ -66,6 +71,7 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private ComboBox<GameModule> gameSelector;
     @FXML private Button launchGameButton;
     @FXML private Button refreshButton;
+    @FXML private ProgressIndicator refreshProgressIndicator;
     
     // Message and Logging Components
     @FXML private ScrollPane messageScrollPane;
@@ -83,6 +89,8 @@ public class GDKGameLobbyController implements Initializable {
     // Application Control Components
     @FXML private Button exitButton;
     @FXML private Label statusLabel;
+    @FXML private ProgressBar loadingProgressBar;
+    @FXML private Label loadingStatusLabel;
 
     // ==================== DEPENDENCIES ====================
     
@@ -120,6 +128,13 @@ public class GDKGameLobbyController implements Initializable {
     
     // Flag to prevent persistence messages during startup loading
     private boolean isLoadingPersistenceSettings = false;
+    
+    /**
+     * Animation control for loading states
+     */
+    private boolean isRefreshing = false;
+    private javafx.animation.Timeline loadingAnimation;
+    private int loadingDots = 0;
     
     /**
      * JSON mapper for parsing and validating JSON configuration data
@@ -260,23 +275,136 @@ public class GDKGameLobbyController implements Initializable {
         
         // Refresh button: Reload the list of available games
         refreshButton.setOnAction(event -> {
+            // Start loading animation
+            startLoadingAnimation();
+            
             // Clear the message container immediately
             messageContainer.getChildren().clear();
             
-            // Add a small delay to show the user that reload was triggered
-            Platform.runLater(() -> {
+            // Run the refresh in a background thread to keep UI responsive
+            new Thread(() -> {
                 try {
-                    Thread.sleep(250); // 250ms delay
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    // Store previous module names for removal detection
+                    Set<String> previousModuleNames = new HashSet<>();
+                    if (previousModuleCount > 0) {
+                        for (GameModule module : availableGameModules) {
+                            previousModuleNames.add(module.getGameName());
+                        }
+                    }
+                    
+                    // Clear existing game modules to start fresh
+                    availableGameModules.clear();
+                    
+                    // Clear the currently selected game module since we're refreshing
+                    selectedGameModule = null;
+                    
+                    // Get the path to the modules directory from application constants
+                    String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+                    
+                    // Detect disabled/removed modules before recompilation
+                    if (previousModuleCount == 0) {
+                        // First load - detect pre-disabled modules
+                        detectDisabledModulesBeforeRecompilation(modulesDirectoryPath);
+                    } else {
+                        // Subsequent loads - detect newly removed modules
+                        detectNewlyRemovedModules(previousModuleNames);
+                    }
+                    
+                    // Skip compilation checks on startup for faster loading
+                    // Only recompile if this is not the first load
+                    if (previousModuleCount > 0) {
+                        checkAndRecompileModules(modulesDirectoryPath);
+                    }
+                    
+                    // Use the ModuleLoader to discover all available game modules
+                    List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
+                    
+                    // Add each discovered module to our observable list
+                    for (GameModule gameModule : discoveredGameModules) {
+                        availableGameModules.add(gameModule); // Add to observable list for UI binding
+                        String gameName = gameModule.getGameName();
+                        String className = gameModule.getClass().getSimpleName();
+                        Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
+                        
+                        // Add user-friendly message for each detected game (only on first load)
+                        if (previousModuleCount == 0) {
+                            addUserMessage("🎮 Detected game: " + gameName);
+                        }
+                    }
+                    
+                    // Update the ComboBox with the new list of games
+                    Logging.info("🔄 Updating ComboBox with " + availableGameModules.size() + " modules");
+                    gameSelector.setItems(availableGameModules);
+                    
+                    // Clear the ComboBox selection since we refreshed
+                    gameSelector.getSelectionModel().clearSelection();
+                    
+                    // Force UI refresh on the JavaFX Application Thread
+                    Platform.runLater(() -> {
+                        // Update the status label with the new count
+                        updateGameCountStatus();
+                        
+                        // Force ComboBox to refresh its display
+                        gameSelector.requestLayout();
+                    });
+                    
+                    // Check for module changes and provide user feedback
+                    int currentModuleCount = availableGameModules.size();
+                    
+                    if (availableGameModules.isEmpty()) {
+                        addUserMessage("⚠️ No game modules found in " + modulesDirectoryPath);
+                    } else if (previousModuleCount > 0) {
+                        // Check for module changes (additions/removals)
+                        Set<String> currentModuleNames = new HashSet<>();
+                        for (GameModule module : availableGameModules) {
+                            currentModuleNames.add(module.getGameName());
+                        }
+                        
+                        // Find removed module names
+                        Set<String> removedNames = new HashSet<>(previousModuleNames);
+                        removedNames.removeAll(currentModuleNames);
+                        
+                        // Find added module names
+                        Set<String> addedNames = new HashSet<>(currentModuleNames);
+                        addedNames.removeAll(previousModuleNames);
+                        
+                        // Add removed names to tracking set
+                        removedModuleNames.addAll(removedNames);
+                        
+                        // Show specific removal messages
+                        for (String removedName : removedNames) {
+                            addUserMessage("⚠️ Game module '" + removedName + "' was removed or disabled");
+                        }
+                        
+                        // Show specific addition messages
+                        for (String addedName : addedNames) {
+                            addUserMessage("✅ New game module '" + addedName + "' was added");
+                        }
+                        
+                        addUserMessage("✅ Successfully detected " + currentModuleCount + " game(s)");
+                    } else if (previousModuleCount == 0) {
+                        // First time loading - check for disabled modules that exist but aren't loaded
+                        checkForDisabledModulesOnFirstLoad(modulesDirectoryPath, currentModuleCount);
+                    } else {
+                        addUserMessage("✅ Successfully detected " + currentModuleCount + " game(s)");
+                    }
+                    
+                    // Update the previous count for next comparison
+                    previousModuleCount = currentModuleCount;
+                    
+                } catch (Exception moduleDiscoveryError) {
+                    // Handle any errors during module discovery
+                    Logging.error("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage(), moduleDiscoveryError);
+                    Platform.runLater(() -> {
+                        addUserMessage("❌ Error refreshing game list: " + moduleDiscoveryError.getMessage());
+                    });
+                } finally {
+                    // Stop loading animation when done (regardless of success or failure)
+                    Platform.runLater(() -> {
+                        stopLoadingAnimation();
+                    });
                 }
-                addUserMessage("🔄 Reload in progress..."); // Show progress indicator
-                
-                // Run the refresh in a background thread to keep UI responsive
-                new Thread(() -> {
-                    refreshAvailableGameModules(); // Reload games from modules directory
-                }).start();
-            });
+            }).start();
         });
         
 
@@ -334,6 +462,84 @@ public class GDKGameLobbyController implements Initializable {
         Logging.info("🎯 Event handlers configured");
     }
 
+    // ==================== ANIMATION MANAGEMENT ====================
+    
+    /**
+     * Start the loading animation with animated text and progress bar
+     */
+    private void startLoadingAnimation() {
+        isRefreshing = true;
+        refreshButton.setDisable(true);
+        loadingProgressBar.setVisible(true);
+        loadingProgressBar.setProgress(0.0);
+        loadingStatusLabel.setVisible(true);
+        loadingStatusLabel.setText("Starting module discovery...");
+        
+        // Debug logging
+        Logging.info("🎯 Progress bar made visible and set to 0%");
+        
+        // Create animated text with dots
+        loadingDots = 0;
+        loadingAnimation = new Timeline(
+            new KeyFrame(Duration.millis(300), event -> { // Faster animation - 300ms instead of 1000ms
+                loadingDots = (loadingDots + 1) % 4;
+                String dots = ".".repeat(loadingDots);
+                
+                // Update status message with current task
+                String currentTask = getCurrentLoadingTask();
+                loadingStatusLabel.setText(currentTask + dots);
+                
+                // Update progress bar - increment by larger amounts and faster
+                double currentProgress = loadingProgressBar.getProgress();
+                double newProgress = currentProgress + 0.25; // Larger increment - 25% per step
+                if (newProgress > 0.9) newProgress = 0.9; // Don't complete until actually done
+                loadingProgressBar.setProgress(newProgress);
+                
+                // Debug logging for progress
+                Logging.info("🎯 Progress bar updated: " + (int)(newProgress * 100) + "%");
+            })
+        );
+        loadingAnimation.setCycleCount(Timeline.INDEFINITE);
+        loadingAnimation.play();
+    }
+    
+    /**
+     * Get the current loading task description based on animation state
+     */
+    private String getCurrentLoadingTask() {
+        // Cycle through different tasks based on animation state
+        String[] tasks = {
+            "Discovering modules",
+            "Validating source code",
+            "Loading compiled classes",
+            "Initializing game modules",
+            "Updating UI components"
+        };
+        
+        int taskIndex = (loadingDots / 2) % tasks.length; // Change task every 2 dots
+        return tasks[taskIndex];
+    }
+    
+    /**
+     * Stop the loading animation
+     */
+    private void stopLoadingAnimation() {
+        Logging.info("🎯 Stopping loading animation");
+        isRefreshing = false;
+        refreshButton.setDisable(false);
+        loadingProgressBar.setVisible(false);
+        loadingStatusLabel.setVisible(false);
+        
+        if (loadingAnimation != null) {
+            loadingAnimation.stop();
+        }
+        
+        // Complete the progress bar
+        loadingProgressBar.setProgress(1.0);
+        loadingStatusLabel.setText("Reload completed!");
+        Logging.info("🎯 Progress bar completed to 100%");
+    }
+    
     // ==================== GAME MODULE MANAGEMENT ====================
     
     /**
@@ -1002,6 +1208,18 @@ public class GDKGameLobbyController implements Initializable {
      * @param userMessage The message to display to the user
      */
     private void addUserMessage(String userMessage) {
+        // If this is a loading animation message and we're already refreshing,
+        // replace the last message instead of adding a new one
+        if (isRefreshing && userMessage.startsWith("🔄 Reload in progress")) {
+            // Remove the last message if it's also a loading message
+            if (!messageQueue.isEmpty()) {
+                String lastMessage = ((LinkedList<String>) messageQueue).peekLast();
+                if (lastMessage != null && lastMessage.startsWith("🔄 Reload in progress")) {
+                    ((LinkedList<String>) messageQueue).removeLast();
+                }
+            }
+        }
+        
         // Add message to queue
         messageQueue.offer(userMessage);
         

@@ -49,6 +49,49 @@
     -fx-transition: all 0.2s ease-in-out;
 }
 
+.refresh-progress {
+    -fx-progress-color: #007bff;
+    -fx-background-color: transparent;
+    -fx-pref-width: 20;
+    -fx-pref-height: 20;
+    -fx-max-width: 20;
+    -fx-max-height: 20;
+}
+
+.loading-progress {
+    -fx-accent: linear-gradient(to right, #007bff 0%, #0056b3 100%);
+    -fx-background-color: #f1f3f4;
+    -fx-pref-height: 20;
+    -fx-max-height: 20;
+    -fx-pref-width: 250;
+    -fx-min-width: 250;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 0, 2);
+}
+
+.loading-progress .track {
+    -fx-background-color: #f1f3f4;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.loading-progress .bar {
+    -fx-background-color: linear-gradient(to right, #007bff 0%, #0056b3 100%);
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 123, 255, 0.4), 4, 0, 0, 1);
+}
+
+.loading-status-text {
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0 0 10;
+}
+
 .nav-button:hover {
     -fx-background-color: rgba(0, 123, 255, 0.1);
     -fx-text-fill: #007bff;

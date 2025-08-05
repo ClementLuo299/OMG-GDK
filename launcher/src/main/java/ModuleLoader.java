@@ -149,9 +149,9 @@ public class ModuleLoader {
                 } else {
                     // Check if all required classes are present
                     if (!areAllRequiredClassesPresent(classesDir)) {
-                        Logging.warning("⚠️ Missing required classes in " + moduleDir.getName() + " - skipping module (no source changes detected)");
-                        // Don't compile - just skip this module if classes are missing but source hasn't changed
-                        return null;
+                        Logging.warning("⚠️ Missing required classes in " + moduleDir.getName() + " - compiling to restore missing classes");
+                        // Compile to restore missing classes (e.g., after module was commented out and uncommented)
+                        classesDir = null; // Force recompilation
                     } else {
                         String mainClassName = findMainClassInDirectory(classesDir);
                         if (mainClassName != null) {
@@ -170,9 +170,9 @@ public class ModuleLoader {
                                     return null;
                                 }
                             } catch (ClassNotFoundException e) {
-                                Logging.warning("⚠️ Missing required classes in " + moduleDir.getName() + " - skipping module (no source changes detected)");
-                                // Don't compile - just skip this module if classes are missing but source hasn't changed
-                                return null;
+                                Logging.warning("⚠️ Missing required classes in " + moduleDir.getName() + " - compiling to restore missing classes");
+                                // Compile to restore missing classes (e.g., after module was commented out and uncommented)
+                                classesDir = null; // Force recompilation
                             } catch (Exception e) {
                                 Logging.warning("⚠️ Error loading module " + moduleDir.getName() + ": " + e.getMessage());
                                 return null;
@@ -185,9 +185,9 @@ public class ModuleLoader {
                 }
             }
             
-            // If we get here, either no classes directory or compilation is needed due to source changes
+            // If we get here, either no classes directory or compilation is needed due to source changes or missing classes
             if (classesDir == null) {
-                Logging.info("🔨 Compiling module due to source changes: " + moduleDir.getName());
+                Logging.info("🔨 Compiling module: " + moduleDir.getName());
                 // Try to compile the module automatically
                 if (compileModule(moduleDir)) {
                     Logging.info("✅ Successfully compiled " + moduleDir.getName());

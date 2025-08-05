@@ -2,6 +2,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
 
@@ -26,7 +28,10 @@
         <Region HBox.hgrow="ALWAYS"/>
         <Label fx:id="gameTitleLabel" text="OMG Game Development Kit" styleClass="main-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="refreshButton" text="↻" styleClass="nav-button, icon-button"/>
+        <HBox spacing="5" alignment="CENTER_RIGHT">
+            <ProgressIndicator fx:id="refreshProgressIndicator" visible="false" prefWidth="20" prefHeight="20" styleClass="refresh-progress"/>
+            <Button fx:id="refreshButton" text="↻" styleClass="nav-button, icon-button"/>
+        </HBox>
     </HBox>
     
     <!-- Main Content Area -->
@@ -86,7 +91,8 @@
         <padding>
             <Insets top="10" right="15" bottom="10" left="15"/>
         </padding>
-        <Label text="GDK Game Lobby" styleClass="status-text"/>
+        <ProgressBar fx:id="loadingProgressBar" visible="false" prefWidth="250" styleClass="loading-progress"/>
+        <Label fx:id="loadingStatusLabel" text="" visible="false" styleClass="loading-status-text"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Label fx:id="statusLabel" text="Available Games: 0" styleClass="status-text"/>
     </HBox>
