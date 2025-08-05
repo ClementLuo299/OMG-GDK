@@ -139,7 +139,7 @@ public class Main implements GameModule {
         Scene scene = new Scene(root, 400, 600);
         
         // Configure stage
-        primaryStage.setTitle("Sliding Puzzle");
+        primaryStage.setTitle("Sliding Puzzle Game");
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(600);
         

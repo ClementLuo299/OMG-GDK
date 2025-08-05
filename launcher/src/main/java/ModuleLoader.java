@@ -141,27 +141,53 @@ public class ModuleLoader {
             if (classesDir != null) {
                 Logging.info("✅ Found compiled classes in " + moduleDir.getName());
                 
-                String mainClassName = findMainClassInDirectory(classesDir);
-                if (mainClassName != null) {
-                    Logging.info("✅ Found Main.class in " + moduleDir.getName());
-                    
-                    // Try to create the module instance - this validates it implements GameModule
-                    GameModule module = createModuleInstance(classesDir, mainClassName);
-                    if (module != null) {
-                        Logging.info("✅ Successfully created GameModule instance for " + moduleDir.getName());
-                        return module;
-                    } else {
-                        Logging.info("❌ Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
-                        // Clean up compiled files since module is invalid
-                        cleanupCompiledFiles(moduleDir);
-                        return null;
-                    }
+                // ONLY compile if source code has changed - this is the key optimization
+                if (isSourceCodeNewerThanCompiled(moduleDir)) {
+                    Logging.info("🔄 Source code changed in " + moduleDir.getName() + " - incremental compilation");
+                    // Don't clean up - let Maven handle incremental compilation
+                    classesDir = null; // Force recompilation
                 } else {
-                    Logging.info("❌ No Main.class found in " + moduleDir.getName());
-                    return null;
+                    // Check if all required classes are present
+                    if (!areAllRequiredClassesPresent(classesDir)) {
+                        Logging.warning("⚠️ Missing required classes in " + moduleDir.getName() + " - skipping module (no source changes detected)");
+                        // Don't compile - just skip this module if classes are missing but source hasn't changed
+                        return null;
+                    } else {
+                        String mainClassName = findMainClassInDirectory(classesDir);
+                        if (mainClassName != null) {
+                            Logging.info("✅ Found Main.class in " + moduleDir.getName());
+                            
+                            // Try to create the module instance - this validates it implements GameModule
+                            try {
+                                GameModule module = createModuleInstance(classesDir, mainClassName);
+                                if (module != null) {
+                                    Logging.info("✅ Successfully created GameModule instance for " + moduleDir.getName());
+                                    return module;
+                                } else {
+                                    Logging.info("❌ Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
+                                    // Clean up compiled files since module is invalid
+                                    cleanupCompiledFiles(moduleDir);
+                                    return null;
+                                }
+                            } catch (ClassNotFoundException e) {
+                                Logging.warning("⚠️ Missing required classes in " + moduleDir.getName() + " - skipping module (no source changes detected)");
+                                // Don't compile - just skip this module if classes are missing but source hasn't changed
+                                return null;
+                            } catch (Exception e) {
+                                Logging.warning("⚠️ Error loading module " + moduleDir.getName() + ": " + e.getMessage());
+                                return null;
+                            }
+                        } else {
+                            Logging.info("❌ No Main.class found in " + moduleDir.getName());
+                            return null;
+                        }
+                    }
                 }
-            } else {
-                Logging.info("❌ No compiled classes found in " + moduleDir.getName() + " - attempting to compile");
+            }
+            
+            // If we get here, either no classes directory or compilation is needed due to source changes
+            if (classesDir == null) {
+                Logging.info("🔨 Compiling module due to source changes: " + moduleDir.getName());
                 // Try to compile the module automatically
                 if (compileModule(moduleDir)) {
                     Logging.info("✅ Successfully compiled " + moduleDir.getName());
@@ -194,7 +220,7 @@ public class ModuleLoader {
                         return null;
                     }
                 } else {
-                    Logging.info("❌ Failed to compile " + moduleDir.getName());
+                    Logging.info("❌ Failed to compile " + moduleDir.getName() + " - continuing without this module");
                     return null;
                 }
             }
@@ -347,8 +373,8 @@ public class ModuleLoader {
         try {
             Logging.info("🔨 Compiling module: " + moduleDir.getName());
             
-            // Create Maven compile command
-            ProcessBuilder pb = new ProcessBuilder("mvn", "compile", "-q");
+            // Use incremental compilation - only compile changed files
+            ProcessBuilder pb = new ProcessBuilder("mvn", "compile");
             pb.directory(moduleDir);
             pb.redirectErrorStream(true);
             
@@ -368,27 +394,154 @@ public class ModuleLoader {
             
             if (exitCode == 0) {
                 Logging.info("✅ Compilation successful for " + moduleDir.getName());
+                // Add a small delay to ensure files are written
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
                 return true;
             } else {
-                Logging.error("❌ Compilation failed for " + moduleDir.getName() + " (exit code: " + exitCode + ")");
+                Logging.warning("⚠️ Compilation failed for " + moduleDir.getName() + " (exit code: " + exitCode + ")");
                 if (output.length() > 0) {
-                    Logging.error("Compilation output: " + output.toString());
+                    // Only log the last few lines to avoid spam
+                    String[] lines = output.toString().split("\n");
+                    int start = Math.max(0, lines.length - 10);
+                    StringBuilder shortOutput = new StringBuilder();
+                    for (int i = start; i < lines.length; i++) {
+                        shortOutput.append(lines[i]).append("\n");
+                    }
+                    Logging.warning("Compilation output (last 10 lines): " + shortOutput.toString());
                 }
                 return false;
             }
             
         } catch (Exception e) {
-            Logging.error("Error compiling module " + moduleDir.getName() + ": " + e.getMessage(), e);
+            Logging.warning("⚠️ Exception during compilation of " + moduleDir.getName() + ": " + e.getMessage());
             return false;
         }
+    }
+    
+    /**
+     * Checks if source code files are newer than compiled files
+     */
+    private static boolean isSourceCodeNewerThanCompiled(File moduleDir) {
+        try {
+            File sourceDir = new File(moduleDir, "src/main/java");
+            File classesDir = new File(moduleDir, "target/classes");
+            
+            if (!sourceDir.exists() || !classesDir.exists()) {
+                return false;
+            }
+            
+            // Get the most recent modification time of source files
+            long latestSourceTime = getLatestModificationTime(sourceDir);
+            
+            // Get the most recent modification time of compiled files
+            long latestCompiledTime = getLatestModificationTime(classesDir);
+            
+            // If source is newer than compiled, recompilation is needed
+            return latestSourceTime > latestCompiledTime;
+            
+        } catch (Exception e) {
+            Logging.warning("⚠️ Error checking source code timestamps for " + moduleDir.getName() + ": " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Checks if all required classes are present in the compiled classes directory
+     */
+    private static boolean areAllRequiredClassesPresent(File classesDir) {
+        try {
+            // Check for Main.class
+            File mainClass = new File(classesDir, "Main.class");
+            if (!mainClass.exists()) {
+                Logging.info("❌ Main.class missing in " + classesDir.getParentFile().getName());
+                return false;
+            }
+            
+            // Check for Metadata.class
+            File metadataClass = new File(classesDir, "Metadata.class");
+            if (!metadataClass.exists()) {
+                Logging.info("❌ Metadata.class missing in " + classesDir.getParentFile().getName());
+                return false;
+            }
+            
+            Logging.info("✅ All required classes present in " + classesDir.getParentFile().getName());
+            return true;
+            
+        } catch (Exception e) {
+            Logging.warning("⚠️ Error checking required classes in " + classesDir.getParentFile().getName() + ": " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Gets the latest modification time of files in a directory (recursive)
+     */
+    private static long getLatestModificationTime(File dir) {
+        long latestTime = 0;
+        
+        if (dir.exists() && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        long dirTime = getLatestModificationTime(file);
+                        if (dirTime > latestTime) {
+                            latestTime = dirTime;
+                        }
+                    } else {
+                        long fileTime = file.lastModified();
+                        if (fileTime > latestTime) {
+                            latestTime = fileTime;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return latestTime;
     }
     
     /**
      * Creates a module instance from a classes directory
      */
     private static GameModule createModuleInstance(File classesDir, String mainClassName) throws Exception {
+        // Create classpath URLs including GDK dependencies
+        List<URL> classpathUrls = new ArrayList<>();
+        classpathUrls.add(classesDir.toURI().toURL());
+        
+        // Add GDK dependencies to classpath
+        try {
+            // Get the project root directory (parent of modules directory)
+            File modulesDir = classesDir.getParentFile().getParentFile().getParentFile();
+            File projectRoot = modulesDir.getParentFile();
+            
+            // Add gdk module classes
+            File gdkClassesDir = new File(projectRoot, "gdk/target/classes");
+            if (gdkClassesDir.exists()) {
+                classpathUrls.add(gdkClassesDir.toURI().toURL());
+                Logging.info("✅ Added GDK classes to classpath: " + gdkClassesDir.getAbsolutePath());
+            } else {
+                Logging.warning("⚠️ GDK classes directory not found: " + gdkClassesDir.getAbsolutePath());
+            }
+            
+            // Add launcher module classes
+            File launcherClassesDir = new File(projectRoot, "launcher/target/classes");
+            if (launcherClassesDir.exists()) {
+                classpathUrls.add(launcherClassesDir.toURI().toURL());
+                Logging.info("✅ Added launcher classes to classpath: " + launcherClassesDir.getAbsolutePath());
+            } else {
+                Logging.warning("⚠️ Launcher classes directory not found: " + launcherClassesDir.getAbsolutePath());
+            }
+        } catch (Exception e) {
+            Logging.warning("Could not add GDK dependencies to classpath: " + e.getMessage());
+        }
+        
         URLClassLoader classLoader = new URLClassLoader(
-            new URL[]{classesDir.toURI().toURL()},
+            classpathUrls.toArray(new URL[0]),
             ModuleLoader.class.getClassLoader()
         );
         

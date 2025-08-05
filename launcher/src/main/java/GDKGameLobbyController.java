@@ -166,8 +166,7 @@ public class GDKGameLobbyController implements Initializable {
         // Load saved JSON content and toggle state
         loadPersistenceSettings();
         
-        // Add startup message
-        addUserMessage("🔍 Starting game detection...");
+        // Start game detection
         
         // Refresh the game list on startup (fast mode - skip compilation checks)
         refreshAvailableGameModulesFast();
@@ -231,8 +230,7 @@ public class GDKGameLobbyController implements Initializable {
         // Uses a modern font stack with fallbacks and appropriate size
         messageContainer.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
         
-        // Display a welcome message to inform users they're in the right place
-        addUserMessage("🎮 Welcome to GDK Game Picker!");
+        // Message area is ready for user feedback
         
         // Log successful UI initialization for debugging purposes
         Logging.info("🎨 UI components initialized");

@@ -78,7 +78,7 @@ public class Main implements GameModule {
         root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
         
         // Title
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("🎮 Game Communication Test");
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("🎮 Game Communication Test (Incremental!)");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
         // Game info
