@@ -96,7 +96,7 @@ public class Main implements GameModule {
             }
             
             // Configure stage
-            primaryStage.setTitle("Tic Tac Toe - GDK");
+            primaryStage.setTitle("Tic Tac Toe");
             primaryStage.setMinWidth(400);
             primaryStage.setMinHeight(500);
             
@@ -118,7 +118,7 @@ public class Main implements GameModule {
         root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
         
         // Title
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("⭕ Tic Tac Toe");
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("Tic Tac Toe");
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
         // Game info
@@ -198,7 +198,7 @@ public class Main implements GameModule {
         Scene scene = new Scene(root, 400, 500);
         
         // Configure stage
-        primaryStage.setTitle("Tic Tac Toe - GDK");
+        primaryStage.setTitle("Tic Tac Toe");
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(500);
         
