@@ -1,18 +1,24 @@
 import gdk.GameModule;
 import gdk.Logging;
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
  * Utility class for discovering and loading game modules.
  * Provides functionality to scan directories for game modules and load them dynamically.
- * Supports compiled classes for development.
+ * Supports source code analysis for development.
  *
  * @authors Clement Luo
  * @date July 19, 2025
+ * @edited August 4, 2025
  * @since 1.0
  */
 public class ModuleLoader {
@@ -21,7 +27,7 @@ public class ModuleLoader {
     
     /**
      * Discovers game modules in the specified directory.
-     * Scans for compiled classes and attempts to load GameModule implementations.
+     * Scans for source code and attempts to load GameModule implementations.
      * 
      * @param modulesDir The directory to scan for modules
      * @return List of discovered game modules
@@ -33,9 +39,9 @@ public class ModuleLoader {
         File dir = new File(modulesDir);
         Logging.info("🔍 Starting module discovery in: " + modulesDir);
         
-        // Load from compiled classes (development mode)
-        List<GameModule> modules = discoverModulesFromClasses(dir);
-        Logging.info("📦 Found " + modules.size() + " module(s) from compiled classes");
+        // Load from source code (development mode)
+        List<GameModule> modules = discoverModulesFromSource(dir);
+        Logging.info("📦 Found " + modules.size() + " module(s) from source code");
         
         Logging.info("✅ Total modules discovered: " + modules.size());
         return modules;
@@ -76,15 +82,15 @@ public class ModuleLoader {
         }
     }
     
-    // ==================== CLASS-BASED MODULE DISCOVERY ====================
+    // ==================== SOURCE-BASED MODULE DISCOVERY ====================
     
     /**
-     * Discovers game modules from compiled classes (development mode).
+     * Discovers game modules from source code (development mode).
      * 
      * @param modulesDir The modules directory
      * @return List of discovered game modules
      */
-    private static List<GameModule> discoverModulesFromClasses(File modulesDir) {
+    private static List<GameModule> discoverModulesFromSource(File modulesDir) {
         List<GameModule> modules = new ArrayList<>();
         
         File[] subdirs = modulesDir.listFiles(File::isDirectory);
@@ -94,7 +100,7 @@ public class ModuleLoader {
             for (File subdir : subdirs) {
                 Logging.info("🔍 Checking subdirectory: " + subdir.getName());
                 try {
-                    GameModule module = loadModuleFromClasses(subdir);
+                    GameModule module = loadModuleFromSource(subdir);
                     if (module != null) {
                         Logging.info("✅ Successfully loaded module: " + subdir.getName());
                         modules.add(module);
@@ -102,7 +108,7 @@ public class ModuleLoader {
                         Logging.info("❌ Failed to load module from: " + subdir.getName());
                     }
                 } catch (Exception e) {
-                    Logging.error("Failed to load module from classes in " + subdir.getName() + ": " + e.getMessage(), e);
+                    Logging.error("Failed to load module from source in " + subdir.getName() + ": " + e.getMessage(), e);
                 }
             }
         }
@@ -112,60 +118,176 @@ public class ModuleLoader {
     }
     
     /**
-     * Loads a game module from compiled classes.
+     * Loads a game module from source code.
      * 
-     * @param moduleDir The module directory containing compiled classes
+     * @param moduleDir The module directory containing source code
      * @return The loaded game module, or null if loading fails
      */
-    private static GameModule loadModuleFromClasses(File moduleDir) {
+    private static GameModule loadModuleFromSource(File moduleDir) {
         Logging.info("🔍 Loading module from: " + moduleDir.getName());
         
         try {
-            // First check if source code exists (fast check)
-            if (!hasMainSourceFile(moduleDir)) {
-                Logging.info("❌ No Main.java source file found in " + moduleDir.getName());
-                return null; // Skip if no source code
+            // Check if source code exists and is valid
+            if (!hasValidMainSourceFile(moduleDir)) {
+                Logging.info("❌ No valid Main.java source file found in " + moduleDir.getName());
+                // Clean up compiled files since module is disabled
+                cleanupCompiledFiles(moduleDir);
+                return null; // Skip if no valid source code
             }
-            Logging.info("✅ Found Main.java source file in " + moduleDir.getName());
+            Logging.info("✅ Found valid Main.java source file in " + moduleDir.getName());
             
+            // Try to load from compiled classes if available (for instantiation)
             File classesDir = findClassesDirectory(moduleDir);
-            if (classesDir == null) {
-                Logging.info("❌ No compiled classes found in " + moduleDir.getName());
-                return null; // No compiled classes, skip silently
+            if (classesDir != null) {
+                Logging.info("✅ Found compiled classes in " + moduleDir.getName());
+                
+                String mainClassName = findMainClassInDirectory(classesDir);
+                if (mainClassName != null) {
+                    Logging.info("✅ Found Main.class in " + moduleDir.getName());
+                    
+                    // Try to create the module instance - this validates it implements GameModule
+                    GameModule module = createModuleInstance(classesDir, mainClassName);
+                    if (module != null) {
+                        Logging.info("✅ Successfully created GameModule instance for " + moduleDir.getName());
+                        return module;
+                    } else {
+                        Logging.info("❌ Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
+                        // Clean up compiled files since module is invalid
+                        cleanupCompiledFiles(moduleDir);
+                        return null;
+                    }
+                } else {
+                    Logging.info("❌ No Main.class found in " + moduleDir.getName());
+                    return null;
+                }
+            } else {
+                Logging.info("❌ No compiled classes found in " + moduleDir.getName() + " - attempting to compile");
+                // Try to compile the module automatically
+                if (compileModule(moduleDir)) {
+                    Logging.info("✅ Successfully compiled " + moduleDir.getName());
+                    // Try to load again after compilation
+                    classesDir = findClassesDirectory(moduleDir);
+                    if (classesDir != null) {
+                        Logging.info("✅ Found compiled classes in " + moduleDir.getName() + " after compilation");
+                        
+                        String mainClassName = findMainClassInDirectory(classesDir);
+                        if (mainClassName != null) {
+                            Logging.info("✅ Found Main.class in " + moduleDir.getName());
+                            
+                            // Try to create the module instance - this validates it implements GameModule
+                            GameModule module = createModuleInstance(classesDir, mainClassName);
+                            if (module != null) {
+                                Logging.info("✅ Successfully created GameModule instance for " + moduleDir.getName());
+                                return module;
+                            } else {
+                                Logging.info("❌ Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
+                                // Clean up compiled files since module is invalid
+                                cleanupCompiledFiles(moduleDir);
+                                return null;
+                            }
+                        } else {
+                            Logging.info("❌ No Main.class found in " + moduleDir.getName() + " after compilation");
+                            return null;
+                        }
+                    } else {
+                        Logging.info("❌ Compilation failed for " + moduleDir.getName());
+                        return null;
+                    }
+                } else {
+                    Logging.info("❌ Failed to compile " + moduleDir.getName());
+                    return null;
+                }
             }
-            Logging.info("✅ Found compiled classes in " + moduleDir.getName());
-            
-            String mainClassName = findMainClassInDirectory(classesDir);
-            if (mainClassName == null) {
-                Logging.info("❌ No Main.class found in " + moduleDir.getName());
-                return null; // No Main class, skip silently
-            }
-            Logging.info("✅ Found Main.class in " + moduleDir.getName());
-            
-            // Try to create the module instance - this validates it implements GameModule
-            GameModule module = createModuleInstance(classesDir, mainClassName);
-            if (module == null) {
-                Logging.info("❌ Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
-                return null; // Main class exists but doesn't implement GameModule
-            }
-            
-            Logging.info("✅ Successfully created GameModule instance for " + moduleDir.getName());
-            return module;
             
         } catch (Exception e) {
-            Logging.error("Error loading module from classes in " + moduleDir.getName() + ": " + e.getMessage(), e);
+            Logging.error("Error loading module from source in " + moduleDir.getName() + ": " + e.getMessage(), e);
         }
         
         return null;
     }
     
     /**
-     * Checks if a module has a Main.java source file
+     * Checks if a module has a valid Main.java source file that implements GameModule
      */
-    private static boolean hasMainSourceFile(File moduleDir) {
+    private static boolean hasValidMainSourceFile(File moduleDir) {
         // Check for Main.java directly in src/main/java/ (standardized structure)
         File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
-        return mainJavaFile.exists();
+        if (!mainJavaFile.exists()) {
+            return false;
+        }
+        
+        // Validate that the source code implements GameModule interface
+        return validateMainSourceCode(mainJavaFile);
+    }
+    
+    /**
+     * Validates that Main.java source code implements GameModule interface
+     */
+    private static boolean validateMainSourceCode(File mainJavaFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(mainJavaFile))) {
+            StringBuilder content = new StringBuilder();
+            String line;
+            boolean isCommented = false;
+            
+            while ((line = reader.readLine()) != null) {
+                // Skip commented lines
+                if (line.trim().startsWith("//")) {
+                    continue;
+                }
+                
+                // Handle block comments
+                if (line.contains("/*")) {
+                    isCommented = true;
+                }
+                if (line.contains("*/")) {
+                    isCommented = false;
+                    continue;
+                }
+                if (isCommented) {
+                    continue;
+                }
+                
+                content.append(line).append("\n");
+            }
+            
+            String sourceCode = content.toString();
+            
+            // Check for required GameModule implementation
+            boolean implementsGameModule = sourceCode.contains("implements GameModule") || 
+                                         sourceCode.contains("implements gdk.GameModule");
+            
+            // Check for required methods
+            boolean hasLaunchGame = sourceCode.contains("launchGame") && 
+                                  sourceCode.contains("Stage primaryStage");
+            boolean hasStopGame = sourceCode.contains("stopGame");
+            boolean hasHandleMessage = sourceCode.contains("handleMessage") && 
+                                     sourceCode.contains("Map<String, Object>");
+            boolean hasGetMetadata = sourceCode.contains("getMetadata");
+            
+            // Check for class declaration
+            boolean hasClassDeclaration = sourceCode.contains("class Main") || 
+                                        sourceCode.contains("public class Main");
+            
+            // All conditions must be met for a valid game module
+            boolean isValid = implementsGameModule && hasLaunchGame && hasStopGame && 
+                            hasHandleMessage && hasGetMetadata && hasClassDeclaration;
+            
+            if (!isValid) {
+                Logging.info("❌ Main.java validation failed for " + mainJavaFile.getParentFile().getParentFile().getParentFile().getName());
+                Logging.info("   - Implements GameModule: " + implementsGameModule);
+                Logging.info("   - Has launchGame: " + hasLaunchGame);
+                Logging.info("   - Has stopGame: " + hasStopGame);
+                Logging.info("   - Has handleMessage: " + hasHandleMessage);
+                Logging.info("   - Has getMetadata: " + hasGetMetadata);
+                Logging.info("   - Has class declaration: " + hasClassDeclaration);
+            }
+            
+            return isValid;
+            
+        } catch (IOException e) {
+            Logging.error("Error reading Main.java file: " + e.getMessage(), e);
+            return false;
+        }
     }
     
     /**
@@ -177,6 +299,88 @@ public class ModuleLoader {
             return null;
         }
         return classesDir;
+    }
+    
+    /**
+     * Cleans up compiled files for a module that is no longer valid
+     * @param moduleDir The module directory to clean up
+     */
+    private static void cleanupCompiledFiles(File moduleDir) {
+        try {
+            File targetDir = new File(moduleDir, "target");
+            if (targetDir.exists() && targetDir.isDirectory()) {
+                // Remove the entire target directory
+                deleteDirectory(targetDir);
+                Logging.info("🧹 Cleaned up compiled files for " + moduleDir.getName());
+            }
+        } catch (Exception e) {
+            Logging.error("Error cleaning up compiled files for " + moduleDir.getName() + ": " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Recursively deletes a directory and all its contents
+     * @param dir The directory to delete
+     */
+    private static void deleteDirectory(File dir) {
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        deleteDirectory(file);
+                    } else {
+                        file.delete();
+                    }
+                }
+            }
+            dir.delete();
+        }
+    }
+    
+    /**
+     * Compiles a module using Maven
+     * @param moduleDir The module directory to compile
+     * @return true if compilation was successful, false otherwise
+     */
+    private static boolean compileModule(File moduleDir) {
+        try {
+            Logging.info("🔨 Compiling module: " + moduleDir.getName());
+            
+            // Create Maven compile command
+            ProcessBuilder pb = new ProcessBuilder("mvn", "compile", "-q");
+            pb.directory(moduleDir);
+            pb.redirectErrorStream(true);
+            
+            Process process = pb.start();
+            
+            // Read output for logging
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+            }
+            
+            // Wait for compilation to complete
+            int exitCode = process.waitFor();
+            
+            if (exitCode == 0) {
+                Logging.info("✅ Compilation successful for " + moduleDir.getName());
+                return true;
+            } else {
+                Logging.error("❌ Compilation failed for " + moduleDir.getName() + " (exit code: " + exitCode + ")");
+                if (output.length() > 0) {
+                    Logging.error("Compilation output: " + output.toString());
+                }
+                return false;
+            }
+            
+        } catch (Exception e) {
+            Logging.error("Error compiling module " + moduleDir.getName() + ": " + e.getMessage(), e);
+            return false;
+        }
     }
     
     /**

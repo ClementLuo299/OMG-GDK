@@ -55,7 +55,7 @@ import javafx.collections.ObservableList;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited July 25, 2025
+ * @edited August 4, 2025
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
