@@ -88,12 +88,18 @@ public class ModuleLoader {
         List<GameModule> modules = new ArrayList<>();
         
         File[] subdirs = modulesDir.listFiles(File::isDirectory);
+        Logging.info("🔍 Found " + (subdirs != null ? subdirs.length : 0) + " subdirectories in modules directory");
+        
         if (subdirs != null) {
             for (File subdir : subdirs) {
+                Logging.info("🔍 Checking subdirectory: " + subdir.getName());
                 try {
                     GameModule module = loadModuleFromClasses(subdir);
                     if (module != null) {
+                        Logging.info("✅ Successfully loaded module: " + subdir.getName());
                         modules.add(module);
+                    } else {
+                        Logging.info("❌ Failed to load module from: " + subdir.getName());
                     }
                 } catch (Exception e) {
                     Logging.error("Failed to load module from classes in " + subdir.getName() + ": " + e.getMessage(), e);
@@ -101,6 +107,7 @@ public class ModuleLoader {
             }
         }
         
+        Logging.info("📦 Total modules loaded: " + modules.size());
         return modules;
     }
     
@@ -111,29 +118,38 @@ public class ModuleLoader {
      * @return The loaded game module, or null if loading fails
      */
     private static GameModule loadModuleFromClasses(File moduleDir) {
+        Logging.info("🔍 Loading module from: " + moduleDir.getName());
+        
         try {
             // First check if source code exists (fast check)
             if (!hasMainSourceFile(moduleDir)) {
+                Logging.info("❌ No Main.java source file found in " + moduleDir.getName());
                 return null; // Skip if no source code
             }
+            Logging.info("✅ Found Main.java source file in " + moduleDir.getName());
             
             File classesDir = findClassesDirectory(moduleDir);
             if (classesDir == null) {
+                Logging.info("❌ No compiled classes found in " + moduleDir.getName());
                 return null; // No compiled classes, skip silently
             }
+            Logging.info("✅ Found compiled classes in " + moduleDir.getName());
             
             String mainClassName = findMainClassInDirectory(classesDir);
             if (mainClassName == null) {
+                Logging.info("❌ No Main.class found in " + moduleDir.getName());
                 return null; // No Main class, skip silently
             }
+            Logging.info("✅ Found Main.class in " + moduleDir.getName());
             
             // Try to create the module instance - this validates it implements GameModule
             GameModule module = createModuleInstance(classesDir, mainClassName);
             if (module == null) {
-                Logging.info("Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
+                Logging.info("❌ Module " + moduleDir.getName() + " has Main class but doesn't implement GameModule interface");
                 return null; // Main class exists but doesn't implement GameModule
             }
             
+            Logging.info("✅ Successfully created GameModule instance for " + moduleDir.getName());
             return module;
             
         } catch (Exception e) {
@@ -246,7 +262,21 @@ public class ModuleLoader {
      * @return The class name, or null if not found
      */
     private static String findMainClassRecursively(File classesDir, String packagePath) {
+        Logging.info("🔍 Looking for Main.class in: " + classesDir.getAbsolutePath());
+        
+        // List all files in the classes directory for debugging
+        File[] files = classesDir.listFiles();
+        if (files != null) {
+            Logging.info("📁 Files in classes directory:");
+            for (File file : files) {
+                Logging.info("   - " + file.getName() + (file.isDirectory() ? " (dir)" : " (file)"));
+            }
+        }
+        
         File mainClassFile = new File(classesDir, "Main.class");
-        return mainClassFile.exists() ? "Main" : null;
+        boolean exists = mainClassFile.exists();
+        Logging.info("🔍 Main.class exists: " + exists + " at " + mainClassFile.getAbsolutePath());
+        
+        return exists ? "Main" : null;
     }
 } 

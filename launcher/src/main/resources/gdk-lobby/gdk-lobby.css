@@ -1,3 +1,5 @@
+
+
 /* ==================== GDK GAME LOBBY STYLES ==================== */
 
 /* Main Container */
@@ -25,6 +27,26 @@
     -fx-cursor: hand;
     -fx-padding: 10 20;
     -fx-background-radius: 5;
+}
+
+.nav-button.icon-button {
+    -fx-min-width: 44;
+    -fx-min-height: 44;
+    -fx-max-width: 44;
+    -fx-max-height: 44;
+    -fx-padding: 8;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+}
+
+.nav-button.icon-button:hover {
+    -fx-background-color: #e9ecef;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    -fx-transition: all 0.2s ease-in-out;
 }
 
 .nav-button:hover {
@@ -129,6 +151,9 @@
     -fx-background-radius: 5;
     -fx-padding: 8 12;
     -fx-font-size: 12px;
+    -fx-min-height: 45;
+    -fx-max-height: 45;
+    -fx-pref-height: 45;
 }
 
 .combo-box .list-cell {
@@ -464,6 +489,12 @@
     -fx-border-color: #007bff;
     -fx-border-width: 2;
     -fx-effect: dropshadow(gaussian, rgba(0, 123, 255, 0.3), 5, 0, 0, 2);
+}
+
+.combo-box:focused {
+    -fx-min-height: 45;
+    -fx-max-height: 45;
+    -fx-pref-height: 45;
 }
 
 /* ==================== JSON DATA INPUT STYLES ==================== */

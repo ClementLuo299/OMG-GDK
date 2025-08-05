@@ -22,11 +22,11 @@
     
     <!-- Header -->
     <HBox alignment="CENTER" spacing="20" styleClass="header" VBox.vgrow="NEVER">
-        <Button fx:id="exitButton" text="Exit" styleClass="nav-button"/>
+        <Button fx:id="exitButton" text="✕" styleClass="nav-button, icon-button"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Label fx:id="gameTitleLabel" text="OMG Game Development Kit" styleClass="main-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="refreshButton" text="Refresh" styleClass="nav-button"/>
+        <Button fx:id="refreshButton" text="↻" styleClass="nav-button, icon-button"/>
     </HBox>
     
     <!-- Main Content Area -->
@@ -42,7 +42,8 @@
             <HBox alignment="CENTER_LEFT" spacing="20" VBox.vgrow="NEVER">
                 <Label text="Select Game:" styleClass="field-label"/>
                 <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
-                         styleClass="combo-box" prefWidth="400"/>
+                         styleClass="combo-box" prefWidth="400" 
+                         style="-fx-min-height: 45; -fx-max-height: 45; -fx-pref-height: 45;"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="launchGameButton" text="Launch Game" 
                         styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only;"/>
