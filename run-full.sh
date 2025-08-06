@@ -26,4 +26,4 @@ fi
 # Run the GDK using Maven exec plugin with JavaFX
 echo "Running GDK with modules..."
 cd launcher
-mvn javafx:run -Djavafx.mainClass="GDKApplication" -Dexec.args="--modules-dir=../modules" 
+mvn javafx:run -Djavafx.mainClass="GDKApplication" -Djavafx.jvmargs="--enable-native-access=javafx.graphics --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED" -Dexec.args="--modules-dir=../modules" 

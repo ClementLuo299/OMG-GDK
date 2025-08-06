@@ -35,7 +35,7 @@ public class GDKApplication extends Application {
      * Path to the modules directory relative to the launcher
      * This is where game modules (JARs and compiled classes) are stored
      */
-    public static final String MODULES_DIRECTORY_PATH = "modules";
+    public static final String MODULES_DIRECTORY_PATH = "../modules";
     
     // ==================== INSTANCE VARIABLES ====================
     

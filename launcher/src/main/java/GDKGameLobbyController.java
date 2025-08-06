@@ -200,21 +200,20 @@ public class GDKGameLobbyController implements Initializable {
         // Load saved JSON content and toggle state
         loadPersistenceSettings();
         
-        // Start game detection
-        
-        // Refresh the game list on startup (fast mode - skip compilation checks)
-        refreshAvailableGameModulesFast();
+        // Start game detection - DELAYED until startup progress window is ready
+        // refreshAvailableGameModulesFast(); // Moved to Startup.ensureUIReady()
         
         // Initialize the status label
         updateGameCountStatus();
         
-                    // Check for compilation failures on startup AFTER modules are loaded
-            Platform.runLater(() -> {
-                checkStartupCompilationFailures();
-                
-                // Clear startup progress window reference after startup is complete
-                startupProgressWindow = null;
-            });
+        // Check for compilation failures on startup AFTER modules are loaded
+        // DELAYED: Moved to Startup.ensureUIReady() to ensure pre-startup window is visible first
+        // Platform.runLater(() -> {
+        //     checkStartupCompilationFailures();
+        //     
+        //     // Clear startup progress window reference after startup is complete
+        //     startupProgressWindow = null;
+        // });
         
         // Note: TextArea doesn't support syntax highlighting like CodeArea
         // JSON syntax highlighting removed for compatibility
@@ -566,6 +565,10 @@ public class GDKGameLobbyController implements Initializable {
         this.startupProgressWindow = progressWindow;
     }
     
+    public void clearStartupProgressWindow() {
+        this.startupProgressWindow = null;
+    }
+    
     /**
      * Get the current loading task description based on animation state
      */
@@ -621,7 +624,7 @@ public class GDKGameLobbyController implements Initializable {
     /**
      * Fast refresh that skips compilation checks for faster startup
      */
-    private void refreshAvailableGameModulesFast() {
+    public void refreshAvailableGameModulesFast() {
         try {
             // Store previous module names for change detection
             Set<String> previousModuleNames = new HashSet<>();
@@ -996,7 +999,7 @@ public class GDKGameLobbyController implements Initializable {
     /**
      * Check for compilation failures on startup
      */
-    private void checkStartupCompilationFailures() {
+    public void checkStartupCompilationFailures() {
         try {
             Logging.info("🚀 Checking for compilation failures on startup...");
             

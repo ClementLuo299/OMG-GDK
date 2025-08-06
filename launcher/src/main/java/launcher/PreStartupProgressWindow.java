@@ -45,6 +45,10 @@ public class PreStartupProgressWindow {
         progressFrame.setResizable(false);
         progressFrame.setAlwaysOnTop(true);
         
+        // Remove the close button from the title bar by using undecorated window
+        progressFrame.setUndecorated(true);
+        progressFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
         // Create UI components (this also sets up the layout)
         createUIComponents();
         
@@ -66,9 +70,9 @@ public class PreStartupProgressWindow {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         
         // Subtitle
-        JLabel subtitleLabel = new JLabel("Initializing...");
+        JLabel subtitleLabel = new JLabel("Initializing");
         subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        subtitleLabel.setForeground(new Color(189, 195, 199));
+        subtitleLabel.setForeground(new Color(52, 58, 64));
         subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         
         // Progress bar

@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import launcher.StartupProgressWindow;
@@ -160,7 +162,7 @@ public class Startup {
                     updateProgress(3, "Rendering application...");
                     
                     // Use a timer to delay the fade-in
-                    javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(1200)); // DEVELOPMENT: Slowed down
+                    javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(3000)); // DEVELOPMENT: Slowed down
                     pause.setOnFinished(event -> {
                         // Now fade in the main window
                         Logging.info("✨ Fading in main application window...");
@@ -370,14 +372,44 @@ public class Startup {
             }
             
             // Wait for the controller to finish its initialization
-            // The controller's initialize() method calls refreshAvailableGameModulesFast()
-            // which might take some time to complete
             updateProgress(2, "Initializing game modules...");
-            Thread.sleep(1000); // DEVELOPMENT: Slowed down to see messages
+            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
             
-            // Show module loading information
-            updateProgress(2, "Loading available game modules...");
-            Thread.sleep(800); // DEVELOPMENT: Slowed down to see messages
+            // Build modules if needed (moved from shell script to JavaFX app)
+            updateProgress(2, "Building modules (checking for changes)...");
+            Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
+            
+            if (needToBuildModules()) {
+                updateProgress(2, "Building modules (incremental)...");
+                Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
+                
+                // Build GDK first (if needed)
+                if (!new File("../gdk/target/classes").exists()) {
+                    updateProgress(2, "Building GDK...");
+                    Thread.sleep(1500); // DEVELOPMENT: Slowed down to see messages
+                    buildModule("../gdk");
+                }
+                
+                // Build launcher
+                updateProgress(2, "Building launcher...");
+                Thread.sleep(1500); // DEVELOPMENT: Slowed down to see messages
+                buildModule(".");
+            } else {
+                updateProgress(2, "Using existing builds (recent compilation detected)");
+                Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
+            }
+            
+            // Now trigger module loading with progress window ready
+            if (lobbyController != null) {
+                updateProgress(2, "Loading available game modules...");
+                Thread.sleep(2500); // DEVELOPMENT: Slowed down to see messages
+                
+                // Additional delay to ensure pre-startup window is fully visible
+                Thread.sleep(2000); // DEVELOPMENT: Ensure window is visible before module loading
+                
+                // Trigger module discovery and loading
+                lobbyController.refreshAvailableGameModulesFast();
+            }
             
             // Get and display discovered modules
             List<GameModule> discoveredModules = ModuleLoader.getDiscoveredModules();
@@ -388,15 +420,27 @@ public class Startup {
                     moduleList.append(discoveredModules.get(i).getGameName());
                 }
                 updateProgress(2, "Loaded modules: " + moduleList.toString());
-                Thread.sleep(1000); // DEVELOPMENT: Slowed down to see module list
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see module list
             } else {
                 updateProgress(2, "No game modules found");
-                Thread.sleep(500); // DEVELOPMENT: Slowed down to see message
+                Thread.sleep(1500); // DEVELOPMENT: Slowed down to see message
+            }
+            
+            // Now check for compilation failures after modules are loaded
+            if (lobbyController != null) {
+                updateProgress(2, "Checking module compilation...");
+                Thread.sleep(1000); // DEVELOPMENT: Slowed down to see message
+                
+                // Check for compilation failures
+                lobbyController.checkStartupCompilationFailures();
+                
+                // Clear startup progress window reference after startup is complete
+                lobbyController.clearStartupProgressWindow();
             }
             
             // Additional wait for any background processes
             updateProgress(2, "Finalizing UI components...");
-            Thread.sleep(600); // DEVELOPMENT: Slowed down to see messages
+            Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
             
             // Force JavaFX to process all pending events
             javafx.application.Platform.runLater(() -> {
@@ -410,6 +454,63 @@ public class Startup {
         } catch (Exception e) {
             Logging.error("❌ Error ensuring UI readiness: " + e.getMessage(), e);
             throw new RuntimeException("Failed to ensure UI readiness", e);
+        }
+    }
+    
+    // ==================== MODULE BUILDING METHODS ====================
+    
+    /**
+     * Check if modules need to be built based on file timestamps
+     * @return true if modules need to be built
+     */
+    private boolean needToBuildModules() {
+        try {
+            // Check if launcher classes exist (minimal check)
+            if (!new File("target/classes").exists()) {
+                return true;
+            }
+            
+            // Simple check: if launcher target directory is recent, skip build
+            long currentTime = System.currentTimeMillis();
+            long launcherAge = currentTime - new File("target/classes").lastModified();
+            
+            // If launcher is less than 5 minutes old, assume no changes
+            return launcherAge >= 300000; // 5 minutes = 300000ms
+        } catch (Exception e) {
+            Logging.error("❌ Error checking if modules need to be built: " + e.getMessage(), e);
+            return true; // Build on error to be safe
+        }
+    }
+    
+    /**
+     * Build a module using Maven
+     * @param modulePath The path to the module directory
+     */
+    private void buildModule(String modulePath) {
+        try {
+            Logging.info("🔨 Building module: " + modulePath);
+            
+            // Create process builder for Maven command
+            ProcessBuilder pb = new ProcessBuilder("mvn", "compile", "-DskipTests", "-q");
+            pb.directory(new File(modulePath));
+            
+            // Redirect stderr to suppress warnings
+            pb.redirectErrorStream(true);
+            
+            // Start the process
+            Process process = pb.start();
+            
+            // Wait for completion
+            int exitCode = process.waitFor();
+            
+            if (exitCode != 0) {
+                throw new RuntimeException("Maven build failed with exit code: " + exitCode);
+            }
+            
+            Logging.info("✅ Successfully built module: " + modulePath);
+        } catch (IOException | InterruptedException e) {
+            Logging.error("❌ Error building module " + modulePath + ": " + e.getMessage(), e);
+            throw new RuntimeException("Failed to build module: " + modulePath, e);
         }
     }
 } 
