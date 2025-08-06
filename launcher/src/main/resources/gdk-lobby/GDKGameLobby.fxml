@@ -11,7 +11,7 @@
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
-<?import launcher.ProfessionalJsonEditor?>
+<?import launcher.SingleJsonEditor?>
 
 <VBox fx:id="mainContainer" prefHeight="900.0" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
@@ -54,8 +54,14 @@
                         styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only;"/>
             </HBox>
             
-            <!-- Professional JSON Editor -->
-            <ProfessionalJsonEditor fx:id="jsonEditor" VBox.vgrow="ALWAYS"/>
+            <!-- JSON Editors Side by Side -->
+            <HBox spacing="15" VBox.vgrow="ALWAYS">
+                <!-- JSON Input Editor -->
+                <SingleJsonEditor fx:id="jsonInputEditor" title="JSON Input" HBox.hgrow="ALWAYS"/>
+                
+                <!-- JSON Output Editor -->
+                <SingleJsonEditor fx:id="jsonOutputEditor" title="JSON Output" HBox.hgrow="ALWAYS"/>
+            </HBox>
             
             <!-- Control Buttons -->
             <HBox spacing="10" alignment="CENTER_LEFT" VBox.vgrow="NEVER" styleClass="button-grid">

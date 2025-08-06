@@ -205,13 +205,13 @@ public class TicTacToeController implements Initializable {
     /**
      * Sends a chat message
      */
-    private void sendChatMessage() {
-        String message = chatInputField.getText().trim();
-        if (!message.isEmpty()) {
-            addPlayerMessage(currentPlayer, message);
-            chatInputField.clear();
-        }
-    }
+    // private void sendChatMessage() {
+    //     String message = chatInputField.getText().trim();
+    //     if (!message.isEmpty()) {
+    //         addPlayerMessage(currentPlayer, message);
+    //         chatInputField.clear();
+    //     }
+    // }
     
     /**
      * Adds a move to the history

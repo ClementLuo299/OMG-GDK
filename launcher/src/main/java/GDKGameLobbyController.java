@@ -1,6 +1,7 @@
 import gdk.GameModule;
 import gdk.Logging;
-import launcher.ProfessionalJsonEditor;
+import launcher.SingleJsonEditor;
+import launcher.StartupProgressWindow;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -39,6 +40,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -78,7 +83,8 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private VBox messageContainer;
     
     // JSON Configuration Components
-    @FXML private ProfessionalJsonEditor jsonEditor;
+    @FXML private SingleJsonEditor jsonInputEditor;
+    @FXML private SingleJsonEditor jsonOutputEditor;
     @FXML private Button clearInputButton;
 
     @FXML private Button clearOutputButton2;
@@ -137,6 +143,16 @@ public class GDKGameLobbyController implements Initializable {
     private int loadingDots = 0;
     
     /**
+     * Current module being processed for progress bar
+     */
+    private String currentProcessingModule = "";
+    
+    /**
+     * Reference to startup progress window for module loading updates
+     */
+    private StartupProgressWindow startupProgressWindow = null;
+    
+    /**
      * JSON mapper for parsing and validating JSON configuration data
      */
     private ObjectMapper jsonDataMapper;
@@ -178,6 +194,9 @@ public class GDKGameLobbyController implements Initializable {
         // Set up event handlers
         setupEventHandlers();
         
+        // Register this controller with ModuleLoader for progress updates
+        ModuleLoader.setUIController(this);
+        
         // Load saved JSON content and toggle state
         loadPersistenceSettings();
         
@@ -188,6 +207,14 @@ public class GDKGameLobbyController implements Initializable {
         
         // Initialize the status label
         updateGameCountStatus();
+        
+                    // Check for compilation failures on startup AFTER modules are loaded
+            Platform.runLater(() -> {
+                checkStartupCompilationFailures();
+                
+                // Clear startup progress window reference after startup is complete
+                startupProgressWindow = null;
+            });
         
         // Note: TextArea doesn't support syntax highlighting like CodeArea
         // JSON syntax highlighting removed for compatibility
@@ -332,6 +359,17 @@ public class GDKGameLobbyController implements Initializable {
                         }
                     }
                     
+                    // Check for compilation failures and broken modules in the logs and notify user
+                    checkForCompilationFailures(modulesDirectoryPath);
+                    checkForBrokenModules(modulesDirectoryPath);
+                    
+                    // Check for compilation failures detected by ModuleLoader
+                    Logging.info("🔍 Checking for ModuleLoader compilation failures...");
+                    checkModuleLoaderCompilationFailures();
+                    
+                    // Force a more aggressive check for compilation issues
+                    forceCompilationCheck(modulesDirectoryPath);
+                    
                     // Update the ComboBox with the new list of games
                     Logging.info("🔄 Updating ComboBox with " + availableGameModules.size() + " modules");
                     gameSelector.setItems(availableGameModules);
@@ -450,7 +488,7 @@ public class GDKGameLobbyController implements Initializable {
         
         // JSON Text Area Change Handler
         // Save JSON content when modified (with debouncing)
-        jsonEditor.inputTextProperty().addListener((observable, oldValue, newValue) -> {
+        jsonInputEditor.textProperty().addListener((observable, oldValue, newValue) -> {
             // Use Platform.runLater to debounce rapid changes
             Platform.runLater(() -> {
                 if (jsonPersistenceToggle.isSelected()) {
@@ -504,6 +542,31 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
+     * Set the current module being processed
+     * @param moduleName The name of the module being processed
+     */
+    public void setCurrentProcessingModule(String moduleName) {
+        this.currentProcessingModule = moduleName;
+        Logging.info("🎯 Now processing module: " + moduleName);
+    }
+    
+    /**
+     * Clear the current processing module
+     */
+    public void clearCurrentProcessingModule() {
+        this.currentProcessingModule = "";
+        Logging.info("✅ Finished processing all modules");
+    }
+    
+    /**
+     * Set the startup progress window for module loading updates
+     * @param progressWindow The startup progress window
+     */
+    public void setStartupProgressWindow(StartupProgressWindow progressWindow) {
+        this.startupProgressWindow = progressWindow;
+    }
+    
+    /**
      * Get the current loading task description based on animation state
      */
     private String getCurrentLoadingTask() {
@@ -517,7 +580,14 @@ public class GDKGameLobbyController implements Initializable {
         };
         
         int taskIndex = (loadingDots / 2) % tasks.length; // Change task every 2 dots
-        return tasks[taskIndex];
+        String baseTask = tasks[taskIndex];
+        
+        // Add current module name if available
+        if (!currentProcessingModule.isEmpty()) {
+            return baseTask + " - " + currentProcessingModule;
+        }
+        
+        return baseTask;
     }
     
     /**
@@ -571,6 +641,11 @@ public class GDKGameLobbyController implements Initializable {
             // Get the path to the modules directory from application constants
             String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
             
+            // Update startup progress window if available
+            if (startupProgressWindow != null) {
+                startupProgressWindow.addMessage("🔍 Discovering game modules from source...");
+            }
+            
             // Skip compilation checks on startup for speed
             // Just discover modules from existing compiled classes
             
@@ -593,6 +668,11 @@ public class GDKGameLobbyController implements Initializable {
             }
             
             // Note: We don't check for failed module loads as requested - only track successful loads
+            
+            // Update startup progress window if available
+            if (startupProgressWindow != null) {
+                startupProgressWindow.addMessage("✅ Found " + discoveredGameModules.size() + " game modules");
+            }
             
             // Add summary message for detected games
             if (availableGameModules.size() > 0) {
@@ -757,6 +837,355 @@ public class GDKGameLobbyController implements Initializable {
             });
         }
         }).start();
+    }
+    
+    /**
+     * Check for broken modules (modules that load but have Java file issues)
+     * @param modulesDirectoryPath Path to the modules directory
+     */
+    private void checkForBrokenModules(String modulesDirectoryPath) {
+        try {
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue; // Skip non-module directories
+                    }
+                    
+                    File pomFile = new File(subdir, "pom.xml");
+                    if (pomFile.exists()) {
+                        // Check if this module has Java file issues but still loads
+                        File mainJava = new File(subdir, "src/main/java/Main.java");
+                        File metadataJava = new File(subdir, "src/main/java/Metadata.java");
+                        File classesDir = new File(subdir, "target/classes");
+                        File mainClass = new File(classesDir, "Main.class");
+                        File metadataClass = new File(classesDir, "Metadata.class");
+                        
+                        // If core files exist and compile, but there might be other issues
+                        if (mainJava.exists() && metadataJava.exists() && 
+                            classesDir.exists() && mainClass.exists() && metadataClass.exists()) {
+                            
+                            // Check if there are other Java files that might have issues
+                            List<File> allJavaFiles = findAllJavaFilesInModule(subdir);
+                            if (allJavaFiles.size() > 2) { // More than just Main.java and Metadata.java
+                                // Check for syntax issues in other files
+                                List<String> problematicFiles = new ArrayList<>();
+                                for (File javaFile : allJavaFiles) {
+                                    if (!javaFile.getName().equals("Main.java") && 
+                                        !javaFile.getName().equals("Metadata.java")) {
+                                        if (!isJavaFileValid(javaFile)) {
+                                            String relativePath = javaFile.getPath().substring(subdir.getPath().length() + 1);
+                                            problematicFiles.add(relativePath);
+                                        }
+                                    }
+                                }
+                                
+                                if (!problematicFiles.isEmpty()) {
+                                    addUserMessage("⚠️ Module '" + subdir.getName() + "' has issues in: " + String.join(", ", problematicFiles));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error checking for broken modules: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Find all Java files in a module directory
+     * @param moduleDir The module directory
+     * @return List of Java files
+     */
+    private List<File> findAllJavaFilesInModule(File moduleDir) {
+        List<File> javaFiles = new ArrayList<>();
+        findJavaFilesRecursivelyInModule(moduleDir, javaFiles);
+        return javaFiles;
+    }
+    
+    /**
+     * Recursively find Java files in a module directory
+     * @param dir The directory to search
+     * @param javaFiles List to add Java files to
+     */
+    private void findJavaFilesRecursivelyInModule(File dir, List<File> javaFiles) {
+        if (!dir.exists() || !dir.isDirectory()) {
+            return;
+        }
+        
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    // Skip target and .git directories
+                    if (!file.getName().equals("target") && !file.getName().equals(".git")) {
+                        findJavaFilesRecursivelyInModule(file, javaFiles);
+                    }
+                } else if (file.getName().endsWith(".java")) {
+                    javaFiles.add(file);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Check if a Java file has valid syntax
+     * @param javaFile The Java file to check
+     * @return true if the file appears to have valid syntax
+     */
+    private boolean isJavaFileValid(File javaFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(javaFile))) {
+            StringBuilder content = new StringBuilder();
+            String line;
+            boolean isCommented = false;
+            
+            while ((line = reader.readLine()) != null) {
+                // Skip commented lines
+                if (line.trim().startsWith("//")) {
+                    continue;
+                }
+                
+                // Handle block comments
+                if (line.contains("/*")) {
+                    isCommented = true;
+                }
+                if (line.contains("*/")) {
+                    isCommented = false;
+                    continue;
+                }
+                if (isCommented) {
+                    continue;
+                }
+                
+                content.append(line).append("\n");
+            }
+            
+            String sourceCode = content.toString();
+            
+            // Basic syntax checks
+            boolean hasClassDeclaration = sourceCode.contains("class ") || sourceCode.contains("public class ");
+            boolean hasBalancedBraces = countChar(sourceCode, '{') == countChar(sourceCode, '}');
+            boolean hasBalancedParens = countChar(sourceCode, '(') == countChar(sourceCode, ')');
+            boolean hasBalancedBrackets = countChar(sourceCode, '[') == countChar(sourceCode, ']');
+            
+            return hasClassDeclaration && hasBalancedBraces && hasBalancedParens && hasBalancedBrackets;
+            
+        } catch (Exception e) {
+            Logging.warning("⚠️ Error reading Java file " + javaFile.getName() + ": " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Counts occurrences of a character in a string
+     * @param str The string to search
+     * @param ch The character to count
+     * @return The count
+     */
+    private int countChar(String str, char ch) {
+        int count = 0;
+        for (char c : str.toCharArray()) {
+            if (c == ch) count++;
+        }
+        return count;
+    }
+    
+    /**
+     * Check for compilation failures on startup
+     */
+    private void checkStartupCompilationFailures() {
+        try {
+            Logging.info("🚀 Checking for compilation failures on startup...");
+            
+            // Get the modules directory path
+            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            
+            // Check for compilation failures detected by ModuleLoader
+            checkModuleLoaderCompilationFailures();
+            
+            // Also check for any existing compilation issues
+            checkForCompilationFailures(modulesDirectoryPath);
+            
+            // Force a compilation check for all modules to detect issues
+            forceCompilationCheck(modulesDirectoryPath);
+            
+            Logging.info("✅ Startup compilation failure check completed");
+            
+        } catch (Exception e) {
+            Logging.error("❌ Error during startup compilation failure check: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Check for compilation failures detected by ModuleLoader
+     */
+    private void checkModuleLoaderCompilationFailures() {
+        try {
+            Logging.info("🔍 Starting check for ModuleLoader compilation failures...");
+            
+            // Get compilation failures from ModuleLoader
+            List<String> compilationFailures = ModuleLoader.getLastCompilationFailures();
+            
+            Logging.info("📊 Found " + compilationFailures.size() + " compilation failures to report");
+            
+            if (!compilationFailures.isEmpty()) {
+                // Use Platform.runLater to ensure UI updates happen on the JavaFX thread
+                Platform.runLater(() -> {
+                    Logging.info("🎯 Adding compilation failure messages to UI...");
+                    for (String moduleName : compilationFailures) {
+                        String message = "⚠️ Module '" + moduleName + "' failed to compile - check source code for errors";
+                        addUserMessage(message);
+                        Logging.info("📝 Added message: " + message);
+                    }
+                    String summaryMessage = "📋 Compilation failures detected in: " + String.join(", ", compilationFailures);
+                    addUserMessage(summaryMessage);
+                    Logging.info("📝 Added summary message: " + summaryMessage);
+                });
+                
+                Logging.info("📢 Queued compilation failure notifications for UI: " + String.join(", ", compilationFailures));
+            } else {
+                Logging.info("✅ No compilation failures to report");
+            }
+            
+            // Clear the stored failures after reporting them
+            ModuleLoader.clearCompilationFailures();
+            
+        } catch (Exception e) {
+            Logging.error("❌ Error checking ModuleLoader compilation failures: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Force compilation check for all modules to detect issues
+     * @param modulesDirectoryPath Path to the modules directory
+     */
+    private void forceCompilationCheck(String modulesDirectoryPath) {
+        try {
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue; // Skip non-module directories
+                    }
+                    
+                    File pomFile = new File(subdir, "pom.xml");
+                    if (pomFile.exists()) {
+                        // Check if this module has compilation issues by attempting compilation
+                        File mainJava = new File(subdir, "src/main/java/Main.java");
+                        File metadataJava = new File(subdir, "src/main/java/Metadata.java");
+                        
+                        if (mainJava.exists() && metadataJava.exists()) {
+                            // Try to compile the module
+                            boolean compilationSuccess = attemptModuleCompilation(subdir);
+                            if (!compilationSuccess) {
+                                addUserMessage("⚠️ Module '" + subdir.getName() + "' has compilation errors - check the console for details");
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error during forced compilation check: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Attempt to compile a module and return success status
+     * @param moduleDir The module directory
+     * @return true if compilation succeeds
+     */
+    private boolean attemptModuleCompilation(File moduleDir) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("mvn", "compile");
+            pb.directory(moduleDir);
+            pb.redirectErrorStream(true);
+            
+            Process process = pb.start();
+            
+            // Read output for logging
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+            }
+            
+            // Wait for compilation to complete
+            int exitCode = process.waitFor();
+            
+            if (exitCode == 0) {
+                Logging.info("✅ Forced compilation successful for " + moduleDir.getName());
+                return true;
+            } else {
+                Logging.warning("⚠️ Forced compilation failed for " + moduleDir.getName() + " (exit code: " + exitCode + ")");
+                // Log compilation errors for debugging
+                String[] lines = output.toString().split("\n");
+                for (String line : lines) {
+                    if (line.contains("ERROR") || line.contains("FAILURE") || line.contains("BUILD FAILURE")) {
+                        Logging.warning("  " + line);
+                    }
+                }
+                return false;
+            }
+            
+        } catch (Exception e) {
+            Logging.warning("⚠️ Exception during forced compilation of " + moduleDir.getName() + ": " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Check for compilation failures and notify the user
+     * @param modulesDirectoryPath Path to the modules directory
+     */
+    private void checkForCompilationFailures(String modulesDirectoryPath) {
+        try {
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue; // Skip non-module directories
+                    }
+                    
+                    File pomFile = new File(subdir, "pom.xml");
+                    if (pomFile.exists()) {
+                        // Check if this module has compilation issues
+                        File classesDir = new File(subdir, "target/classes");
+                        File mainClass = new File(classesDir, "Main.class");
+                        File metadataClass = new File(classesDir, "Metadata.class");
+                        
+                        // Check if source files exist
+                        File mainJava = new File(subdir, "src/main/java/Main.java");
+                        File metadataJava = new File(subdir, "src/main/java/Metadata.java");
+                        
+                        if (mainJava.exists() && metadataJava.exists()) {
+                            // Source files exist, check if compilation succeeded
+                            if (!classesDir.exists() || !mainClass.exists() || !metadataClass.exists()) {
+                                addUserMessage("⚠️ Module '" + subdir.getName() + "' failed to compile - check for syntax errors");
+                            }
+                        } else {
+                            // Missing source files
+                            if (!mainJava.exists()) {
+                                addUserMessage("⚠️ Module '" + subdir.getName() + "' missing Main.java file");
+                            }
+                            if (!metadataJava.exists()) {
+                                addUserMessage("⚠️ Module '" + subdir.getName() + "' missing Metadata.java file");
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error checking for compilation failures: " + e.getMessage(), e);
+        }
     }
     
     /**
@@ -1020,7 +1449,7 @@ public class GDKGameLobbyController implements Initializable {
         Map<String, Object> jsonConfigurationData = parseJsonConfigurationData();
         if (jsonConfigurationData == null) {
             // Check if it's due to invalid JSON syntax (not empty input)
-            String jsonText = jsonEditor.getInputText().trim();
+            String jsonText = jsonInputEditor.getText().trim();
             if (!jsonText.isEmpty()) {
                 showErrorDialog("Invalid JSON", "Please enter valid JSON configuration."); // Show error to user
                 return; // Exit early if JSON syntax is invalid
@@ -1058,7 +1487,7 @@ public class GDKGameLobbyController implements Initializable {
         }
         
         // Get the content from the JSON input area
-        String jsonContent = jsonEditor.getInputText().trim();
+        String jsonContent = jsonInputEditor.getText().trim();
         String gameModuleName = selectedGameModule.getGameName();
         
         if (jsonContent.isEmpty()) {
@@ -1080,7 +1509,7 @@ public class GDKGameLobbyController implements Initializable {
                 String responseJson = formatJsonResponse(response);
                 
                 // Display in the output area
-                jsonEditor.setOutputText(responseJson);
+                jsonOutputEditor.setText(responseJson);
                 
                 // Add status message to message area
                 addUserMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");
@@ -1105,7 +1534,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void clearJsonInputData() {
         // Remove all text from the JSON input area
-        jsonEditor.clearInput();
+        jsonInputEditor.clear();
         
         // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON input data");
@@ -1113,7 +1542,7 @@ public class GDKGameLobbyController implements Initializable {
     
     private void clearJsonOutputData() {
         // Remove all text from the JSON output area
-        jsonEditor.clearOutput();
+        jsonOutputEditor.clear();
         
         // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON output data");
@@ -1127,7 +1556,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void clearJsonConfigurationData() {
         // Remove all text from the JSON output area
-        jsonEditor.clearOutput();
+        jsonOutputEditor.clear();
         
         // Provide user feedback about the action
         addUserMessage("🗑️ Cleared JSON output data");
@@ -1144,7 +1573,7 @@ public class GDKGameLobbyController implements Initializable {
         String metadataRequest = "{\n  \"function\": \"metadata\"\n}";
         
         // Set the JSON input area content
-        jsonEditor.setInputText(metadataRequest);
+        jsonInputEditor.setText(metadataRequest);
         
         // Provide user feedback about the action
         addUserMessage("📋 Filled JSON input with metadata request");
@@ -1177,7 +1606,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private Map<String, Object> parseJsonConfigurationData() {
         // Get the JSON text from the text area and remove leading/trailing whitespace
-        String jsonConfigurationText = jsonEditor.getInputText().trim();
+        String jsonConfigurationText = jsonInputEditor.getText().trim();
         
         // If JSON is empty, return null (let the game decide what to do)
         if (jsonConfigurationText.isEmpty()) {
@@ -1353,7 +1782,7 @@ public class GDKGameLobbyController implements Initializable {
             Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
             if (Files.exists(jsonFile)) {
                 String savedJson = Files.readString(jsonFile);
-                jsonEditor.setInputText(savedJson);
+                jsonInputEditor.setText(savedJson);
                 // No startup message - only show when setting changes
             } else {
                 // No startup message - only show when setting changes
@@ -1373,7 +1802,7 @@ public class GDKGameLobbyController implements Initializable {
         }
         
         try {
-            String jsonContent = jsonEditor.getInputText();
+            String jsonContent = jsonInputEditor.getText();
             Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
             Files.writeString(jsonFile, jsonContent);
             Logging.info("📋 Saved JSON input content to file");

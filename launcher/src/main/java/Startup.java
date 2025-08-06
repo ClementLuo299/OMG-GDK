@@ -1,10 +1,14 @@
 import gdk.Logging;
+import gdk.GameModule;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.List;
+import launcher.StartupProgressWindow;
+import launcher.PreStartupProgressWindow;
 
 /**
  * Handles the complete startup process for the GDK application.
@@ -44,6 +48,16 @@ public class Startup {
      * Controller for the main GDK lobby interface
      */
     private GDKGameLobbyController lobbyController;
+    
+    /**
+     * Startup progress window for showing initialization progress
+     */
+    private StartupProgressWindow progressWindow;
+    
+    /**
+     * Pre-startup progress window (Swing-based)
+     */
+    private PreStartupProgressWindow preProgressWindow;
 
     // ==================== CONSTRUCTOR ====================
     
@@ -55,6 +69,30 @@ public class Startup {
     public Startup(Stage primaryApplicationStage) {
         this.primaryApplicationStage = primaryApplicationStage;
         this.gameModuleLoader = new ModuleLoader();
+    }
+    
+    /**
+     * Create a new Startup instance with the provided primary stage and progress window.
+     * 
+     * @param primaryApplicationStage The primary stage for the application
+     * @param progressWindow The progress window to use for startup updates
+     */
+    public Startup(Stage primaryApplicationStage, StartupProgressWindow progressWindow) {
+        this.primaryApplicationStage = primaryApplicationStage;
+        this.gameModuleLoader = new ModuleLoader();
+        this.progressWindow = progressWindow;
+    }
+    
+    /**
+     * Create a new Startup instance with the provided primary stage and pre-startup progress window.
+     * 
+     * @param primaryApplicationStage The primary stage for the application
+     * @param preProgressWindow The pre-startup progress window to use for startup updates
+     */
+    public Startup(Stage primaryApplicationStage, PreStartupProgressWindow preProgressWindow) {
+        this.primaryApplicationStage = primaryApplicationStage;
+        this.gameModuleLoader = new ModuleLoader();
+        this.preProgressWindow = preProgressWindow;
     }
 
     // ==================== PUBLIC STARTUP ORCHESTRATION ====================
@@ -70,25 +108,90 @@ public class Startup {
     public void start() {
         Logging.info("🔄 Starting GDK application startup process");
         
+        // Use pre-startup window if provided, otherwise create JavaFX progress window
+        if (preProgressWindow != null) {
+            // Use the pre-startup window for all progress updates
+            preProgressWindow.setTotalSteps(3); // 3 main startup steps (simplified)
+            preProgressWindow.updateProgress(0, "Starting GDK application...");
+        } else {
+            // Create a new JavaFX progress window for clean startup
+            progressWindow = new StartupProgressWindow();
+            progressWindow.setTotalSteps(3); // 3 main startup steps (simplified)
+            progressWindow.show();
+        }
+        
         try {
-            // Step 1: Initialize the main user interface
+            // Step 1: Initialize the main user interface (this includes FXML loading and controller init)
+            updateProgress(1, "Loading user interface...");
             Scene mainLobbyScene = initializeMainUserInterface();
             
-            // Step 2: Create and configure the ViewModel
+            // Step 2: Create and configure the ViewModel (quick step, no progress update)
             GDKViewModel applicationViewModel = initializeApplicationViewModel();
             
-            // Step 3: Configure the primary application stage
+            // Step 3: Configure the primary application stage (quick step, no progress update)
             configurePrimaryApplicationStage(mainLobbyScene);
             
-            // Step 4: Wire up the controller with the ViewModel
+            // Step 4: Wire up the controller with the ViewModel (quick step, no progress update)
             wireUpControllerWithViewModel(mainLobbyScene, applicationViewModel);
             
-            // Step 5: Display the application to the user
-            primaryApplicationStage.show();
+            // Pass the progress window to the controller for module loading updates
+            if (lobbyController != null && progressWindow != null) {
+                lobbyController.setStartupProgressWindow(progressWindow);
+            }
+            
+            // Step 2: Ensure UI is ready and show application (this takes time)
+            updateProgress(2, "Preparing application...");
+            
+            // Ensure the UI is fully ready before showing the main window
+            ensureUIReady();
+            
+            // Now show the main application window when everything is ready
+            updateProgress(3, "Starting application...");
+            
+            // Use Platform.runLater to ensure proper JavaFX thread timing
+            javafx.application.Platform.runLater(() -> {
+                // Show the window but keep it invisible
+                Logging.info("🎬 Showing main application window (invisible)...");
+                primaryApplicationStage.show();
+                
+                // Use another runLater to ensure the window is fully rendered
+                javafx.application.Platform.runLater(() -> {
+                    // Wait a bit more to ensure all UI components are fully rendered
+                    updateProgress(3, "Rendering application...");
+                    
+                    // Use a timer to delay the fade-in
+                    javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(1200)); // DEVELOPMENT: Slowed down
+                    pause.setOnFinished(event -> {
+                        // Now fade in the main window
+                        Logging.info("✨ Fading in main application window...");
+                        primaryApplicationStage.setOpacity(1.0);
+                        
+                        // Hide the progress window after the main window is visible
+                        Logging.info("🏁 Hiding progress window...");
+                        hideProgressWindow();
+                    });
+                    pause.play();
+                });
+            });
             
             Logging.info("✅ GDK application startup completed successfully");
         } catch (Exception startupError) {
             Logging.error("❌ GDK application startup failed: " + startupError.getMessage(), startupError);
+            
+            // Show error in progress window before hiding
+            if (progressWindow != null) {
+                progressWindow.addMessage("❌ ERROR: " + startupError.getMessage());
+                progressWindow.updateProgress(5, "Startup failed - check error messages");
+                
+                // Keep progress window visible for a moment to show error
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                progressWindow.hide();
+            }
+            
             throw new RuntimeException("Failed to start GDK application", startupError);
         }
     }
@@ -193,6 +296,12 @@ public class Startup {
         // Set the main lobby scene on the primary stage
         primaryApplicationStage.setScene(mainLobbyScene);
         
+        // Make the window invisible initially to prevent flash
+        primaryApplicationStage.setOpacity(0.0);
+        
+        // Don't show the window yet - we'll show it at the very end
+        // primaryApplicationStage.show(); // This will be called later
+        
         Logging.info("✅ Primary application stage configured successfully");
     }
     
@@ -217,6 +326,90 @@ public class Startup {
             }
         } catch (Exception wiringError) {
             Logging.error("❌ Error wiring up controller: " + wiringError.getMessage(), wiringError);
+        }
+    }
+    
+    // ==================== PROGRESS WINDOW HELPERS ====================
+    
+    /**
+     * Update progress on the appropriate progress window
+     * @param step The current step
+     * @param status The status message
+     */
+    private void updateProgress(int step, String status) {
+        if (preProgressWindow != null) {
+            preProgressWindow.updateProgress(step, status);
+        } else if (progressWindow != null) {
+            progressWindow.updateProgress(step, status);
+        }
+    }
+    
+
+    
+    /**
+     * Hide the appropriate progress window
+     */
+    private void hideProgressWindow() {
+        if (preProgressWindow != null) {
+            preProgressWindow.hide();
+        } else if (progressWindow != null) {
+            progressWindow.hide();
+        }
+    }
+    
+    /**
+     * Ensure the UI is fully ready before showing the main window
+     */
+    private void ensureUIReady() {
+        Logging.info("🔧 Ensuring UI is fully ready...");
+        
+        try {
+            // Verify the lobby controller is ready
+            if (lobbyController == null) {
+                throw new RuntimeException("Lobby controller is not ready");
+            }
+            
+            // Wait for the controller to finish its initialization
+            // The controller's initialize() method calls refreshAvailableGameModulesFast()
+            // which might take some time to complete
+            updateProgress(2, "Initializing game modules...");
+            Thread.sleep(1000); // DEVELOPMENT: Slowed down to see messages
+            
+            // Show module loading information
+            updateProgress(2, "Loading available game modules...");
+            Thread.sleep(800); // DEVELOPMENT: Slowed down to see messages
+            
+            // Get and display discovered modules
+            List<GameModule> discoveredModules = ModuleLoader.getDiscoveredModules();
+            if (!discoveredModules.isEmpty()) {
+                StringBuilder moduleList = new StringBuilder();
+                for (int i = 0; i < discoveredModules.size(); i++) {
+                    if (i > 0) moduleList.append(", ");
+                    moduleList.append(discoveredModules.get(i).getGameName());
+                }
+                updateProgress(2, "Loaded modules: " + moduleList.toString());
+                Thread.sleep(1000); // DEVELOPMENT: Slowed down to see module list
+            } else {
+                updateProgress(2, "No game modules found");
+                Thread.sleep(500); // DEVELOPMENT: Slowed down to see message
+            }
+            
+            // Additional wait for any background processes
+            updateProgress(2, "Finalizing UI components...");
+            Thread.sleep(600); // DEVELOPMENT: Slowed down to see messages
+            
+            // Force JavaFX to process all pending events
+            javafx.application.Platform.runLater(() -> {
+                Logging.info("✅ UI components fully initialized");
+            });
+            
+            // Small additional delay to ensure everything is ready
+            Thread.sleep(200);
+            
+            Logging.info("✅ UI is fully ready for user interaction");
+        } catch (Exception e) {
+            Logging.error("❌ Error ensuring UI readiness: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to ensure UI readiness", e);
         }
     }
 } 

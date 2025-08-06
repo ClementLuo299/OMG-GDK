@@ -6,6 +6,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import javafx.stage.Stage;
+import launcher.StartupProgressWindow;
+import launcher.PreStartupProgressWindow;
 
 /**
  * Main JavaFX Application class for the OMG Game Development Kit (GDK).
@@ -33,7 +35,7 @@ public class GDKApplication extends Application {
      * Path to the modules directory relative to the launcher
      * This is where game modules (JARs and compiled classes) are stored
      */
-    public static final String MODULES_DIRECTORY_PATH = "../modules";
+    public static final String MODULES_DIRECTORY_PATH = "modules";
     
     // ==================== INSTANCE VARIABLES ====================
     
@@ -57,10 +59,33 @@ public class GDKApplication extends Application {
     public void start(Stage primaryStage) {
         this.primaryApplicationStage = primaryStage;
         
+        // Show pre-startup progress window immediately
+        PreStartupProgressWindow preProgressWindow = new PreStartupProgressWindow();
+        preProgressWindow.setTotalSteps(6); // Pre-JavaFX + JavaFX steps
+        preProgressWindow.show();
+        preProgressWindow.updateProgress(0, "Starting GDK application...");
+        
         try {
-            new Startup(primaryApplicationStage).start();
+            // Update progress for JavaFX initialization
+            preProgressWindow.updateProgress(1, "Initializing JavaFX components...");
+            
+            // Keep pre-startup window visible and delegate to Startup class
+            // The Startup class will handle the transition
+            new Startup(primaryApplicationStage, preProgressWindow).start();
         } catch (Exception startupError) {
             Logging.error("❌ Failed to start GDK application: " + startupError.getMessage(), startupError);
+            
+            // Show error in pre-startup progress window
+            preProgressWindow.updateProgress(6, "Startup failed - check error messages");
+            
+            // Keep progress window visible for a moment to show error
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            preProgressWindow.hide();
+            
             displayErrorDialog("Startup Error", null, "Failed to start GDK application: " + startupError.getMessage());
         }
     }

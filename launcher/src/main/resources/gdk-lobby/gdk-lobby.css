@@ -2,6 +2,111 @@
 
 /* ==================== GDK GAME LOBBY STYLES ==================== */
 
+/* Single JSON Editor Styles */
+.single-json-editor {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0, 0, 1);
+}
+
+.single-json-editor .title-label {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 10px 15px 5px 15px;
+}
+
+.single-json-editor .toolbar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 5px 15px;
+}
+
+.single-json-editor .toolbar .button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #495057;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 5px 10px;
+    -fx-cursor: hand;
+}
+
+.single-json-editor .toolbar .button:hover {
+    -fx-background-color: #e9ecef;
+    -fx-border-color: #adb5bd;
+}
+
+.single-json-editor .toolbar .button:pressed {
+    -fx-background-color: #dee2e6;
+    -fx-border-color: #6c757d;
+}
+
+.single-json-editor .code-area {
+    -fx-font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+    -fx-font-size: 12px;
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #2c3e50;
+}
+
+.single-json-editor .code-area .content {
+    -fx-background-color: #ffffff;
+}
+
+.single-json-editor .code-area .paragraph-box:has-caret {
+    -fx-background-color: #f8f9fa;
+}
+
+.single-json-editor .code-area .lineno {
+    -fx-background-color: #f8f9fa;
+    -fx-text-fill: #6c757d;
+    -fx-font-size: 11px;
+    -fx-padding: 0 5px 0 5px;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 0 1 0 0;
+}
+
+.single-json-editor .code-area .keyword {
+    -fx-fill: #e83e8c;
+    -fx-font-weight: bold;
+}
+
+.single-json-editor .code-area .string {
+    -fx-fill: #28a745;
+}
+
+.single-json-editor .code-area .number {
+    -fx-fill: #fd7e14;
+}
+
+.single-json-editor .code-area .brace {
+    -fx-fill: #6f42c1;
+    -fx-font-weight: bold;
+}
+
+.single-json-editor .code-area .bracket {
+    -fx-fill: #6f42c1;
+    -fx-font-weight: bold;
+}
+
+.single-json-editor .code-area .colon {
+    -fx-fill: #495057;
+    -fx-font-weight: bold;
+}
+
+.single-json-editor .code-area .comma {
+    -fx-fill: #495057;
+    -fx-font-weight: bold;
+}
+
 /* Main Container */
 .game-lobby-container {
     -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
