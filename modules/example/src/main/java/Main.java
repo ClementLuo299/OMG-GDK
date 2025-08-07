@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 import java.util.HashMap;
 import java.util.Map;
 
+import launcher.utils.DialogUtil;
+
 /**
  * Example Game Module - A simple game module for testing the GDK.
  * Demonstrates basic game module implementation and communication.

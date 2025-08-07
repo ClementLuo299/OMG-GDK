@@ -1,7 +1,8 @@
-package launcher;
+package launcher.gui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import launcher.GDKApplication;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -26,6 +27,7 @@ import java.util.function.Consumer;
  *
  * @authors Clement Luo
  * @date July 25, 2025
+ * @edited August 6, 2025
  * @since 1.0
  */
 public class ServerSimulatorController {

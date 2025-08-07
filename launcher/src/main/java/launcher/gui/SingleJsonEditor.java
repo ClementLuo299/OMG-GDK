@@ -1,4 +1,4 @@
-package launcher;
+package launcher.gui;
 
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
@@ -40,6 +40,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.time.Duration;
 import javafx.scene.layout.Priority;
+
+import launcher.utils.DialogUtil;
 
 /**
  * A professional single-area JSON editor using RichTextFX with syntax highlighting,

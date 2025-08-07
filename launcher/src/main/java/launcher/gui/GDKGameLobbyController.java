@@ -1,7 +1,10 @@
-package launcher;
+package launcher.gui;
 
 import gdk.GameModule;
 import gdk.Logging;
+import launcher.utils.ModuleLoader;
+import launcher.lifecycle.start.StartupProgressWindow;
+import launcher.GDKApplication;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -47,6 +50,8 @@ import java.io.InputStreamReader;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import launcher.utils.DialogUtil;
 
 
 /**

@@ -1,7 +1,10 @@
-package launcher;
+package launcher.gui;
 
 import gdk.GameModule;
 import gdk.Logging;
+import launcher.utils.ModuleLoader;
+import launcher.gui.ServerSimulatorController;
+import launcher.GDKApplication;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,7 +31,7 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited July 25, 2025
+ * @edited August 6, 2025
  * @since 1.0
  */
 public class GDKViewModel {

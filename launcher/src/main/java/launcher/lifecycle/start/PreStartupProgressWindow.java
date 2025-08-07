@@ -1,4 +1,4 @@
-package launcher;
+package launcher.lifecycle.start;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -19,6 +19,8 @@ import java.util.TimerTask;
  * during the JavaFX initialization phase.
  * 
  * @author Clement Luo
+ * @date August 5, 2025
+ * @edited August 6, 2025
  * @since 1.0
  */
 public class PreStartupProgressWindow {

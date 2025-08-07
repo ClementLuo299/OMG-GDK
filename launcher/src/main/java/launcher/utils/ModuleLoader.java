@@ -1,7 +1,9 @@
-package launcher;
+package launcher.utils;
 
 import gdk.GameModule;
 import gdk.Logging;
+import launcher.lifecycle.start.Startup;
+import launcher.gui.GDKGameLobbyController;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -22,7 +24,7 @@ import java.io.InputStreamReader;
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited August 4, 2025
+ * @edited August 6, 2025
  * @since 1.0
  */
 public class ModuleLoader {

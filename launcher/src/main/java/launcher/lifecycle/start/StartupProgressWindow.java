@@ -1,4 +1,4 @@
-package launcher;
+package launcher.lifecycle.start;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * - Clean, modern UI design
  * 
  * @author Clement Luo
+ * @date August 5, 2025
+ * @edited August 6, 2025
  * @since 1.0
  */
 public class StartupProgressWindow {
@@ -58,7 +60,7 @@ public class StartupProgressWindow {
     private void createProgressWindow() {
         // Create the main stage
         progressStage = new Stage();
-        progressStage.setTitle("GDK Game Development Kit - Starting Up");
+        progressStage.setTitle("OMG Game Development Kit - Starting Up");
         progressStage.initStyle(StageStyle.UNDECORATED); // No window decorations
         progressStage.initModality(Modality.APPLICATION_MODAL); // Block other windows
         progressStage.setResizable(false);
@@ -87,7 +89,7 @@ public class StartupProgressWindow {
         root.setStyle("-fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e);");
         
         // Title
-        Label titleLabel = new Label("GDK Game Development Kit");
+        Label titleLabel = new Label("OMG Game Development Kit");
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 24));
         titleLabel.setStyle("-fx-text-fill: white;");
         

@@ -28,6 +28,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import launcher.utils.DialogUtil;
+
 /**
  * Controller for the TicTacToe game screen.
  * Handles game logic, UI updates, and user interactions.

@@ -1,4 +1,4 @@
-package launcher;
+package launcher.lifecycle.stop;
 
 /**
  * Handles the shutdown process of the GDK application.

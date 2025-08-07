@@ -5,6 +5,11 @@ import gdk.Logging;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import launcher.utils.DialogUtil;
+import launcher.lifecycle.start.Startup;
+import launcher.lifecycle.start.PreStartupProgressWindow;
+import launcher.gui.GDKViewModel;
+
 
 /**
  * Main JavaFX Application class for the OMG Game Development Kit (GDK).
