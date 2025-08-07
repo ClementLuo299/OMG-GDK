@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.ArrayList;
 import launcher.StartupProgressWindow;
 import launcher.PreStartupProgressWindow;
 
@@ -113,12 +114,12 @@ public class Startup {
         // Use pre-startup window if provided, otherwise create JavaFX progress window
         if (preProgressWindow != null) {
             // Use the pre-startup window for all progress updates
-            preProgressWindow.setTotalSteps(3); // 3 main startup steps (simplified)
+            preProgressWindow.setTotalSteps(15); // 15 granular steps for better progress tracking
             preProgressWindow.updateProgress(0, "Starting GDK application...");
         } else {
             // Create a new JavaFX progress window for clean startup
             progressWindow = new StartupProgressWindow();
-            progressWindow.setTotalSteps(3); // 3 main startup steps (simplified)
+            progressWindow.setTotalSteps(15); // 15 granular steps for better progress tracking
             progressWindow.show();
         }
         
@@ -147,9 +148,14 @@ public class Startup {
             // Ensure the UI is fully ready before showing the main window
             ensureUIReady();
             
-            // Now show the main application window when everything is ready
-            updateProgress(3, "Starting application...");
+            // Hide the progress window FIRST
+            Logging.info("🏁 Hiding progress window...");
+            hideProgressWindow();
             
+            // Wait a moment for the progress window to fully close
+            Thread.sleep(1000); // DEVELOPMENT: Wait for progress window to close
+            
+            // Now show the main application window when everything is ready
             // Use Platform.runLater to ensure proper JavaFX thread timing
             javafx.application.Platform.runLater(() -> {
                 // Show the window but keep it invisible
@@ -158,19 +164,12 @@ public class Startup {
                 
                 // Use another runLater to ensure the window is fully rendered
                 javafx.application.Platform.runLater(() -> {
-                    // Wait a bit more to ensure all UI components are fully rendered
-                    updateProgress(3, "Rendering application...");
-                    
                     // Use a timer to delay the fade-in
                     javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(3000)); // DEVELOPMENT: Slowed down
                     pause.setOnFinished(event -> {
-                        // Now fade in the main window
+                        // Then fade in the main window
                         Logging.info("✨ Fading in main application window...");
                         primaryApplicationStage.setOpacity(1.0);
-                        
-                        // Hide the progress window after the main window is visible
-                        Logging.info("🏁 Hiding progress window...");
-                        hideProgressWindow();
                     });
                     pause.play();
                 });
@@ -346,6 +345,73 @@ public class Startup {
         }
     }
     
+    /**
+     * Update progress with individual module loading message
+     * @param moduleName The name of the module being loaded
+     */
+    public void updateProgressWithModule(String moduleName) {
+        String status = "Loading module: " + moduleName + "...";
+        // This method is called by ModuleLoader, but we handle individual module progress
+        // in loadModulesWithProgress() method, so this is just a fallback
+        updateProgress(6, status);
+    }
+    
+    /**
+     * Load modules with individual progress messages for each module
+     */
+    private void loadModulesWithProgress() {
+        try {
+            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            File modulesDir = new File(modulesDirectoryPath);
+            
+            if (!modulesDir.exists() || !modulesDir.isDirectory()) {
+                updateProgress(6, "Modules directory not found");
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
+                return;
+            }
+            
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            if (subdirs == null || subdirs.length == 0) {
+                updateProgress(6, "No modules found");
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
+                return;
+            }
+            
+            // Filter out non-module directories
+            List<File> moduleDirs = new ArrayList<>();
+            for (File subdir : subdirs) {
+                if (!subdir.getName().equals("target") && !subdir.getName().equals(".git")) {
+                    moduleDirs.add(subdir);
+                }
+            }
+            
+            // Load each module with individual progress message (steps 6-11)
+            int moduleStep = 6;
+            for (File moduleDir : moduleDirs) {
+                String moduleName = moduleDir.getName();
+                updateProgress(moduleStep, "Loading module: " + moduleName + "...");
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see each module message
+                moduleStep++;
+            }
+            
+            // Now trigger the actual module loading (this will populate the UI)
+            lobbyController.refreshAvailableGameModulesFast();
+            
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Logging.error("❌ Module loading interrupted: " + e.getMessage(), e);
+            updateProgress(11, "Module loading interrupted");
+        } catch (Exception e) {
+            Logging.error("❌ Error loading modules with progress: " + e.getMessage(), e);
+            updateProgress(11, "Error loading modules");
+            try {
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see error message
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    
 
     
     /**
@@ -371,65 +437,49 @@ public class Startup {
                 throw new RuntimeException("Lobby controller is not ready");
             }
             
-            // Wait for the controller to finish its initialization
+            // Step 1: Initialize game modules
             updateProgress(2, "Initializing game modules...");
             Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
             
-            // Build modules if needed (moved from shell script to JavaFX app)
-            updateProgress(2, "Building modules (checking for changes)...");
-            Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
-            
+            // Step 2: Build modules if needed (moved from shell script to JavaFX app)
             if (needToBuildModules()) {
-                updateProgress(2, "Building modules (incremental)...");
-                Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
                 
                 // Build GDK first (if needed)
                 if (!new File("../gdk/target/classes").exists()) {
-                    updateProgress(2, "Building GDK...");
-                    Thread.sleep(1500); // DEVELOPMENT: Slowed down to see messages
+                    updateProgress(3, "Building GDK...");
+                    Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
                     buildModule("../gdk");
                 }
                 
                 // Build launcher
-                updateProgress(2, "Building launcher...");
-                Thread.sleep(1500); // DEVELOPMENT: Slowed down to see messages
+                updateProgress(4, "Building launcher...");
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
                 buildModule(".");
             } else {
-                updateProgress(2, "Using existing builds (recent compilation detected)");
-                Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
+                updateProgress(3, "Using existing builds (recent compilation detected)");
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
             }
             
-            // Now trigger module loading with progress window ready
+            // Step 3: Prepare module discovery
+            updateProgress(5, "Preparing module discovery...");
+            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
+            
+            // Register this startup instance with ModuleLoader for individual module messages
+            ModuleLoader.setStartupProgressWindow(this);
+            
+            // Step 4: Load modules with individual progress messages
             if (lobbyController != null) {
-                updateProgress(2, "Loading available game modules...");
-                Thread.sleep(2500); // DEVELOPMENT: Slowed down to see messages
-                
-                // Additional delay to ensure pre-startup window is fully visible
-                Thread.sleep(2000); // DEVELOPMENT: Ensure window is visible before module loading
-                
-                // Trigger module discovery and loading
-                lobbyController.refreshAvailableGameModulesFast();
+                loadModulesWithProgress();
             }
             
-            // Get and display discovered modules
-            List<GameModule> discoveredModules = ModuleLoader.getDiscoveredModules();
-            if (!discoveredModules.isEmpty()) {
-                StringBuilder moduleList = new StringBuilder();
-                for (int i = 0; i < discoveredModules.size(); i++) {
-                    if (i > 0) moduleList.append(", ");
-                    moduleList.append(discoveredModules.get(i).getGameName());
-                }
-                updateProgress(2, "Loaded modules: " + moduleList.toString());
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see module list
-            } else {
-                updateProgress(2, "No game modules found");
-                Thread.sleep(1500); // DEVELOPMENT: Slowed down to see message
-            }
+            // Step 5: Finalize module loading
+            updateProgress(12, "Finalizing module loading...");
+            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
             
-            // Now check for compilation failures after modules are loaded
+            // Step 6: Check for compilation failures after modules are loaded
             if (lobbyController != null) {
-                updateProgress(2, "Checking module compilation...");
-                Thread.sleep(1000); // DEVELOPMENT: Slowed down to see message
+                updateProgress(13, "Checking for compilation issues...");
+                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
                 
                 // Check for compilation failures
                 lobbyController.checkStartupCompilationFailures();
@@ -438,9 +488,16 @@ public class Startup {
                 lobbyController.clearStartupProgressWindow();
             }
             
-            // Additional wait for any background processes
-            updateProgress(2, "Finalizing UI components...");
-            Thread.sleep(2000); // DEVELOPMENT: Slowed down to see messages
+            // Step 7: Startup complete
+            updateProgress(14, "Startup complete");
+            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
+            
+            // Step 8: Final step to reach 100%
+            updateProgress(15, "Ready!");
+            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
+            
+            // Clear the startup progress window reference to prevent further updates
+            ModuleLoader.clearStartupProgressWindow();
             
             // Force JavaFX to process all pending events
             javafx.application.Platform.runLater(() -> {

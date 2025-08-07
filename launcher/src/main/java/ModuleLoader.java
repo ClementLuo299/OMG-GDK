@@ -191,6 +191,9 @@ public class ModuleLoader {
     // Callback for UI updates
     private static GDKGameLobbyController uiController = null;
     
+    // Callback for startup progress window
+    private static Startup startupProgressWindow = null;
+    
     // Store discovered modules for startup progress
     private static List<GameModule> discoveredModules = new ArrayList<>();
     
@@ -200,6 +203,14 @@ public class ModuleLoader {
      */
     public static void setUIController(GDKGameLobbyController controller) {
         uiController = controller;
+    }
+    
+    public static void setStartupProgressWindow(Startup startup) {
+        startupProgressWindow = startup;
+    }
+    
+    public static void clearStartupProgressWindow() {
+        startupProgressWindow = null;
     }
     
     /**
@@ -270,6 +281,18 @@ public class ModuleLoader {
             // Use Platform.runLater to ensure UI updates happen on the JavaFX thread
             javafx.application.Platform.runLater(() -> {
                 uiController.setCurrentProcessingModule(moduleName);
+            });
+        }
+        
+        // Update startup progress window with individual module message
+        if (startupProgressWindow != null) {
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    startupProgressWindow.updateProgressWithModule(moduleName);
+                } catch (Exception e) {
+                    // Ignore exceptions when startup progress window is being cleared
+                    Logging.info("📊 Progress update skipped (startup window cleared)");
+                }
             });
         }
     }
