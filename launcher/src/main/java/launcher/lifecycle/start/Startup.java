@@ -1,11 +1,9 @@
 package launcher.lifecycle.start;
 
 import gdk.Logging;
-import gdk.GameModule;
+
 import launcher.utils.ModuleLoader;
 import launcher.gui.GDKGameLobbyController;
-import launcher.lifecycle.start.StartupProgressWindow;
-import launcher.lifecycle.start.PreStartupProgressWindow;
 import launcher.gui.GDKViewModel;
 import launcher.GDKApplication;
 

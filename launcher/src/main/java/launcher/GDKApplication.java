@@ -1,14 +1,10 @@
 package launcher;
 
-import gdk.Logging;
-
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import launcher.utils.DialogUtil;
 import launcher.lifecycle.start.Startup;
-import launcher.lifecycle.start.PreStartupProgressWindow;
-import launcher.gui.GDKViewModel;
+import launcher.lifecycle.stop.Shutdown;
 
 
 /**
@@ -36,71 +32,34 @@ public class GDKApplication extends Application {
     /**
      * JavaFX application startup method called by the framework.
      * 
-     * This method is invoked when the JavaFX application is starting up.
-     * It initializes the GDK and delegates the main startup process to
-     * the Startup class for better organization.
+     * This method delegates the startup process to the Startup class.
      * 
      * @param primaryStage The primary stage provided by JavaFX
      */
     @Override
     public void start(Stage primaryStage) {
-        // Show pre-startup progress window immediately
-        PreStartupProgressWindow preProgressWindow = new PreStartupProgressWindow();
-        preProgressWindow.setTotalSteps(6); // Pre-JavaFX + JavaFX steps
-        preProgressWindow.show();
-        preProgressWindow.updateProgress(0, "Starting GDK application...");
-        
-        try {
-            // Update progress for JavaFX initialization
-            preProgressWindow.updateProgress(1, "Initializing JavaFX components...");
-            
-            // Keep pre-startup window visible and delegate to Startup class
-            // The Startup class will handle the transition
-            new Startup(primaryStage, preProgressWindow).start();
-        } catch (Exception startupError) {
-            Logging.error("❌ Failed to start GDK application: " + startupError.getMessage(), startupError);
-            
-            // Show error in pre-startup progress window
-            preProgressWindow.updateProgress(6, "Startup failed - check error messages");
-            
-            // Keep progress window visible for a moment to show error
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            preProgressWindow.hide();
-            
-            DialogUtil.showStartupError("Startup Error", null, "Failed to start GDK application: " + startupError.getMessage());
-        }
+        new Startup(primaryStage).start();
     }
 
     /**
      * JavaFX application shutdown method called by the framework.
      * 
-     * This method is invoked when the JavaFX application is shutting down.
-     * It performs any necessary cleanup and logging.
+     * This method delegates the shutdown process to the Shutdown class.
      */
     @Override
     public void stop() {
-        Logging.info("🔄 GDK application shutdown completed");
+        new Shutdown().shutdown();
     }
     
     /**
      * Main entry point for the GDK application.
      * 
      * This method is the standard Java main method that launches the
-     * JavaFX application. It includes error handling for fatal application
-     * errors that might occur during the launch process.
+     * JavaFX application.
      * 
-     * @param commandLineArguments Command line arguments passed to the application
+     * @param args Command line arguments passed to the application
      */
-    public static void main(String[] commandLineArguments) {
-        try {
-            launch(commandLineArguments);
-        } catch (Exception fatalError) {
-            Logging.error("❌ Fatal application error: " + fatalError.getMessage(), fatalError);
-            DialogUtil.showFatalError("Fatal Application Error", "The application cannot start", "A fatal error occurred: " + fatalError.getMessage());
-        }
+    public static void main(String[] args) {
+        launch(args);
     }
 } 
