@@ -104,11 +104,7 @@ public class Main implements GameModule {
         jsonDataButton.setOnAction(e -> {
             Logging.info("📦 Checking for custom JSON data...");
             Logging.info("📦 No custom JSON data found");
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
-            alert.setTitle("JSON Data Information");
-            alert.setHeaderText("No Custom Data");
-            alert.setContentText("No custom JSON data was provided when launching this game.");
-            alert.showAndWait();
+            DialogUtil.showInfo("JSON Data Information", "No Custom Data", "No custom JSON data was provided when launching this game.");
         });
         
         javafx.scene.control.Button closeButton = new javafx.scene.control.Button("❌ Close Game");

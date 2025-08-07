@@ -246,18 +246,12 @@ public class TicTacToeController implements Initializable {
     @FXML
     private void onForfeitGameClicked() {
         if (gameInProgress) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Forfeit Game");
-            alert.setHeaderText("Are you sure you want to forfeit?");
-            alert.setContentText("This will end the current game.");
-            
-            alert.showAndWait().ifPresent(response -> {
-                if (response == javafx.scene.control.ButtonType.OK) {
-                    // Logging should be handled by Main class
-                    addSystemMessage(currentPlayer.getName() + " forfeited the game!");
-                    handleGameWon();
-                }
-            });
+            boolean confirmed = DialogUtil.showConfirmation("Forfeit Game", "Are you sure you want to forfeit?", "This will end the current game.");
+            if (confirmed) {
+                // Logging should be handled by Main class
+                addSystemMessage(currentPlayer.getName() + " forfeited the game!");
+                handleGameWon();
+            }
         }
     }
     
@@ -486,11 +480,7 @@ public class TicTacToeController implements Initializable {
      * Shows an alert dialog
      */
     private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        DialogUtil.showInfo(title, message);
     }
     
     /**

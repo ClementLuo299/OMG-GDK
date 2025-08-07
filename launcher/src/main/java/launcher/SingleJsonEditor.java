@@ -1,3 +1,5 @@
+package launcher;
+
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
@@ -379,11 +381,20 @@ public class SingleJsonEditor extends VBox {
      * Show an alert dialog.
      */
     private void showAlert(AlertType type, String title, String header, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
+        switch (type) {
+            case ERROR:
+                DialogUtil.showError(title, header, content);
+                break;
+            case WARNING:
+                DialogUtil.showWarning(title, header, content);
+                break;
+            case INFORMATION:
+                DialogUtil.showInfo(title, header, content);
+                break;
+            default:
+                DialogUtil.showInfo(title, header, content);
+                break;
+        }
     }
 
     // ==================== PUBLIC API ====================

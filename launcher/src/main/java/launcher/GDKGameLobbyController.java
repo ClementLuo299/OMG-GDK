@@ -1,3 +1,5 @@
+package launcher;
+
 import gdk.GameModule;
 import gdk.Logging;
 
@@ -1452,7 +1454,7 @@ public class GDKGameLobbyController implements Initializable {
     private void launchSelectedGame() {
         // Step 1: Validate that a game is selected
         if (selectedGameModule == null) {
-            showErrorDialog("No Game Selected", "Please select a game to launch."); // Show error to user
+            DialogUtil.showGameError("No Game Selected", "Please select a game to launch."); // Show error to user
             return; // Exit early if no game is selected
         }
 
@@ -1462,7 +1464,7 @@ public class GDKGameLobbyController implements Initializable {
             // Check if it's due to invalid JSON syntax (not empty input)
             String jsonText = jsonInputEditor.getText().trim();
             if (!jsonText.isEmpty()) {
-                showErrorDialog("Invalid JSON", "Please enter valid JSON configuration."); // Show error to user
+                DialogUtil.showJsonError("Invalid JSON", "Please enter valid JSON configuration."); // Show error to user
                 return; // Exit early if JSON syntax is invalid
             }
             // If JSON is empty, continue with null data (let game decide)
@@ -1478,7 +1480,7 @@ public class GDKGameLobbyController implements Initializable {
         if (applicationViewModel != null) {
             applicationViewModel.handleLaunchGame(selectedGameModule); // Delegate to ViewModel
         } else {
-            showErrorDialog("Application Error", "ViewModel reference is not available."); // Show error if ViewModel is missing
+            DialogUtil.showError("Application Error", "ViewModel reference is not available."); // Show error if ViewModel is missing
         }
     }
 
@@ -1717,22 +1719,7 @@ public class GDKGameLobbyController implements Initializable {
     
 
     
-    /**
-     * Show an error dialog to the user.
-     * 
-     * This method displays a modal error dialog with the specified
-     * title and content to inform the user about errors.
-     * 
-     * @param dialogTitle The title of the error dialog
-     * @param errorMessage The error message to display
-     */
-    private void showErrorDialog(String dialogTitle, String errorMessage) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-        alert.setTitle(dialogTitle);
-        alert.setHeaderText(null);
-        alert.setContentText(errorMessage);
-        alert.showAndWait();
-    }
+
     
     // ==================== JSON PERSISTENCE METHODS ====================
     

@@ -1,3 +1,5 @@
+package launcher;
+
 import gdk.GameModule;
 import gdk.Logging;
 import java.io.File;

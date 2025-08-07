@@ -1,25 +1,15 @@
-import gdk.GameModule;
+package launcher;
+
 import gdk.Logging;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
-
 import javafx.stage.Stage;
 
 
 /**
  * Main JavaFX Application class for the OMG Game Development Kit (GDK).
- * 
  * This class serves as the entry point for the GDK launcher application.
- * It handles the initial application startup and delegates the main startup
- * logic to the Startup class for better separation of concerns.
- * 
- * Key responsibilities:
- * - Initialize the JavaFX application lifecycle
- * - Handle application startup and shutdown
- * - Display error dialogs for critical failures
- * - Provide constants used throughout the application
+ * Modules directory path is here.
  *
  * @authors Clement Luo
  * @date July 20, 2025
@@ -36,13 +26,6 @@ public class GDKApplication extends Application {
      */
     public static final String MODULES_DIRECTORY_PATH = "../modules";
     
-    // ==================== INSTANCE VARIABLES ====================
-    
-    /**
-     * The primary JavaFX stage that hosts the main application window
-     */
-    private Stage primaryApplicationStage;
-
     // ==================== JAVAFX LIFECYCLE METHODS ====================
     
     /**
@@ -56,8 +39,6 @@ public class GDKApplication extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        this.primaryApplicationStage = primaryStage;
-        
         // Show pre-startup progress window immediately
         PreStartupProgressWindow preProgressWindow = new PreStartupProgressWindow();
         preProgressWindow.setTotalSteps(6); // Pre-JavaFX + JavaFX steps
@@ -70,7 +51,7 @@ public class GDKApplication extends Application {
             
             // Keep pre-startup window visible and delegate to Startup class
             // The Startup class will handle the transition
-            new Startup(primaryApplicationStage, preProgressWindow).start();
+            new Startup(primaryStage, preProgressWindow).start();
         } catch (Exception startupError) {
             Logging.error("❌ Failed to start GDK application: " + startupError.getMessage(), startupError);
             
@@ -85,7 +66,7 @@ public class GDKApplication extends Application {
             }
             preProgressWindow.hide();
             
-            displayErrorDialog("Startup Error", null, "Failed to start GDK application: " + startupError.getMessage());
+            DialogUtil.showStartupError("Startup Error", null, "Failed to start GDK application: " + startupError.getMessage());
         }
     }
 
@@ -101,25 +82,6 @@ public class GDKApplication extends Application {
     }
     
     /**
-     * Display an error dialog to the user.
-     * 
-     * This method creates and shows a modal error dialog with the specified
-     * title, header, and content. It's used to inform users about errors
-     * that prevent the application from functioning properly.
-     * 
-     * @param dialogTitle The title of the error dialog
-     * @param headerText The header text (can be null)
-     * @param contentText The error message to display
-     */
-    private static void displayErrorDialog(String dialogTitle, String headerText, String contentText) {
-        Alert errorDialog = new Alert(Alert.AlertType.ERROR);
-        errorDialog.setTitle(dialogTitle);
-        errorDialog.setHeaderText(headerText);
-        errorDialog.setContentText(contentText);
-        errorDialog.showAndWait();
-    }
-
-    /**
      * Main entry point for the GDK application.
      * 
      * This method is the standard Java main method that launches the
@@ -133,7 +95,7 @@ public class GDKApplication extends Application {
             launch(commandLineArguments);
         } catch (Exception fatalError) {
             Logging.error("❌ Fatal application error: " + fatalError.getMessage(), fatalError);
-            displayErrorDialog("Fatal Application Error", "The application cannot start", "A fatal error occurred: " + fatalError.getMessage());
+            DialogUtil.showFatalError("Fatal Application Error", "The application cannot start", "A fatal error occurred: " + fatalError.getMessage());
         }
     }
 } 
