@@ -1,5 +1,3 @@
-package launcher;
-
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

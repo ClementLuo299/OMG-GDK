@@ -1,5 +1,3 @@
-package launcher;
-
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
@@ -44,6 +42,11 @@ import javafx.scene.layout.Priority;
 /**
  * A professional single-area JSON editor using RichTextFX with syntax highlighting,
  * line numbers, and comprehensive editing features.
+ * 
+ * @author: Clement Luo
+ * @date: August 5, 2025
+ * @edited: August 6, 2025
+ * @since: 1.0
  */
 public class SingleJsonEditor extends VBox {
     

@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
-import launcher.StartupProgressWindow;
-import launcher.PreStartupProgressWindow;
+
 
 /**
  * Handles the complete startup process for the GDK application.
@@ -30,7 +29,7 @@ import launcher.PreStartupProgressWindow;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited July 25, 2025
+ * @edited August 6, 2025
  * @since 1.0
  */
 public class Startup {
@@ -219,6 +218,10 @@ public class Startup {
             
             Logging.info("📂 Loading FXML from: " + fxmlResourceUrl);
             FXMLLoader fxmlLoader = new FXMLLoader(fxmlResourceUrl);
+            
+            // Register custom classes for FXML loading
+            fxmlLoader.setClassLoader(GDKApplication.class.getClassLoader());
+            
             Scene mainLobbyScene = new Scene(fxmlLoader.load());
             
             // Store the controller reference for later use

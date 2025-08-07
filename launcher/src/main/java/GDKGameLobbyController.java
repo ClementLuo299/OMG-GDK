@@ -1,7 +1,5 @@
 import gdk.GameModule;
 import gdk.Logging;
-import launcher.SingleJsonEditor;
-import launcher.StartupProgressWindow;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -65,7 +63,7 @@ import javafx.collections.ObservableList;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 4, 2025
+ * @edited August 6, 2025
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -83,8 +81,10 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private VBox messageContainer;
     
     // JSON Configuration Components
-    @FXML private SingleJsonEditor jsonInputEditor;
-    @FXML private SingleJsonEditor jsonOutputEditor;
+    @FXML private VBox jsonInputEditorContainer;
+    @FXML private VBox jsonOutputEditorContainer;
+    private SingleJsonEditor jsonInputEditor;
+    private SingleJsonEditor jsonOutputEditor;
     @FXML private Button clearInputButton;
 
     @FXML private Button clearOutputButton2;
@@ -270,6 +270,14 @@ public class GDKGameLobbyController implements Initializable {
         // Apply consistent styling to the message container for better readability
         // Uses a modern font stack with fallbacks and appropriate size
         messageContainer.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
+        
+        // Create SingleJsonEditor instances programmatically
+        jsonInputEditor = new SingleJsonEditor("JSON Input");
+        jsonOutputEditor = new SingleJsonEditor("JSON Output");
+        
+        // Add the editors to their containers
+        jsonInputEditorContainer.getChildren().add(jsonInputEditor);
+        jsonOutputEditorContainer.getChildren().add(jsonOutputEditor);
         
         // Message area is ready for user feedback
         

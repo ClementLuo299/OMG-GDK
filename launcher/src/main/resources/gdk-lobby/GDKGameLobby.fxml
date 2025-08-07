@@ -11,8 +11,6 @@
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
-<?import launcher.SingleJsonEditor?>
-
 <VBox fx:id="mainContainer" prefHeight="900.0" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="GDKGameLobbyController"
@@ -57,10 +55,10 @@
             <!-- JSON Editors Side by Side -->
             <HBox spacing="15" VBox.vgrow="ALWAYS">
                 <!-- JSON Input Editor -->
-                <SingleJsonEditor fx:id="jsonInputEditor" title="JSON Input" HBox.hgrow="ALWAYS"/>
+                <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS"/>
                 
                 <!-- JSON Output Editor -->
-                <SingleJsonEditor fx:id="jsonOutputEditor" title="JSON Output" HBox.hgrow="ALWAYS"/>
+                <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS"/>
             </HBox>
             
             <!-- Control Buttons -->

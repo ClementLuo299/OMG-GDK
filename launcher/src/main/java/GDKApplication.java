@@ -6,8 +6,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import javafx.stage.Stage;
-import launcher.StartupProgressWindow;
-import launcher.PreStartupProgressWindow;
+
 
 /**
  * Main JavaFX Application class for the OMG Game Development Kit (GDK).
@@ -24,7 +23,7 @@ import launcher.PreStartupProgressWindow;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited July 25, 2025
+ * @edited August 6, 2025    
  * @since 1.0
  */
 public class GDKApplication extends Application {
