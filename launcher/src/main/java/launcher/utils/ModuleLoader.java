@@ -2,8 +2,10 @@ package launcher.utils;
 
 import gdk.GameModule;
 import gdk.Logging;
+
 import launcher.lifecycle.start.Startup;
 import launcher.gui.GDKGameLobbyController;
+
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 /**
@@ -24,7 +25,7 @@ import java.io.InputStreamReader;
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited August 6, 2025
+ * @edited August 7, 2025
  * @since 1.0
  */
 public class ModuleLoader {
@@ -288,17 +289,7 @@ public class ModuleLoader {
             });
         }
         
-        // Update startup progress window with individual module message
-        if (startupProgressWindow != null) {
-            javafx.application.Platform.runLater(() -> {
-                try {
-                    startupProgressWindow.updateProgressWithModule(moduleName);
-                } catch (Exception e) {
-                    // Ignore exceptions when startup progress window is being cleared
-                    Logging.info("📊 Progress update skipped (startup window cleared)");
-                }
-            });
-        }
+        // Note: Progress window updates are now handled by PreStartupProgressWindow in Startup class
     }
     
     /**

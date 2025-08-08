@@ -3,10 +3,8 @@ package launcher.lifecycle.start;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicProgressBarUI;
+
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,7 +18,7 @@ import java.util.TimerTask;
  * 
  * @author Clement Luo
  * @date August 5, 2025
- * @edited August 6, 2025
+ * @edited August 7, 2025
  * @since 1.0
  */
 public class PreStartupProgressWindow {

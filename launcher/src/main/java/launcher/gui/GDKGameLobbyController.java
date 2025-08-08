@@ -3,7 +3,7 @@ package launcher.gui;
 import gdk.GameModule;
 import gdk.Logging;
 import launcher.utils.ModuleLoader;
-import launcher.lifecycle.start.StartupProgressWindow;
+
 import launcher.GDKApplication;
 
 import javafx.fxml.FXML;
@@ -70,7 +70,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 6, 2025
+ * @edited August 7, 2025
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -154,10 +154,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private String currentProcessingModule = "";
     
-    /**
-     * Reference to startup progress window for module loading updates
-     */
-    private StartupProgressWindow startupProgressWindow = null;
+    // Note: Progress window is now handled by PreStartupProgressWindow in Startup class
     
     /**
      * JSON mapper for parsing and validating JSON configuration data
@@ -576,13 +573,7 @@ public class GDKGameLobbyController implements Initializable {
      * Set the startup progress window for module loading updates
      * @param progressWindow The startup progress window
      */
-    public void setStartupProgressWindow(StartupProgressWindow progressWindow) {
-        this.startupProgressWindow = progressWindow;
-    }
-    
-    public void clearStartupProgressWindow() {
-        this.startupProgressWindow = null;
-    }
+    // Note: Progress window methods removed - now handled by PreStartupProgressWindow in Startup class
     
     /**
      * Get the current loading task description based on animation state
@@ -659,10 +650,7 @@ public class GDKGameLobbyController implements Initializable {
             // Get the path to the modules directory from application constants
             String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
             
-            // Update startup progress window if available
-            if (startupProgressWindow != null) {
-                startupProgressWindow.addMessage("🔍 Discovering game modules from source...");
-            }
+            // Note: Progress window updates now handled by PreStartupProgressWindow in Startup class
             
             // Skip compilation checks on startup for speed
             // Just discover modules from existing compiled classes
@@ -687,10 +675,7 @@ public class GDKGameLobbyController implements Initializable {
             
             // Note: We don't check for failed module loads as requested - only track successful loads
             
-            // Update startup progress window if available
-            if (startupProgressWindow != null) {
-                startupProgressWindow.addMessage("✅ Found " + discoveredGameModules.size() + " game modules");
-            }
+            // Note: Progress window updates now handled by PreStartupProgressWindow in Startup class
             
             // Add summary message for detected games
             if (availableGameModules.size() > 0) {

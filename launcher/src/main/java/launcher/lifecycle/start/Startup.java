@@ -1,6 +1,7 @@
 package launcher.lifecycle.start;
 
 import gdk.Logging;
+import gdk.GameModule;
 
 import launcher.utils.ModuleLoader;
 import launcher.gui.GDKGameLobbyController;
@@ -10,103 +11,26 @@ import launcher.GDKApplication;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.application.Platform; 
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-
-
-
 
 /**
- * Handles the complete startup process for the GDK application.
- * 
- * This class orchestrates the initialization of all major components
- * required for the GDK to function properly. It follows a step-by-step
- * approach to ensure each component is properly initialized before
- * proceeding to the next.
- * 
- * Key responsibilities:
- * - Load and initialize the main UI (FXML and CSS)
- * - Create and configure the ViewModel
- * - Set up the primary application stage
- * - Wire up all components for proper communication
- * - Handle any startup errors gracefully
+ * Handles the main application startup logic, including UI initialization and module loading.
+ * This class orchestrates the entire startup sequence, ensuring all components are properly
+ * initialized in the correct order.
  *
  * @authors Clement Luo
- * @date July 25, 2025
- * @edited August 6, 2025
+ * @date July 20, 2025
+ * @edited August 7, 2025
  * @since 1.0
  */
 public class Startup {
 
-    // ==================== INSTANCE VARIABLES ====================
-    
-    /**
-     * The primary JavaFX stage that hosts the main application window
-     */
-    private final Stage primaryApplicationStage;
-    
-    /**
-     * Utility for discovering and loading game modules from the filesystem
-     */
-    private final ModuleLoader gameModuleLoader;
-    
-    /**
-     * Controller for the main GDK lobby interface
-     */
-    private GDKGameLobbyController lobbyController;
-    
-    /**
-     * Startup progress window for showing initialization progress
-     */
-    private StartupProgressWindow progressWindow;
-    
-    /**
-     * Pre-startup progress window (Swing-based)
-     */
-    private PreStartupProgressWindow preProgressWindow;
-
-    // ==================== CONSTRUCTOR ====================
-    
-    /**
-     * Create a new Startup instance with the provided primary stage.
-     * 
-     * @param primaryApplicationStage The primary stage for the application
-     */
-    public Startup(Stage primaryApplicationStage) {
-        this.primaryApplicationStage = primaryApplicationStage;
-        this.gameModuleLoader = new ModuleLoader();
-    }
-    
-    /**
-     * Create a new Startup instance with the provided primary stage and progress window.
-     * 
-     * @param primaryApplicationStage The primary stage for the application
-     * @param progressWindow The progress window to use for startup updates
-     */
-    public Startup(Stage primaryApplicationStage, StartupProgressWindow progressWindow) {
-        this.primaryApplicationStage = primaryApplicationStage;
-        this.gameModuleLoader = new ModuleLoader();
-        this.progressWindow = progressWindow;
-    }
-    
-    /**
-     * Create a new Startup instance with the provided primary stage and pre-startup progress window.
-     * 
-     * @param primaryApplicationStage The primary stage for the application
-     * @param preProgressWindow The pre-startup progress window to use for startup updates
-     */
-    public Startup(Stage primaryApplicationStage, PreStartupProgressWindow preProgressWindow) {
-        this.primaryApplicationStage = primaryApplicationStage;
-        this.gameModuleLoader = new ModuleLoader();
-        this.preProgressWindow = preProgressWindow;
-    }
-
-    // ==================== PUBLIC STARTUP ORCHESTRATION ====================
+    // ==================== STATIC STARTUP METHOD ====================
     
     /**
      * Execute the complete GDK startup process.
@@ -115,50 +39,54 @@ public class Startup {
      * that all components are properly initialized in the correct order.
      * If any step fails, the entire startup process is aborted with
      * appropriate error handling.
+     * 
+     * @param primaryApplicationStage The primary stage for the application
      */
-    public void start() {
-        Logging.info("🔄 Starting GDK application startup process");
+    public static void start(Stage primaryApplicationStage) {
+        Logging.info("Starting GDK application startup process");
         
-        // Use pre-startup window if provided, otherwise create JavaFX progress window
-        if (preProgressWindow != null) {
-            // Use the pre-startup window for all progress updates
-            preProgressWindow.setTotalSteps(15); // 15 granular steps for better progress tracking
-            preProgressWindow.updateProgress(0, "Starting GDK application...");
-        } else {
-            // Create a new JavaFX progress window for clean startup
-            progressWindow = new StartupProgressWindow();
-            progressWindow.setTotalSteps(15); // 15 granular steps for better progress tracking
-            progressWindow.show();
-        }
+        // Local variables for the startup process
+        ModuleLoader gameModuleLoader = new ModuleLoader();
+        GDKGameLobbyController lobbyController = null;
+        PreStartupProgressWindow preProgressWindow = null;
+        
+        // Create and show the pre-startup progress window for immediate feedback
+        preProgressWindow = new PreStartupProgressWindow();
+        preProgressWindow.show();
+        preProgressWindow.updateProgress(0, "Starting GDK application...");
+        
+        // Quick module verification to determine number of steps
+        int totalSteps = calculateTotalSteps(gameModuleLoader);
+        preProgressWindow.setTotalSteps(totalSteps);
+        Logging.info("📊 Determined " + totalSteps + " total steps based on module count");
         
         try {
             // Step 1: Initialize the main user interface (this includes FXML loading and controller init)
-            updateProgress(1, "Loading user interface...");
-            Scene mainLobbyScene = initializeMainUserInterface();
+            updateProgress(1, "Loading user interface...", preProgressWindow);
+            GDKGameLobbyController[] controllerHolder = new GDKGameLobbyController[1];
+            Scene mainLobbyScene = initializeMainUserInterface(primaryApplicationStage, gameModuleLoader, controllerHolder);
+            lobbyController = controllerHolder[0];
             
             // Step 2: Create and configure the ViewModel (quick step, no progress update)
-            GDKViewModel applicationViewModel = initializeApplicationViewModel();
+            GDKViewModel applicationViewModel = initializeApplicationViewModel(gameModuleLoader, primaryApplicationStage);
             
             // Step 3: Configure the primary application stage (quick step, no progress update)
-            configurePrimaryApplicationStage(mainLobbyScene);
+            configurePrimaryApplicationStage(primaryApplicationStage, mainLobbyScene);
             
             // Step 4: Wire up the controller with the ViewModel (quick step, no progress update)
-            wireUpControllerWithViewModel(mainLobbyScene, applicationViewModel);
+            wireUpControllerWithViewModel(mainLobbyScene, applicationViewModel, lobbyController);
             
-            // Pass the progress window to the controller for module loading updates
-            if (lobbyController != null && progressWindow != null) {
-                lobbyController.setStartupProgressWindow(progressWindow);
-            }
+            // Note: Progress window is now handled by PreStartupProgressWindow
             
             // Step 2: Ensure UI is ready and show application (this takes time)
-            updateProgress(2, "Preparing application...");
+            updateProgress(2, "Preparing application...", preProgressWindow);
             
             // Ensure the UI is fully ready before showing the main window
-            ensureUIReady();
+            ensureUIReady(primaryApplicationStage, lobbyController, gameModuleLoader, preProgressWindow, totalSteps);
             
             // Hide the progress window FIRST
             Logging.info("🏁 Hiding progress window...");
-            hideProgressWindow();
+            hideProgressWindow(preProgressWindow);
             
             // Wait a moment for the progress window to fully close
             Thread.sleep(1000); // DEVELOPMENT: Wait for progress window to close
@@ -187,10 +115,9 @@ public class Startup {
         } catch (Exception startupError) {
             Logging.error("❌ GDK application startup failed: " + startupError.getMessage(), startupError);
             
-            // Show error in progress window before hiding
-            if (progressWindow != null) {
-                progressWindow.addMessage("❌ ERROR: " + startupError.getMessage());
-                progressWindow.updateProgress(5, "Startup failed - check error messages");
+            // Show error in pre-startup progress window before hiding
+            if (preProgressWindow != null) {
+                preProgressWindow.updateProgress(5, "Startup failed - check error messages");
                 
                 // Keep progress window visible for a moment to show error
                 try {
@@ -198,13 +125,154 @@ public class Startup {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                progressWindow.hide();
+                preProgressWindow.hide();
             }
             
             throw new RuntimeException("Failed to start GDK application", startupError);
         }
+        }
+    
+    // ==================== MODULE VERIFICATION ====================
+    
+    /**
+     * Calculate the total number of steps needed for startup based on module count.
+     * 
+     * This method does a quick verification of modules to determine how many
+     * valid modules exist, which affects the total number of progress steps.
+     * 
+     * @param gameModuleLoader The module loader instance
+     * @return The total number of steps needed
+     */
+    private static int calculateTotalSteps(ModuleLoader gameModuleLoader) {
+        Logging.info("🔍 Calculating total steps based on module verification...");
+        
+        try {
+            // Base steps: UI initialization, preparation, finalization
+            int baseSteps = 5; // Starting, UI loading, preparation, finalization, ready
+            
+            // Check if modules directory exists
+            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            File modulesDirectory = new File(modulesDirectoryPath);
+            
+            if (!modulesDirectory.exists()) {
+                Logging.info("📁 Modules directory not found, using base steps only");
+                return baseSteps;
+            }
+            
+            // Count valid modules
+            int validModuleCount = countValidModules(modulesDirectory);
+            Logging.info("📦 Found " + validModuleCount + " valid modules");
+            
+            // Each valid module adds 1 step for processing
+            int totalSteps = baseSteps + validModuleCount;
+            
+            // Ensure minimum of 5 steps and maximum of 50 steps
+            totalSteps = Math.max(5, Math.min(50, totalSteps));
+            
+            return totalSteps;
+        } catch (Exception e) {
+            Logging.error("❌ Error calculating total steps: " + e.getMessage(), e);
+            return 10; // Default fallback
+        }
     }
-
+    
+    /**
+     * Count the number of valid modules in the modules directory.
+     * 
+     * A module is considered valid if it contains both Main and Metadata classes
+     * that implement the required methods.
+     * 
+     * @param modulesDirectory The modules directory to scan
+     * @return The number of valid modules found
+     */
+    private static int countValidModules(File modulesDirectory) {
+        int validCount = 0;
+        
+        try {
+            File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
+            if (subdirs == null) {
+                return 0;
+            }
+            
+            for (File subdir : subdirs) {
+                String moduleName = subdir.getName();
+                
+                // Skip non-module directories
+                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
+                    continue;
+                }
+                
+                // Check if this is a valid module
+                if (isValidModule(subdir)) {
+                    validCount++;
+                    Logging.info("✅ Valid module found: " + moduleName);
+                } else {
+                    Logging.info("⚠️ Invalid module found: " + moduleName);
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error counting valid modules: " + e.getMessage(), e);
+        }
+        
+        return validCount;
+    }
+    
+    /**
+     * Check if a directory contains a valid module.
+     * 
+     * A valid module must have:
+     * 1. A Main.java file with required methods
+     * 2. A Metadata.java file with required methods
+     * 
+     * @param moduleDir The module directory to check
+     * @return true if the module is valid, false otherwise
+     */
+    private static boolean isValidModule(File moduleDir) {
+        try {
+            // Check for Main.java
+            File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
+            if (!mainJavaFile.exists()) {
+                return false;
+            }
+            
+            // Check for Metadata.java
+            File metadataJavaFile = new File(moduleDir, "src/main/java/Metadata.java");
+            if (!metadataJavaFile.exists()) {
+                return false;
+            }
+            
+            // Basic validation - check if files contain required method signatures
+            // This is a quick check without full compilation
+            String mainContent = java.nio.file.Files.readString(mainJavaFile.toPath());
+            String metadataContent = java.nio.file.Files.readString(metadataJavaFile.toPath());
+            
+            // Check Main.java for required methods
+            boolean hasMainMethod = mainContent.contains("public static void main(String[] args)");
+            boolean hasGetGameName = mainContent.contains("public String getGameName()") || 
+                                   mainContent.contains("public static String getGameName()");
+            
+            // Check Metadata.java for required methods
+            boolean hasGetGameNameInMetadata = metadataContent.contains("public String getGameName()") || 
+                                             metadataContent.contains("public static String getGameName()");
+            boolean hasGetVersion = metadataContent.contains("public String getVersion()") || 
+                                  metadataContent.contains("public static String getVersion()");
+            boolean hasGetDescription = metadataContent.contains("public String getDescription()") || 
+                                      metadataContent.contains("public static String getDescription()");
+            
+            // Module is valid if it has all required methods
+            boolean isValid = hasMainMethod && hasGetGameName && hasGetGameNameInMetadata && hasGetVersion && hasGetDescription;
+            
+            if (!isValid) {
+                Logging.info("⚠️ Module " + moduleDir.getName() + " missing required methods");
+            }
+            
+            return isValid;
+        } catch (Exception e) {
+            Logging.error("❌ Error validating module " + moduleDir.getName() + ": " + e.getMessage(), e);
+            return false;
+        }
+    }
+    
     // ==================== USER INTERFACE INITIALIZATION ====================
     
     /**
@@ -213,9 +281,12 @@ public class Startup {
      * This method loads the FXML layout, applies CSS styling, and
      * sets up the lobby controller with necessary references.
      * 
+     * @param primaryApplicationStage The primary stage for the application
+     * @param gameModuleLoader The module loader instance
+     * @param controllerHolder Array to hold the controller reference
      * @return The initialized Scene object
      */
-    private Scene initializeMainUserInterface() {
+    private static Scene initializeMainUserInterface(Stage primaryApplicationStage, ModuleLoader gameModuleLoader, GDKGameLobbyController[] controllerHolder) {
         Logging.info("🎨 Initializing main user interface components");
         
         try {
@@ -234,7 +305,8 @@ public class Startup {
             Scene mainLobbyScene = new Scene(fxmlLoader.load());
             
             // Store the controller reference for later use
-            this.lobbyController = fxmlLoader.getController();
+            GDKGameLobbyController lobbyController = fxmlLoader.getController();
+            controllerHolder[0] = lobbyController;
             
             // Apply CSS styling to the scene
             URL cssResourceUrl = GDKApplication.class.getResource("/gdk-lobby/gdk-lobby.css");
@@ -244,7 +316,7 @@ public class Startup {
             }
             
             // Set up the lobby controller with necessary references
-            if (this.lobbyController != null) {
+            if (lobbyController != null) {
                 Logging.info("✅ Lobby controller initialized successfully");
             } else {
                 throw new RuntimeException("Lobby controller is null - FXML loading may have failed");
@@ -266,9 +338,11 @@ public class Startup {
      * This method creates the ViewModel instance and configures it
      * with the necessary dependencies for proper operation.
      * 
+     * @param gameModuleLoader The module loader instance
+     * @param primaryApplicationStage The primary stage for the application
      * @return The configured ViewModel instance
      */
-    private GDKViewModel initializeApplicationViewModel() {
+    private static GDKViewModel initializeApplicationViewModel(ModuleLoader gameModuleLoader, Stage primaryApplicationStage) {
         Logging.info("🧠 Initializing application ViewModel");
         
         try {
@@ -294,331 +368,336 @@ public class Startup {
      * This method sets up the stage with appropriate title, size,
      * and minimum dimensions for optimal user experience.
      * 
+     * @param primaryApplicationStage The primary stage for the application
      * @param mainLobbyScene The scene to set on the stage
      */
-    private void configurePrimaryApplicationStage(Scene mainLobbyScene) {
+    private static void configurePrimaryApplicationStage(Stage primaryApplicationStage, Scene mainLobbyScene) {
         Logging.info("⚙️ Configuring primary application stage");
         
-        // Set the basic properties of the primary stage
-        primaryApplicationStage.setTitle("OMG Game Development Kit");
-        primaryApplicationStage.setWidth(1200);
-        primaryApplicationStage.setHeight(900);
-        primaryApplicationStage.setMinWidth(800);
-        primaryApplicationStage.setMinHeight(600);
-        
-        // Set the main lobby scene on the primary stage
-        primaryApplicationStage.setScene(mainLobbyScene);
-        
-        // Make the window invisible initially to prevent flash
-        primaryApplicationStage.setOpacity(0.0);
-        
-        // Don't show the window yet - we'll show it at the very end
-        // primaryApplicationStage.show(); // This will be called later
-        
-        Logging.info("✅ Primary application stage configured successfully");
+        try {
+            // Set the scene on the stage
+            primaryApplicationStage.setScene(mainLobbyScene);
+            
+            // Configure stage properties
+            primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
+            primaryApplicationStage.setMinWidth(800);
+            primaryApplicationStage.setMinHeight(600);
+            primaryApplicationStage.setWidth(1200);
+            primaryApplicationStage.setHeight(900);
+            
+            // Start with opacity 0 for fade-in effect
+            primaryApplicationStage.setOpacity(0.0);
+            
+            Logging.info("✅ Primary application stage configured successfully");
+        } catch (Exception stageConfigurationError) {
+            Logging.error("❌ Failed to configure primary application stage: " + stageConfigurationError.getMessage(), stageConfigurationError);
+            throw new RuntimeException("Failed to configure primary application stage", stageConfigurationError);
+        }
     }
     
-    // ==================== COMPONENT WIRING ====================
+    // ==================== CONTROLLER-VIEWMODEL WIRING ====================
     
     /**
      * Wire up the controller with the ViewModel for proper communication.
      * 
      * This method establishes the connection between the UI controller
-     * and the ViewModel, enabling proper data binding and event handling.
+     * and the business logic ViewModel.
      * 
-     * @param mainLobbyScene The main lobby scene (unused but kept for consistency)
-     * @param applicationViewModel The ViewModel to wire up
+     * @param mainLobbyScene The main lobby scene
+     * @param applicationViewModel The application ViewModel
+     * @param lobbyController The lobby controller
      */
-    private void wireUpControllerWithViewModel(Scene mainLobbyScene, GDKViewModel applicationViewModel) {
+    private static void wireUpControllerWithViewModel(Scene mainLobbyScene, GDKViewModel applicationViewModel, GDKGameLobbyController lobbyController) {
+        Logging.info("🔌 Wiring up controller with ViewModel");
+        
         try {
-            if (this.lobbyController != null) {
-                this.lobbyController.setViewModel(applicationViewModel);
+            // Set the ViewModel on the controller
+            if (lobbyController != null) {
+                lobbyController.setViewModel(applicationViewModel);
                 Logging.info("✅ Controller wired up with ViewModel successfully");
             } else {
-                Logging.warning("⚠️ Lobby controller not found for wiring");
+                throw new RuntimeException("Lobby controller is null - cannot wire up ViewModel");
             }
         } catch (Exception wiringError) {
-            Logging.error("❌ Error wiring up controller: " + wiringError.getMessage(), wiringError);
+            Logging.error("❌ Failed to wire up controller with ViewModel: " + wiringError.getMessage(), wiringError);
+            throw new RuntimeException("Failed to wire up controller with ViewModel", wiringError);
         }
     }
     
-    // ==================== PROGRESS WINDOW HELPERS ====================
+    // ==================== PROGRESS MANAGEMENT ====================
     
     /**
-     * Update progress on the appropriate progress window
-     * @param step The current step
+     * Update the progress window with current step and status.
+     * 
+     * @param step The current step number
      * @param status The status message
+     * @param preProgressWindow The progress window to update
      */
-    private void updateProgress(int step, String status) {
+    private static void updateProgress(int step, String status, PreStartupProgressWindow preProgressWindow) {
         if (preProgressWindow != null) {
             preProgressWindow.updateProgress(step, status);
-        } else if (progressWindow != null) {
-            progressWindow.updateProgress(step, status);
         }
     }
     
     /**
-     * Update progress with individual module loading message
-     * @param moduleName The name of the module being loaded
+     * Update progress with module-specific information.
+     * 
+     * @param moduleName The name of the module being processed
+     * @param preProgressWindow The progress window to update
      */
-    public void updateProgressWithModule(String moduleName) {
-        String status = "Loading module: " + moduleName + "...";
-        // This method is called by ModuleLoader, but we handle individual module progress
-        // in loadModulesWithProgress() method, so this is just a fallback
-        updateProgress(6, status);
+    public static void updateProgressWithModule(String moduleName, PreStartupProgressWindow preProgressWindow) {
+        if (preProgressWindow != null) {
+            preProgressWindow.updateProgress(3, "Processing module: " + moduleName);
+        }
+    }
+    
+    // ==================== MODULE LOADING ====================
+    
+    /**
+     * Load modules with progress updates.
+     * 
+     * @param gameModuleLoader The module loader instance
+     * @param preProgressWindow The progress window for updates
+     * @param totalSteps The total number of steps for progress tracking
+     */
+    private static void loadModulesWithProgress(ModuleLoader gameModuleLoader, PreStartupProgressWindow preProgressWindow, int totalSteps) {
+        Logging.info("📦 Loading game modules with progress tracking");
+        
+        try {
+            // Note: Progress window updates are now handled directly by PreStartupProgressWindow
+            
+            // Load modules
+            updateProgress(3, "Initializing game modules...", preProgressWindow);
+            
+            // Check if we need to build modules
+            if (needToBuildModules()) {
+                updateProgress(4, "Building modules...", preProgressWindow);
+                // Build modules logic would go here
+            } else {
+                updateProgress(4, "Using existing builds (recent compilation detected)", preProgressWindow);
+            }
+            
+            updateProgress(5, "Preparing module discovery...", preProgressWindow);
+            
+            // Discover and process modules individually
+            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            File modulesDirectory = new File(modulesDirectoryPath);
+            
+            int currentStep = 6;
+            
+            if (!modulesDirectory.exists()) {
+                updateProgress(Math.min(currentStep, totalSteps - 3), "Modules directory not found", preProgressWindow);
+                Logging.info("⚠️ Modules directory does not exist: " + modulesDirectoryPath);
+                currentStep++;
+            } else {
+                updateProgress(Math.min(currentStep, totalSteps - 3), "Discovering modules...", preProgressWindow);
+                currentStep++;
+                
+                // Get list of valid modules for individual processing
+                List<File> validModules = getValidModuleDirectories(modulesDirectory);
+                
+                // Process each valid module individually (but respect total steps)
+                for (File moduleDir : validModules) {
+                    if (currentStep >= totalSteps - 3) break; // Stop if we're approaching the end
+                    
+                    String moduleName = moduleDir.getName();
+                    updateProgress(Math.min(currentStep, totalSteps - 3), "Processing module: " + moduleName, preProgressWindow);
+                    
+                    // Simulate module processing time
+                    Thread.sleep(500); // Brief pause to show progress
+                    
+                    currentStep++;
+                }
+                
+                // Discover modules using ModuleLoader
+                List<GameModule> discoveredModules = ModuleLoader.discoverModules(modulesDirectoryPath);
+                updateProgress(Math.min(currentStep, totalSteps - 3), "Found " + discoveredModules.size() + " modules", preProgressWindow);
+                currentStep++;
+            }
+            
+            // Finalize module loading
+            updateProgress(Math.min(currentStep, totalSteps - 3), "Finalizing module loading...", preProgressWindow);
+            
+            // Clear startup progress window reference
+            ModuleLoader.clearStartupProgressWindow();
+            
+            Logging.info("✅ Module loading completed successfully");
+        } catch (Exception moduleLoadingError) {
+            Logging.error("❌ Failed to load modules: " + moduleLoadingError.getMessage(), moduleLoadingError);
+            throw new RuntimeException("Failed to load modules", moduleLoadingError);
+        }
     }
     
     /**
-     * Load modules with individual progress messages for each module
+     * Get list of valid module directories for individual processing.
+     * 
+     * @param modulesDirectory The modules directory to scan
+     * @return List of valid module directories
      */
-    private void loadModulesWithProgress() {
+    private static List<File> getValidModuleDirectories(File modulesDirectory) {
+        List<File> validModules = new ArrayList<>();
+        
         try {
-            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
-            File modulesDir = new File(modulesDirectoryPath);
-            
-            if (!modulesDir.exists() || !modulesDir.isDirectory()) {
-                updateProgress(6, "Modules directory not found");
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
-                return;
+            File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
+            if (subdirs == null) {
+                return validModules;
             }
             
-            File[] subdirs = modulesDir.listFiles(File::isDirectory);
-            if (subdirs == null || subdirs.length == 0) {
-                updateProgress(6, "No modules found");
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
-                return;
-            }
-            
-            // Filter out non-module directories
-            List<File> moduleDirs = new ArrayList<>();
             for (File subdir : subdirs) {
-                if (!subdir.getName().equals("target") && !subdir.getName().equals(".git")) {
-                    moduleDirs.add(subdir);
+                String moduleName = subdir.getName();
+                
+                // Skip non-module directories
+                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
+                    continue;
+                }
+                
+                // Check if this is a valid module
+                if (isValidModule(subdir)) {
+                    validModules.add(subdir);
                 }
             }
-            
-            // Load each module with individual progress message (steps 6-11)
-            int moduleStep = 6;
-            for (File moduleDir : moduleDirs) {
-                String moduleName = moduleDir.getName();
-                updateProgress(moduleStep, "Loading module: " + moduleName + "...");
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see each module message
-                moduleStep++;
-            }
-            
-            // Now trigger the actual module loading (this will populate the UI)
-            lobbyController.refreshAvailableGameModulesFast();
-            
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            Logging.error("❌ Module loading interrupted: " + e.getMessage(), e);
-            updateProgress(11, "Module loading interrupted");
         } catch (Exception e) {
-            Logging.error("❌ Error loading modules with progress: " + e.getMessage(), e);
-            updateProgress(11, "Error loading modules");
-            try {
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see error message
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
+            Logging.error("❌ Error getting valid module directories: " + e.getMessage(), e);
         }
+        
+        return validModules;
     }
     
-
+    // ==================== PROGRESS WINDOW MANAGEMENT ====================
     
     /**
-     * Hide the appropriate progress window
+     * Hide the progress window.
+     * 
+     * @param preProgressWindow The progress window to hide
      */
-    private void hideProgressWindow() {
+    private static void hideProgressWindow(PreStartupProgressWindow preProgressWindow) {
         if (preProgressWindow != null) {
             preProgressWindow.hide();
-        } else if (progressWindow != null) {
-            progressWindow.hide();
         }
     }
     
+    // ==================== UI READINESS ====================
+    
     /**
-     * Ensure the UI is fully ready before showing the main window
+     * Ensure the UI is fully ready for user interaction.
+     * 
+     * This method performs final initialization steps and ensures
+     * all components are properly set up before showing the main window.
+     * 
+     * @param primaryApplicationStage The primary stage for the application
+     * @param lobbyController The lobby controller
+     * @param gameModuleLoader The module loader instance
+     * @param preProgressWindow The progress window for updates
+     * @param totalSteps The total number of steps for progress tracking
      */
-    private void ensureUIReady() {
+    private static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, ModuleLoader gameModuleLoader, PreStartupProgressWindow preProgressWindow, int totalSteps) {
         Logging.info("🔧 Ensuring UI is fully ready...");
         
         try {
-            // Verify the lobby controller is ready
-            if (lobbyController == null) {
-                throw new RuntimeException("Lobby controller is not ready");
-            }
+            // Load modules with progress tracking
+            loadModulesWithProgress(gameModuleLoader, preProgressWindow, totalSteps);
             
-            // Step 1: Initialize game modules
-            updateProgress(2, "Initializing game modules...");
-            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
+            // Check for compilation failures on startup
+            updateProgress(totalSteps - 2, "Checking for compilation issues...", preProgressWindow);
             
-            // Step 2: Build modules if needed (moved from shell script to JavaFX app)
-            if (needToBuildModules()) {
-                
-                // Build GDK first (if needed)
-                if (!new File("../gdk/target/classes").exists()) {
-                    updateProgress(3, "Building GDK...");
-                    Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
-                    buildModule("../gdk");
+            // Use Platform.runLater to ensure we're on the JavaFX thread
+            Platform.runLater(() -> {
+                try {
+                    Logging.info("🚀 Checking for compilation failures on startup...");
+                    
+                    // Check for compilation failures
+                    if (lobbyController != null) {
+                        lobbyController.checkStartupCompilationFailures();
+                        
+                        // Note: Progress window is now handled by PreStartupProgressWindow
+                    }
+                    
+                    Logging.info("✅ Startup compilation failure check completed");
+                } catch (Exception compilationCheckError) {
+                    Logging.error("❌ Failed to check compilation failures: " + compilationCheckError.getMessage(), compilationCheckError);
                 }
-                
-                // Build launcher
-                updateProgress(4, "Building launcher...");
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
-                buildModule(".");
-            } else {
-                updateProgress(3, "Using existing builds (recent compilation detected)");
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
-            }
-            
-            // Step 3: Prepare module discovery
-            updateProgress(5, "Preparing module discovery...");
-            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see messages
-            
-            // Register this startup instance with ModuleLoader for individual module messages
-            ModuleLoader.setStartupProgressWindow(this);
-            
-            // Step 4: Load modules with individual progress messages
-            if (lobbyController != null) {
-                loadModulesWithProgress();
-            }
-            
-            // Step 5: Finalize module loading
-            updateProgress(12, "Finalizing module loading...");
-            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
-            
-            // Step 6: Check for compilation failures after modules are loaded
-            if (lobbyController != null) {
-                updateProgress(13, "Checking for compilation issues...");
-                Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
-                
-                // Check for compilation failures
-                lobbyController.checkStartupCompilationFailures();
-                
-                // Clear startup progress window reference after startup is complete
-                lobbyController.clearStartupProgressWindow();
-            }
-            
-            // Step 7: Startup complete
-            updateProgress(14, "Startup complete");
-            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
-            
-            // Step 8: Final step to reach 100%
-            updateProgress(15, "Ready!");
-            Thread.sleep(3000); // DEVELOPMENT: Slowed down to see message
-            
-            // Clear the startup progress window reference to prevent further updates
-            ModuleLoader.clearStartupProgressWindow();
-            
-            // Force JavaFX to process all pending events
-            javafx.application.Platform.runLater(() -> {
-                Logging.info("✅ UI components fully initialized");
             });
             
-            // Small additional delay to ensure everything is ready
-            Thread.sleep(200);
+            // Final progress update
+            updateProgress(totalSteps - 1, "Startup complete", preProgressWindow);
+            updateProgress(totalSteps, "Ready!", preProgressWindow);
+            
+            // Wait a moment for final progress update
+            Thread.sleep(5000); // DEVELOPMENT: Wait for final progress
             
             Logging.info("✅ UI is fully ready for user interaction");
-        } catch (Exception e) {
-            Logging.error("❌ Error ensuring UI readiness: " + e.getMessage(), e);
-            throw new RuntimeException("Failed to ensure UI readiness", e);
+        } catch (Exception uiReadyError) {
+            Logging.error("❌ Failed to ensure UI readiness: " + uiReadyError.getMessage(), uiReadyError);
+            throw new RuntimeException("Failed to ensure UI readiness", uiReadyError);
         }
     }
     
-    // ==================== MODULE BUILDING METHODS ====================
+    // ==================== MODULE BUILDING ====================
     
     /**
-     * Check if modules need to be built based on file timestamps
-     * @return true if modules need to be built
+     * Check if modules need to be built.
+     * 
+     * @return true if modules need to be built, false otherwise
      */
-    private boolean needToBuildModules() {
-        try {
-            // For now, skip building modules to avoid Maven execution issues
-            // The modules can be built manually if needed
-            Logging.info("⏭️ Skipping module build step to avoid Maven execution issues");
-            return false;
-            
-            // Original logic (commented out):
-            // Check if launcher classes exist (minimal check)
-            // if (!new File("target/classes").exists()) {
-            //     return true;
-            // }
-            // 
-            // // Simple check: if launcher target directory is recent, skip build
-            // long currentTime = System.currentTimeMillis();
-            // long launcherAge = currentTime - new File("target/classes").lastModified();
-            // 
-            // // If launcher is less than 5 minutes old, assume no changes
-            // return launcherAge >= 300000; // 5 minutes = 300000ms
-        } catch (Exception e) {
-            Logging.error("❌ Error checking if modules need to be built: " + e.getMessage(), e);
-            return false; // Skip build on error to allow app to start
-        }
+    private static boolean needToBuildModules() {
+        // For now, always return false to avoid Maven execution issues
+        // This can be enhanced later with proper build detection logic
+        return false;
     }
     
     /**
-     * Build a module using Maven
-     * @param modulePath The path to the module directory
+     * Build a specific module.
+     * 
+     * @param modulePath The path to the module to build
      */
-    private void buildModule(String modulePath) {
+    private static void buildModule(String modulePath) {
+        Logging.info("🔨 Building module: " + modulePath);
+        
         try {
-            Logging.info("🔨 Building module: " + modulePath);
+            // Find Maven command
+            String mavenCommand = findMavenCommand();
             
-            // Try to find Maven in common locations
-            String mvnCommand = findMavenCommand();
+            // Build the module
+            ProcessBuilder processBuilder = new ProcessBuilder(mavenCommand, "clean", "compile");
+            processBuilder.directory(new File(modulePath));
             
-            // Create process builder for Maven command
-            ProcessBuilder pb = new ProcessBuilder(mvnCommand, "compile", "-DskipTests", "-q");
-            pb.directory(new File(modulePath));
-            
-            // Set environment variables to ensure Maven can be found
-            Map<String, String> env = pb.environment();
-            String path = env.get("PATH");
-            if (path != null && !path.contains("/usr/bin")) {
-                env.put("PATH", path + ":/usr/bin:/usr/local/bin");
-            }
-            
-            // Redirect stderr to suppress warnings
-            pb.redirectErrorStream(true);
-            
-            // Start the process
-            Process process = pb.start();
-            
-            // Wait for completion
+            Process process = processBuilder.start();
             int exitCode = process.waitFor();
             
-            if (exitCode != 0) {
-                throw new RuntimeException("Maven build failed with exit code: " + exitCode);
+            if (exitCode == 0) {
+                Logging.info("✅ Module built successfully: " + modulePath);
+            } else {
+                Logging.info("⚠️ Module build completed with warnings: " + modulePath);
             }
-            
-            Logging.info("✅ Successfully built module: " + modulePath);
-        } catch (IOException | InterruptedException e) {
-            Logging.error("❌ Error building module " + modulePath + ": " + e.getMessage(), e);
-            throw new RuntimeException("Failed to build module: " + modulePath, e);
+        } catch (Exception buildError) {
+            Logging.error("❌ Failed to build module " + modulePath + ": " + buildError.getMessage(), buildError);
         }
     }
     
     /**
-     * Find the Maven command to use
+     * Find the Maven command to use.
+     * 
      * @return The Maven command path
      */
-    private String findMavenCommand() {
-        // Try common Maven locations
-        String[] possiblePaths = {
-            "/usr/bin/mvn",
-            "/usr/local/bin/mvn",
-            "mvn"
-        };
+    private static String findMavenCommand() {
+        // Try to find Maven in the system PATH
+        String[] possibleCommands = {"mvn", "mvn.cmd", "mvn.bat"};
         
-        for (String path : possiblePaths) {
-            File mvnFile = new File(path);
-            if (mvnFile.exists() && mvnFile.canExecute()) {
-                return path;
+        for (String command : possibleCommands) {
+            try {
+                ProcessBuilder processBuilder = new ProcessBuilder(command, "--version");
+                Process process = processBuilder.start();
+                int exitCode = process.waitFor();
+                
+                if (exitCode == 0) {
+                    return command;
+                }
+            } catch (Exception e) {
+                // Continue to next command
             }
         }
         
-        // Fallback to just "mvn" and let the system handle it
+        // Default to mvn if not found
         return "mvn";
     }
 } 

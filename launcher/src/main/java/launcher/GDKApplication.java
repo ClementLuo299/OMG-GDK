@@ -14,7 +14,7 @@ import launcher.lifecycle.stop.Shutdown;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited August 6, 2025    
+ * @edited August 7, 2025     
  * @since 1.0
  */
 public class GDKApplication extends Application {
@@ -38,7 +38,7 @@ public class GDKApplication extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        new Startup(primaryStage).start();
+        Startup.start(primaryStage);
     }
 
     /**
@@ -48,7 +48,7 @@ public class GDKApplication extends Application {
      */
     @Override
     public void stop() {
-        new Shutdown().shutdown();
+        Shutdown.shutdown();
     }
     
     /**
