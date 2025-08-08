@@ -2,7 +2,10 @@ package launcher.gui;
 
 import gdk.GameModule;
 import gdk.Logging;
-import launcher.utils.ModuleLoader;
+import launcher.utils.ModuleDiscovery;
+import launcher.utils.ModuleCompiler;
+
+import java.io.File;
 
 import launcher.GDKApplication;
 
@@ -70,7 +73,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 7, 2025
+ * @edited August 8, 2025 
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -198,8 +201,8 @@ public class GDKGameLobbyController implements Initializable {
         // Set up event handlers
         setupEventHandlers();
         
-        // Register this controller with ModuleLoader for progress updates
-        ModuleLoader.setUIController(this);
+        // Register this controller with ModuleCompiler for progress updates
+        ModuleCompiler.setUIController(this);
         
         // Load saved JSON content and toggle state
         loadPersistenceSettings();
@@ -354,8 +357,9 @@ public class GDKGameLobbyController implements Initializable {
                         checkAndRecompileModules(modulesDirectoryPath);
                     }
                     
-                    // Use the ModuleLoader to discover all available game modules
-                    List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
+                    // Use ModuleDiscovery and ModuleCompiler to discover all available game modules
+                    List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(new File(modulesDirectoryPath));
+                    List<GameModule> discoveredGameModules = ModuleCompiler.loadModules(validModuleDirectories);
                     
                     // Add each discovered module to our observable list
                     for (GameModule gameModule : discoveredGameModules) {
@@ -374,9 +378,9 @@ public class GDKGameLobbyController implements Initializable {
                     checkForCompilationFailures(modulesDirectoryPath);
                     checkForBrokenModules(modulesDirectoryPath);
                     
-                    // Check for compilation failures detected by ModuleLoader
-                    Logging.info("🔍 Checking for ModuleLoader compilation failures...");
-                    checkModuleLoaderCompilationFailures();
+                    // Check for compilation failures detected by ModuleCompiler
+                    Logging.info("🔍 Checking for ModuleCompiler compilation failures...");
+                    checkModuleCompilerCompilationFailures();
                     
                     // Force a more aggressive check for compilation issues
                     forceCompilationCheck(modulesDirectoryPath);
@@ -655,8 +659,9 @@ public class GDKGameLobbyController implements Initializable {
             // Skip compilation checks on startup for speed
             // Just discover modules from existing compiled classes
             
-            // Use the ModuleLoader to discover all available game modules
-            List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
+            // Use ModuleDiscovery and ModuleCompiler to discover all available game modules
+            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(new File(modulesDirectoryPath));
+            List<GameModule> discoveredGameModules = ModuleCompiler.loadModules(validModuleDirectories);
             
             // Track newly discovered modules for detailed reporting
             Set<String> newlyDiscoveredModuleNames = new HashSet<>();
@@ -756,8 +761,9 @@ public class GDKGameLobbyController implements Initializable {
                 checkAndRecompileModules(modulesDirectoryPath);
             }
             
-            // Use the ModuleLoader to discover all available game modules
-            List<GameModule> discoveredGameModules = ModuleLoader.discoverModules(modulesDirectoryPath);
+            // Use ModuleDiscovery and ModuleCompiler to discover all available game modules
+            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(new File(modulesDirectoryPath));
+            List<GameModule> discoveredGameModules = ModuleCompiler.loadModules(validModuleDirectories);
             
             // Add each discovered module to our observable list
             for (GameModule gameModule : discoveredGameModules) {
@@ -1006,8 +1012,8 @@ public class GDKGameLobbyController implements Initializable {
             // Get the modules directory path
             String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
             
-            // Check for compilation failures detected by ModuleLoader
-            checkModuleLoaderCompilationFailures();
+            // Check for compilation failures detected by ModuleCompiler
+            checkModuleCompilerCompilationFailures();
             
             // Also check for any existing compilation issues
             checkForCompilationFailures(modulesDirectoryPath);
@@ -1023,14 +1029,14 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
-     * Check for compilation failures detected by ModuleLoader
+     * Check for compilation failures detected by ModuleCompiler
      */
-    private void checkModuleLoaderCompilationFailures() {
+    private void checkModuleCompilerCompilationFailures() {
         try {
-            Logging.info("🔍 Starting check for ModuleLoader compilation failures...");
+            Logging.info("🔍 Starting check for ModuleCompiler compilation failures...");
             
-            // Get compilation failures from ModuleLoader
-            List<String> compilationFailures = ModuleLoader.getLastCompilationFailures();
+            // Get compilation failures from ModuleCompiler
+            List<String> compilationFailures = ModuleCompiler.getLastCompilationFailures();
             
             Logging.info("📊 Found " + compilationFailures.size() + " compilation failures to report");
             
@@ -1054,10 +1060,10 @@ public class GDKGameLobbyController implements Initializable {
             }
             
             // Clear the stored failures after reporting them
-            ModuleLoader.clearCompilationFailures();
+            ModuleCompiler.clearCompilationFailures();
             
         } catch (Exception e) {
-            Logging.error("❌ Error checking ModuleLoader compilation failures: " + e.getMessage(), e);
+            Logging.error("❌ Error checking ModuleCompiler compilation failures: " + e.getMessage(), e);
         }
     }
     

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Timer;
 import java.util.TimerTask;
+import launcher.utils.ModuleDiscovery;
 
 /**
  * Manages the running, displaying, and lifecycle of the startup progress window.
@@ -38,6 +39,21 @@ public class StartupWindowManager {
      */
     public StartupWindowManager(PreStartupProgressWindow progressWindow) {
         this.progressWindow = progressWindow;
+    }
+
+    /**
+     * Create, configure (with calculated steps), and show the progress window.
+     * 
+     * @return Initialized and visible StartupWindowManager
+     */
+    public static StartupWindowManager initializeWithCalculatedSteps() {
+        PreStartupProgressWindow window = new PreStartupProgressWindow();
+        StartupWindowManager manager = new StartupWindowManager(window);
+        int steps = ModuleDiscovery.calculateTotalSteps();
+        manager.setTotalSteps(steps);
+        manager.show();
+        manager.updateProgress(0, "Starting GDK application...");
+        return manager;
     }
     
     /**

@@ -2,7 +2,10 @@ package launcher.gui;
 
 import gdk.GameModule;
 import gdk.Logging;
-import launcher.utils.ModuleLoader;
+import launcher.utils.ModuleDiscovery;
+import launcher.utils.ModuleCompiler;
+
+import java.io.File;
 import launcher.gui.ServerSimulatorController;
 import launcher.GDKApplication;
 
@@ -31,17 +34,14 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 6, 2025
+ * @edited August 8, 2025
  * @since 1.0
  */
 public class GDKViewModel {
 
     // ==================== DEPENDENCIES ====================
     
-    /**
-     * Utility for discovering and loading game modules from the filesystem
-     */
-    private final ModuleLoader gameModuleLoader;
+    // Module loader functionality is now handled by static methods in ModuleDiscovery and ModuleCompiler
     
     /**
      * The primary JavaFX stage that hosts the main application window
@@ -70,12 +70,11 @@ public class GDKViewModel {
     // ==================== CONSTRUCTOR ====================
     
     /**
-     * Create a new GDK ViewModel with the specified module loader.
-     * 
-     * @param gameModuleLoader The module loader to use for discovering game modules
+     * Create a new GDK ViewModel.
+     * Module discovery and loading is now handled by static methods.
      */
-    public GDKViewModel(ModuleLoader gameModuleLoader) {
-        this.gameModuleLoader = gameModuleLoader;
+    public GDKViewModel() {
+        // No module loader instance needed - using static methods now
     }
 
     // ==================== PUBLIC SETTERS ====================
@@ -302,7 +301,9 @@ public class GDKViewModel {
             String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
             Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
             
-            List<GameModule> discoveredModules = gameModuleLoader.discoverModules(modulesDirectoryPath);
+            // Use ModuleDiscovery to find valid modules, then ModuleCompiler to load them
+            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(new File(modulesDirectoryPath));
+            List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
             Logging.info("✅ Found " + discoveredModules.size() + " game module(s)");
             
         } catch (Exception moduleDiscoveryError) {
