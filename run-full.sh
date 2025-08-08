@@ -23,7 +23,7 @@ if [ ! -f "$TICTACTOE_JAR" ]; then
     exit 1
 fi
 
-# Run the GDK using Maven exec plugin with JavaFX
+# Run the GDK using Maven exec plugin
 echo "Running GDK with modules..."
 cd launcher
-mvn javafx:run -Djavafx.mainClass="GDKApplication" -Djavafx.jvmargs="--enable-native-access=javafx.graphics --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED" -Dexec.args="--modules-dir=../modules" 
+mvn exec:java -Dexec.mainClass="launcher.GDKApplication" -q 

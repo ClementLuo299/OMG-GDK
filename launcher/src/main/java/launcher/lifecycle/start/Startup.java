@@ -25,7 +25,7 @@ import java.util.ArrayList;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited August 7, 2025
+ * @edited August 8, 2025
  * @since 1.0
  */
 public class Startup {
@@ -45,19 +45,22 @@ public class Startup {
     public static void start(Stage primaryApplicationStage) {
         Logging.info("Starting GDK application startup process");
         
-        // Create and show the pre-startup progress window for immediate feedback
-        PreStartupProgressWindow preProgressWindow = new PreStartupProgressWindow();
-        preProgressWindow.show();
-        preProgressWindow.updateProgress(0, "Starting GDK application...");
+        // Create and manage the pre-startup progress window
+        PreStartupProgressWindow progressWindow = new PreStartupProgressWindow();
+        StartupWindowManager windowManager = new StartupWindowManager(progressWindow);
         
         // Quick module verification to determine number of steps
         int totalSteps = calculateTotalSteps();
-        preProgressWindow.setTotalSteps(totalSteps);
+        windowManager.setTotalSteps(totalSteps);
         Logging.info("📊 Determined " + totalSteps + " total steps based on module count");
+        
+        // Show the window and start with initial progress
+        windowManager.show();
+        windowManager.updateProgress(0, "Starting GDK application...");
         
         try {
             // Step 1: Initialize the main user interface (this includes FXML loading and controller init)
-            updateProgress(1, "Loading user interface...", preProgressWindow);
+            updateProgress(1, "Loading user interface...", windowManager);
             GDKGameLobbyController[] controllerHolder = new GDKGameLobbyController[1];
             Scene mainLobbyScene = initializeMainUserInterface(primaryApplicationStage, controllerHolder);
             GDKGameLobbyController lobbyController = controllerHolder[0];
@@ -71,17 +74,15 @@ public class Startup {
             // Step 4: Wire up the controller with the ViewModel (quick step, no progress update)
             wireUpControllerWithViewModel(mainLobbyScene, applicationViewModel, lobbyController);
             
-            // Note: Progress window is now handled by PreStartupProgressWindow
-            
             // Step 2: Ensure UI is ready and show application (this takes time)
-            updateProgress(2, "Preparing application...", preProgressWindow);
+            updateProgress(2, "Preparing application...", windowManager);
             
             // Ensure the UI is fully ready before showing the main window
-            ensureUIReady(primaryApplicationStage, lobbyController, preProgressWindow, totalSteps);
+            ensureUIReady(primaryApplicationStage, lobbyController, windowManager, totalSteps);
             
             // Hide the progress window FIRST
             Logging.info("🏁 Hiding progress window...");
-            hideProgressWindow(preProgressWindow);
+            hideProgressWindow(windowManager);
             
             // Wait a moment for the progress window to fully close
             Thread.sleep(1000); // DEVELOPMENT: Wait for progress window to close
@@ -111,8 +112,8 @@ public class Startup {
             Logging.error("❌ GDK application startup failed: " + startupError.getMessage(), startupError);
             
             // Show error in pre-startup progress window before hiding
-            if (preProgressWindow != null) {
-                preProgressWindow.updateProgress(5, "Startup failed - check error messages");
+            if (windowManager != null) {
+                windowManager.updateProgress(5, "Startup failed - check error messages");
                 
                 // Keep progress window visible for a moment to show error
                 try {
@@ -120,7 +121,7 @@ public class Startup {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                preProgressWindow.hide();
+                windowManager.hide();
             }
             
             throw new RuntimeException("Failed to start GDK application", startupError);
@@ -425,9 +426,9 @@ public class Startup {
      * @param status The status message
      * @param preProgressWindow The progress window to update
      */
-    private static void updateProgress(int step, String status, PreStartupProgressWindow preProgressWindow) {
-        if (preProgressWindow != null) {
-            preProgressWindow.updateProgress(step, status);
+    private static void updateProgress(int step, String status, StartupWindowManager windowManager) {
+        if (windowManager != null) {
+            windowManager.updateProgress(step, status);
         }
     }
     
@@ -437,11 +438,7 @@ public class Startup {
      * @param moduleName The name of the module being processed
      * @param preProgressWindow The progress window to update
      */
-    public static void updateProgressWithModule(String moduleName, PreStartupProgressWindow preProgressWindow) {
-        if (preProgressWindow != null) {
-            preProgressWindow.updateProgress(3, "Processing module: " + moduleName);
-        }
-    }
+
     
     // ==================== MODULE LOADING ====================
     
@@ -451,24 +448,24 @@ public class Startup {
      * @param preProgressWindow The progress window for updates
      * @param totalSteps The total number of steps for progress tracking
      */
-    private static void loadModulesWithProgress(PreStartupProgressWindow preProgressWindow, int totalSteps) {
+    private static void loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
         Logging.info("📦 Loading game modules with progress tracking");
         
         try {
             // Note: Progress window updates are now handled directly by PreStartupProgressWindow
             
             // Load modules
-            updateProgress(3, "Initializing game modules...", preProgressWindow);
+            updateProgress(3, "Initializing game modules...", windowManager);
             
             // Check if we need to build modules
             if (needToBuildModules()) {
-                updateProgress(4, "Building modules...", preProgressWindow);
+                updateProgress(4, "Building modules...", windowManager);
                 // Build modules logic would go here
             } else {
-                updateProgress(4, "Using existing builds (recent compilation detected)", preProgressWindow);
+                updateProgress(4, "Using existing builds (recent compilation detected)", windowManager);
             }
             
-            updateProgress(5, "Preparing module discovery...", preProgressWindow);
+            updateProgress(5, "Preparing module discovery...", windowManager);
             
             // Discover and process modules individually
             String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
@@ -477,11 +474,11 @@ public class Startup {
             int currentStep = 6;
             
             if (!modulesDirectory.exists()) {
-                updateProgress(Math.min(currentStep, totalSteps - 3), "Modules directory not found", preProgressWindow);
+                updateProgress(Math.min(currentStep, totalSteps - 3), "Modules directory not found", windowManager);
                 Logging.info("⚠️ Modules directory does not exist: " + modulesDirectoryPath);
                 currentStep++;
             } else {
-                updateProgress(Math.min(currentStep, totalSteps - 3), "Discovering modules...", preProgressWindow);
+                updateProgress(Math.min(currentStep, totalSteps - 3), "Discovering modules...", windowManager);
                 currentStep++;
                 
                 // Get list of valid modules for individual processing
@@ -492,7 +489,7 @@ public class Startup {
                     if (currentStep >= totalSteps - 3) break; // Stop if we're approaching the end
                     
                     String moduleName = moduleDir.getName();
-                    updateProgress(Math.min(currentStep, totalSteps - 3), "Processing module: " + moduleName, preProgressWindow);
+                    updateProgress(Math.min(currentStep, totalSteps - 3), "Processing module: " + moduleName, windowManager);
                     
                     // Simulate module processing time
                     Thread.sleep(500); // Brief pause to show progress
@@ -502,12 +499,12 @@ public class Startup {
                 
                 // Discover modules using ModuleLoader
                 List<GameModule> discoveredModules = ModuleLoader.discoverModules(modulesDirectoryPath);
-                updateProgress(Math.min(currentStep, totalSteps - 3), "Found " + discoveredModules.size() + " modules", preProgressWindow);
+                updateProgress(Math.min(currentStep, totalSteps - 3), "Found " + discoveredModules.size() + " modules", windowManager);
                 currentStep++;
             }
             
             // Finalize module loading
-            updateProgress(Math.min(currentStep, totalSteps - 3), "Finalizing module loading...", preProgressWindow);
+            updateProgress(Math.min(currentStep, totalSteps - 3), "Finalizing module loading...", windowManager);
             
             // Clear startup progress window reference
             ModuleLoader.clearStartupProgressWindow();
@@ -561,9 +558,9 @@ public class Startup {
      * 
      * @param preProgressWindow The progress window to hide
      */
-    private static void hideProgressWindow(PreStartupProgressWindow preProgressWindow) {
-        if (preProgressWindow != null) {
-            preProgressWindow.hide();
+    private static void hideProgressWindow(StartupWindowManager windowManager) {
+        if (windowManager != null) {
+            windowManager.hide();
         }
     }
     
@@ -580,15 +577,15 @@ public class Startup {
      * @param preProgressWindow The progress window for updates
      * @param totalSteps The total number of steps for progress tracking
      */
-    private static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, PreStartupProgressWindow preProgressWindow, int totalSteps) {
+    private static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager, int totalSteps) {
         Logging.info("🔧 Ensuring UI is fully ready...");
         
         try {
             // Load modules with progress tracking
-            loadModulesWithProgress(preProgressWindow, totalSteps);
+            loadModulesWithProgress(windowManager, totalSteps);
             
             // Check for compilation failures on startup
-            updateProgress(totalSteps - 2, "Checking for compilation issues...", preProgressWindow);
+            updateProgress(totalSteps - 2, "Checking for compilation issues...", windowManager);
             
             // Use Platform.runLater to ensure we're on the JavaFX thread
             Platform.runLater(() -> {
@@ -598,8 +595,6 @@ public class Startup {
                     // Check for compilation failures
                     if (lobbyController != null) {
                         lobbyController.checkStartupCompilationFailures();
-                        
-                        // Note: Progress window is now handled by PreStartupProgressWindow
                     }
                     
                     Logging.info("✅ Startup compilation failure check completed");
@@ -609,8 +604,8 @@ public class Startup {
             });
             
             // Final progress update
-            updateProgress(totalSteps - 1, "Startup complete", preProgressWindow);
-            updateProgress(totalSteps, "Ready!", preProgressWindow);
+            updateProgress(totalSteps - 1, "Startup complete", windowManager);
+            updateProgress(totalSteps, "Ready!", windowManager);
             
             // Wait a moment for final progress update
             Thread.sleep(5000); // DEVELOPMENT: Wait for final progress

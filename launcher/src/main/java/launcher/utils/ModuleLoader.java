@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited August 7, 2025
+ * @edited August 8, 2025
  * @since 1.0
  */
 public class ModuleLoader {

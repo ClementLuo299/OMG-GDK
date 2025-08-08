@@ -14,4 +14,4 @@ fi
 # Run the GDK (build process will happen inside the JavaFX app)
 echo "🎮 Launching GDK..."
 cd launcher
-mvn javafx:run -Djavafx.mainClass="GDKApplication" -Djavafx.jvmargs="--enable-native-access=javafx.graphics" -q 
+mvn exec:java -Dexec.mainClass="launcher.GDKApplication" -q 
