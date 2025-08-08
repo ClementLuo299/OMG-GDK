@@ -1,4 +1,4 @@
-package launcher.lifecycle.start;
+package launcher.lifecycle.start.gui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -6,32 +6,22 @@ import javafx.stage.Stage;
 import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
+import launcher.lifecycle.start.startup_window.StartupWindowManager;
 
 import java.net.URL;
 
-/**
- * Initializes the JavaFX UI: loads FXML, creates ViewModel, configures Stage, and wires controller.
- */
 public final class UIInitializer {
 
     private UIInitializer() {}
 
     public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindowManager windowManager) {
-        // Step 1: Load main UI
         windowManager.updateProgress(1, "Loading user interface...");
         GDKGameLobbyController[] controllerHolder = new GDKGameLobbyController[1];
         Scene mainLobbyScene = initializeMainUserInterface(controllerHolder);
         GDKGameLobbyController lobbyController = controllerHolder[0];
-
-        // Step 2: Create ViewModel
         GDKViewModel applicationViewModel = initializeApplicationViewModel(primaryApplicationStage);
-
-        // Step 3: Configure Stage
         configurePrimaryApplicationStage(primaryApplicationStage, mainLobbyScene);
-
-        // Step 4: Wire Controller ↔ ViewModel
         wireUpControllerWithViewModel(applicationViewModel, lobbyController);
-
         return lobbyController;
     }
 

@@ -1,8 +1,12 @@
 package launcher.lifecycle.start;
 
 import gdk.Logging;
+
 import javafx.stage.Stage;
+
 import launcher.gui.GDKGameLobbyController;
+import launcher.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.lifecycle.start.gui.UIInitializer;
 
 /**
  * Orchestrates the startup process of the GDK application.

@@ -1,4 +1,4 @@
-package launcher.lifecycle.start;
+package launcher.lifecycle.start.startup_window;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

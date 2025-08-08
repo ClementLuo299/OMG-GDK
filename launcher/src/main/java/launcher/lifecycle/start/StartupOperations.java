@@ -7,6 +7,7 @@ import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.utils.ModuleCompiler;
 import launcher.utils.ModuleDiscovery;
+import launcher.lifecycle.start.startup_window.StartupWindowManager;
 
 import java.io.File;
 import java.util.List;
