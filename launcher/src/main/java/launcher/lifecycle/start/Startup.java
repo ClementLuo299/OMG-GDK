@@ -52,7 +52,7 @@ public class Startup {
         // Quick module verification to determine number of steps
         int totalSteps = calculateTotalSteps();
         windowManager.setTotalSteps(totalSteps);
-        Logging.info("📊 Determined " + totalSteps + " total steps based on module count");
+        Logging.info("Determined " + totalSteps + " total steps based on module count");
         
         // Show the window and start with initial progress
         windowManager.show();
@@ -81,7 +81,7 @@ public class Startup {
             ensureUIReady(primaryApplicationStage, lobbyController, windowManager, totalSteps);
             
             // Hide the progress window FIRST
-            Logging.info("🏁 Hiding progress window...");
+            Logging.info("Hiding progress window...");
             hideProgressWindow(windowManager);
             
             // Wait a moment for the progress window to fully close
@@ -91,7 +91,7 @@ public class Startup {
             // Use Platform.runLater to ensure proper JavaFX thread timing
             javafx.application.Platform.runLater(() -> {
                 // Show the window but keep it invisible
-                Logging.info("🎬 Showing main application window (invisible)...");
+                Logging.info("Showing main application window (invisible)...");
                 primaryApplicationStage.show();
                 
                 // Use another runLater to ensure the window is fully rendered
@@ -99,17 +99,17 @@ public class Startup {
                     // Use a timer to delay the fade-in
                     javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(3000)); // DEVELOPMENT: Slowed down
                     pause.setOnFinished(event -> {
-                        // Then fade in the main window
-                        Logging.info("✨ Fading in main application window...");
-                        primaryApplicationStage.setOpacity(1.0);
+                                                   // Then fade in the main window
+                           Logging.info("Fading in main application window...");
+                           primaryApplicationStage.setOpacity(1.0);
                     });
                     pause.play();
                 });
             });
             
-            Logging.info("✅ GDK application startup completed successfully");
-        } catch (Exception startupError) {
-            Logging.error("❌ GDK application startup failed: " + startupError.getMessage(), startupError);
+                               Logging.info("GDK application startup completed successfully");
+               } catch (Exception startupError) {
+                   Logging.error("GDK application startup failed: " + startupError.getMessage(), startupError);
             
             // Show error in pre-startup progress window before hiding
             if (windowManager != null) {
@@ -139,7 +139,7 @@ public class Startup {
      * @return The total number of steps needed
      */
     private static int calculateTotalSteps() {
-        Logging.info("🔍 Calculating total steps based on module verification...");
+        Logging.info("Calculating total steps based on module verification...");
         
         try {
             // Base steps: UI initialization, preparation, finalization
@@ -150,13 +150,13 @@ public class Startup {
             File modulesDirectory = new File(modulesDirectoryPath);
             
             if (!modulesDirectory.exists()) {
-                Logging.info("📁 Modules directory not found, using base steps only");
+                Logging.info("Modules directory not found, using base steps only");
                 return baseSteps;
             }
             
             // Count valid modules
             int validModuleCount = countValidModules(modulesDirectory);
-            Logging.info("📦 Found " + validModuleCount + " valid modules");
+            Logging.info("Found " + validModuleCount + " valid modules");
             
             // Each valid module adds 1 step for processing
             int totalSteps = baseSteps + validModuleCount;
@@ -166,7 +166,7 @@ public class Startup {
             
             return totalSteps;
         } catch (Exception e) {
-            Logging.error("❌ Error calculating total steps: " + e.getMessage(), e);
+            Logging.error("Error calculating total steps: " + e.getMessage(), e);
             return 10; // Default fallback
         }
     }
@@ -200,13 +200,13 @@ public class Startup {
                 // Check if this is a valid module
                 if (isValidModule(subdir)) {
                     validCount++;
-                    Logging.info("✅ Valid module found: " + moduleName);
+                    Logging.info("Valid module found: " + moduleName);
                 } else {
-                    Logging.info("⚠️ Invalid module found: " + moduleName);
+                    Logging.info("Invalid module found: " + moduleName);
                 }
             }
         } catch (Exception e) {
-            Logging.error("❌ Error counting valid modules: " + e.getMessage(), e);
+            Logging.error("Error counting valid modules: " + e.getMessage(), e);
         }
         
         return validCount;
@@ -258,12 +258,12 @@ public class Startup {
             boolean isValid = hasMainMethod && hasGetGameName && hasGetGameNameInMetadata && hasGetVersion && hasGetDescription;
             
             if (!isValid) {
-                Logging.info("⚠️ Module " + moduleDir.getName() + " missing required methods");
+                Logging.info("Module " + moduleDir.getName() + " missing required methods");
             }
             
             return isValid;
         } catch (Exception e) {
-            Logging.error("❌ Error validating module " + moduleDir.getName() + ": " + e.getMessage(), e);
+            Logging.error("Error validating module " + moduleDir.getName() + ": " + e.getMessage(), e);
             return false;
         }
     }
@@ -281,7 +281,7 @@ public class Startup {
      * @return The initialized Scene object
      */
     private static Scene initializeMainUserInterface(Stage primaryApplicationStage, GDKGameLobbyController[] controllerHolder) {
-        Logging.info("🎨 Initializing main user interface components");
+        Logging.info("Initializing main user interface components");
         
         try {
             // Load FXML scene from resources
@@ -290,7 +290,7 @@ public class Startup {
                 throw new RuntimeException("FXML resource not found: /gdk-lobby/GDKGameLobby.fxml");
             }
             
-            Logging.info("📂 Loading FXML from: " + fxmlResourceUrl);
+            Logging.info("Loading FXML from: " + fxmlResourceUrl);
             FXMLLoader fxmlLoader = new FXMLLoader(fxmlResourceUrl);
             
             // Register custom classes for FXML loading
@@ -306,20 +306,20 @@ public class Startup {
             URL cssResourceUrl = GDKApplication.class.getResource("/gdk-lobby/gdk-lobby.css");
             if (cssResourceUrl != null) {
                 mainLobbyScene.getStylesheets().add(cssResourceUrl.toExternalForm());
-                Logging.info("📂 CSS styling loaded from: " + cssResourceUrl);
+                Logging.info("CSS styling loaded from: " + cssResourceUrl);
             }
             
             // Set up the lobby controller with necessary references
             if (lobbyController != null) {
-                Logging.info("✅ Lobby controller initialized successfully");
+                Logging.info("Lobby controller initialized successfully");
             } else {
                 throw new RuntimeException("Lobby controller is null - FXML loading may have failed");
             }
             
-            Logging.info("✅ Main user interface loaded successfully");
+            Logging.info("Main user interface loaded successfully");
             return mainLobbyScene;
         } catch (Exception uiInitializationError) {
-            Logging.error("❌ Failed to load main user interface: " + uiInitializationError.getMessage(), uiInitializationError);
+            Logging.error("Failed to load main user interface: " + uiInitializationError.getMessage(), uiInitializationError);
             throw new RuntimeException("Failed to initialize main user interface", uiInitializationError);
         }
     }
@@ -336,7 +336,7 @@ public class Startup {
      * @return The configured ViewModel instance
      */
     private static GDKViewModel initializeApplicationViewModel(Stage primaryApplicationStage) {
-        Logging.info("🧠 Initializing application ViewModel");
+        Logging.info("Initializing application ViewModel");
         
         try {
             // Create a new ViewModel instance with the module loader
@@ -345,10 +345,10 @@ public class Startup {
             // Configure the ViewModel with the primary application stage
             applicationViewModel.setPrimaryStage(primaryApplicationStage);
             
-            Logging.info("✅ Application ViewModel initialized successfully");
+            Logging.info("Application ViewModel initialized successfully");
             return applicationViewModel;
         } catch (Exception viewModelInitializationError) {
-            Logging.error("❌ Failed to initialize ViewModel: " + viewModelInitializationError.getMessage(), viewModelInitializationError);
+            Logging.error("Failed to initialize ViewModel: " + viewModelInitializationError.getMessage(), viewModelInitializationError);
             throw new RuntimeException("Failed to initialize ViewModel", viewModelInitializationError);
         }
     }
@@ -365,7 +365,7 @@ public class Startup {
      * @param mainLobbyScene The scene to set on the stage
      */
     private static void configurePrimaryApplicationStage(Stage primaryApplicationStage, Scene mainLobbyScene) {
-        Logging.info("⚙️ Configuring primary application stage");
+        Logging.info("Configuring primary application stage");
         
         try {
             // Set the scene on the stage
@@ -381,9 +381,9 @@ public class Startup {
             // Start with opacity 0 for fade-in effect
             primaryApplicationStage.setOpacity(0.0);
             
-            Logging.info("✅ Primary application stage configured successfully");
+            Logging.info("Primary application stage configured successfully");
         } catch (Exception stageConfigurationError) {
-            Logging.error("❌ Failed to configure primary application stage: " + stageConfigurationError.getMessage(), stageConfigurationError);
+            Logging.error("Failed to configure primary application stage: " + stageConfigurationError.getMessage(), stageConfigurationError);
             throw new RuntimeException("Failed to configure primary application stage", stageConfigurationError);
         }
     }
@@ -401,18 +401,18 @@ public class Startup {
      * @param lobbyController The lobby controller
      */
     private static void wireUpControllerWithViewModel(Scene mainLobbyScene, GDKViewModel applicationViewModel, GDKGameLobbyController lobbyController) {
-        Logging.info("🔌 Wiring up controller with ViewModel");
+        Logging.info("Wiring up controller with ViewModel");
         
         try {
             // Set the ViewModel on the controller
             if (lobbyController != null) {
                 lobbyController.setViewModel(applicationViewModel);
-                Logging.info("✅ Controller wired up with ViewModel successfully");
+                Logging.info("Controller wired up with ViewModel successfully");
             } else {
                 throw new RuntimeException("Lobby controller is null - cannot wire up ViewModel");
             }
         } catch (Exception wiringError) {
-            Logging.error("❌ Failed to wire up controller with ViewModel: " + wiringError.getMessage(), wiringError);
+            Logging.error("Failed to wire up controller with ViewModel: " + wiringError.getMessage(), wiringError);
             throw new RuntimeException("Failed to wire up controller with ViewModel", wiringError);
         }
     }
@@ -449,7 +449,7 @@ public class Startup {
      * @param totalSteps The total number of steps for progress tracking
      */
     private static void loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
-        Logging.info("📦 Loading game modules with progress tracking");
+        Logging.info("Loading game modules with progress tracking");
         
         try {
             // Note: Progress window updates are now handled directly by PreStartupProgressWindow
@@ -475,7 +475,7 @@ public class Startup {
             
             if (!modulesDirectory.exists()) {
                 updateProgress(Math.min(currentStep, totalSteps - 3), "Modules directory not found", windowManager);
-                Logging.info("⚠️ Modules directory does not exist: " + modulesDirectoryPath);
+                Logging.info("Modules directory does not exist: " + modulesDirectoryPath);
                 currentStep++;
             } else {
                 updateProgress(Math.min(currentStep, totalSteps - 3), "Discovering modules...", windowManager);
@@ -509,9 +509,9 @@ public class Startup {
             // Clear startup progress window reference
             ModuleLoader.clearStartupProgressWindow();
             
-            Logging.info("✅ Module loading completed successfully");
+            Logging.info("Module loading completed successfully");
         } catch (Exception moduleLoadingError) {
-            Logging.error("❌ Failed to load modules: " + moduleLoadingError.getMessage(), moduleLoadingError);
+            Logging.error("Failed to load modules: " + moduleLoadingError.getMessage(), moduleLoadingError);
             throw new RuntimeException("Failed to load modules", moduleLoadingError);
         }
     }
@@ -545,7 +545,7 @@ public class Startup {
                 }
             }
         } catch (Exception e) {
-            Logging.error("❌ Error getting valid module directories: " + e.getMessage(), e);
+            Logging.error("Error getting valid module directories: " + e.getMessage(), e);
         }
         
         return validModules;
@@ -578,7 +578,7 @@ public class Startup {
      * @param totalSteps The total number of steps for progress tracking
      */
     private static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager, int totalSteps) {
-        Logging.info("🔧 Ensuring UI is fully ready...");
+        Logging.info("Ensuring UI is fully ready...");
         
         try {
             // Load modules with progress tracking
@@ -590,16 +590,16 @@ public class Startup {
             // Use Platform.runLater to ensure we're on the JavaFX thread
             Platform.runLater(() -> {
                 try {
-                    Logging.info("🚀 Checking for compilation failures on startup...");
+                    Logging.info("Checking for compilation failures on startup...");
                     
                     // Check for compilation failures
                     if (lobbyController != null) {
                         lobbyController.checkStartupCompilationFailures();
                     }
                     
-                    Logging.info("✅ Startup compilation failure check completed");
+                    Logging.info("Startup compilation failure check completed");
                 } catch (Exception compilationCheckError) {
-                    Logging.error("❌ Failed to check compilation failures: " + compilationCheckError.getMessage(), compilationCheckError);
+                    Logging.error("Failed to check compilation failures: " + compilationCheckError.getMessage(), compilationCheckError);
                 }
             });
             
@@ -610,9 +610,9 @@ public class Startup {
             // Wait a moment for final progress update
             Thread.sleep(5000); // DEVELOPMENT: Wait for final progress
             
-            Logging.info("✅ UI is fully ready for user interaction");
+            Logging.info("UI is fully ready for user interaction");
         } catch (Exception uiReadyError) {
-            Logging.error("❌ Failed to ensure UI readiness: " + uiReadyError.getMessage(), uiReadyError);
+            Logging.error("Failed to ensure UI readiness: " + uiReadyError.getMessage(), uiReadyError);
             throw new RuntimeException("Failed to ensure UI readiness", uiReadyError);
         }
     }
@@ -636,7 +636,7 @@ public class Startup {
      * @param modulePath The path to the module to build
      */
     private static void buildModule(String modulePath) {
-        Logging.info("🔨 Building module: " + modulePath);
+        Logging.info("Building module: " + modulePath);
         
         try {
             // Find Maven command
@@ -650,12 +650,12 @@ public class Startup {
             int exitCode = process.waitFor();
             
             if (exitCode == 0) {
-                Logging.info("✅ Module built successfully: " + modulePath);
+                Logging.info("Module built successfully: " + modulePath);
             } else {
-                Logging.info("⚠️ Module build completed with warnings: " + modulePath);
+                Logging.info("Module build completed with warnings: " + modulePath);
             }
         } catch (Exception buildError) {
-            Logging.error("❌ Failed to build module " + modulePath + ": " + buildError.getMessage(), buildError);
+            Logging.error("Failed to build module " + modulePath + ": " + buildError.getMessage(), buildError);
         }
     }
     
