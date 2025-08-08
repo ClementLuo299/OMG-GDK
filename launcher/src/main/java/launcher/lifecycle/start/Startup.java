@@ -45,18 +45,13 @@ public class Startup {
     public static void start(Stage primaryApplicationStage) {
         Logging.info("Starting GDK application startup process");
         
-        // Local variables for the startup process
-        ModuleLoader gameModuleLoader = new ModuleLoader();
-        GDKGameLobbyController lobbyController = null;
-        PreStartupProgressWindow preProgressWindow = null;
-        
         // Create and show the pre-startup progress window for immediate feedback
-        preProgressWindow = new PreStartupProgressWindow();
+        PreStartupProgressWindow preProgressWindow = new PreStartupProgressWindow();
         preProgressWindow.show();
         preProgressWindow.updateProgress(0, "Starting GDK application...");
         
         // Quick module verification to determine number of steps
-        int totalSteps = calculateTotalSteps(gameModuleLoader);
+        int totalSteps = calculateTotalSteps();
         preProgressWindow.setTotalSteps(totalSteps);
         Logging.info("📊 Determined " + totalSteps + " total steps based on module count");
         
@@ -64,11 +59,11 @@ public class Startup {
             // Step 1: Initialize the main user interface (this includes FXML loading and controller init)
             updateProgress(1, "Loading user interface...", preProgressWindow);
             GDKGameLobbyController[] controllerHolder = new GDKGameLobbyController[1];
-            Scene mainLobbyScene = initializeMainUserInterface(primaryApplicationStage, gameModuleLoader, controllerHolder);
-            lobbyController = controllerHolder[0];
+            Scene mainLobbyScene = initializeMainUserInterface(primaryApplicationStage, controllerHolder);
+            GDKGameLobbyController lobbyController = controllerHolder[0];
             
             // Step 2: Create and configure the ViewModel (quick step, no progress update)
-            GDKViewModel applicationViewModel = initializeApplicationViewModel(gameModuleLoader, primaryApplicationStage);
+            GDKViewModel applicationViewModel = initializeApplicationViewModel(primaryApplicationStage);
             
             // Step 3: Configure the primary application stage (quick step, no progress update)
             configurePrimaryApplicationStage(primaryApplicationStage, mainLobbyScene);
@@ -82,7 +77,7 @@ public class Startup {
             updateProgress(2, "Preparing application...", preProgressWindow);
             
             // Ensure the UI is fully ready before showing the main window
-            ensureUIReady(primaryApplicationStage, lobbyController, gameModuleLoader, preProgressWindow, totalSteps);
+            ensureUIReady(primaryApplicationStage, lobbyController, preProgressWindow, totalSteps);
             
             // Hide the progress window FIRST
             Logging.info("🏁 Hiding progress window...");
@@ -140,10 +135,9 @@ public class Startup {
      * This method does a quick verification of modules to determine how many
      * valid modules exist, which affects the total number of progress steps.
      * 
-     * @param gameModuleLoader The module loader instance
      * @return The total number of steps needed
      */
-    private static int calculateTotalSteps(ModuleLoader gameModuleLoader) {
+    private static int calculateTotalSteps() {
         Logging.info("🔍 Calculating total steps based on module verification...");
         
         try {
@@ -282,11 +276,10 @@ public class Startup {
      * sets up the lobby controller with necessary references.
      * 
      * @param primaryApplicationStage The primary stage for the application
-     * @param gameModuleLoader The module loader instance
      * @param controllerHolder Array to hold the controller reference
      * @return The initialized Scene object
      */
-    private static Scene initializeMainUserInterface(Stage primaryApplicationStage, ModuleLoader gameModuleLoader, GDKGameLobbyController[] controllerHolder) {
+    private static Scene initializeMainUserInterface(Stage primaryApplicationStage, GDKGameLobbyController[] controllerHolder) {
         Logging.info("🎨 Initializing main user interface components");
         
         try {
@@ -338,16 +331,15 @@ public class Startup {
      * This method creates the ViewModel instance and configures it
      * with the necessary dependencies for proper operation.
      * 
-     * @param gameModuleLoader The module loader instance
      * @param primaryApplicationStage The primary stage for the application
      * @return The configured ViewModel instance
      */
-    private static GDKViewModel initializeApplicationViewModel(ModuleLoader gameModuleLoader, Stage primaryApplicationStage) {
+    private static GDKViewModel initializeApplicationViewModel(Stage primaryApplicationStage) {
         Logging.info("🧠 Initializing application ViewModel");
         
         try {
             // Create a new ViewModel instance with the module loader
-            GDKViewModel applicationViewModel = new GDKViewModel(gameModuleLoader);
+            GDKViewModel applicationViewModel = new GDKViewModel(null);
             
             // Configure the ViewModel with the primary application stage
             applicationViewModel.setPrimaryStage(primaryApplicationStage);
@@ -456,11 +448,10 @@ public class Startup {
     /**
      * Load modules with progress updates.
      * 
-     * @param gameModuleLoader The module loader instance
      * @param preProgressWindow The progress window for updates
      * @param totalSteps The total number of steps for progress tracking
      */
-    private static void loadModulesWithProgress(ModuleLoader gameModuleLoader, PreStartupProgressWindow preProgressWindow, int totalSteps) {
+    private static void loadModulesWithProgress(PreStartupProgressWindow preProgressWindow, int totalSteps) {
         Logging.info("📦 Loading game modules with progress tracking");
         
         try {
@@ -586,16 +577,15 @@ public class Startup {
      * 
      * @param primaryApplicationStage The primary stage for the application
      * @param lobbyController The lobby controller
-     * @param gameModuleLoader The module loader instance
      * @param preProgressWindow The progress window for updates
      * @param totalSteps The total number of steps for progress tracking
      */
-    private static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, ModuleLoader gameModuleLoader, PreStartupProgressWindow preProgressWindow, int totalSteps) {
+    private static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, PreStartupProgressWindow preProgressWindow, int totalSteps) {
         Logging.info("🔧 Ensuring UI is fully ready...");
         
         try {
             // Load modules with progress tracking
-            loadModulesWithProgress(gameModuleLoader, preProgressWindow, totalSteps);
+            loadModulesWithProgress(preProgressWindow, totalSteps);
             
             // Check for compilation failures on startup
             updateProgress(totalSteps - 2, "Checking for compilation issues...", preProgressWindow);

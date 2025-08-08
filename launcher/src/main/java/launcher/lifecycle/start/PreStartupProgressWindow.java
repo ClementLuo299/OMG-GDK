@@ -23,23 +23,24 @@ import java.util.TimerTask;
  */
 public class PreStartupProgressWindow {
     
+    // Swing components for the pre-startup progress window UI
     private JFrame progressFrame;
     private JProgressBar progressBar;
     private JLabel statusLabel;
     
-    // Progress tracking
+    // Progress tracking for the progress bar
     private AtomicInteger currentStep = new AtomicInteger(0);
-    private int totalSteps = 15; // More granular steps for better progress tracking
+    private int totalSteps = 15; // Default total steps for the progress bar
     
-    // Animation support
+    // Dot animation for the status label
     private Timer animationTimer;
-    private String fullMessage = "";
-    private int currentCharIndex = 0;
-    private boolean isAnimating = false;
+    private String fullMessage = ""; // Holds the base message text
+    private int currentCharIndex = 0; // Current number of dots
+    private boolean isAnimating = false; // Whether the animation is currently running
     
-    // Progress bar animation
+    // Progress bar shimmer animation
     private Timer progressAnimationTimer;
-    private float shimmerOffset = 0.0f;
+    private float shimmerOffset = 0.0f; // Float to determine the shimmer percentage
     
     /**
      * Initialize the pre-startup progress window
