@@ -42,7 +42,6 @@ public final class StartupOperations {
                 if (currentStep >= totalSteps - 3) break;
                 String moduleName = moduleDir.getName();
                 windowManager.updateProgress(Math.min(currentStep, totalSteps - 3), "Processing module: " + moduleName);
-                try { Thread.sleep(500); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
                 currentStep++;
             }
             List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
@@ -65,19 +64,13 @@ public final class StartupOperations {
         });
         windowManager.updateProgress(totalSteps - 1, "Startup complete");
         windowManager.updateProgress(totalSteps, "Ready!");
-        try { Thread.sleep(5000); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
     }
 
     public static void showMainStageWithFade(Stage primaryApplicationStage, StartupWindowManager windowManager) {
         windowManager.hide();
-        try { Thread.sleep(1000); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         Platform.runLater(() -> {
+            primaryApplicationStage.setOpacity(1.0);
             primaryApplicationStage.show();
-            Platform.runLater(() -> {
-                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(3000));
-                pause.setOnFinished(event -> primaryApplicationStage.setOpacity(1.0));
-                pause.play();
-            });
         });
     }
 } 

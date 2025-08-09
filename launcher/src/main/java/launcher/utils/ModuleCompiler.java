@@ -185,19 +185,11 @@ public class ModuleCompiler {
      */
     private static boolean validateMainClass(Class<?> mainClass) {
         try {
-            // Check for main method
-            Method mainMethod = mainClass.getMethod("main", String[].class);
-            if (mainMethod == null) {
-                return false;
+            boolean implementsGameModule = GameModule.class.isAssignableFrom(mainClass);
+            if (!implementsGameModule) {
+                Logging.info("Main class does not implement GameModule interface");
             }
-            
-            // For performance, skip runtime checks and assume it's valid
-            Logging.info("Main class validation passed (runtime checks skipped for performance)");
-            return true;
-            
-        } catch (NoSuchMethodException e) {
-            Logging.error("Main class missing main method: " + e.getMessage(), e);
-            return false;
+            return implementsGameModule;
         } catch (Exception e) {
             Logging.error("Error validating main class: " + e.getMessage(), e);
             return false;

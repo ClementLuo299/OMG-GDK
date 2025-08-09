@@ -163,12 +163,9 @@ public class ModuleDiscovery {
     private static boolean validateMainJavaFile(File mainJavaFile) {
         try {
             String content = Files.readString(mainJavaFile.toPath());
-            
-            // Accept both common main signatures
-            boolean hasMainMethod = content.contains("public static void main(String[] args)") ||
-                                  content.contains("public static void main(String args[])");
-            
-            return hasMainMethod;
+            boolean implementsGameModule = content.contains("implements GameModule");
+            boolean hasClassMain = content.contains("class Main");
+            return implementsGameModule && hasClassMain;
         } catch (IOException e) {
             Logging.error("Error reading Main.java file: " + e.getMessage(), e);
             return false;
@@ -182,15 +179,11 @@ public class ModuleDiscovery {
     private static boolean validateMetadataJavaFile(File metadataJavaFile) {
         try {
             String content = Files.readString(metadataJavaFile.toPath());
-            
-            boolean hasGetGameName = content.contains("public String getGameName()") || 
-                                   content.contains("public static String getGameName()");
-            boolean hasGetVersion = content.contains("public String getVersion()") || 
-                                  content.contains("public static String getVersion()");
-            boolean hasGetDescription = content.contains("public String getDescription()") || 
-                                      content.contains("public static String getDescription()");
-            
-            return hasGetGameName && hasGetVersion && hasGetDescription;
+            boolean extendsGameMetadata = content.contains("extends GameMetadata");
+            boolean hasGetGameName = content.contains("getGameName()");
+            boolean hasGetGameVersion = content.contains("getGameVersion()");
+            boolean hasGetGameDescription = content.contains("getGameDescription()");
+            return extendsGameMetadata && hasGetGameName && hasGetGameVersion && hasGetGameDescription;
         } catch (IOException e) {
             Logging.error("Error reading Metadata.java file: " + e.getMessage(), e);
             return false;
