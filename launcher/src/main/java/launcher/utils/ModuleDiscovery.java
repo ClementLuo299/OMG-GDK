@@ -13,19 +13,13 @@ import java.util.List;
  * Handles module discovery and validation.
  * This class is responsible for finding modules in the modules directory
  * and validating their structure and required components.
- *
- * @author Clement Luo
- * @date August 8, 2025
- * @edited August 8, 2025
- * @since 1.0
  */
 public class ModuleDiscovery {
     
     /**
      * Discover all valid modules in the modules directory.
-     * 
-     * @param modulesDirectoryPath The path to the modules directory
-     * @return List of discovered GameModule instances
+     * Currently only identifies candidates and logs validation; actual loading
+     * is delegated elsewhere (kept intentionally side-effect free here).
      */
     public static List<GameModule> discoverModules(String modulesDirectoryPath) {
         Logging.info("Starting module discovery in: " + modulesDirectoryPath);
@@ -35,7 +29,7 @@ public class ModuleDiscovery {
         
         if (!modulesDirectory.exists() || !modulesDirectory.isDirectory()) {
             Logging.info("Modules directory does not exist: " + modulesDirectoryPath);
-            return discoveredModules;
+            return discoveredModules; // return empty by design
         }
         
         File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
@@ -50,9 +44,9 @@ public class ModuleDiscovery {
             String moduleName = subdir.getName();
             Logging.info("Checking subdirectory: " + moduleName);
             
+            // Only log validity here; loading is performed by ModuleCompiler
             if (isValidModuleStructure(subdir)) {
                 Logging.info("Valid module structure found: " + moduleName);
-                // Note: Actual module loading is handled by ModuleLoader
             } else {
                 Logging.info("Invalid module structure: " + moduleName);
             }
@@ -64,9 +58,6 @@ public class ModuleDiscovery {
     
     /**
      * Count the number of valid modules in the modules directory.
-     * 
-     * @param modulesDirectory The modules directory to scan
-     * @return The number of valid modules found
      */
     public static int countValidModules(File modulesDirectory) {
         int validCount = 0;
@@ -74,18 +65,18 @@ public class ModuleDiscovery {
         try {
             File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
             if (subdirs == null) {
-                return 0;
+                return 0; // nothing to scan
             }
             
             for (File subdir : subdirs) {
                 String moduleName = subdir.getName();
                 
-                // Skip non-module directories
+                // Skip infra/hidden directories that are not game modules
                 if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
                     continue;
                 }
                 
-                // Check if this is a valid module
+                // Only structural validity is checked here (not compilation)
                 if (isValidModuleStructure(subdir)) {
                     validCount++;
                     Logging.info("Valid module found: " + moduleName);
@@ -102,9 +93,6 @@ public class ModuleDiscovery {
     
     /**
      * Get list of valid module directories for processing.
-     * 
-     * @param modulesDirectory The modules directory to scan
-     * @return List of valid module directories
      */
     public static List<File> getValidModuleDirectories(File modulesDirectory) {
         List<File> validModules = new ArrayList<>();
@@ -112,18 +100,18 @@ public class ModuleDiscovery {
         try {
             File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
             if (subdirs == null) {
-                return validModules;
+                return validModules; // empty if nothing to scan
             }
             
             for (File subdir : subdirs) {
                 String moduleName = subdir.getName();
                 
-                // Skip non-module directories
+                // Filter out infra/hidden directories
                 if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
                     continue;
                 }
                 
-                // Check if this is a valid module
+                // Collect only those passing structural checks
                 if (isValidModuleStructure(subdir)) {
                     validModules.add(subdir);
                 }
@@ -137,13 +125,11 @@ public class ModuleDiscovery {
     
     /**
      * Check if a directory has a valid module structure.
-     * 
-     * @param moduleDir The module directory to validate
-     * @return true if the module has valid structure, false otherwise
+     * Validity = presence of required files + minimal API signatures.
      */
     public static boolean isValidModuleStructure(File moduleDir) {
         try {
-            // Check for required source files
+            // Require top-level entry points (minimal contract for modules)
             File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
             File metadataJavaFile = new File(moduleDir, "src/main/java/Metadata.java");
             
@@ -152,13 +138,12 @@ public class ModuleDiscovery {
                 return false;
             }
             
-            // Validate Main.java content
+            // Minimal content checks for Main and Metadata
             if (!validateMainJavaFile(mainJavaFile)) {
                 Logging.info("Module " + moduleDir.getName() + " missing required methods in Main.java");
                 return false;
             }
             
-            // Validate Metadata.java content
             if (!validateMetadataJavaFile(metadataJavaFile)) {
                 Logging.info("Module " + moduleDir.getName() + " missing required methods in Metadata.java");
                 return false;
@@ -173,15 +158,13 @@ public class ModuleDiscovery {
     
     /**
      * Validate that Main.java contains required methods.
-     * 
-     * @param mainJavaFile The Main.java file to validate
-     * @return true if the file contains required methods, false otherwise
+     * Currently ensures a runnable entrypoint via a main method signature.
      */
     private static boolean validateMainJavaFile(File mainJavaFile) {
         try {
             String content = Files.readString(mainJavaFile.toPath());
             
-            // Check for required methods
+            // Accept both common main signatures
             boolean hasMainMethod = content.contains("public static void main(String[] args)") ||
                                   content.contains("public static void main(String args[])");
             
@@ -193,16 +176,13 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Validate that Metadata.java contains required methods.
-     * 
-     * @param metadataJavaFile The Metadata.java file to validate
-     * @return true if the file contains required methods, false otherwise
+     * Validate that Metadata.java exposes minimal game metadata contract.
+     * Accepts instance or static getters for name, version, description.
      */
     private static boolean validateMetadataJavaFile(File metadataJavaFile) {
         try {
             String content = Files.readString(metadataJavaFile.toPath());
             
-            // Check for required methods
             boolean hasGetGameName = content.contains("public String getGameName()") || 
                                    content.contains("public static String getGameName()");
             boolean hasGetVersion = content.contains("public String getVersion()") || 
@@ -219,9 +199,6 @@ public class ModuleDiscovery {
     
     /**
      * Check if a module directory exists and is accessible.
-     * 
-     * @param modulePath The path to the module directory
-     * @return true if the module directory exists and is accessible, false otherwise
      */
     public static boolean moduleDirectoryExists(String modulePath) {
         File moduleDir = new File(modulePath);
@@ -230,22 +207,17 @@ public class ModuleDiscovery {
     
     /**
      * Calculate the total number of steps needed for startup progress tracking.
-     * 
-     * This method determines the number of progress bar steps based on:
-     * - Base steps for UI initialization and preparation
-     * - Number of valid modules found (each module adds 1 step)
-     * 
-     * @return The total number of steps for progress tracking
+     * Base steps + one per valid module; clamped for UX.
      */
     public static int calculateTotalSteps() {
         Logging.info("Calculating total steps based on module verification...");
         
         try {
-            // Base steps: UI initialization, preparation, finalization
-            int baseSteps = 5; // Starting, UI loading, preparation, finalization, ready
+            // Base steps: starting, UI loading, preparation, finalization, ready
+            int baseSteps = 5;
             
-            // Check if modules directory exists
-            String modulesDirectoryPath = "../modules"; // Relative to launcher
+            // Relative to launcher module root
+            String modulesDirectoryPath = "../modules";
             File modulesDirectory = new File(modulesDirectoryPath);
             
             if (!modulesDirectory.exists()) {
@@ -253,28 +225,22 @@ public class ModuleDiscovery {
                 return baseSteps;
             }
             
-            // Count valid modules
             int validModuleCount = countValidModules(modulesDirectory);
             Logging.info("Found " + validModuleCount + " valid modules");
             
-            // Each valid module adds 1 step for processing
             int totalSteps = baseSteps + validModuleCount;
-            
-            // Ensure minimum of 5 steps and maximum of 50 steps
+            // Maintain a reasonable range for the progress bar
             totalSteps = Math.max(5, Math.min(50, totalSteps));
-            
             return totalSteps;
         } catch (Exception e) {
             Logging.error("Error calculating total steps: " + e.getMessage(), e);
-            return 10; // Default fallback
+            return 10; // safe fallback
         }
     }
     
     /**
      * Get the list of all module directories (valid or invalid).
-     * 
-     * @param modulesDirectory The modules directory to scan
-     * @return List of all module directories
+     * Useful for diagnostics or bulk operations before validation.
      */
     public static List<File> getAllModuleDirectories(File modulesDirectory) {
         List<File> allModules = new ArrayList<>();
@@ -288,7 +254,7 @@ public class ModuleDiscovery {
             for (File subdir : subdirs) {
                 String moduleName = subdir.getName();
                 
-                // Skip non-module directories
+                // Skip infra/hidden directories
                 if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
                     continue;
                 }
