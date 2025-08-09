@@ -20,6 +20,7 @@ public final class UIInitializer {
         Scene mainLobbyScene = initializeMainUserInterface(controllerHolder);
         GDKGameLobbyController lobbyController = controllerHolder[0];
         GDKViewModel applicationViewModel = initializeApplicationViewModel(primaryApplicationStage);
+        applicationViewModel.setMainLobbyScene(mainLobbyScene);
         configurePrimaryApplicationStage(primaryApplicationStage, mainLobbyScene);
         wireUpControllerWithViewModel(applicationViewModel, lobbyController);
         return lobbyController;

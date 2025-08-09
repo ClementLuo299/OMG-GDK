@@ -52,17 +52,21 @@ public class ServerSimulatorController {
     /**
      * Button for sending messages
      */
-    @FXML private Button sendMessageButton;
-    
-    /**
-     * Button for clearing all messages from the display
-     */
-    @FXML private Button clearMessagesButton;
-    
-    /**
-     * Button for closing the server simulator window
-     */
-    @FXML private Button closeWindowButton;
+         @FXML private Button sendMessageButton;
+     
+     /**
+      * Button for clearing all messages from the display
+      */
+     @FXML private Button clearMessagesButton;
+     
+     /** Save/Load buttons */
+     @FXML private Button saveMessagesButton;
+     @FXML private Button loadMessagesButton;
+     
+     /**
+      * Button for closing the server simulator window
+      */
+     @FXML private Button closeWindowButton;
     
     // ==================== DEPENDENCIES ====================
     
@@ -96,6 +100,7 @@ public class ServerSimulatorController {
         
         setupMessageInputHandling();
         setupSendButtonStateManagement();
+        setupSaveLoadHandlers();
     }
     
     /**
@@ -106,6 +111,9 @@ public class ServerSimulatorController {
      */
     private void setupMessageInputHandling() {
         messageInputField.setOnAction(event -> handleSendMessageAction());
+        if (sendMessageButton != null) {
+            sendMessageButton.setOnAction(event -> handleSendMessageAction());
+        }
     }
     
     /**
@@ -119,6 +127,42 @@ public class ServerSimulatorController {
         messageInputField.textProperty().addListener((observable, oldValue, newValue) -> {
             sendMessageButton.setDisable(newValue == null || newValue.trim().isEmpty());
         });
+    }
+
+    private void setupSaveLoadHandlers() {
+        if (saveMessagesButton != null) {
+            saveMessagesButton.setOnAction(e -> handleSaveMessages());
+        }
+        if (loadMessagesButton != null) {
+            loadMessagesButton.setOnAction(e -> handleLoadMessages());
+        }
+    }
+
+    private void handleSaveMessages() {
+        try {
+            String content = receivedMessagesDisplayArea.getText();
+            if (content == null) content = "";
+            java.nio.file.Path out = java.nio.file.Paths.get("server-simulator-messages.txt");
+            java.nio.file.Files.writeString(out, content);
+            addReceivedMessageToDisplay("Saved to " + out.toAbsolutePath());
+        } catch (Exception e) {
+            addReceivedMessageToDisplay("ERROR saving: " + e.getMessage());
+        }
+    }
+
+    private void handleLoadMessages() {
+        try {
+            java.nio.file.Path in = java.nio.file.Paths.get("server-simulator-messages.txt");
+            if (!java.nio.file.Files.exists(in)) {
+                addReceivedMessageToDisplay("No saved file found: " + in.toAbsolutePath());
+                return;
+            }
+            String content = java.nio.file.Files.readString(in);
+            receivedMessagesDisplayArea.setText(content);
+            addReceivedMessageToDisplay("Loaded from " + in.toAbsolutePath());
+        } catch (Exception e) {
+            addReceivedMessageToDisplay("ERROR loading: " + e.getMessage());
+        }
     }
 
     // ==================== SETUP METHODS ====================
@@ -192,7 +236,7 @@ public class ServerSimulatorController {
      */
     private void addSentMessageToDisplay(String messageText) {
         String currentTimestamp = java.time.LocalTime.now().toString();
-        String formattedMessage = "[" + currentTimestamp + "] SENT: " + messageText + "\n";
+        String formattedMessage = "[" + currentTimestamp + "] -> " + messageText + "\n";
         receivedMessagesDisplayArea.appendText(formattedMessage);
         receivedMessagesDisplayArea.setScrollTop(Double.MAX_VALUE);
     }
@@ -218,7 +262,7 @@ public class ServerSimulatorController {
     public void addReceivedMessageToDisplay(String messageText) {
         if (receivedMessagesDisplayArea != null) {
             String currentTimestamp = java.time.LocalTime.now().toString();
-            String formattedMessage = "[" + currentTimestamp + "] " + messageText + "\n";
+            String formattedMessage = "[" + currentTimestamp + "] <- " + messageText + "\n";
             
             javafx.application.Platform.runLater(() -> {
                 receivedMessagesDisplayArea.appendText(formattedMessage);

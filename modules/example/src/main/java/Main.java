@@ -36,12 +36,8 @@ public class Main implements GameModule {
     // UI references
     private javafx.scene.control.TextArea chatAreaRef;
     private javafx.scene.control.TextArea playersTextRef;
-    private javafx.scene.control.TextArea movesAreaRef;
     private javafx.scene.control.Label infoLabelRef;
     private javafx.scene.control.Label youLabelRef;
-    private javafx.scene.control.ComboBox<String> simSenderRef;
-    private javafx.scene.control.TextField simTextRef;
-    private javafx.scene.control.TextField localMoveInputRef;
     
     /**
      * Constructor for Main.
@@ -64,6 +60,15 @@ public class Main implements GameModule {
     @Override
     public void stopGame() {
         Logging.info("🔄 " + metadata.getGameName() + " closing - cleaning up resources");
+        // Publish end-of-game message to server simulator
+        try {
+            java.util.Map<String, Object> endMsg = new java.util.HashMap<>();
+            endMsg.put("function", "end");
+            if (localPlayerId != null) endMsg.put("playerId", localPlayerId);
+            endMsg.put("timestamp", java.time.Instant.now().toString());
+            gdk.MessagingBridge.publish(endMsg);
+        } catch (Exception ignored) {
+        }
     }
     
     @Override
@@ -110,9 +115,7 @@ public class Main implements GameModule {
                 if (playersTextRef != null) {
                     playersTextRef.setText(buildPlayersText());
                 }
-                if (simSenderRef != null) {
-                    populateSimSenderOptions();
-                }
+
             });
             return java.util.Map.of("status", "ok");
         }
@@ -129,18 +132,9 @@ public class Main implements GameModule {
             appendChat("broadcast", text);
             return java.util.Map.of("status", "ok");
         }
-        if ("move".equals(function)) {
-            String playerId = String.valueOf(message.getOrDefault("playerId", "?"));
-            Object moveObj = message.get("move");
-            String moveStr;
-            try {
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                moveStr = mapper.writeValueAsString(moveObj);
-            } catch (Exception e) {
-                moveStr = String.valueOf(moveObj);
-            }
-            Logging.info("🎯 Move from " + playerId + ": " + moveStr);
-            appendMove(playerId, moveStr);
+        if ("end".equals(function)) {
+            Logging.info("🏁 End message received");
+            // Here we could perform graceful shutdown logic if needed
             return java.util.Map.of("status", "ok");
         }
         
@@ -175,29 +169,9 @@ public class Main implements GameModule {
         });
     }
     
-    private void populateSimSenderOptions() {
-        java.util.List<String> senders = new java.util.ArrayList<>();
-        senders.add("server");
-        if (lastPlayers != null) {
-            for (java.util.Map<String, Object> p : lastPlayers) {
-                Object id = p.get("id");
-                if (id != null) {
-                    senders.add(String.valueOf(id));
-                }
-            }
-        }
-        simSenderRef.getItems().setAll(senders);
-        if (!senders.isEmpty()) {
-            simSenderRef.getSelectionModel().selectFirst();
-        }
-    }
+
     
-    private void appendMove(String playerId, String moveText) {
-        if (movesAreaRef == null) return;
-        javafx.application.Platform.runLater(() -> {
-            movesAreaRef.appendText("[" + playerId + "] " + moveText + "\n");
-        });
-    }
+
 
     /**
      * Creates a simple test interface to demonstrate game communication.
@@ -234,30 +208,6 @@ public class Main implements GameModule {
         playersTextRef.setWrapText(true);
         playersTextRef.setText(buildPlayersText());
         
-        // Moves area
-        movesAreaRef = new javafx.scene.control.TextArea();
-        movesAreaRef.setEditable(false);
-        movesAreaRef.setPrefRowCount(6);
-        movesAreaRef.setWrapText(true);
-        
-        // Local move input (simulating local player's move)
-        localMoveInputRef = new javafx.scene.control.TextField();
-        localMoveInputRef.setPromptText("Type local move JSON (e.g., {\"function\":\"move\",\"playerId\":\"p1\",\"move\":{...}}) and press Enter...");
-        localMoveInputRef.setOnAction(e -> {
-            String text = localMoveInputRef.getText().trim();
-            if (!text.isEmpty()) {
-                try {
-                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                    @SuppressWarnings("unchecked")
-                    java.util.Map<String, Object> msg = mapper.readValue(text, java.util.Map.class);
-                    handleMessage(msg);
-                } catch (Exception ex) {
-                    appendMove("invalid", text);
-                }
-                localMoveInputRef.clear();
-            }
-        });
-        
         // Chatroom UI
         chatAreaRef = new javafx.scene.control.TextArea();
         chatAreaRef.setEditable(false);
@@ -269,27 +219,13 @@ public class Main implements GameModule {
             String text = chatInput.getText().trim();
             if (!text.isEmpty()) {
                 appendChat("me", text);
+                // Publish to simulator for visibility
+                java.util.Map<String, Object> out = new java.util.HashMap<>();
+                out.put("function", "message");
+                out.put("from", localPlayerId == null ? "me" : localPlayerId);
+                out.put("text", text);
+                gdk.MessagingBridge.publish(out);
                 chatInput.clear();
-            }
-        });
-        
-        // In-game Simulator (send function=message)
-        javafx.scene.control.Label simLabel = new javafx.scene.control.Label("Simulated Server:");
-        simSenderRef = new javafx.scene.control.ComboBox<>();
-        populateSimSenderOptions();
-        simTextRef = new javafx.scene.control.TextField();
-        simTextRef.setPromptText("Enter message text to send as function=message");
-        javafx.scene.control.Button simSendBtn = new javafx.scene.control.Button("Send");
-        simSendBtn.setOnAction(e -> {
-            String from = simSenderRef.getValue() == null ? "server" : simSenderRef.getValue();
-            String text = simTextRef.getText() == null ? "" : simTextRef.getText().trim();
-            if (!text.isEmpty()) {
-                java.util.Map<String, Object> msg = new java.util.HashMap<>();
-                msg.put("function", "message");
-                msg.put("from", from);
-                msg.put("text", text);
-                handleMessage(msg);
-                simTextRef.clear();
             }
         });
         
@@ -318,6 +254,8 @@ public class Main implements GameModule {
         backButton.setOnAction(e -> {
             Logging.info("🔙 Returning to lobby from Example Game");
             stopGame();
+            // Request the window to switch back
+            primaryStage.fireEvent(new javafx.stage.WindowEvent(primaryStage, javafx.stage.WindowEvent.WINDOW_CLOSE_REQUEST));
         });
         
         // Add components to root
@@ -328,17 +266,9 @@ public class Main implements GameModule {
             statusLabel,
             new javafx.scene.control.Label("Players:"),
             playersTextRef,
-            new javafx.scene.control.Label("Moves:"),
-            movesAreaRef,
-            new javafx.scene.control.Label("Local Move (JSON):"),
-            localMoveInputRef,
             new javafx.scene.control.Label("Chatroom:"),
             chatAreaRef,
             chatInput,
-            simLabel,
-            new javafx.scene.layout.HBox(10, new javafx.scene.control.Label("From:"), simSenderRef),
-            simTextRef,
-            simSendBtn,
             jsonDataButton,
             backButton,
             closeButton

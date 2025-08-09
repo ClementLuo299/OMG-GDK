@@ -100,7 +100,6 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button clearOutputButton2;
     @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
-    @FXML private Button openServerSimulatorButton;
     @FXML private JFXToggleButton jsonPersistenceToggle;
     
     // Application Control Components
@@ -315,12 +314,7 @@ public class GDKGameLobbyController implements Initializable {
         // Launch button: Start the selected game with validation
         launchGameButton.setOnAction(event -> launchSelectedGame());
         
-        // Open server simulator window
-        openServerSimulatorButton.setOnAction(event -> {
-            if (applicationViewModel != null) {
-                applicationViewModel.openServerSimulatorWindow();
-            }
-        });
+        // Server Simulator button removed; simulator auto-starts/stops with game.
         
         // Refresh button: Reload the list of available games
         refreshButton.setOnAction(event -> {

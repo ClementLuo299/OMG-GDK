@@ -25,6 +25,8 @@
 
         <HBox spacing="5" styleClass="button-section">
             <Button fx:id="clearMessagesButton" text="Clear Messages" />
+            <Button fx:id="saveMessagesButton" text="Save Messages" />
+            <Button fx:id="loadMessagesButton" text="Load Messages" />
             <Button fx:id="closeWindowButton" text="Close" />
         </HBox>
     </children>

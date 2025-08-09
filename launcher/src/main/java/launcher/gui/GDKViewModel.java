@@ -67,6 +67,8 @@ public class GDKViewModel {
      */
     private ServerSimulatorController serverSimulatorController;
 
+    private Scene mainLobbyScene;
+
     // ==================== CONSTRUCTOR ====================
     
     /**
@@ -88,6 +90,10 @@ public class GDKViewModel {
         this.primaryApplicationStage = primaryApplicationStage;
     }
 
+    public void setMainLobbyScene(Scene mainLobbyScene) {
+        this.mainLobbyScene = mainLobbyScene;
+    }
+
     // ==================== PUBLIC ACTION HANDLERS ====================
     
     /**
@@ -105,7 +111,6 @@ public class GDKViewModel {
         }
         
         try {
-            createServerSimulator();
             launchGameWithScene(selectedGameModule);
         } catch (Exception gameLaunchError) {
             Logging.error("❌ Error launching game: " + gameLaunchError.getMessage());
@@ -129,12 +134,9 @@ public class GDKViewModel {
         }
     }
     
-    public void openServerSimulatorWindow() {
-        try {
-            createServerSimulator();
-        } catch (Exception e) {
-            Logging.error("❌ Error opening server simulator: " + e.getMessage());
-        }
+    // Removed manual open; simulator now starts/stops with the game.
+    public boolean isGameRunning() {
+        return currentlyRunningGame != null;
     }
 
     // ==================== GAME MANAGEMENT ====================
@@ -150,6 +152,10 @@ public class GDKViewModel {
             primaryApplicationStage.setTitle(selectedGameModule.getGameName());
             primaryApplicationStage.setScene(gameScene);
             updateGameStateAfterSuccessfulLaunch(selectedGameModule);
+            // Auto-start server simulator with game (ensure single instance)
+            if (serverSimulatorStage == null) {
+                createServerSimulator();
+            }
             setupGameCloseHandler();
             Logging.info("🎮 Game launched successfully");
         } else {
@@ -176,6 +182,11 @@ public class GDKViewModel {
         primaryApplicationStage.setOnCloseRequest(event -> {
             Logging.info("🎮 Game window closing");
             cleanupGameAndServerSimulator();
+            // Return to lobby scene when game window closes
+            if (mainLobbyScene != null) {
+                primaryApplicationStage.setScene(mainLobbyScene);
+                primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
+            }
         });
     }
 
@@ -212,10 +223,23 @@ public class GDKViewModel {
                             messageMap.put("text", messageText);
                         }
                         java.util.Map<String, Object> response = currentlyRunningGame.handleMessage(messageMap);
-                        String responseText = (response != null) ? mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response) : "null";
-                        serverSimulatorController.addReceivedMessageToDisplay("RECV: " + responseText);
+                        if (response == null) {
+                            response = new java.util.HashMap<>();
+                            response.put("status", "ok");
+                        }
+                        String responseText = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
+                        serverSimulatorController.addReceivedMessageToDisplay(responseText);
                     } catch (Exception e) {
                         serverSimulatorController.addReceivedMessageToDisplay("ERROR: " + e.getMessage());
+                    }
+                });
+                // Plug in reverse bridge: messages from game -> simulator display
+                gdk.MessagingBridge.setConsumer(msg -> {
+                    try {
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
+                        serverSimulatorController.addReceivedMessageToDisplay(pretty);
+                    } catch (Exception ignored) {
                     }
                 });
             }
