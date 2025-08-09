@@ -100,6 +100,7 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button clearOutputButton2;
     @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
+    @FXML private Button openServerSimulatorButton;
     @FXML private JFXToggleButton jsonPersistenceToggle;
     
     // Application Control Components
@@ -313,6 +314,13 @@ public class GDKGameLobbyController implements Initializable {
         // Button Event Handlers
         // Launch button: Start the selected game with validation
         launchGameButton.setOnAction(event -> launchSelectedGame());
+        
+        // Open server simulator window
+        openServerSimulatorButton.setOnAction(event -> {
+            if (applicationViewModel != null) {
+                applicationViewModel.openServerSimulatorWindow();
+            }
+        });
         
         // Refresh button: Reload the list of available games
         refreshButton.setOnAction(event -> {
@@ -1471,6 +1479,19 @@ public class GDKGameLobbyController implements Initializable {
         }
         
         addUserMessage("🚀 Launching " + selectedGameModule.getGameName());
+        
+        // Load optional start message
+        java.util.Map<String, Object> startMessage = launcher.utils.StartMessageUtil.loadDefaultStartMessage();
+        if (startMessage != null) {
+            try {
+                java.util.Map<String, Object> response = selectedGameModule.handleMessage(startMessage);
+                if (response != null) {
+                    addUserMessage("✅ Start message acknowledged by " + selectedGameModule.getGameName());
+                }
+            } catch (Exception e) {
+                addUserMessage("⚠️ Failed to send start message: " + e.getMessage());
+            }
+        }
         
         // Step 5: Launch the game using the ViewModel
         if (applicationViewModel != null) {

@@ -128,6 +128,14 @@ public class GDKViewModel {
             Logging.error("❌ Error refreshing game list: " + refreshError.getMessage());
         }
     }
+    
+    public void openServerSimulatorWindow() {
+        try {
+            createServerSimulator();
+        } catch (Exception e) {
+            Logging.error("❌ Error opening server simulator: " + e.getMessage());
+        }
+    }
 
     // ==================== GAME MANAGEMENT ====================
     
@@ -139,6 +147,8 @@ public class GDKViewModel {
     private void launchGameWithScene(GameModule selectedGameModule) {
         Scene gameScene = selectedGameModule.launchGame(primaryApplicationStage);
         if (gameScene != null) {
+            primaryApplicationStage.setTitle(selectedGameModule.getGameName());
+            primaryApplicationStage.setScene(gameScene);
             updateGameStateAfterSuccessfulLaunch(selectedGameModule);
             setupGameCloseHandler();
             Logging.info("🎮 Game launched successfully");
@@ -182,6 +192,33 @@ public class GDKViewModel {
             Scene serverSimulatorScene = loadServerSimulatorScene();
             configureServerSimulatorStage(serverSimulatorScene);
             setupServerSimulatorCloseHandler();
+            // Wire message handler to route messages to the currently running game
+            if (serverSimulatorController != null) {
+                serverSimulatorController.setMessageHandler(messageText -> {
+                    try {
+                        if (currentlyRunningGame == null) {
+                            serverSimulatorController.addReceivedMessageToDisplay("ERROR: No game running");
+                            return;
+                        }
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        java.util.Map<String, Object> messageMap;
+                        try {
+                            messageMap = mapper.readValue(messageText, java.util.Map.class);
+                        } catch (Exception parseError) {
+                            // Treat as plain chat text
+                            messageMap = new java.util.HashMap<>();
+                            messageMap.put("function", "message");
+                            messageMap.put("from", "server");
+                            messageMap.put("text", messageText);
+                        }
+                        java.util.Map<String, Object> response = currentlyRunningGame.handleMessage(messageMap);
+                        String responseText = (response != null) ? mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response) : "null";
+                        serverSimulatorController.addReceivedMessageToDisplay("RECV: " + responseText);
+                    } catch (Exception e) {
+                        serverSimulatorController.addReceivedMessageToDisplay("ERROR: " + e.getMessage());
+                    }
+                });
+            }
             Logging.info("🔧 Server simulator created successfully");
         } catch (Exception serverSimulatorError) {
             Logging.error("❌ Failed to create server simulator: " + serverSimulatorError.getMessage());
