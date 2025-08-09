@@ -53,6 +53,14 @@ public final class StartupOperations {
     public static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
         int totalSteps = windowManager.getTotalSteps();
         loadModulesWithProgress(windowManager, totalSteps);
+        Platform.runLater(() -> {
+            try {
+                if (lobbyController != null) {
+                    lobbyController.refreshAvailableGameModulesFast();
+                }
+            } catch (Exception ignored) {
+            }
+        });
         windowManager.updateProgress(totalSteps - 2, "Checking for compilation issues...");
         Platform.runLater(() -> {
             try {
