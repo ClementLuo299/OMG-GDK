@@ -14,6 +14,11 @@ import java.util.List;
 
 /**
  * Encapsulates operational startup tasks (module loading, readiness checks, and stage display).
+ * 
+ * @author Clement Luo
+ * @date August 9, 2025
+ * @edited August 9, 2025
+ * @since 1.0
  */
 public final class StartupOperations {
 
@@ -44,6 +49,8 @@ public final class StartupOperations {
                 windowManager.updateProgress(Math.min(currentStep, totalSteps - 3), "Processing module: " + moduleName);
                 currentStep++;
             }
+            // Start transcript session on launch path
+            launcher.utils.TranscriptRecorder.startSession();
             List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
             windowManager.updateProgress(Math.min(currentStep, totalSteps - 3), "Found " + discoveredModules.size() + " modules");
         }

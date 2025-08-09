@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import launcher.utils.DialogUtil;
 
@@ -18,7 +19,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited July 24, 2025
+ * @edited August 9, 2025
  * @since 1.0
  */
 public class Main implements GameModule {
@@ -36,6 +37,7 @@ public class Main implements GameModule {
     // UI references
     private javafx.scene.control.TextArea chatAreaRef;
     private javafx.scene.control.TextArea playersTextRef;
+    private javafx.scene.control.TextArea allMessagesAreaRef;
     private javafx.scene.control.Label infoLabelRef;
     private javafx.scene.control.Label youLabelRef;
     
@@ -83,6 +85,7 @@ public class Main implements GameModule {
             return metadata.toMap();
         }
         if ("start".equals(function)) {
+            appendAllMessages(message);
             // Extract simple fields for display later
             Object modeObj = message.get("gameMode");
             String mode = modeObj instanceof String ? (String) modeObj : "unknown";
@@ -120,21 +123,22 @@ public class Main implements GameModule {
             return java.util.Map.of("status", "ok");
         }
         if ("chat".equals(function) || "message".equals(function)) {
+            appendAllMessages(message);
             String from = String.valueOf(message.getOrDefault("from", "server"));
             String text = String.valueOf(message.getOrDefault("text", ""));
             Logging.info("💬 Message from " + from + ": " + text);
             appendChat(from, text);
             return java.util.Map.of("status", "ok");
         }
-        if ("broadcast".equals(function)) {
-            String text = String.valueOf(message.getOrDefault("text", ""));
-            Logging.info("📢 Broadcast: " + text);
-            appendChat("broadcast", text);
+        if ("ack".equals(function)) {
+            String of = String.valueOf(message.getOrDefault("of", "message"));
+            String status = String.valueOf(message.getOrDefault("status", "ok"));
+            appendChat("server-ack", of + " => " + status);
             return java.util.Map.of("status", "ok");
         }
         if ("end".equals(function)) {
+            appendAllMessages(message);
             Logging.info("🏁 End message received");
-            // Here we could perform graceful shutdown logic if needed
             return java.util.Map.of("status", "ok");
         }
         
@@ -166,6 +170,19 @@ public class Main implements GameModule {
         if (chatAreaRef == null) return;
         javafx.application.Platform.runLater(() -> {
             chatAreaRef.appendText("[" + from + "] " + text + "\n");
+        });
+    }
+    
+    private void appendAllMessages(java.util.Map<String, Object> message) {
+        if (allMessagesAreaRef == null || message == null) return;
+        javafx.application.Platform.runLater(() -> {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(message);
+                allMessagesAreaRef.appendText(pretty + "\n\n");
+            } catch (Exception e) {
+                allMessagesAreaRef.appendText(String.valueOf(message) + "\n\n");
+            }
         });
     }
     
@@ -207,6 +224,12 @@ public class Main implements GameModule {
         playersTextRef.setPrefRowCount(4);
         playersTextRef.setWrapText(true);
         playersTextRef.setText(buildPlayersText());
+        
+        // All messages area
+        allMessagesAreaRef = new javafx.scene.control.TextArea();
+        allMessagesAreaRef.setEditable(false);
+        allMessagesAreaRef.setPrefRowCount(8);
+        allMessagesAreaRef.setWrapText(true);
         
         // Chatroom UI
         chatAreaRef = new javafx.scene.control.TextArea();
@@ -253,9 +276,15 @@ public class Main implements GameModule {
         
         backButton.setOnAction(e -> {
             Logging.info("🔙 Returning to lobby from Example Game");
+            // Send end message before stopping
+            java.util.Map<String, Object> endMessage = new java.util.HashMap<>();
+            endMessage.put("function", "end");
+            endMessage.put("reason", "user_returned_to_lobby");
+            endMessage.put("timestamp", java.time.Instant.now().toString());
+            gdk.MessagingBridge.publish(endMessage);
             stopGame();
-            // Request the window to switch back
-            primaryStage.fireEvent(new javafx.stage.WindowEvent(primaryStage, javafx.stage.WindowEvent.WINDOW_CLOSE_REQUEST));
+            // Use the messaging bridge to return to lobby instead of firing close event
+            gdk.MessagingBridge.returnToLobby();
         });
         
         // Add components to root
@@ -266,6 +295,8 @@ public class Main implements GameModule {
             statusLabel,
             new javafx.scene.control.Label("Players:"),
             playersTextRef,
+            new javafx.scene.control.Label("All Messages:"),
+            allMessagesAreaRef,
             new javafx.scene.control.Label("Chatroom:"),
             chatAreaRef,
             chatInput,

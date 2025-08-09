@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 8, 2025
+ * @edited August 9, 2025  
  * @since 1.0
  */
 public class GDKViewModel {
@@ -92,6 +92,20 @@ public class GDKViewModel {
 
     public void setMainLobbyScene(Scene mainLobbyScene) {
         this.mainLobbyScene = mainLobbyScene;
+    }
+    
+    /**
+     * Public method for games to call when they want to return to the lobby.
+     * This method safely cleans up the game and returns to the lobby scene.
+     */
+    public void returnToLobby() {
+        Logging.info("🎮 Game requested return to lobby via returnToLobby()");
+        cleanupGameAndServerSimulator();
+        // Return to lobby scene
+        if (mainLobbyScene != null) {
+            primaryApplicationStage.setScene(mainLobbyScene);
+            primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
+        }
     }
 
     // ==================== PUBLIC ACTION HANDLERS ====================
@@ -170,6 +184,8 @@ public class GDKViewModel {
      */
     private void updateGameStateAfterSuccessfulLaunch(GameModule selectedGameModule) {
         currentlyRunningGame = selectedGameModule;
+        // Set up the lobby return callback for games
+        gdk.MessagingBridge.setLobbyReturnCallback(this::returnToLobby);
     }
     
     /**
@@ -183,6 +199,17 @@ public class GDKViewModel {
             Logging.info("🎮 Game window closing");
             cleanupGameAndServerSimulator();
             // Return to lobby scene when game window closes
+            if (mainLobbyScene != null) {
+                primaryApplicationStage.setScene(mainLobbyScene);
+                primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
+            }
+        });
+        
+        // Handle WINDOW_CLOSE_REQUEST events from games (like "Back to Lobby" button)
+        primaryApplicationStage.addEventHandler(javafx.stage.WindowEvent.WINDOW_CLOSE_REQUEST, event -> {
+            Logging.info("🎮 Game requested return to lobby");
+            cleanupGameAndServerSimulator();
+            // Return to lobby scene
             if (mainLobbyScene != null) {
                 primaryApplicationStage.setScene(mainLobbyScene);
                 primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
@@ -222,11 +249,19 @@ public class GDKViewModel {
                             messageMap.put("from", "server");
                             messageMap.put("text", messageText);
                         }
+                        // Record to transcript
+                        launcher.utils.TranscriptRecorder.recordToGame(messageMap);
                         java.util.Map<String, Object> response = currentlyRunningGame.handleMessage(messageMap);
                         if (response == null) {
                             response = new java.util.HashMap<>();
+                            response.put("function", "ack");
                             response.put("status", "ok");
+                            Object of = messageMap.get("function");
+                            if (of != null) response.put("of", of);
+                            response.put("timestamp", java.time.Instant.now().toString());
                         }
+                        // Record from game
+                        launcher.utils.TranscriptRecorder.recordFromGame(response);
                         String responseText = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
                         serverSimulatorController.addReceivedMessageToDisplay(responseText);
                     } catch (Exception e) {
@@ -239,8 +274,29 @@ public class GDKViewModel {
                         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                         String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
                         serverSimulatorController.addReceivedMessageToDisplay(pretty);
+                        // Send confirmation back to the game
+                        if (currentlyRunningGame != null) {
+                            java.util.Map<String, Object> ack = new java.util.HashMap<>();
+                            ack.put("function", "ack");
+                            ack.put("status", "ok");
+                            Object of = (msg != null) ? msg.get("function") : null;
+                            if (of != null) ack.put("of", of);
+                            ack.put("timestamp", java.time.Instant.now().toString());
+                            currentlyRunningGame.handleMessage(ack);
+                        }
                     } catch (Exception ignored) {
                     }
+                });
+                // Also mirror messages to lobby JSON output (if requested from game)
+                gdk.MessagingBridge.addConsumer(msg -> {
+                    try {
+                        // Present end message or others back to the lobby UI if needed
+                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                        String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
+                        if (serverSimulatorController != null) {
+                            serverSimulatorController.addReceivedMessageToDisplay(pretty);
+                        }
+                    } catch (Exception ignored) {}
                 });
             }
             Logging.info("🔧 Server simulator created successfully");

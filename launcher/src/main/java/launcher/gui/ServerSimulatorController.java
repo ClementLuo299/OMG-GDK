@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 6, 2025
+ * @edited August 9, 2025   
  * @since 1.0
  */
 public class ServerSimulatorController {
@@ -101,6 +101,7 @@ public class ServerSimulatorController {
         setupMessageInputHandling();
         setupSendButtonStateManagement();
         setupSaveLoadHandlers();
+        setupClearHandler();
     }
     
     /**
@@ -140,11 +141,23 @@ public class ServerSimulatorController {
 
     private void handleSaveMessages() {
         try {
+            // Ensure saved directory exists
+            java.nio.file.Path savedDir = java.nio.file.Paths.get("saved");
+            if (!java.nio.file.Files.exists(savedDir)) {
+                java.nio.file.Files.createDirectories(savedDir);
+            }
+            
+            // Save raw message area
             String content = receivedMessagesDisplayArea.getText();
             if (content == null) content = "";
-            java.nio.file.Path out = java.nio.file.Paths.get("server-simulator-messages.txt");
+            java.nio.file.Path out = java.nio.file.Paths.get("saved/server-simulator-messages.txt");
             java.nio.file.Files.writeString(out, content);
             addReceivedMessageToDisplay("Saved to " + out.toAbsolutePath());
+            // Also save structured transcript JSONL
+            java.nio.file.Path transcript = launcher.utils.TranscriptRecorder.saveTranscript(java.nio.file.Paths.get("saved/transcript.jsonl"));
+            if (transcript != null) {
+                addReceivedMessageToDisplay("Transcript saved: " + transcript.toAbsolutePath());
+            }
         } catch (Exception e) {
             addReceivedMessageToDisplay("ERROR saving: " + e.getMessage());
         }
@@ -162,6 +175,20 @@ public class ServerSimulatorController {
             addReceivedMessageToDisplay("Loaded from " + in.toAbsolutePath());
         } catch (Exception e) {
             addReceivedMessageToDisplay("ERROR loading: " + e.getMessage());
+        }
+    }
+
+    private void setupClearHandler() {
+        if (clearMessagesButton != null) {
+            clearMessagesButton.setOnAction(e -> {
+                if (receivedMessagesDisplayArea != null) {
+                    receivedMessagesDisplayArea.clear();
+                }
+                if (messageInputField != null) {
+                    messageInputField.clear();
+                }
+                Logging.info("🧹 Server Simulator messages cleared");
+            });
         }
     }
 

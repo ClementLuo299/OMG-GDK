@@ -7,9 +7,19 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
+/*
+ * 
+ * @author Clement Luo
+ * @date August 8, 2025
+ * @edited August 8, 2025
+ * @since 1.0
+ */
 public final class StartMessageUtil {
-    private static final String DEFAULT_FILE_NAME = "start-message.example.json";
+    private static final String DEFAULT_FILE_NAME = "saved/start-message.example.json";
 
     private StartMessageUtil() {}
 
@@ -29,8 +39,44 @@ public final class StartMessageUtil {
                     }
                 }
             }
+        } else {
+            // If file doesn't exist, create a default start message
+            msg = createDefaultStartMessage();
+            // Try to save it for future use
+            try {
+                ensureSavedDirectoryExists();
+                ObjectMapper mapper = new ObjectMapper();
+                String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
+                Files.writeString(Path.of(DEFAULT_FILE_NAME), json);
+                Logging.info("📝 Created default start message file: " + DEFAULT_FILE_NAME);
+            } catch (Exception e) {
+                Logging.error("Failed to save default start message: " + e.getMessage(), e);
+            }
         }
         return msg;
+    }
+
+    private static Map<String, Object> createDefaultStartMessage() {
+        Map<String, Object> defaultMsg = new HashMap<>();
+        defaultMsg.put("function", "start");
+        defaultMsg.put("gameMode", "multi_player");
+        defaultMsg.put("localPlayerId", "p1");
+        
+        List<Map<String, Object>> players = new ArrayList<>();
+        Map<String, Object> player1 = new HashMap<>();
+        player1.put("id", "p1");
+        player1.put("name", "Player1");
+        player1.put("role", "host");
+        players.add(player1);
+        
+        Map<String, Object> player2 = new HashMap<>();
+        player2.put("id", "p2");
+        player2.put("name", "Player2");
+        player2.put("role", "guest");
+        players.add(player2);
+        
+        defaultMsg.put("players", players);
+        return defaultMsg;
     }
 
     public static Map<String, Object> loadStartMessage(Path filePath) {
@@ -51,6 +97,18 @@ public final class StartMessageUtil {
         } catch (Exception e) {
             Logging.error("Failed to load start message: " + e.getMessage(), e);
             return null;
+        }
+    }
+
+    public static void ensureSavedDirectoryExists() {
+        try {
+            Path savedDir = Path.of("saved");
+            if (!Files.exists(savedDir)) {
+                Files.createDirectories(savedDir);
+                Logging.info("📁 Created saved directory: " + savedDir.toAbsolutePath());
+            }
+        } catch (Exception e) {
+            Logging.error("Failed to create saved directory: " + e.getMessage(), e);
         }
     }
 } 

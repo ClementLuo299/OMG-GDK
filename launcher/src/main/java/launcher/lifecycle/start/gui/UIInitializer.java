@@ -10,6 +10,14 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
 
 import java.net.URL;
 
+/*
+ * Initializes the main user interface components.
+ * 
+ * @author Clement Luo
+ * @date August 8, 2025
+ * @edited August 8, 2025
+ * @since 1.0
+ */
 public final class UIInitializer {
 
     private UIInitializer() {}

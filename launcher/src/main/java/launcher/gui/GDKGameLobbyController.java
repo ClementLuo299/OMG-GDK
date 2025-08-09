@@ -73,7 +73,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 8, 2025 
+ * @edited August 9, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -169,12 +169,13 @@ public class GDKGameLobbyController implements Initializable {
     /**
      * File path for saving JSON content
      */
-    private static final String JSON_PERSISTENCE_FILE = "gdk-json-persistence.txt";
+    private static final String JSON_PERSISTENCE_FILE = "saved/gdk-json-persistence.txt";
     
     /**
      * File path for saving persistence toggle state
      */
-    private static final String PERSISTENCE_TOGGLE_FILE = "gdk-persistence-toggle.txt";
+    private static final String PERSISTENCE_TOGGLE_FILE = "saved/gdk-persistence-toggle.txt";
+    private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
 
     // ==================== INITIALIZATION ====================
     
@@ -201,8 +202,14 @@ public class GDKGameLobbyController implements Initializable {
         // Set up event handlers
         setupEventHandlers();
         
+        // Mirror game 'end' messages into JSON output
+        subscribeToEndMessageMirror();
+        
         // Register this controller with ModuleCompiler for progress updates
         ModuleCompiler.setUIController(this);
+        
+        // Ensure saved directory exists
+        ensureSavedDirectoryExists();
         
         // Load saved JSON content and toggle state
         loadPersistenceSettings();
@@ -219,13 +226,27 @@ public class GDKGameLobbyController implements Initializable {
         //     checkStartupCompilationFailures();
         //     
         //     // Clear startup progress window reference after startup is complete
-        //     startupProgressWindow = null;
+        //     //     startupProgressWindow = null;
         // });
         
         // Note: TextArea doesn't support syntax highlighting like CodeArea
         // JSON syntax highlighting removed for compatibility
         
         Logging.info("✅ GDK Game Picker Controller initialized successfully");
+    }
+
+    private void subscribeToEndMessageMirror() {
+        try {
+            gdk.MessagingBridge.addConsumer(msg -> {
+                try {
+                    Object fn = (msg != null) ? msg.get("function") : null;
+                    if (fn != null && "end".equals(String.valueOf(fn))) {
+                        String pretty = formatJsonResponse((Map<String, Object>) msg);
+                        Platform.runLater(() -> jsonOutputEditor.setText(pretty));
+                    }
+                } catch (Exception ignored) {}
+            });
+        } catch (Exception ignored) {}
     }
 
 
@@ -304,10 +325,11 @@ public class GDKGameLobbyController implements Initializable {
         // Game Selection Handler
         // When user selects a game from the dropdown, update the selected game and show feedback
         gameSelector.setOnAction(event -> {
-            selectedGameModule = gameSelector.getValue(); // Store the selected game module
-            String selectedGameName = selectedGameModule != null ? 
-                selectedGameModule.getGameName() : "None"; // Get game name from interface
-            addUserMessage("🎮 Selected game: " + selectedGameName); // Show user feedback
+            selectedGameModule = gameSelector.getValue();
+            String selectedGameName = selectedGameModule != null ? selectedGameModule.getGameName() : "None";
+            addUserMessage("🎮 Selected game: " + selectedGameName);
+            // Persist selected game
+            persistSelectedGame(selectedGameName);
         });
         
         // Button Event Handlers
@@ -1750,6 +1772,9 @@ public class GDKGameLobbyController implements Initializable {
                 loadSavedJsonContent();
             }
             
+            // Load persisted selected game
+            loadPersistedSelectedGame();
+            
             // Clear flag after loading is complete
             isLoadingPersistenceSettings = false;
             
@@ -1801,6 +1826,18 @@ public class GDKGameLobbyController implements Initializable {
             addUserMessage("❌ Error loading saved JSON content");
         }
     }
+
+    private void ensureSavedDirectoryExists() {
+        try {
+            Path savedDir = Paths.get("saved");
+            if (!Files.exists(savedDir)) {
+                Files.createDirectories(savedDir);
+                Logging.info("📁 Created saved directory: " + savedDir.toAbsolutePath());
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Failed to create saved directory: " + e.getMessage());
+        }
+    }
     
     /**
      * Save JSON content to file if persistence is enabled.
@@ -1811,6 +1848,7 @@ public class GDKGameLobbyController implements Initializable {
         }
         
         try {
+            ensureSavedDirectoryExists();
             String jsonContent = jsonInputEditor.getText();
             Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
             Files.writeString(jsonFile, jsonContent);
@@ -1825,6 +1863,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void savePersistenceToggleState() {
         try {
+            ensureSavedDirectoryExists();
             boolean isEnabled = jsonPersistenceToggle.isSelected();
             Path toggleFile = Paths.get(PERSISTENCE_TOGGLE_FILE);
             Files.writeString(toggleFile, String.valueOf(isEnabled));
@@ -1850,6 +1889,38 @@ public class GDKGameLobbyController implements Initializable {
         } catch (Exception e) {
             Logging.error("❌ Error clearing JSON persistence file: " + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * Persist the selected game module's name.
+     * @param gameName The name of the selected game module.
+     */
+    private void persistSelectedGame(String gameName) {
+        try {
+            if (gameName == null || gameName.equals("None")) return;
+            ensureSavedDirectoryExists();
+            java.nio.file.Files.writeString(java.nio.file.Paths.get(SELECTED_GAME_FILE), gameName);
+        } catch (Exception ignored) {}
+    }
+
+    /**
+     * Load the persisted selected game module.
+     */
+    private void loadPersistedSelectedGame() {
+        try {
+            java.nio.file.Path p = java.nio.file.Paths.get(SELECTED_GAME_FILE);
+            if (!java.nio.file.Files.exists(p)) return;
+            String gameName = java.nio.file.Files.readString(p).trim();
+            if (gameName.isEmpty()) return;
+            for (gdk.GameModule gm : availableGameModules) {
+                if (gameName.equals(gm.getGameName())) {
+                    selectedGameModule = gm;
+                    gameSelector.getSelectionModel().select(gm);
+                    addUserMessage("📌 Restored selected game: " + gameName);
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
     }
     
     /**
