@@ -49,8 +49,6 @@ public final class StartupOperations {
                 windowManager.updateProgress(Math.min(currentStep, totalSteps - 3), "Processing module: " + moduleName);
                 currentStep++;
             }
-            // Start transcript session on launch path
-            launcher.utils.TranscriptRecorder.startSession();
             List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
             windowManager.updateProgress(Math.min(currentStep, totalSteps - 3), "Found " + discoveredModules.size() + " modules");
         }

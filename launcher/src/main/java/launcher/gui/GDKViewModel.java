@@ -298,6 +298,9 @@ public class GDKViewModel {
                 // Also mirror messages to lobby JSON output (if requested from game)
                 gdk.MessagingBridge.addConsumer(msg -> {
                     try {
+                        // Record the message to the transcript
+                        launcher.utils.TranscriptRecorder.recordFromGame(msg);
+                        
                         // Present end message or others back to the lobby UI if needed
                         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                         String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);

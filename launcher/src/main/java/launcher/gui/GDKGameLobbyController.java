@@ -239,6 +239,9 @@ public class GDKGameLobbyController implements Initializable {
         try {
             gdk.MessagingBridge.addConsumer(msg -> {
                 try {
+                    // Record the message to the transcript
+                    launcher.utils.TranscriptRecorder.recordFromGame(msg);
+                    
                     Object fn = (msg != null) ? msg.get("function") : null;
                     if (fn != null && "end".equals(String.valueOf(fn))) {
                         String pretty = formatJsonResponse((Map<String, Object>) msg);
@@ -1503,9 +1506,14 @@ public class GDKGameLobbyController implements Initializable {
         java.util.Map<String, Object> startMessage = launcher.utils.StartMessageUtil.loadDefaultStartMessage();
         if (startMessage != null) {
             try {
+                // Record start message to transcript
+                launcher.utils.TranscriptRecorder.recordToGame(startMessage);
+                
                 java.util.Map<String, Object> response = selectedGameModule.handleMessage(startMessage);
                 if (response != null) {
                     addUserMessage("✅ Start message acknowledged by " + selectedGameModule.getGameName());
+                    // Record response to transcript
+                    launcher.utils.TranscriptRecorder.recordFromGame(response);
                 }
             } catch (Exception e) {
                 addUserMessage("⚠️ Failed to send start message: " + e.getMessage());
