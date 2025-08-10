@@ -186,6 +186,14 @@ public class GDKViewModel {
         currentlyRunningGame = selectedGameModule;
         // Set up the lobby return callback for games
         gdk.MessagingBridge.setLobbyReturnCallback(this::returnToLobby);
+        
+        // Start transcript recording with game metadata
+        String gameName = selectedGameModule.getMetadata().getGameName();
+        String gameVersion = selectedGameModule.getMetadata().getGameVersion();
+        launcher.utils.TranscriptRecorder.startSession(gameName, gameVersion);
+        
+        Logging.info("🎮 Game launched successfully: " + gameName + " (v" + gameVersion + ")");
+        Logging.info("📝 Started transcript recording for game session");
     }
     
     /**

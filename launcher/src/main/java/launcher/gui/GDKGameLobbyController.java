@@ -730,6 +730,9 @@ public class GDKGameLobbyController implements Initializable {
                 // Force ComboBox to refresh its display
                 gameSelector.requestLayout();
                 
+                // Restore previously selected game after modules are loaded
+                restorePreviouslySelectedGame();
+                
                 // Log the final state for debugging
                 Logging.info("📊 Final UI state: " + availableGameModules.size() + " modules in ComboBox");
                 for (GameModule module : availableGameModules) {
@@ -1921,6 +1924,32 @@ public class GDKGameLobbyController implements Initializable {
                 }
             }
         } catch (Exception ignored) {}
+    }
+    
+    /**
+     * Restore the previously selected game after modules are loaded.
+     * This method is called after the ComboBox is populated with modules.
+     */
+    private void restorePreviouslySelectedGame() {
+        try {
+            java.nio.file.Path p = java.nio.file.Paths.get(SELECTED_GAME_FILE);
+            if (!java.nio.file.Files.exists(p)) return;
+            String gameName = java.nio.file.Files.readString(p).trim();
+            if (gameName.isEmpty()) return;
+            
+            // Find the game module with the saved name
+            for (gdk.GameModule gm : availableGameModules) {
+                if (gameName.equals(gm.getGameName())) {
+                    selectedGameModule = gm;
+                    gameSelector.getSelectionModel().select(gm);
+                    addUserMessage("📌 Restored previously selected game: " + gameName);
+                    Logging.info("📌 Restored previously selected game: " + gameName);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error restoring previously selected game: " + e.getMessage(), e);
+        }
     }
     
     /**
