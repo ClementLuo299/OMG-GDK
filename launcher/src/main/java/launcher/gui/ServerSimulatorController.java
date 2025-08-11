@@ -85,6 +85,13 @@ public class ServerSimulatorController {
      */
     private GDKApplication gdkApplication;
 
+    // ==================== CONSTANTS ====================
+    
+    /**
+     * File path for persisting input content
+     */
+    private static final String INPUT_PERSISTENCE_FILE = "saved/server-simulator-input.txt";
+
     // ==================== INITIALIZATION ====================
     
     /**
@@ -102,6 +109,7 @@ public class ServerSimulatorController {
         setupSendButtonStateManagement();
         setupSaveLoadHandlers();
         setupClearHandler();
+        loadInputContent(); // Load input content on initialization
     }
     
     /**
@@ -141,40 +149,155 @@ public class ServerSimulatorController {
 
     private void handleSaveMessages() {
         try {
+            // Create file chooser for save
+            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+            fileChooser.setTitle("Save Server Simulator Input");
+            fileChooser.getExtensionFilters().add(
+                new javafx.stage.FileChooser.ExtensionFilter("Text Files", "*.txt")
+            );
+            fileChooser.getExtensionFilters().add(
+                new javafx.stage.FileChooser.ExtensionFilter("All Files", "*.*")
+            );
+            
+            // Set initial directory to saved folder if it exists
+            java.io.File savedDir = new java.io.File("saved");
+            if (savedDir.exists() && savedDir.isDirectory()) {
+                fileChooser.setInitialDirectory(savedDir);
+            }
+            
+            // Get the window from the scene instead of stored stage reference
+            javafx.stage.Window window = null;
+            if (messageInputField != null && messageInputField.getScene() != null) {
+                window = messageInputField.getScene().getWindow();
+            } else if (serverSimulatorStage != null) {
+                window = serverSimulatorStage;
+            }
+            
+            if (window == null) {
+                addReceivedMessageToDisplay("❌ ERROR: Cannot determine window for file chooser");
+                Logging.error("❌ Cannot determine window for file chooser in server simulator");
+                return;
+            }
+            
+            // Show save dialog
+            java.io.File file = fileChooser.showSaveDialog(window);
+            if (file != null) {
+                // Save only the input field content
+                String inputContent = messageInputField.getText();
+                if (inputContent == null) inputContent = "";
+                java.nio.file.Files.writeString(file.toPath(), inputContent);
+                addReceivedMessageToDisplay("✅ Input content saved to: " + file.getAbsolutePath());
+            }
+        } catch (Exception e) {
+            addReceivedMessageToDisplay("❌ ERROR saving: " + e.getMessage());
+            Logging.error("❌ Failed to save server simulator input: " + e.getMessage(), e);
+        }
+    }
+
+    private void handleLoadMessages() {
+        try {
+            // Create file chooser for load
+            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+            fileChooser.setTitle("Load Server Simulator Input");
+            fileChooser.getExtensionFilters().add(
+                new javafx.stage.FileChooser.ExtensionFilter("Text Files", "*.txt")
+            );
+            fileChooser.getExtensionFilters().add(
+                new javafx.stage.FileChooser.ExtensionFilter("All Files", "*.*")
+            );
+            
+            // Set initial directory to saved folder if it exists
+            java.io.File savedDir = new java.io.File("saved");
+            if (savedDir.exists() && savedDir.isDirectory()) {
+                fileChooser.setInitialDirectory(savedDir);
+            }
+            
+            // Get the window from the scene instead of stored stage reference
+            javafx.stage.Window window = null;
+            if (messageInputField != null && messageInputField.getScene() != null) {
+                window = messageInputField.getScene().getWindow();
+            } else if (serverSimulatorStage != null) {
+                window = serverSimulatorStage;
+            }
+            
+            if (window == null) {
+                addReceivedMessageToDisplay("❌ ERROR: Cannot determine window for file chooser");
+                Logging.error("❌ Cannot determine window for file chooser in server simulator");
+                return;
+            }
+            
+            // Show open dialog
+            java.io.File file = fileChooser.showOpenDialog(window);
+            if (file != null) {
+                if (!file.exists()) {
+                    addReceivedMessageToDisplay("❌ File not found: " + file.getAbsolutePath());
+                    return;
+                }
+                
+                String content = java.nio.file.Files.readString(file.toPath());
+                messageInputField.setText(content);
+                addReceivedMessageToDisplay("✅ Input content loaded from: " + file.getAbsolutePath());
+            }
+        } catch (Exception e) {
+            addReceivedMessageToDisplay("❌ ERROR loading: " + e.getMessage());
+            Logging.error("❌ Failed to load server simulator input: " + e.getMessage(), e);
+        }
+    }
+
+    // ==================== INPUT PERSISTENCE METHODS ====================
+    
+    /**
+     * Save the current input content to the persistence file.
+     */
+    private void saveInputContent() {
+        try {
             // Ensure saved directory exists
             java.nio.file.Path savedDir = java.nio.file.Paths.get("saved");
             if (!java.nio.file.Files.exists(savedDir)) {
                 java.nio.file.Files.createDirectories(savedDir);
             }
             
-            // Save raw message area
-            String content = receivedMessagesDisplayArea.getText();
-            if (content == null) content = "";
-            java.nio.file.Path out = java.nio.file.Paths.get("saved/server-simulator-messages.txt");
-            java.nio.file.Files.writeString(out, content);
-            addReceivedMessageToDisplay("Saved to " + out.toAbsolutePath());
-            // Also save structured transcript JSONL
-            java.nio.file.Path transcript = launcher.utils.TranscriptRecorder.saveTranscript(java.nio.file.Paths.get("saved/transcript.jsonl"));
-            if (transcript != null) {
-                addReceivedMessageToDisplay("Transcript saved: " + transcript.toAbsolutePath());
+            // Save current input content
+            String inputContent = messageInputField.getText();
+            if (inputContent != null && !inputContent.trim().isEmpty()) {
+                java.nio.file.Files.writeString(java.nio.file.Paths.get(INPUT_PERSISTENCE_FILE), inputContent);
+                Logging.info("💾 Server simulator input content saved");
             }
         } catch (Exception e) {
-            addReceivedMessageToDisplay("ERROR saving: " + e.getMessage());
+            Logging.error("❌ Failed to save input content: " + e.getMessage(), e);
         }
     }
-
-    private void handleLoadMessages() {
+    
+    /**
+     * Load the previously saved input content from the persistence file.
+     */
+    private void loadInputContent() {
         try {
-            java.nio.file.Path in = java.nio.file.Paths.get("server-simulator-messages.txt");
-            if (!java.nio.file.Files.exists(in)) {
-                addReceivedMessageToDisplay("No saved file found: " + in.toAbsolutePath());
-                return;
+            java.nio.file.Path inputFile = java.nio.file.Paths.get(INPUT_PERSISTENCE_FILE);
+            if (java.nio.file.Files.exists(inputFile)) {
+                String savedContent = java.nio.file.Files.readString(inputFile);
+                if (savedContent != null && !savedContent.trim().isEmpty()) {
+                    messageInputField.setText(savedContent);
+                    Logging.info("📂 Server simulator input content restored");
+                }
             }
-            String content = java.nio.file.Files.readString(in);
-            receivedMessagesDisplayArea.setText(content);
-            addReceivedMessageToDisplay("Loaded from " + in.toAbsolutePath());
         } catch (Exception e) {
-            addReceivedMessageToDisplay("ERROR loading: " + e.getMessage());
+            Logging.error("❌ Failed to load input content: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Clear the saved input content from the persistence file.
+     */
+    private void clearSavedInputContent() {
+        try {
+            java.nio.file.Path inputFile = java.nio.file.Paths.get(INPUT_PERSISTENCE_FILE);
+            if (java.nio.file.Files.exists(inputFile)) {
+                java.nio.file.Files.deleteIfExists(inputFile);
+                Logging.info("🗑️ Server simulator saved input content cleared");
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Failed to clear saved input content: " + e.getMessage(), e);
         }
     }
 
@@ -238,6 +361,7 @@ public class ServerSimulatorController {
                 sendMessageToGame(messageText);
                 addSentMessageToDisplay(messageText);
                 clearMessageInputField();
+                saveInputContent(); // Save input content after sending
                 
             } catch (Exception messageError) {
                 Logging.error("❌ Error sending message: " + messageError.getMessage());
@@ -309,7 +433,8 @@ public class ServerSimulatorController {
     @FXML
     private void handleClearMessagesAction() {
         clearMessageInputField();
-        Logging.info("🧹 Server Simulator input field cleared");
+        clearSavedInputContent(); // Also clear saved input content
+        Logging.info("🧹 Server Simulator input field and saved content cleared");
     }
     
     /**
@@ -324,6 +449,7 @@ public class ServerSimulatorController {
         if (serverSimulatorStage != null) {
             serverSimulatorStage.close();
         }
+        clearSavedInputContent(); // Clear saved input on window close
     }
 
     // ==================== UTILITY METHODS ====================
@@ -354,5 +480,6 @@ public class ServerSimulatorController {
             // This could trigger game cleanup if needed
             // Currently not implemented but available for future use
         }
+        clearSavedInputContent(); // Clear saved input on application exit
     }
 } 

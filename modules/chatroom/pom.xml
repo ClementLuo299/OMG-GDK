@@ -8,7 +8,7 @@
     <parent>
         <groupId>com.omg</groupId>
         <artifactId>omg-gdk</artifactId>
-        <version>1.0.0</version>
+        <version>Beta 1.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -23,14 +23,14 @@
         <dependency>
             <groupId>com.omg</groupId>
             <artifactId>gdk</artifactId>
-            <version>1.0.0</version>
+            <version>Beta 1.0.0</version>
         </dependency>
         
         <!-- GDK Launcher -->
         <dependency>
             <groupId>com.omg</groupId>
             <artifactId>launcher</artifactId>
-            <version>1.0.0</version>
+            <version>Beta 1.0.0</version>
         </dependency>
         
         <!-- JavaFX -->
