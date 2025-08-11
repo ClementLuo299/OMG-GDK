@@ -6,7 +6,6 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.games.modules.ExampleGameModule$ExampleGameController"
       styleClass="game-container"
       spacing="20"
       alignment="CENTER">
@@ -16,17 +15,17 @@
     </padding>
 
     <!-- Game Title -->
-    <Label text="Example Game" styleClass="game-title"/>
+    <Label text="Chatroom" styleClass="game-title"/>
 
     <!-- Game Content -->
     <VBox spacing="10" alignment="CENTER">
-        <Label fx:id="statusLabel" text="Example Game - Template" styleClass="status-label"/>
-        <Label text="This is a template for creating new games" styleClass="instruction-label"/>
+        <Label fx:id="statusLabel" text="Chatroom - Multiplayer Chat" styleClass="status-label"/>
+        <Label text="Join the conversation with other users" styleClass="instruction-label"/>
     </VBox>
 
     <!-- Game Controls -->
     <HBox spacing="10" alignment="CENTER">
-        <Button text="New Game" fx:id="newGameBtn" styleClass="control-button"/>
+        <Button text="Join Chat" fx:id="joinChatBtn" styleClass="control-button"/>
         <Button text="Back to Library" fx:id="backBtn" styleClass="control-button"/>
     </HBox>
 

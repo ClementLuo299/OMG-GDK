@@ -73,7 +73,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 9, 2025       
+ * @edited August 10, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -1558,6 +1558,9 @@ public class GDKGameLobbyController implements Initializable {
             // Attempt to parse the JSON to validate its syntax
             Map<String, Object> messageData = jsonDataMapper.readValue(jsonContent, Map.class);
             
+            // Record message to transcript before sending
+            launcher.utils.TranscriptRecorder.recordToGame(messageData);
+            
             // Send the message to the game module
             Map<String, Object> response = selectedGameModule.handleMessage(messageData);
             
@@ -1567,6 +1570,9 @@ public class GDKGameLobbyController implements Initializable {
                 
                 // Display in the output area
                 jsonOutputEditor.setText(responseJson);
+                
+                // Record response to transcript
+                launcher.utils.TranscriptRecorder.recordFromGame(response);
                 
                 // Add status message to message area
                 addUserMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");

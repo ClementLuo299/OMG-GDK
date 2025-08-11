@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Metadata for the Example Game module.
- * Provides all the metadata information for the Example Game.
+ * Metadata for the Chatroom Module.
+ * Provides all the metadata information for the Chatroom application.
  *
  * @authors Clement Luo
  * @date July 25, 2025
@@ -18,7 +18,7 @@ public class Metadata extends GameMetadata {
     
     @Override
     public String getGameName() {
-        return "Example Game";
+        return "Chatroom";
     }
     
     @Override
@@ -28,7 +28,7 @@ public class Metadata extends GameMetadata {
     
     @Override
     public String getGameDescription() {
-        return "A simple example game for testing the GDK framework";
+        return "A multiplayer chatroom application for testing the GDK framework";
     }
     
     @Override
@@ -40,7 +40,7 @@ public class Metadata extends GameMetadata {
     
     @Override
     public boolean supportsSinglePlayer() {
-        return true;
+        return false;
     }
     
     @Override
@@ -50,7 +50,7 @@ public class Metadata extends GameMetadata {
     
     @Override
     public boolean supportsAIOpponent() {
-        return true;
+        return false;
     }
     
     @Override
@@ -62,12 +62,12 @@ public class Metadata extends GameMetadata {
     
     @Override
     public int getMinPlayers() {
-        return 1;
+        return 2;
     }
     
     @Override
     public int getMaxPlayers() {
-        return 4;
+        return 10;
     }
     
     @Override
@@ -77,16 +77,16 @@ public class Metadata extends GameMetadata {
     
     @Override
     public String getMaxDifficulty() {
-        return "Hard";
+        return "Easy";
     }
     
     @Override
     public int getEstimatedDurationMinutes() {
-        return 15;
+        return 0; // Variable duration for chat
     }
     
     @Override
     public List<String> getRequiredResources() {
-        return Arrays.asList("display", "input_device");
+        return Arrays.asList("display", "input_device", "network");
     }
 } 

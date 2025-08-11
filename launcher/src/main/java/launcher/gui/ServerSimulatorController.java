@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 9, 2025   
+ * @edited August 10, 2025   
  * @since 1.0
  */
 public class ServerSimulatorController {
@@ -303,15 +303,13 @@ public class ServerSimulatorController {
     /**
      * Handle the clear messages action initiated by the user.
      * 
-     * This method clears all messages from the display area
-     * and provides user feedback about the action.
+     * This method clears only the message input field to prepare
+     * for new input, preserving the message history in the display.
      */
     @FXML
     private void handleClearMessagesAction() {
-        if (receivedMessagesDisplayArea != null) {
-            receivedMessagesDisplayArea.clear();
-            Logging.info("🧹 Server Simulator messages cleared");
-        }
+        clearMessageInputField();
+        Logging.info("🧹 Server Simulator input field cleared");
     }
     
     /**

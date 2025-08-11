@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import launcher.utils.DialogUtil;
 
 /**
- * Example Game Module - A simple game module for testing the GDK.
- * Demonstrates basic game module implementation and communication.
+ * Chatroom Module - A multiplayer chatroom application for testing the GDK.
+ * Demonstrates basic module implementation and communication.
  *
  * @authors Clement Luo
  * @date July 19, 2025
@@ -26,7 +26,7 @@ public class Main implements GameModule {
     
     // ==================== GAME CONSTANTS ====================
     
-    private static final String GAME_ID = "example";
+    private static final String GAME_ID = "chatroom";
     private final Metadata metadata;
     
     // Transient state from start message
@@ -50,11 +50,11 @@ public class Main implements GameModule {
     
     @Override
     public Scene launchGame(Stage primaryStage) {
-        Logging.info("🎮 Launching Example Game");
+        Logging.info("🎮 Launching Chatroom");
         try {
             return createTestInterface(primaryStage);
         } catch (Exception e) {
-            Logging.error("❌ Failed to launch Example Game: " + e.getMessage(), e);
+            Logging.error("❌ Failed to launch Chatroom: " + e.getMessage(), e);
             return null;
         }
     }
@@ -81,7 +81,7 @@ public class Main implements GameModule {
         
         String function = (String) message.get("function");
         if ("metadata".equals(function)) {
-            Logging.info("📋 Returning metadata for Example Game");
+            Logging.info("📋 Returning metadata for Chatroom");
             return metadata.toMap();
         }
         if ("start".equals(function)) {
@@ -269,13 +269,13 @@ public class Main implements GameModule {
         closeButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px;");
         
         closeButton.setOnAction(e -> {
-            Logging.info("🔒 Closing Example Game");
+            Logging.info("🔒 Closing Chatroom");
             stopGame();
             Platform.exit();
         });
         
         backButton.setOnAction(e -> {
-            Logging.info("🔙 Returning to lobby from Example Game");
+            Logging.info("🔙 Returning to lobby from Chatroom");
             // Send end message before stopping
             java.util.Map<String, Object> endMessage = new java.util.HashMap<>();
             endMessage.put("function", "end");
@@ -307,14 +307,14 @@ public class Main implements GameModule {
         
         // Create scene
         Scene scene = new Scene(root, 400, 300);
-        scene.getStylesheets().add(getClass().getResource("/games/example/css/example.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/games/chatroom/css/chatroom.css").toExternalForm());
         
         // Configure stage
-        primaryStage.setTitle("Example Game - GDK Test");
+        primaryStage.setTitle("Chatroom - GDK Test");
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(300);
         
-        Logging.info("✅ Example Game interface created successfully");
+        Logging.info("✅ Chatroom interface created successfully");
         return scene;
     }
 } 

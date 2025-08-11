@@ -12,11 +12,11 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>example-module</artifactId>
+    <artifactId>chatroom-module</artifactId>
     <packaging>jar</packaging>
 
-    <name>Example Game Module</name>
-    <description>Example game module for testing game communication</description>
+    <name>Chatroom Module</name>
+    <description>Chatroom application</description>
 
     <dependencies>
         <!-- GDK Library -->

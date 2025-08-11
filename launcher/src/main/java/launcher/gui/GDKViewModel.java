@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 9, 2025  
+ * @edited August 10, 2025  
  * @since 1.0
  */
 public class GDKViewModel {
@@ -396,6 +396,11 @@ public class GDKViewModel {
             } catch (Exception gameStopError) {
                 Logging.error("❌ Error stopping game: " + gameStopError.getMessage());
             }
+            
+            // End transcript session and save transcript
+            launcher.utils.TranscriptRecorder.endSessionIfEndDetected(null);
+            launcher.utils.TranscriptRecorder.saveCurrentTranscript();
+            Logging.info("📝 Transcript session ended and saved");
             
             currentlyRunningGame = null;
         }
