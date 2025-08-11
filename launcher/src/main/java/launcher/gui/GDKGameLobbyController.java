@@ -73,7 +73,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 10, 2025       
+ * @edited August 11, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -101,6 +101,7 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
     @FXML private JFXToggleButton jsonPersistenceToggle;
+    @FXML private JFXToggleButton autoLaunchToggle;
     
     // Application Control Components
     @FXML private Button exitButton;
@@ -176,6 +177,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private static final String PERSISTENCE_TOGGLE_FILE = "saved/gdk-persistence-toggle.txt";
     private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
+    private static final String AUTO_LAUNCH_ENABLED_FILE = "saved/gdk-auto-launch-enabled.txt";
 
     // ==================== INITIALIZATION ====================
     
@@ -525,6 +527,24 @@ public class GDKGameLobbyController implements Initializable {
                 addUserMessage("📋 JSON persistence disabled");
             } else {
                 addUserMessage("📋 JSON persistence enabled");
+            }
+        });
+        
+        // Auto-Launch Toggle Handler
+        // Save auto-launch state when changed
+        autoLaunchToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            // Skip messages during startup loading
+            if (isLoadingPersistenceSettings) {
+                return;
+            }
+            
+            boolean isEnabled = newValue;
+            saveAutoLaunchToggleState();
+            
+            if (isEnabled) {
+                addUserMessage("🚀 Auto-launch enabled - games will launch directly on startup");
+            } else {
+                addUserMessage("🚀 Auto-launch disabled - GDK interface will show on startup");
             }
         });
         
@@ -1472,60 +1492,96 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== GAME LAUNCHING ====================
     
     /**
-     * Launch the currently selected game with validation.
+     * Launch the selected game with the provided JSON configuration data.
+     * This method can be called from both UI launch and auto-launch.
      * 
-     * This method validates the game selection and JSON configuration,
-     * then delegates the actual launching to the ViewModel.
+     * @param jsonConfigurationData The JSON configuration data to use, or null for defaults
+     * @param isAutoLaunch Whether this is an auto-launch (affects messaging)
      */
-    private void launchSelectedGame() {
-        // Step 1: Validate that a game is selected
-        if (selectedGameModule == null) {
-            DialogUtil.showGameError("No Game Selected", "Please select a game to launch."); // Show error to user
-            return; // Exit early if no game is selected
-        }
-
-        // Step 2: Parse and validate JSON syntax
-        Map<String, Object> jsonConfigurationData = parseJsonConfigurationData();
-        if (jsonConfigurationData == null) {
-            // Check if it's due to invalid JSON syntax (not empty input)
-            String jsonText = jsonInputEditor.getText().trim();
-            if (!jsonText.isEmpty()) {
-                DialogUtil.showJsonError("Invalid JSON", "Please enter valid JSON configuration."); // Show error to user
-                return; // Exit early if JSON syntax is invalid
-            }
-            // If JSON is empty, continue with null data (let game decide)
-            addUserMessage("📦 No JSON data provided (game will use its own defaults)");
-        } else {
-            // Log information about the JSON data being included
-            addUserMessage("📦 Including custom JSON data with " + jsonConfigurationData.size() + " fields");
-        }
+    private void launchSelectedGameWithConfiguration(Map<String, Object> jsonConfigurationData, boolean isAutoLaunch) {
+        // Use the utility class for the core launch logic
+        boolean configSuccess = launcher.utils.GameLaunchUtil.launchGameWithConfiguration(selectedGameModule, jsonConfigurationData, isAutoLaunch);
         
-        addUserMessage("🚀 Launching " + selectedGameModule.getGameName());
-        
-        // Load optional start message
-        java.util.Map<String, Object> startMessage = launcher.utils.StartMessageUtil.loadDefaultStartMessage();
-        if (startMessage != null) {
-            try {
-                // Record start message to transcript
-                launcher.utils.TranscriptRecorder.recordToGame(startMessage);
-                
-                java.util.Map<String, Object> response = selectedGameModule.handleMessage(startMessage);
-                if (response != null) {
-                    addUserMessage("✅ Start message acknowledged by " + selectedGameModule.getGameName());
-                    // Record response to transcript
-                    launcher.utils.TranscriptRecorder.recordFromGame(response);
-                }
-            } catch (Exception e) {
-                addUserMessage("⚠️ Failed to send start message: " + e.getMessage());
-            }
+        if (!configSuccess) {
+            return; // Exit early if configuration failed
         }
         
         // Step 5: Launch the game using the ViewModel
         if (applicationViewModel != null) {
             applicationViewModel.handleLaunchGame(selectedGameModule); // Delegate to ViewModel
         } else {
-            DialogUtil.showError("Application Error", "ViewModel reference is not available."); // Show error if ViewModel is missing
+            if (!isAutoLaunch) {
+                DialogUtil.showError("Application Error", "ViewModel reference is not available.");
+            }
         }
+    }
+
+    /**
+     * Launch the selected game using the JSON input from the UI.
+     * This is the original method that gets called when the user presses "Launch Game".
+     */
+    private void launchSelectedGame() {
+        // Parse and validate JSON syntax from UI
+        Map<String, Object> jsonConfigurationData = parseJsonConfigurationData();
+        if (jsonConfigurationData == null) {
+            // Check if it's due to invalid JSON syntax (not empty input)
+            String jsonText = jsonInputEditor.getText().trim();
+            if (!jsonText.isEmpty()) {
+                DialogUtil.showJsonError("Invalid JSON", "Please enter valid JSON configuration.");
+                return; // Exit early if JSON syntax is invalid
+            }
+        }
+        
+        // Launch with UI configuration
+        launchSelectedGameWithConfiguration(jsonConfigurationData, false);
+    }
+    
+    /**
+     * Launch a specific game module with saved JSON configuration.
+     * This method is designed for auto-launch functionality.
+     * 
+     * @param gameModule The game module to launch
+     * @param savedJson The saved JSON configuration string
+     * @return true if launch was successful, false otherwise
+     */
+    public boolean launchGameWithSavedJson(GameModule gameModule, String savedJson) {
+        try {
+            // Temporarily set the selected game module
+            GameModule previousSelected = selectedGameModule;
+            selectedGameModule = gameModule;
+            
+            // Parse the saved JSON
+            Map<String, Object> jsonConfigurationData = null;
+            if (savedJson != null && !savedJson.trim().isEmpty()) {
+                try {
+                    jsonConfigurationData = jsonDataMapper.readValue(savedJson.trim(), Map.class);
+                } catch (Exception e) {
+                    Logging.error("Auto-launch: Failed to parse saved JSON: " + e.getMessage());
+                    // Continue with null configuration (let game use defaults)
+                }
+            }
+            
+            // Launch the game with the saved configuration
+            launchSelectedGameWithConfiguration(jsonConfigurationData, true);
+            
+            // Restore the previous selection
+            selectedGameModule = previousSelected;
+            
+            return true;
+        } catch (Exception e) {
+            Logging.error("Auto-launch: Error launching game with saved JSON: " + e.getMessage(), e);
+            return false;
+        }
+    }
+    
+    /**
+     * Get the application ViewModel reference.
+     * This method is used by auto-launch functionality.
+     * 
+     * @return The application ViewModel instance
+     */
+    public GDKViewModel getApplicationViewModel() {
+        return applicationViewModel;
     }
 
     // ==================== JSON CONFIGURATION HANDLING ====================
@@ -1784,6 +1840,9 @@ public class GDKGameLobbyController implements Initializable {
             // Load persistence toggle state
             loadPersistenceToggleState();
             
+            // Load auto-launch toggle state
+            loadAutoLaunchToggleState();
+            
             // Load saved JSON content if persistence is enabled
             if (jsonPersistenceToggle.isSelected()) {
                 loadSavedJsonContent();
@@ -1822,6 +1881,29 @@ public class GDKGameLobbyController implements Initializable {
             Logging.error("❌ Error loading persistence toggle state: " + e.getMessage(), e);
             // Default to enabled on error
             jsonPersistenceToggle.setSelected(true);
+        }
+    }
+    
+    /**
+     * Load the auto-launch toggle state from file.
+     */
+    private void loadAutoLaunchToggleState() {
+        try {
+            Path toggleFile = Paths.get(AUTO_LAUNCH_ENABLED_FILE);
+            if (Files.exists(toggleFile)) {
+                String toggleState = Files.readString(toggleFile).trim();
+                boolean isEnabled = Boolean.parseBoolean(toggleState);
+                autoLaunchToggle.setSelected(isEnabled);
+                // No startup message - only show when setting changes
+            } else {
+                // Default to disabled if no saved state
+                autoLaunchToggle.setSelected(false);
+                // No startup message - only show when setting changes
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error loading auto-launch toggle state: " + e.getMessage(), e);
+            // Default to disabled on error
+            autoLaunchToggle.setSelected(false);
         }
     }
     
@@ -1887,6 +1969,21 @@ public class GDKGameLobbyController implements Initializable {
             Logging.info("📋 Saved persistence toggle state: " + (isEnabled ? "enabled" : "disabled"));
         } catch (Exception e) {
             Logging.error("❌ Error saving persistence toggle state: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Save auto-launch toggle state to file.
+     */
+    private void saveAutoLaunchToggleState() {
+        try {
+            ensureSavedDirectoryExists();
+            boolean isEnabled = autoLaunchToggle.isSelected();
+            Path toggleFile = Paths.get(AUTO_LAUNCH_ENABLED_FILE);
+            Files.writeString(toggleFile, String.valueOf(isEnabled));
+            Logging.info("📋 Saved auto-launch toggle state: " + (isEnabled ? "enabled" : "disabled"));
+        } catch (Exception e) {
+            Logging.error("❌ Error saving auto-launch toggle state: " + e.getMessage(), e);
         }
     }
     
@@ -1976,6 +2073,14 @@ public class GDKGameLobbyController implements Initializable {
             
             // Save persistence toggle state
             savePersistenceToggleState();
+            
+            // Save auto-launch toggle state
+            saveAutoLaunchToggleState();
+            
+            // Save selected game
+            if (selectedGameModule != null) {
+                persistSelectedGame(selectedGameModule.getGameName());
+            }
             
             Logging.info("📋 Application settings saved successfully");
         } catch (Exception e) {

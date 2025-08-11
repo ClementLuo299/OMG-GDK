@@ -74,6 +74,12 @@
                 <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
                 <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true" styleClass="jfoenix-toggle"/>
             </HBox>
+            
+            <!-- Auto-Launch Toggle -->
+            <HBox alignment="CENTER_LEFT" spacing="2" VBox.vgrow="NEVER" style="-fx-min-height: 20; -fx-max-height: 20;">
+                <Label text="Auto-Launch Game" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
+                <JFXToggleButton fx:id="autoLaunchToggle" selected="false" styleClass="jfoenix-toggle"/>
+            </HBox>
         </VBox>
         
         <!-- Divider -->

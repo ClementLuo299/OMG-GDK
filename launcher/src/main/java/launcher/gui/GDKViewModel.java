@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 10, 2025  
+ * @edited August 11, 2025  
  * @since 1.0
  */
 public class GDKViewModel {
@@ -148,9 +148,26 @@ public class GDKViewModel {
         }
     }
     
-    // Removed manual open; simulator now starts/stops with the game.
+    /**
+     * Check if a game is currently running.
+     * 
+     * @return true if a game is running, false otherwise
+     */
     public boolean isGameRunning() {
         return currentlyRunningGame != null;
+    }
+    
+    /**
+     * Get the current game scene if a game is running.
+     * This method is used by auto-launch functionality.
+     * 
+     * @return The current game scene, or null if no game is running
+     */
+    public Scene getCurrentGameScene() {
+        if (currentlyRunningGame != null && primaryApplicationStage != null) {
+            return primaryApplicationStage.getScene();
+        }
+        return null;
     }
 
     // ==================== GAME MANAGEMENT ====================
