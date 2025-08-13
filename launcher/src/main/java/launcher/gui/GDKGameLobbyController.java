@@ -1492,11 +1492,10 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== GAME LAUNCHING ====================
     
     /**
-     * Launch the selected game with the provided JSON configuration data.
-     * This method can be called from both UI launch and auto-launch.
+     * Launch the selected game with the provided JSON configuration.
      * 
-     * @param jsonConfigurationData The JSON configuration data to use, or null for defaults
-     * @param isAutoLaunch Whether this is an auto-launch (affects messaging)
+     * @param jsonConfigurationData The parsed JSON configuration data
+     * @param isAutoLaunch Whether this is an auto-launch (affects error handling)
      */
     private void launchSelectedGameWithConfiguration(Map<String, Object> jsonConfigurationData, boolean isAutoLaunch) {
         // Use the utility class for the core launch logic
@@ -1506,9 +1505,12 @@ public class GDKGameLobbyController implements Initializable {
             return; // Exit early if configuration failed
         }
         
+        // Get the JSON text for the ViewModel to check game mode
+        String jsonText = jsonInputEditor.getText().trim();
+        
         // Step 5: Launch the game using the ViewModel
         if (applicationViewModel != null) {
-            applicationViewModel.handleLaunchGame(selectedGameModule); // Delegate to ViewModel
+            applicationViewModel.handleLaunchGame(selectedGameModule, jsonText); // Delegate to ViewModel with JSON text
         } else {
             if (!isAutoLaunch) {
                 DialogUtil.showError("Application Error", "ViewModel reference is not available.");

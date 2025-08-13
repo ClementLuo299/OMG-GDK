@@ -49,6 +49,11 @@ public class Metadata extends GameMetadata {
     }
     
     @Override
+    public boolean supportsLocalMultiPlayer() {
+        return true;
+    }
+    
+    @Override
     public boolean supportsAIOpponent() {
         return true;
     }

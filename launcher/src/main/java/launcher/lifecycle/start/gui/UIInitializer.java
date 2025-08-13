@@ -7,15 +7,16 @@ import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
+import gdk.Logging;
 
 import java.net.URL;
 
-/*
+/**
  * Initializes the main user interface components.
  * 
  * @author Clement Luo
  * @date August 8, 2025
- * @edited August 8, 2025
+ * @edited August 12, 2025
  * @since 1.0
  */
 public final class UIInitializer {
@@ -77,6 +78,20 @@ public final class UIInitializer {
             primaryApplicationStage.setWidth(1200);
             primaryApplicationStage.setHeight(900);
             primaryApplicationStage.setOpacity(0.0);
+            
+            // Add close handler for proper cleanup
+            primaryApplicationStage.setOnCloseRequest(event -> {
+                Logging.info("🚪 Main GDK window closing - initiating shutdown");
+                try {
+                    // Trigger the shutdown process
+                    launcher.lifecycle.stop.Shutdown.shutdown();
+                } catch (Exception e) {
+                    Logging.error("❌ Error during shutdown: " + e.getMessage(), e);
+                    // Force exit if shutdown fails
+                    System.exit(1);
+                }
+            });
+            
         } catch (Exception stageConfigurationError) {
             throw new RuntimeException("Failed to configure primary application stage", stageConfigurationError);
         }

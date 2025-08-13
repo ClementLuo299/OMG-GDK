@@ -10,6 +10,7 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
+ * @edited August 12, 2025
  * @since 1.0
  */
 public class Metadata extends GameMetadata {
@@ -40,11 +41,16 @@ public class Metadata extends GameMetadata {
     
     @Override
     public boolean supportsSinglePlayer() {
-        return false;
+        return true;
     }
     
     @Override
     public boolean supportsMultiPlayer() {
+        return true;
+    }
+    
+    @Override
+    public boolean supportsLocalMultiPlayer() {
         return true;
     }
     

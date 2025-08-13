@@ -66,7 +66,12 @@ public class GDKViewModel {
      * The controller for the server simulator interface
      */
     private ServerSimulatorController serverSimulatorController;
-
+    
+    /**
+     * Flag to track if the game has requested the server simulator to be closed
+     */
+    private boolean serverSimulatorRequestedClosed = false;
+    
     private Scene mainLobbyScene;
 
     // ==================== CONSTRUCTOR ====================
@@ -111,21 +116,22 @@ public class GDKViewModel {
     // ==================== PUBLIC ACTION HANDLERS ====================
     
     /**
-     * Handle the game launch action initiated by the user.
+     * Handle the launch game action initiated by the user.
      * 
      * This method validates the selected game, creates the server simulator,
      * and launches the game with proper error handling.
      * 
      * @param selectedGameModule The game module selected by the user
+     * @param jsonConfiguration The JSON configuration for the game (can be null)
      */
-    public void handleLaunchGame(GameModule selectedGameModule) {
+    public void handleLaunchGame(GameModule selectedGameModule, String jsonConfiguration) {
         if (selectedGameModule == null) {
             Logging.error("❌ No game selected for launch");
             return;
         }
         
         try {
-            launchGameWithScene(selectedGameModule);
+            launchGameWithScene(selectedGameModule, jsonConfiguration);
         } catch (Exception gameLaunchError) {
             Logging.error("❌ Error launching game: " + gameLaunchError.getMessage());
         }
@@ -176,16 +182,59 @@ public class GDKViewModel {
      * Launch a game with scene creation and state management.
      * 
      * @param selectedGameModule The game module to launch
+     * @param jsonConfiguration The JSON configuration for the game (can be null)
      */
-    private void launchGameWithScene(GameModule selectedGameModule) {
+    private void launchGameWithScene(GameModule selectedGameModule, String jsonConfiguration) {
+        // Reset game state BEFORE launching the game
+        serverSimulatorRequestedClosed = false;
+        Logging.info("🔍 DEBUG: Reset game state - serverSimulatorRequestedClosed: " + serverSimulatorRequestedClosed);
+        
+        // Check if this is single player mode from the JSON configuration
+        boolean isSinglePlayerMode = isSinglePlayerModeFromJson(jsonConfiguration);
+        if (isSinglePlayerMode) {
+            Logging.info("🤖 Single player mode detected from JSON - will skip server simulator creation");
+        }
+        
+        // Set up MessagingBridge consumer BEFORE launching the game
+        setupMessagingBridgeConsumer();
+        
+        // Also set up transcript recording consumer
+        gdk.MessagingBridge.addConsumer(msg -> {
+            try {
+                // Record the message to the transcript
+                launcher.utils.TranscriptRecorder.recordFromGame(msg);
+            } catch (Exception ignored) {}
+        });
+        
         Scene gameScene = selectedGameModule.launchGame(primaryApplicationStage);
         if (gameScene != null) {
             primaryApplicationStage.setTitle(selectedGameModule.getGameName());
             primaryApplicationStage.setScene(gameScene);
             updateGameStateAfterSuccessfulLaunch(selectedGameModule);
-            // Auto-start server simulator with game (ensure single instance)
+            
+            // Auto-start server simulator with game (ensure single instance) - with delay to allow game to configure
             if (serverSimulatorStage == null) {
-                createServerSimulator();
+                // Add a small delay to allow the game to process start messages and potentially close the simulator
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000); // 1 second delay
+                        javafx.application.Platform.runLater(() -> {
+                            // Check if the game has requested the server simulator to be closed OR if it's single player mode
+                            if (serverSimulatorStage == null && !serverSimulatorRequestedClosed && !isSinglePlayerMode) {
+                                Logging.info("🤖 Creating server simulator after delay (not single player mode and no closure requested)");
+                                createServerSimulator();
+                            } else if (serverSimulatorRequestedClosed) {
+                                Logging.info("🤖 Skipping server simulator creation - game requested closure");
+                            } else if (isSinglePlayerMode) {
+                                Logging.info("🤖 Skipping server simulator creation - single player mode detected from JSON");
+                            } else {
+                                Logging.info("🔍 DEBUG: Server simulator already exists, not creating new one");
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }).start();
             }
             setupGameCloseHandler();
             Logging.info("🎮 Game launched successfully");
@@ -293,39 +342,7 @@ public class GDKViewModel {
                         serverSimulatorController.addReceivedMessageToDisplay("ERROR: " + e.getMessage());
                     }
                 });
-                // Plug in reverse bridge: messages from game -> simulator display
-                gdk.MessagingBridge.setConsumer(msg -> {
-                    try {
-                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                        String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
-                        serverSimulatorController.addReceivedMessageToDisplay(pretty);
-                        // Send confirmation back to the game
-                        if (currentlyRunningGame != null) {
-                            java.util.Map<String, Object> ack = new java.util.HashMap<>();
-                            ack.put("function", "ack");
-                            ack.put("status", "ok");
-                            Object of = (msg != null) ? msg.get("function") : null;
-                            if (of != null) ack.put("of", of);
-                            ack.put("timestamp", java.time.Instant.now().toString());
-                            currentlyRunningGame.handleMessage(ack);
-                        }
-                    } catch (Exception ignored) {
-                    }
-                });
-                // Also mirror messages to lobby JSON output (if requested from game)
-                gdk.MessagingBridge.addConsumer(msg -> {
-                    try {
-                        // Record the message to the transcript
-                        launcher.utils.TranscriptRecorder.recordFromGame(msg);
-                        
-                        // Present end message or others back to the lobby UI if needed
-                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                        String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
-                        if (serverSimulatorController != null) {
-                            serverSimulatorController.addReceivedMessageToDisplay(pretty);
-                        }
-                    } catch (Exception ignored) {}
-                });
+                // Note: MessagingBridge consumer is now set up separately when game launches
             }
             Logging.info("🔧 Server simulator created successfully");
         } catch (Exception serverSimulatorError) {
@@ -437,6 +454,19 @@ public class GDKViewModel {
             Logging.info("🔧 Server simulator cleaned up");
         }
     }
+    
+    /**
+     * Close the server simulator window without affecting the game.
+     * This is used when games (like single player) don't need the server simulator.
+     */
+    private void closeServerSimulator() {
+        if (serverSimulatorStage != null) {
+            serverSimulatorStage.close();
+            serverSimulatorStage = null;
+            serverSimulatorController = null;
+            Logging.info("🤖 Server simulator closed by game request (single player mode)");
+        }
+    }
 
     // ==================== UTILITY METHODS ====================
     
@@ -459,5 +489,72 @@ public class GDKViewModel {
         } catch (Exception moduleDiscoveryError) {
             Logging.error("❌ Error discovering modules: " + moduleDiscoveryError.getMessage());
         }
+    }
+
+    /**
+     * Set up the MessagingBridge consumer to handle messages from the currently running game.
+     * This consumer is responsible for receiving messages from the game and
+     * forwarding them to the server simulator for display and processing.
+     */
+    private void setupMessagingBridgeConsumer() {
+        gdk.MessagingBridge.setConsumer(msg -> {
+            try {
+                Logging.info("🔍 DEBUG: Received message from game: " + (msg != null ? msg.get("function") : "null"));
+                
+                // Check if this is a request to close the server simulator
+                if (msg != null && "close_server_simulator".equals(msg.get("function"))) {
+                    Logging.info("🤖 Game requested server simulator closure: " + msg.get("reason"));
+                    Logging.info("🔍 DEBUG: Setting serverSimulatorRequestedClosed from false to true");
+                    serverSimulatorRequestedClosed = true;
+                    Logging.info("🔍 DEBUG: serverSimulatorRequestedClosed is now: " + serverSimulatorRequestedClosed);
+                    closeServerSimulator();
+                    return;
+                }
+                
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
+                if (serverSimulatorController != null) {
+                    serverSimulatorController.addReceivedMessageToDisplay(pretty);
+                }
+                // Send confirmation back to the game
+                if (currentlyRunningGame != null) {
+                    java.util.Map<String, Object> ack = new java.util.HashMap<>();
+                    ack.put("function", "ack");
+                    ack.put("status", "ok");
+                    Object of = (msg != null) ? msg.get("function") : null;
+                    if (of != null) ack.put("of", of);
+                    ack.put("timestamp", java.time.Instant.now().toString());
+                    currentlyRunningGame.handleMessage(ack);
+                }
+            } catch (Exception ignored) {
+            }
+        });
+    }
+
+    /**
+     * Check if the current game is single player mode by examining the JSON configuration.
+     * This is a much simpler and more reliable approach than the MessagingBridge system.
+     */
+    private boolean isSinglePlayerModeFromJson(String jsonConfiguration) {
+        try {
+            if (jsonConfiguration != null && !jsonConfiguration.trim().isEmpty()) {
+                // Parse the JSON to check the gameMode field
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                java.util.Map<String, Object> jsonData = mapper.readValue(jsonConfiguration, java.util.Map.class);
+                
+                Object gameMode = jsonData.get("gameMode");
+                if (gameMode instanceof String) {
+                    String mode = (String) gameMode;
+                    boolean isSinglePlayer = "single_player".equals(mode);
+                    Logging.info("🔍 DEBUG: JSON gameMode: " + mode + ", isSinglePlayer: " + isSinglePlayer);
+                    return isSinglePlayer;
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error checking game mode from JSON: " + e.getMessage());
+        }
+        
+        Logging.info("🔍 DEBUG: Could not determine game mode from JSON, defaulting to false");
+        return false;
     }
 } 

@@ -5,11 +5,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Timer;
 import java.util.TimerTask;
 import launcher.utils.ModuleDiscovery;
+import launcher.lifecycle.stop.Shutdown;
+import gdk.Logging;
 
 /**
  * Manages the running, displaying, and lifecycle of the startup progress window.
  * This class handles showing, hiding, updating progress, and managing animations
  * for the startup window after it has been created.
+ * 
+ * @authors Clement Luo
+ * @date August 12, 2025
+ * @edited August 12, 2025
+ * @since 1.0
  */
 public class StartupWindowManager {
     
@@ -54,9 +61,36 @@ public class StartupWindowManager {
     public void hide() {
         stopAnimations();
         progressWindow.hide();
+        
+        // Register cleanup task with shutdown system
+        Shutdown.registerCleanupTask(() -> {
+            Logging.info("🧹 Cleaning up StartupWindowManager resources...");
+            try {
+                // Ensure animations are stopped
+                stopAnimations();
+                
+                // Dispose of the progress window
+                if (progressWindow != null) {
+                    progressWindow.hide();
+                }
+                
+                Logging.info("✅ StartupWindowManager cleanup completed");
+            } catch (Exception e) {
+                Logging.error("❌ Error during StartupWindowManager cleanup: " + e.getMessage(), e);
+            }
+        });
     }
     
     public void updateProgress(int step, String message) {
+        // Ensure UI updates happen on the EDT for Swing components
+        if (SwingUtilities.isEventDispatchThread()) {
+            updateProgressInternal(step, message);
+        } else {
+            SwingUtilities.invokeLater(() -> updateProgressInternal(step, message));
+        }
+    }
+    
+    private void updateProgressInternal(int step, String message) {
         currentStep.set(step);
         progressWindow.updateProgress(step, message);
         startTextAnimation(message);

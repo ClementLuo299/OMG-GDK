@@ -150,9 +150,9 @@ public final class TranscriptRecorder {
                     }
                 }
                 
-                // Create filename with game name and timestamp
+                // Create filename with game name and timestamp in transcripts subdirectory
                 String timestamp = Instant.now().toString().replace(":", "-").replace("T", "_").replace("Z", "");
-                String fileName = "saved/transcript-" + gameName.replaceAll("[^a-zA-Z0-9]", "_") + "-" + timestamp + ".json";
+                String fileName = "saved/transcripts/transcript-" + gameName.replaceAll("[^a-zA-Z0-9]", "_") + "-" + timestamp + ".json";
                 targetFile = Path.of(fileName);
                 System.out.println("📝 Generated filename: " + fileName);
             }
@@ -256,9 +256,9 @@ public final class TranscriptRecorder {
                     }
                 }
                 
-                // Create filename with game name and timestamp
+                // Create filename with game name and timestamp in transcripts subdirectory
                 String timestamp = Instant.now().toString().replace(":", "-").replace("T", "_").replace("Z", "");
-                String fileName = "saved/transcript-" + gameName.replaceAll("[^a-zA-Z0-9]", "_") + "-" + timestamp + ".txt";
+                String fileName = "saved/transcripts/transcript-" + gameName.replaceAll("[^a-zA-Z0-9]", "_") + "-" + timestamp + ".txt";
                 targetFile = Path.of(fileName);
             }
             
@@ -411,9 +411,9 @@ public final class TranscriptRecorder {
                     }
                 }
                 
-                // Create base filename with game name and timestamp
+                // Create base filename with game name and timestamp in transcripts subdirectory
                 String timestamp = Instant.now().toString().replace(":", "-").replace("T", "_").replace("Z", "");
-                baseFileName = "saved/transcript-" + gameName.replaceAll("[^a-zA-Z0-9]", "_") + "-" + timestamp;
+                baseFileName = "saved/transcripts/transcript-" + gameName.replaceAll("[^a-zA-Z0-9]", "_") + "-" + timestamp;
             }
             
             Path jsonFile = Path.of(baseFileName + ".json");

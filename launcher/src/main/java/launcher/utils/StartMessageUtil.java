@@ -11,15 +11,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-/*
+/**
+ * Utility class for managing start messages for different game modes.
  * 
  * @author Clement Luo
  * @date August 8, 2025
- * @edited August 8, 2025
+ * @edited August 12, 2025
  * @since 1.0
  */
 public final class StartMessageUtil {
     private static final String DEFAULT_FILE_NAME = "saved/start-message.example.json";
+    private static final String LOCAL_MULTIPLAYER_FILE = "saved/start-message-local-multiplayer.json";
+    private static final String SINGLE_PLAYER_FILE = "saved/start-message-single-player.json";
+    private static final String ALL_MODES_FILE = "saved/start-message-all-modes.json";
 
     private StartMessageUtil() {}
 
@@ -54,6 +58,27 @@ public final class StartMessageUtil {
             }
         }
         return msg;
+    }
+    
+    /**
+     * Load a start message for local multiplayer mode
+     */
+    public static Map<String, Object> loadLocalMultiplayerStartMessage() {
+        return loadStartMessage(Path.of(LOCAL_MULTIPLAYER_FILE));
+    }
+    
+    /**
+     * Load a start message for single player mode
+     */
+    public static Map<String, Object> loadSinglePlayerStartMessage() {
+        return loadStartMessage(Path.of(SINGLE_PLAYER_FILE));
+    }
+    
+    /**
+     * Load a start message for all modes (multi player)
+     */
+    public static Map<String, Object> loadAllModesStartMessage() {
+        return loadStartMessage(Path.of(ALL_MODES_FILE));
     }
 
     private static Map<String, Object> createDefaultStartMessage() {

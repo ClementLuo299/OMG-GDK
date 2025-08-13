@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Clement Luo
  * @date August 8, 2025
- * @edited August 8, 2025
+ * @edited August 12, 2025
  * @since 1.0
  */
 public class ModuleCompiler {
@@ -74,10 +74,20 @@ public class ModuleCompiler {
         String moduleName = moduleDir.getName();
         Logging.info("Loading module from: " + moduleName);
         
+        // Add timeout protection for individual module loading
+        long startTime = System.currentTimeMillis();
+        long timeout = 10000; // 10 second timeout for individual module loading
+        
         try {
             // Validate source files first
             if (!ModuleDiscovery.isValidModuleStructure(moduleDir)) {
                 Logging.info("Module " + moduleName + " has invalid structure");
+                return null;
+            }
+            
+            // Check timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                Logging.warning("Module loading timeout for " + moduleName);
                 return null;
             }
             
@@ -88,6 +98,12 @@ public class ModuleCompiler {
                 return null;
             }
             
+            // Check timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                Logging.warning("Module loading timeout for " + moduleName);
+                return null;
+            }
+            
             // Verify Main.class exists
             File mainClassFile = new File(targetClassesDir, "Main.class");
             if (!mainClassFile.exists()) {
@@ -95,8 +111,20 @@ public class ModuleCompiler {
                 return null;
             }
             
+            // Check timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                Logging.warning("Module loading timeout for " + moduleName);
+                return null;
+            }
+            
             // Create class loader with necessary dependencies
             URLClassLoader classLoader = createModuleClassLoader(moduleDir);
+            
+            // Check timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                Logging.warning("Module loading timeout for " + moduleName);
+                return null;
+            }
             
             // Load and validate the Main class
             Class<?> mainClass = classLoader.loadClass("Main");
@@ -105,25 +133,30 @@ public class ModuleCompiler {
                 return null;
             }
             
+            // Check timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                Logging.warning("Module loading timeout for " + moduleName);
+                return null;
+            }
+            
             // Create GameModule instance by instantiating the Main class
             if (GameModule.class.isAssignableFrom(mainClass)) {
-                Object instance = mainClass.getDeclaredConstructor().newInstance();
-                GameModule gameModule = (GameModule) instance;
+                GameModule module = (GameModule) mainClass.getDeclaredConstructor().newInstance();
                 Logging.info("Successfully created GameModule instance for " + moduleName);
-                return gameModule;
+                return module;
             } else {
-                Logging.info("Main class does not implement GameModule interface: " + moduleName);
+                Logging.info("Main class does not implement GameModule interface");
                 return null;
             }
             
         } catch (Exception e) {
-            Logging.error("Failed to load module " + moduleName + ": " + e.getMessage(), e);
+            Logging.error("Error loading module " + moduleName + ": " + e.getMessage(), e);
             return null;
         }
     }
     
     /**
-     * Load all modules from a list of module directories.
+     * Load multiple modules from their compiled classes.
      * 
      * @param moduleDirectories List of module directories to load
      * @return List of successfully loaded GameModule instances
@@ -131,16 +164,32 @@ public class ModuleCompiler {
     public static List<GameModule> loadModules(List<File> moduleDirectories) {
         List<GameModule> loadedModules = new ArrayList<>();
         
+        // Add timeout protection for module loading
+        long startTime = System.currentTimeMillis();
+        long timeout = 15000; // 15 second timeout for all module loading
+        
         for (File moduleDir : moduleDirectories) {
-            GameModule module = loadModule(moduleDir);
-            if (module != null) {
-                loadedModules.add(module);
-                Logging.info("Successfully loaded module: " + moduleDir.getName());
-            } else {
-                Logging.info("Failed to load module: " + moduleDir.getName());
+            // Check timeout
+            if (System.currentTimeMillis() - startTime > timeout) {
+                Logging.warning("Module loading timeout reached, stopping module loading");
+                break;
+            }
+            
+            try {
+                GameModule module = loadModule(moduleDir);
+                if (module != null) {
+                    loadedModules.add(module);
+                    Logging.info("Successfully loaded module: " + moduleDir.getName());
+                } else {
+                    Logging.info("Failed to load module: " + moduleDir.getName());
+                }
+            } catch (Exception e) {
+                Logging.error("Error loading module " + moduleDir.getName() + ": " + e.getMessage(), e);
+                // Continue with other modules instead of failing completely
             }
         }
         
+        Logging.info("Module loading completed. Successfully loaded " + loadedModules.size() + " modules");
         return loadedModules;
     }
     

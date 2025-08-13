@@ -13,6 +13,7 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
+ * @edited August 12, 2025
  * @since 1.0
  */
 public abstract class GameMetadata {
@@ -70,6 +71,13 @@ public abstract class GameMetadata {
      * @return true if AI opponents are supported, false otherwise
      */
     public abstract boolean supportsAIOpponent();
+    
+    /**
+     * Get whether the game supports local multiplayer mode.
+     * 
+     * @return true if local multiplayer is supported, false otherwise
+     */
+    public abstract boolean supportsLocalMultiPlayer();
     
     /**
      * Get whether the game supports tournament mode.
@@ -133,6 +141,7 @@ public abstract class GameMetadata {
         Map<String, Object> gameModes = new HashMap<>();
         gameModes.put("single_player", supportsSinglePlayer());
         gameModes.put("multi_player", supportsMultiPlayer());
+        gameModes.put("local_multiplayer", supportsLocalMultiPlayer());
         gameModes.put("ai_opponent", supportsAIOpponent());
         gameModes.put("tournament", supportsTournament());
         return gameModes;

@@ -2,6 +2,7 @@ package launcher;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import gdk.Logging;
 
 import launcher.lifecycle.start.Startup;
 import launcher.lifecycle.stop.Shutdown;
@@ -14,7 +15,7 @@ import launcher.lifecycle.stop.Shutdown;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited August 7, 2025     
+ * @edited August 12, 2025     
  * @since 1.0
  */
 public class GDKApplication extends Application {
@@ -60,6 +61,17 @@ public class GDKApplication extends Application {
      * @param args Command line arguments passed to the application
      */
     public static void main(String[] args) {
+        // Add shutdown hook for unexpected termination
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Logging.info("🚨 Shutdown hook triggered - cleaning up resources");
+            try {
+                Shutdown.forceShutdown();
+            } catch (Exception e) {
+                Logging.error("💥 Error in shutdown hook: " + e.getMessage(), e);
+                System.exit(1);
+            }
+        }, "ShutdownHook"));
+        
         launch(args);
     }
 } 

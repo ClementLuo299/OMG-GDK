@@ -30,7 +30,7 @@ import java.util.HashMap;
  * 
  * @authors Clement Luo
  * @date August 8, 2025
- * @edited August 11, 2025
+ * @edited August 12, 2025  
  * @since 1.0
  */
 public class Startup {
@@ -46,12 +46,9 @@ public class Startup {
             // Check if auto-launch is enabled and attempt to launch game directly
             if (isAutoLaunchEnabled() && attemptAutoLaunch(primaryApplicationStage)) {
                 Logging.info("Auto-launch successful - bypassing GDK interface");
-                // Keep the primary stage alive but hidden to prevent application shutdown
-                primaryApplicationStage.setTitle("GDK (Auto-Launch Mode)");
-                primaryApplicationStage.setWidth(1);
-                primaryApplicationStage.setHeight(1);
-                primaryApplicationStage.setOpacity(0.0);
-                primaryApplicationStage.show(); // Show but make it invisible
+                            // Keep the primary stage alive but hidden to prevent application shutdown
+            primaryApplicationStage.setTitle("GDK (Auto-Launch Mode)");
+            primaryApplicationStage.hide(); // Hide the stage completely instead of showing it
                 return; // Exit startup process, game is running
             }
 
