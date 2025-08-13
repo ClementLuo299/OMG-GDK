@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 11, 2025  
+ * @edited August 12, 2025  
  * @since 1.0
  */
 public class GDKViewModel {
@@ -189,10 +189,15 @@ public class GDKViewModel {
         serverSimulatorRequestedClosed = false;
         Logging.info("🔍 DEBUG: Reset game state - serverSimulatorRequestedClosed: " + serverSimulatorRequestedClosed);
         
-        // Check if this is single player mode from the JSON configuration
+        // Check if this is single player mode or local multiplayer mode from the JSON configuration
         boolean isSinglePlayerMode = isSinglePlayerModeFromJson(jsonConfiguration);
+        boolean isLocalMultiplayerMode = isLocalMultiplayerModeFromJson(jsonConfiguration);
+        
         if (isSinglePlayerMode) {
             Logging.info("🤖 Single player mode detected from JSON - will skip server simulator creation");
+        }
+        if (isLocalMultiplayerMode) {
+            Logging.info("🤖 Local multiplayer mode detected from JSON - will skip server simulator creation");
         }
         
         // Set up MessagingBridge consumer BEFORE launching the game
@@ -220,13 +225,15 @@ public class GDKViewModel {
                         Thread.sleep(1000); // 1 second delay
                         javafx.application.Platform.runLater(() -> {
                             // Check if the game has requested the server simulator to be closed OR if it's single player mode
-                            if (serverSimulatorStage == null && !serverSimulatorRequestedClosed && !isSinglePlayerMode) {
+                            if (serverSimulatorStage == null && !serverSimulatorRequestedClosed && !isSinglePlayerMode && !isLocalMultiplayerMode) {
                                 Logging.info("🤖 Creating server simulator after delay (not single player mode and no closure requested)");
                                 createServerSimulator();
                             } else if (serverSimulatorRequestedClosed) {
                                 Logging.info("🤖 Skipping server simulator creation - game requested closure");
                             } else if (isSinglePlayerMode) {
                                 Logging.info("🤖 Skipping server simulator creation - single player mode detected from JSON");
+                            } else if (isLocalMultiplayerMode) {
+                                Logging.info("🤖 Skipping server simulator creation - local multiplayer mode detected from JSON");
                             } else {
                                 Logging.info("🔍 DEBUG: Server simulator already exists, not creating new one");
                             }
@@ -548,6 +555,33 @@ public class GDKViewModel {
                     boolean isSinglePlayer = "single_player".equals(mode);
                     Logging.info("🔍 DEBUG: JSON gameMode: " + mode + ", isSinglePlayer: " + isSinglePlayer);
                     return isSinglePlayer;
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error checking game mode from JSON: " + e.getMessage());
+        }
+        
+        Logging.info("🔍 DEBUG: Could not determine game mode from JSON, defaulting to false");
+        return false;
+    }
+
+    /**
+     * Check if the current game is local multiplayer mode by examining the JSON configuration.
+     * This is a much simpler and more reliable approach than the MessagingBridge system.
+     */
+    private boolean isLocalMultiplayerModeFromJson(String jsonConfiguration) {
+        try {
+            if (jsonConfiguration != null && !jsonConfiguration.trim().isEmpty()) {
+                // Parse the JSON to check the gameMode field
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                java.util.Map<String, Object> jsonData = mapper.readValue(jsonConfiguration, java.util.Map.class);
+                
+                Object gameMode = jsonData.get("gameMode");
+                if (gameMode instanceof String) {
+                    String mode = (String) gameMode;
+                    boolean isLocalMultiplayer = "local_multiplayer".equals(mode);
+                    Logging.info("🔍 DEBUG: JSON gameMode: " + mode + ", isLocalMultiplayer: " + isLocalMultiplayer);
+                    return isLocalMultiplayer;
                 }
             }
         } catch (Exception e) {
