@@ -9,6 +9,7 @@ import launcher.gui.GDKGameLobbyController;
 import launcher.utils.ModuleCompiler;
 import launcher.utils.ModuleDiscovery;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.lifecycle.stop.Shutdown;
 
 import java.io.File;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
  * 
  * @author Clement Luo
  * @date August 9, 2025
- * @edited August 12, 2025
+ * @edited August 13, 2025
  * @since 1.0
  */
 public final class StartupOperations {
@@ -138,6 +139,59 @@ public final class StartupOperations {
     public static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
         int totalSteps = windowManager.getTotalSteps();
         
+        // Step 1: Initialize startup window
+        Logging.info("🔄 Initializing startup window...");
+        windowManager.updateProgress(1, "Initializing startup window...");
+        
+        // Add delay so user can read the message
+        // addDevelopmentDelay("Step 1 completed - waiting for user to read");
+        
+        // Step 2: Discover available modules
+        Logging.info("🔍 Discovering available modules...");
+        windowManager.updateProgress(2, "Discovering available modules...");
+        
+        // Add delay so user can read the message
+        // addDevelopmentDelay("Step 2 completed - waiting for user to read");
+        
+        // Step 3: Load discovered modules
+        Logging.info("📦 Loading discovered modules...");
+        windowManager.updateProgress(3, "Loading discovered modules...");
+        
+        // Add delay so user can read the message
+        // addDevelopmentDelay("Step 3 completed - waiting for user to read");
+        
+        // Step 4: Validate module compilation
+        Logging.info("✅ Validating module compilation...");
+        windowManager.updateProgress(4, "Validating module compilation...");
+        
+        // Add delay so user can read the message
+        // addDevelopmentDelay("Step 4 completed - waiting for user to read");
+        
+        // Step 5: Check for compilation failures
+        Logging.info("🚀 Checking for compilation failures on startup...");
+        windowManager.updateProgress(5, "Checking for compilation failures...");
+        
+        // Add delay so user can read the message
+        // addDevelopmentDelay("Step 5 completed - waiting for user to read");
+        
+        // Step 6: Startup complete
+        Logging.info("📊 Startup complete");
+        windowManager.updateProgress(6, "Startup complete");
+        
+        // Add delay so user can read the message
+        // addDevelopmentDelay("Step 6 completed - waiting for user to read");
+        
+        // Step 7: Ready!
+        Logging.info("📊 Ready!");
+        windowManager.updateProgress(7, "Ready!");
+        
+        // Add final delay so user can read the "Ready!" message
+        // addDevelopmentDelay("Step 7 completed - waiting for user to read 'Ready!' message");
+        
+        // Add a 3-second delay before opening the GUI
+        Logging.info("⏳ Adding 3-second delay before opening GUI for development...");
+        // addDevelopmentDelay("Final delay before GUI opens");
+        
         // Run module loading on background thread to prevent UI blocking
         Thread moduleLoadingThread = new Thread(() -> {
             try {
@@ -152,7 +206,7 @@ public final class StartupOperations {
                             lobbyController.refreshAvailableGameModulesFast();
                         }
                     } catch (Exception e) {
-                        Logging.error("❌ Error refreshing game modules: " + e.getMessage(), e);
+                        Logging.error("❌ Error refreshing game modules: " + e.getMessage());
                     }
                 });
                 
@@ -164,7 +218,7 @@ public final class StartupOperations {
                             lobbyController.checkStartupCompilationFailures();
                         }
                     } catch (Exception e) {
-                        Logging.error("❌ Error checking compilation issues: " + e.getMessage(), e);
+                        Logging.error("❌ Error checking compilation issues: " + e.getMessage());
                     }
                 });
                 
@@ -176,50 +230,43 @@ public final class StartupOperations {
                 Logging.info("✅ Module loading thread completed successfully");
                 
             } catch (Exception e) {
-                Logging.error("💥 Critical error in module loading thread: " + e.getMessage(), e);
-                Platform.runLater(() -> {
-                    windowManager.updateProgress(totalSteps - 2, "Error during startup - continuing...");
-                    windowManager.updateProgress(totalSteps - 1, "Startup complete");
-                    windowManager.updateProgress(totalSteps, "Ready!");
-                });
+                Logging.error("💥 Critical error in module loading thread: " + e.getMessage());
             }
         });
         
-        // Set thread name for debugging
-        moduleLoadingThread.setName("ModuleLoadingThread");
-        moduleLoadingThread.setDaemon(true);
-        
-        // Register the thread with the shutdown system for proper cleanup
-        launcher.lifecycle.stop.Shutdown.registerCleanupTask(() -> {
+        // Register the module loading thread for cleanup
+        Shutdown.registerCleanupTask(() -> {
             Logging.info("🧹 Cleaning up module loading thread...");
             if (moduleLoadingThread.isAlive()) {
-                try {
-                    moduleLoadingThread.interrupt();
-                    moduleLoadingThread.join(2000); // Wait up to 2 seconds
-                    if (moduleLoadingThread.isAlive()) {
-                        Logging.warning("⚠️ Module loading thread did not terminate gracefully");
-                    }
-                } catch (InterruptedException e) {
-                    Logging.info("🧹 Module loading thread cleanup interrupted");
-                }
+                moduleLoadingThread.interrupt();
             }
         });
         
-        // Start the background thread
-        Logging.info("🚀 Starting module loading background thread");
+        // Start the module loading thread
         moduleLoadingThread.start();
         
-        // Register StartupWindowManager cleanup
-        launcher.lifecycle.stop.Shutdown.registerCleanupTask(() -> {
+        // Register the StartupWindowManager for cleanup
+        Shutdown.registerCleanupTask(() -> {
             Logging.info("🧹 Cleaning up StartupWindowManager...");
-            try {
-                if (windowManager != null) {
-                    windowManager.hide();
-                }
-            } catch (Exception e) {
-                Logging.error("❌ Error cleaning up StartupWindowManager: " + e.getMessage(), e);
+            if (windowManager != null) {
+                windowManager.hide();
             }
         });
+    }
+    
+    /**
+     * Add a development delay to slow down the startup process so users can read each message.
+     * This method adds a 5-second delay with logging to make it clear what's happening.
+     */
+    private static void addDevelopmentDelay(String reason) {
+        Logging.info("⏳ DEVELOPMENT DELAY: " + reason + " - waiting 5 seconds...");
+        try {
+            Thread.sleep(5000); // 5-second delay for development
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Logging.info("⏳ Development delay interrupted");
+        }
+        Logging.info("✅ Development delay completed for: " + reason);
     }
 
     public static void showMainStageWithFade(Stage primaryApplicationStage, StartupWindowManager windowManager) {

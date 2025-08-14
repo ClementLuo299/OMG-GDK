@@ -16,8 +16,6 @@
     <modules>
         <module>gdk</module>
         <module>launcher</module>
-        <module>modules/tictactoe</module>
-        <module>modules/chatroom</module>
     </modules>
 
     <properties>

@@ -15,7 +15,7 @@ import gdk.Logging;
  * 
  * @authors Clement Luo
  * @date August 12, 2025
- * @edited August 12, 2025
+ * @edited August 13, 2025
  * @since 1.0
  */
 public class StartupWindowManager {
@@ -90,6 +90,21 @@ public class StartupWindowManager {
         }
     }
     
+    /**
+     * Update progress with a delay to slow down the progress bar animation.
+     * This method schedules the progress update after a delay without blocking the UI.
+     */
+    public void updateProgressWithDelay(int step, String message, int delayMs) {
+        Timer delayTimer = new Timer();
+        delayTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updateProgress(step, message);
+                delayTimer.cancel(); // Clean up the timer
+            }
+        }, delayMs);
+    }
+    
     private void updateProgressInternal(int step, String message) {
         currentStep.set(step);
         progressWindow.updateProgress(step, message);
@@ -153,7 +168,7 @@ public class StartupWindowManager {
         progressAnimationTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                shimmerOffset += 0.1f;
+                shimmerOffset += 0.02f; // Much slower shimmer movement for development
                 if (shimmerOffset > 1.0f) {
                     shimmerOffset = 0.0f;
                 }
@@ -164,7 +179,7 @@ public class StartupWindowManager {
                     progressWindow.repaintProgressBar();
                 });
             }
-        }, 0, 50);
+        }, 0, 500); // Much slower animation (500ms instead of 200ms) for development
     }
     
     public int getCurrentStep() {
