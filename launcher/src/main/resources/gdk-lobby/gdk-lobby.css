@@ -709,7 +709,51 @@
     -fx-pref-width: 100%;
     -fx-min-width: 600px;
     -fx-alignment: center;
-    -fx-padding: 15 20 15 20;
+    -fx-padding: 3 20 15 20;
+}
+
+/* Force consistent spacing for game config panel children */
+.game-config-panel > *:nth-child(1) {
+    -fx-min-height: 15px !important;
+    -fx-pref-height: 15px !important;
+    -fx-max-height: 15px !important;
+}
+
+.game-config-panel > *:nth-child(2) {
+    -fx-min-height: 65px !important;
+    -fx-pref-height: 65px !important;
+    -fx-max-height: 65px !important;
+}
+
+.game-config-panel > *:nth-child(3) {
+    -fx-min-height: 15px !important;
+    -fx-pref-height: 15px !important;
+    -fx-max-height: 15px !important;
+}
+
+.game-config-panel > *:nth-child(5) {
+    -fx-min-height: 80px !important;
+    -fx-pref-height: 80px !important;
+    -fx-max-height: 80px !important;
+}
+
+/* Specific CSS classes for fixed height elements */
+.fixed-top-spacer {
+    -fx-min-height: 15px !important;
+    -fx-pref-height: 15px !important;
+    -fx-max-height: 15px !important;
+}
+
+.fixed-game-selector {
+    -fx-min-height: 65px !important;
+    -fx-pref-height: 65px !important;
+    -fx-max-height: 65px !important;
+}
+
+.fixed-middle-spacer {
+    -fx-min-height: 15px !important;
+    -fx-pref-height: 15px !important;
+    -fx-max-height: 15px !important;
 }
 
 /* Fixed height containers */
