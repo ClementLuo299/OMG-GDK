@@ -705,10 +705,24 @@
     -fx-background-color: rgba(255, 255, 255, 0.9);
     -fx-background-radius: 10;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
-    -fx-min-height: 300px;
+    -fx-min-height: 200px;
     -fx-pref-width: 100%;
     -fx-min-width: 600px;
     -fx-alignment: center;
+    -fx-padding: 15 20 15 20;
+}
+
+/* Fixed height containers */
+.fixed-height-game-selector {
+    -fx-min-height: 65px;
+    -fx-pref-height: 65px;
+    -fx-max-height: 65px;
+}
+
+.fixed-height-controls {
+    -fx-min-height: 80px;
+    -fx-pref-height: 80px;
+    -fx-max-height: 80px;
 }
 
 /* Game Picker Container */
@@ -716,7 +730,6 @@
     -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
     -fx-font-family: 'Segoe UI', Arial, sans-serif;
     -fx-pref-width: 1200px;
-    -fx-pref-height: 900px;
 }
 
 /* Header */
@@ -893,7 +906,7 @@
     -fx-border-color: #17a2b8;
     -fx-border-width: 1;
     -fx-border-radius: 5;
-    -fx-pref-height: 250px;
+    -fx-pref-height: 200px;
     -fx-min-height: 150px;
 }
 

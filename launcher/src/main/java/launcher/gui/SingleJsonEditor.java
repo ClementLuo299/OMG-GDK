@@ -49,7 +49,7 @@ import launcher.utils.DialogUtil;
  * 
  * @author: Clement Luo
  * @date: August 5, 2025
- * @edited: August 6, 2025
+ * @edited: August 16, 2025
  * @since: 1.0
  */
 public class SingleJsonEditor extends VBox {
@@ -120,9 +120,10 @@ public class SingleJsonEditor extends VBox {
         codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
         codeArea.setWrapText(true);
         
-        // Set preferred size
-        codeArea.setPrefHeight(200);
+        // Set preferred width (height will expand automatically)
         codeArea.setPrefWidth(600);
+        // Remove fixed height to allow vertical expansion
+        codeArea.setMinHeight(100); // Set minimum height instead
         
         // Apply CSS class for styling
         codeArea.getStyleClass().add("code-area");

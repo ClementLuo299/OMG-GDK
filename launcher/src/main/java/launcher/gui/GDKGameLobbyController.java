@@ -73,7 +73,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 11, 2025       
+ * @edited August 16, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -102,6 +102,7 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button sendMessageButton;
     @FXML private JFXToggleButton jsonPersistenceToggle;
     @FXML private JFXToggleButton autoLaunchToggle;
+    @FXML private JFXToggleButton autoSelectGameToggle;
     
     // Application Control Components
     @FXML private Button exitButton;
@@ -178,6 +179,7 @@ public class GDKGameLobbyController implements Initializable {
     private static final String PERSISTENCE_TOGGLE_FILE = "saved/gdk-persistence-toggle.txt";
     private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
     private static final String AUTO_LAUNCH_ENABLED_FILE = "saved/gdk-auto-launch-enabled.txt";
+    private static final String AUTO_SELECT_ENABLED_FILE = "saved/gdk-auto-select-enabled.txt";
 
     // ==================== INITIALIZATION ====================
     
@@ -312,9 +314,21 @@ public class GDKGameLobbyController implements Initializable {
         jsonInputEditorContainer.getChildren().add(jsonInputEditor);
         jsonOutputEditorContainer.getChildren().add(jsonOutputEditor);
         
+        // Configure JSON editors to expand properly
+        jsonInputEditor.setMinHeight(400);
+        jsonInputEditor.setPrefHeight(450);
+        jsonInputEditor.setMaxHeight(800);
+        jsonOutputEditor.setMinHeight(400);
+        jsonOutputEditor.setPrefHeight(450);
+        jsonOutputEditor.setMaxHeight(800);
+        
+        // Configure containers to allow reasonable expansion
+        jsonInputEditorContainer.setMaxHeight(800);
+        jsonOutputEditorContainer.setMaxHeight(800);
+        
         // Message area is ready for user feedback
         
-        // Log successful UI initialization for debugging purposes
+                // Log successful UI initialization for debugging purposes
         Logging.info("🎨 UI components initialized");
     }
 
@@ -545,6 +559,24 @@ public class GDKGameLobbyController implements Initializable {
                 addUserMessage("🚀 Auto-launch enabled - games will launch directly on startup");
             } else {
                 addUserMessage("🚀 Auto-launch disabled - GDK interface will show on startup");
+            }
+        });
+        
+        // Auto-Select Game Toggle Handler
+        // Save auto-select state when changed
+        autoSelectGameToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            // Skip messages during startup loading
+            if (isLoadingPersistenceSettings) {
+                return;
+            }
+            
+            boolean isEnabled = newValue;
+            saveAutoSelectToggleState();
+            
+            if (isEnabled) {
+                addUserMessage("🎮 Auto-select enabled - games will auto-select on startup");
+            } else {
+                addUserMessage("🎮 Auto-select disabled - GDK interface will show on startup");
             }
         });
         
@@ -1845,6 +1877,9 @@ public class GDKGameLobbyController implements Initializable {
             // Load auto-launch toggle state
             loadAutoLaunchToggleState();
             
+            // Load auto-select toggle state
+            loadAutoSelectToggleState();
+            
             // Load saved JSON content if persistence is enabled
             if (jsonPersistenceToggle.isSelected()) {
                 loadSavedJsonContent();
@@ -1906,6 +1941,29 @@ public class GDKGameLobbyController implements Initializable {
             Logging.error("❌ Error loading auto-launch toggle state: " + e.getMessage(), e);
             // Default to disabled on error
             autoLaunchToggle.setSelected(false);
+        }
+    }
+    
+    /**
+     * Load the auto-select toggle state from file.
+     */
+    private void loadAutoSelectToggleState() {
+        try {
+            Path toggleFile = Paths.get(AUTO_SELECT_ENABLED_FILE);
+            if (Files.exists(toggleFile)) {
+                String toggleState = Files.readString(toggleFile).trim();
+                boolean isEnabled = Boolean.parseBoolean(toggleState);
+                autoSelectGameToggle.setSelected(isEnabled);
+                // No startup message - only show when setting changes
+            } else {
+                // Default to disabled if no saved state
+                autoSelectGameToggle.setSelected(false);
+                // No startup message - only show when setting changes
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error loading auto-select toggle state: " + e.getMessage(), e);
+            // Default to disabled on error
+            autoSelectGameToggle.setSelected(false);
         }
     }
     
@@ -1990,6 +2048,21 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
+     * Save auto-select toggle state to file.
+     */
+    private void saveAutoSelectToggleState() {
+        try {
+            ensureSavedDirectoryExists();
+            boolean isEnabled = autoSelectGameToggle.isSelected();
+            Path toggleFile = Paths.get(AUTO_SELECT_ENABLED_FILE);
+            Files.writeString(toggleFile, String.valueOf(isEnabled));
+            Logging.info("📋 Saved auto-select toggle state: " + (isEnabled ? "enabled" : "disabled"));
+        } catch (Exception e) {
+            Logging.error("❌ Error saving auto-select toggle state: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
      * Clear the JSON persistence file.
      * 
      * This method removes the saved JSON content file when
@@ -2024,6 +2097,11 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void loadPersistedSelectedGame() {
         try {
+            // Only auto-select if the toggle is enabled
+            if (!autoSelectGameToggle.isSelected()) {
+                return;
+            }
+            
             java.nio.file.Path p = java.nio.file.Paths.get(SELECTED_GAME_FILE);
             if (!java.nio.file.Files.exists(p)) return;
             String gameName = java.nio.file.Files.readString(p).trim();
@@ -2032,7 +2110,7 @@ public class GDKGameLobbyController implements Initializable {
                 if (gameName.equals(gm.getGameName())) {
                     selectedGameModule = gm;
                     gameSelector.getSelectionModel().select(gm);
-                    addUserMessage("📌 Restored selected game: " + gameName);
+                    addUserMessage("📌 Auto-selected game: " + gameName);
                     break;
                 }
             }
@@ -2045,6 +2123,11 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void restorePreviouslySelectedGame() {
         try {
+            // Only auto-select if the toggle is enabled
+            if (!autoSelectGameToggle.isSelected()) {
+                return;
+            }
+            
             java.nio.file.Path p = java.nio.file.Paths.get(SELECTED_GAME_FILE);
             if (!java.nio.file.Files.exists(p)) return;
             String gameName = java.nio.file.Files.readString(p).trim();
@@ -2055,8 +2138,8 @@ public class GDKGameLobbyController implements Initializable {
                 if (gameName.equals(gm.getGameName())) {
                     selectedGameModule = gm;
                     gameSelector.getSelectionModel().select(gm);
-                    addUserMessage("📌 Restored previously selected game: " + gameName);
-                    Logging.info("📌 Restored previously selected game: " + gameName);
+                    addUserMessage("📌 Auto-selected previously played game: " + gameName);
+                    Logging.info("📌 Auto-selected previously played game: " + gameName);
                     break;
                 }
             }
@@ -2078,6 +2161,9 @@ public class GDKGameLobbyController implements Initializable {
             
             // Save auto-launch toggle state
             saveAutoLaunchToggleState();
+            
+            // Save auto-select toggle state
+            saveAutoSelectToggleState();
             
             // Save selected game
             if (selectedGameModule != null) {

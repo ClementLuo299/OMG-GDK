@@ -11,7 +11,7 @@
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
-<VBox fx:id="mainContainer" prefHeight="900.0" prefWidth="1200.0" 
+<VBox fx:id="mainContainer" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
                        fx:controller="launcher.gui.GDKGameLobbyController"
       styleClass="game-picker-container" spacing="0" alignment="TOP_LEFT">
@@ -35,62 +35,87 @@
     <!-- Main Content Area -->
     <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
         
-        <!-- Centered Game Configuration Panel -->
-        <VBox styleClass="game-config-panel" spacing="15" alignment="TOP_CENTER" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS" minWidth="500">
+                <!-- Centered Game Configuration Panel -->
+        <BorderPane styleClass="game-config-panel" HBox.hgrow="ALWAYS" minWidth="500" minHeight="500">
             <padding>
-                <Insets top="10" right="20" bottom="10" left="20"/>
+                <Insets top="12" right="20" bottom="15" left="20"/>
             </padding>
             
-            <!-- Game Selection and Launch Button -->
-            <HBox alignment="CENTER_LEFT" spacing="20" VBox.vgrow="NEVER">
-                <Label text="Select Game:" styleClass="field-label"/>
-                <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
-                         styleClass="combo-box" prefWidth="400" 
-                         style="-fx-min-height: 45; -fx-max-height: 45; -fx-pref-height: 45;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="launchGameButton" text="Launch Game" 
-                        styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only;"/>
-            </HBox>
+            <!-- TOP: Game Selection and Launch Button - Fixed Height -->
+            <top>
+                <VBox spacing="0" VBox.vgrow="NEVER">
+                    <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px;">
+                        <Label text="Select Game:" styleClass="field-label" style="-fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
+                        <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
+                                 styleClass="combo-box" prefWidth="400" 
+                                 style="-fx-min-height: 45px; -fx-max-height: 45px; -fx-pref-height: 45px;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="launchGameButton" text="Launch Game" 
+                                styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
+                    </HBox>
+                    <!-- Bottom margin for visual separation -->
+                    <Region VBox.vgrow="NEVER" style="-fx-min-height: 15px; -fx-pref-height: 15px; -fx-max-height: 15px;"/>
+                </VBox>
+            </top>
             
-            <!-- JSON Editors Side by Side -->
-            <HBox spacing="15" VBox.vgrow="ALWAYS">
-                <!-- JSON Input Editor -->
-                <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS"/>
-                
-                <!-- JSON Output Editor -->
-                <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS"/>
-            </HBox>
+            <!-- CENTER: JSON Editors Side by Side - Growable -->
+            <center>
+                <VBox spacing="10" VBox.vgrow="ALWAYS">
+                    <!-- Spacer to prevent overlap -->
+                    <Region VBox.vgrow="NEVER" style="-fx-min-height: 10px; -fx-pref-height: 10px; -fx-max-height: 10px;"/>
+                    
+                    <!-- JSON Editors -->
+                    <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450">
+                        <!-- JSON Input Editor -->
+                        <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
+                        
+                        <!-- JSON Output Editor -->
+                        <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
+                    </HBox>
+                </VBox>
+            </center>
             
-            <!-- Control Buttons -->
-            <HBox spacing="10" alignment="CENTER_LEFT" VBox.vgrow="NEVER" styleClass="button-grid">
-                <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button"/>
-                <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
-                <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
-                <Button fx:id="clearOutputButton2" text="Clear Output" styleClass="small-button"/>
-            </HBox>
-            
-            <!-- JSON Persistence Toggle -->
-            <HBox alignment="CENTER_LEFT" spacing="2" VBox.vgrow="NEVER" style="-fx-min-height: 20; -fx-max-height: 20;">
-                <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
-                <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true" styleClass="jfoenix-toggle"/>
-            </HBox>
-            
-            <!-- Auto-Launch Toggle -->
-            <HBox alignment="CENTER_LEFT" spacing="2" VBox.vgrow="NEVER" style="-fx-min-height: 20; -fx-max-height: 20;">
-                <Label text="Auto-Launch Game" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
-                <JFXToggleButton fx:id="autoLaunchToggle" selected="false" styleClass="jfoenix-toggle"/>
-            </HBox>
-        </VBox>
+            <!-- BOTTOM: Control Buttons and Toggles - Fixed Height -->
+            <bottom>
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-min-height: 80px; -fx-pref-height: 80px; -fx-max-height: 80px;">
+                    <!-- Control Buttons -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="button-grid">
+                        <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button"/>
+                        <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
+                        <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
+                        <Button fx:id="clearOutputButton2" text="Clear Output" styleClass="small-button"/>
+                    </HBox>
+                    
+                    <Region HBox.hgrow="ALWAYS"/>
+                    
+                    <!-- Toggle Switches - Side by Side -->
+                    <HBox spacing="30" alignment="CENTER_LEFT">
+                        <!-- JSON Persistence Toggle -->
+                        <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                            <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
+                            <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true" styleClass="jfoenix-toggle"/>
+                        </HBox>
+                        
+                        <!-- Auto-Launch Toggle -->
+                        <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                            <Label text="Auto-Launch Game" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
+                            <JFXToggleButton fx:id="autoLaunchToggle" selected="false" styleClass="jfoenix-toggle"/>
+                        </HBox>
+                        
+                        <!-- Auto-Select Game Toggle -->
+                        <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                            <Label text="Auto-Select Game" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
+                            <JFXToggleButton fx:id="autoSelectGameToggle" selected="false" styleClass="jfoenix-toggle"/>
+                        </HBox>
+                    </HBox>
+                </HBox>
+            </bottom>
+        </BorderPane>
         
-        <!-- Divider -->
-        <HBox alignment="CENTER" VBox.vgrow="NEVER">
-            <Region style="-fx-background-color: #dee2e6; -fx-min-height: 1; -fx-pref-width: 100%;"/>
-        </HBox>
-        
-        <!-- Message Area -->
-        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400">
+        <!-- Message Area - Fixed Height -->
+        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" prefHeight="250">
             <Label text="Messages" styleClass="section-title"/>
-            <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane">
+            <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane" prefHeight="200">
                 <VBox fx:id="messageContainer" spacing="5" styleClass="message-container"/>
             </ScrollPane>
         </VBox>
