@@ -35,81 +35,63 @@
     <!-- Main Content Area -->
     <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
         
-                        <!-- Centered Game Configuration Panel -->
-        <AnchorPane styleClass="game-config-panel" HBox.hgrow="ALWAYS" minWidth="500" minHeight="500">
-            <padding>
-                <Insets top="2" right="3" bottom="8" left="3"/>
-            </padding>
+        <!-- Game Selection and Launch Button - Right beneath top bar -->
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="game-selector-row" minWidth="800" prefWidth="1000"
+              style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px; -fx-min-width: 800px; -fx-pref-width: 1000px; -fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10; -fx-border-color: #007bff; -fx-border-width: 1; -fx-border-radius: 10; -fx-padding: 10;">
+            <Label text="Select Game:" style="-fx-text-fill: #212529; -fx-font-size: 16px; -fx-font-weight: bold; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
+            <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
+                     prefWidth="400" 
+                     style="-fx-min-height: 45px; -fx-max-height: 45px; -fx-pref-height: 45px; -fx-background-color: #ffffff; -fx-text-fill: #212529; -fx-border-color: #ced4da; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12; -fx-font-size: 12px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="launchGameButton" text="Launch Game" 
+                    style="-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px; -fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 10 20; -fx-min-width: 120;"/>
+        </HBox>
+        
+        <!-- JSON Input Area - Right below game selector row -->
+        <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450" minWidth="800" prefWidth="1000" styleClass="json-input-area"
+              style="-fx-min-height: 400px; -fx-pref-height: 450px; -fx-min-width: 800px; -fx-pref-width: 1000px; -fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10; -fx-border-color: #007bff; -fx-border-width: 1; -fx-border-radius: 10; -fx-padding: 15;">
+            <!-- JSON Input Editor -->
+            <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
             
-            <!-- Top Spacer - Fixed Position -->
-            <Region styleClass="fixed-top-spacer" 
-                    AnchorPane.topAnchor="2" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="5"
-                    style="-fx-min-height: 5px; -fx-pref-height: 5px; -fx-max-height: 5px;"/>
-            
-            <!-- Game Selection and Launch Button - Fixed Position -->
-            <HBox styleClass="fixed-game-selector" alignment="CENTER_LEFT" spacing="20"
-                  AnchorPane.topAnchor="7" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="5"
-                  style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px;">
-                <Label text="Select Game:" styleClass="field-label" style="-fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
-                <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
-                         styleClass="combo-box" prefWidth="400" 
-                         style="-fx-min-height: 45px; -fx-max-height: 45px; -fx-pref-height: 45px;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="launchGameButton" text="Launch Game" 
-                        styleClass="primary-button" style="-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
+            <!-- JSON Output Editor -->
+            <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
+        </HBox>
+        
+        <!-- Control Buttons and Toggles - Below JSON input area -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="control-section" minWidth="800" prefWidth="1000"
+              style="-fx-min-height: 80px; -fx-pref-height: 80px; -fx-max-height: 80px; -fx-min-width: 800px; -fx-pref-width: 1000px; -fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10; -fx-border-color: #007bff; -fx-border-width: 1; -fx-border-radius: 10; -fx-padding: 10;">
+            <!-- Control Buttons -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="clearInputButton" text="Clear Input" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
+                <Button fx:id="metadataRequestButton" text="Request Metadata" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
+                <Button fx:id="sendMessageButton" text="Send Message" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
+                <Button fx:id="clearOutputButton2" text="Clear Output" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
             </HBox>
             
-            <!-- Middle Spacer - Fixed Position -->
-            <Region styleClass="fixed-middle-spacer"
-                    AnchorPane.topAnchor="72" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="5"
-                    style="-fx-min-height: 5px; -fx-pref-height: 5px; -fx-max-height: 5px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
             
-            <!-- JSON Editors - Growable but Fixed Top Position -->
-            <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"
-                  AnchorPane.topAnchor="77" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="5" AnchorPane.bottomAnchor="88">
-                <!-- JSON Input Editor -->
-                <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
-                
-                <!-- JSON Output Editor -->
-                <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
-            </HBox>
-            
-            <!-- Control Buttons and Toggles - Fixed Position -->
-            <HBox spacing="10" alignment="CENTER_LEFT" 
-                  AnchorPane.bottomAnchor="15" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="5"
-                  style="-fx-min-height: 80px; -fx-pref-height: 80px; -fx-max-height: 80px;">
-                <!-- Control Buttons -->
-                <HBox spacing="10" alignment="CENTER_LEFT" styleClass="button-grid">
-                    <Button fx:id="clearInputButton" text="Clear Input" styleClass="small-button"/>
-                    <Button fx:id="metadataRequestButton" text="Request Metadata" styleClass="small-button"/>
-                    <Button fx:id="sendMessageButton" text="Send Message" styleClass="small-button"/>
-                    <Button fx:id="clearOutputButton2" text="Clear Output" styleClass="small-button"/>
+            <!-- Toggle Switches - Side by Side -->
+            <HBox spacing="30" alignment="CENTER_LEFT" 
+                  style="-fx-min-height: 40px; -fx-pref-height: 40px; -fx-max-height: 40px;">
+                <!-- JSON Persistence Toggle -->
+                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                    <Label text="Save JSON" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
+                    <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true"/>
                 </HBox>
                 
-                <Region HBox.hgrow="ALWAYS"/>
+                <!-- Auto-Launch Toggle -->
+                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                    <Label text="Auto-Launch Game" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
+                    <JFXToggleButton fx:id="autoLaunchToggle" selected="false"/>
+                </HBox>
                 
-                <!-- Toggle Switches - Side by Side -->
-                <HBox spacing="30" alignment="CENTER_LEFT">
-                    <!-- JSON Persistence Toggle -->
-                    <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
-                        <Label text="Save JSON" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
-                        <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true" styleClass="jfoenix-toggle"/>
-                    </HBox>
-                    
-                    <!-- Auto-Launch Toggle -->
-                    <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
-                        <Label text="Auto-Launch Game" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
-                        <JFXToggleButton fx:id="autoLaunchToggle" selected="false" styleClass="jfoenix-toggle"/>
-                    </HBox>
-                    
-                    <!-- Auto-Select Game Toggle -->
-                    <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
-                        <Label text="Auto-Select Game" style="-fx-font-weight: bold;" styleClass="toggle-label"/>
-                        <JFXToggleButton fx:id="autoSelectGameToggle" selected="false" styleClass="jfoenix-toggle"/>
-                    </HBox>
+                <!-- Auto-Select Game Toggle -->
+                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                    <Label text="Auto-Select Game" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
+                    <JFXToggleButton fx:id="autoSelectGameToggle" selected="false"/>
                 </HBox>
             </HBox>
-        </AnchorPane>
+        </HBox>
         
         <!-- Message Area - Fixed Height -->
         <VBox styleClass="message-panel" spacing="5" VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" prefHeight="250">

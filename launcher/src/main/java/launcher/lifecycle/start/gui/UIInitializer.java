@@ -3,6 +3,8 @@ package launcher.lifecycle.start.gui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
@@ -10,13 +12,14 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import gdk.Logging;
 
 import java.net.URL;
+import javafx.application.Platform;
 
 /**
  * Initializes the main user interface components.
  * 
  * @author Clement Luo
  * @date August 8, 2025
- * @edited August 12, 2025
+ * @edited August 18, 2025
  * @since 1.0
  */
 public final class UIInitializer {
@@ -89,6 +92,96 @@ public final class UIInitializer {
                     Logging.error("❌ Error during shutdown: " + e.getMessage(), e);
                     // Force exit if shutdown fails
                     System.exit(1);
+                }
+            });
+            
+            // Lightweight resize performance optimization - doesn't change layout
+            primaryApplicationStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+                // Add performance class during resize
+                mainLobbyScene.getRoot().getStyleClass().add("resize-active");
+                
+                // Use JavaFX's built-in resize optimization
+                Platform.runLater(() -> {
+                    // Reduce layout complexity during resize
+                    mainLobbyScene.getRoot().setCache(true);
+                    mainLobbyScene.getRoot().setCacheHint(javafx.scene.CacheHint.SPEED);
+                });
+                
+                // Remove after a short delay to re-enable effects
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(150));
+                pause.setOnFinished(event -> {
+                    mainLobbyScene.getRoot().getStyleClass().remove("resize-active");
+                    
+                    // Restore normal rendering after resize
+                    Platform.runLater(() -> {
+                        mainLobbyScene.getRoot().setCache(false);
+                    });
+                });
+                pause.play();
+            });
+            
+            primaryApplicationStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+                // Add performance class during resize
+                mainLobbyScene.getRoot().getStyleClass().add("resize-active");
+                
+                // Use JavaFX's built-in resize optimization
+                Platform.runLater(() -> {
+                    // Reduce layout complexity during resize
+                    mainLobbyScene.getRoot().setCache(true);
+                    mainLobbyScene.getRoot().setCacheHint(javafx.scene.CacheHint.SPEED);
+                });
+                
+                // Remove after a short delay to re-enable effects
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(150));
+                pause.setOnFinished(event -> {
+                    mainLobbyScene.getRoot().getStyleClass().remove("resize-active");
+                    
+                    // Restore normal rendering after resize
+                    Platform.runLater(() -> {
+                        mainLobbyScene.getRoot().setCache(false);
+                    });
+                });
+                pause.play();
+            });
+            
+            // Enable hardware acceleration for better performance
+            try {
+                // Force hardware acceleration
+                System.setProperty("prism.order", "d3d,opengl,sw");
+                System.setProperty("prism.vsync", "false");
+                System.setProperty("prism.forceGPU", "true");
+                System.setProperty("prism.text", "native");
+                
+                // Optimize JavaFX rendering
+                System.setProperty("javafx.animation.fullspeed", "true");
+                System.setProperty("javafx.animation.pulse", "60");
+                System.setProperty("javafx.animation.force", "false");
+                
+                // Disable expensive features during resize
+                System.setProperty("prism.disableRegionCaching", "true");
+                System.setProperty("prism.disableBlending", "false");
+                
+                // Additional optimizations for better resize performance
+                System.setProperty("prism.verbose", "false");
+                System.setProperty("prism.debug", "false");
+                System.setProperty("prism.trace", "false");
+                
+                Logging.info("🚀 Hardware acceleration and performance optimizations enabled");
+            } catch (Exception e) {
+                Logging.warning("⚠️ Could not enable hardware acceleration: " + e.getMessage());
+            }
+            
+            // Optimize the main layout container for better resize performance
+            Platform.runLater(() -> {
+                // Enable caching for the main container
+                mainLobbyScene.getRoot().setCache(true);
+                mainLobbyScene.getRoot().setCacheHint(javafx.scene.CacheHint.SPEED);
+                
+                // Optimize specific containers that might cause slowdown
+                if (mainLobbyScene.getRoot() instanceof javafx.scene.layout.VBox) {
+                    javafx.scene.layout.VBox rootVBox = (javafx.scene.layout.VBox) mainLobbyScene.getRoot();
+                    rootVBox.setCache(true);
+                    rootVBox.setCacheHint(javafx.scene.CacheHint.SPEED);
                 }
             });
             

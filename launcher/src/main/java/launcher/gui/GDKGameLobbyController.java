@@ -73,7 +73,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 16, 2025       
+ * @edited August 18, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -268,6 +268,8 @@ public class GDKGameLobbyController implements Initializable {
     public void setViewModel(GDKViewModel applicationViewModel) {
         this.applicationViewModel = applicationViewModel;
     }
+    
+
 
     // ==================== USER INTERFACE SETUP ====================
     
@@ -502,8 +504,6 @@ public class GDKGameLobbyController implements Initializable {
                 }
             }).start();
         });
-        
-
         
         // Exit button: Close the entire application
         exitButton.setOnAction(event -> {

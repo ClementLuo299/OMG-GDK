@@ -2,6 +2,27 @@
 
 /* ==================== GDK GAME LOBBY STYLES ==================== */
 
+/* Game Selector Row - Positioned right beneath top bar */
+.game-selector-row {
+    -fx-padding: 10px 20px;
+    -fx-min-width: 800px;
+    -fx-pref-width: 1000px;
+}
+
+/* JSON Input Area - Below game selector */
+.json-input-area {
+    -fx-padding: 10px 20px;
+    -fx-min-width: 800px;
+    -fx-pref-width: 1000px;
+}
+
+/* Control Buttons and Toggles - Below JSON input */
+.control-section {
+    -fx-padding: 10px 20px;
+    -fx-min-width: 800px;
+    -fx-pref-width: 1000px;
+}
+
 /* Single JSON Editor Styles */
 .single-json-editor {
     -fx-background-color: #ffffff;
@@ -731,6 +752,12 @@
     -fx-max-height: 15px !important;
 }
 
+.game-config-panel > *:nth-child(4) {
+    -fx-min-height: 40px !important;
+    -fx-pref-height: 40px !important;
+    -fx-max-height: 40px !important;
+}
+
 .game-config-panel > *:nth-child(5) {
     -fx-min-height: 80px !important;
     -fx-pref-height: 80px !important;
@@ -756,6 +783,11 @@
     -fx-max-height: 15px !important;
 }
 
+.fixed-toggle-row {
+    -fx-min-height: 40px !important;
+    -fx-pref-height: 40px !important;
+}
+
 /* Fixed height containers */
 .fixed-height-game-selector {
     -fx-min-height: 65px;
@@ -767,6 +799,18 @@
     -fx-min-height: 80px;
     -fx-pref-height: 80px;
     -fx-max-height: 80px;
+}
+
+/* Fixed height for toggle switches row */
+.fixed-height-toggles {
+    -fx-min-height: 40px;
+    -fx-pref-height: 40px;
+}
+
+/* Fixed height for JSON input area - but allow growth */
+.fixed-height-json-input {
+    -fx-min-height: 200px;
+    -fx-pref-height: 200px;
 }
 
 /* Game Picker Container */
@@ -807,7 +851,7 @@
 
 /* iOS-style animated toggle switch with pill-shaped track */
 .persistence-toggle .box {
-    -fx-background-color: #e9ecef;
+    -fx-background-color: #6c757d;
     -fx-background-radius: 12;
     -fx-border-color: #6c757d;
     -fx-border-width: 3;
@@ -818,7 +862,7 @@
     -fx-max-height: 24;
     -fx-padding: 2;
     -fx-translate-x: 0;
-    -fx-transition: all 0.2s ease-in-out;
+    -fx-transition: translate-x 0.15s ease-out;
     -fx-alignment: center-left;
     -fx-vertical-alignment: center;
     -fx-content-display: graphic-only;
@@ -829,7 +873,7 @@
     -fx-border-color: #155724;
     -fx-border-width: 3;
     -fx-translate-x: 20;
-    -fx-transition: all 0.2s ease-in-out;
+    -fx-transition: translate-x 0.15s ease-out;
 }
 
 .persistence-toggle:hover .box {
@@ -854,14 +898,13 @@
     -fx-max-width: 20;
     -fx-max-height: 20;
     -fx-translate-x: 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0, 0, 1);
-    -fx-transition: translate-x 0.2s ease-in-out;
+    -fx-transition: translate-x 0.15s ease-out;
     -fx-shape: "";
 }
 
 .persistence-toggle:selected .mark {
     -fx-translate-x: 0;
-    -fx-transition: translate-x 0.2s ease-in-out;
+    -fx-transition: translate-x 0.15s ease-out;
     -fx-background-color: white;
 }
 
@@ -1203,3 +1246,53 @@
     -fx-font-size: 11px;
     -fx-padding: 0 8 0 8;
 }
+
+/* ==================== RESIZE PERFORMANCE OPTIMIZATIONS ==================== */
+/* These optimizations improve resize smoothness without changing the layout */
+
+/* Temporarily disable transitions during resize for smoother performance */
+.resize-active {
+    -fx-transition: none;
+}
+
+.resize-active * {
+    -fx-transition: none;
+}
+
+/* Optimize expensive effects during resize */
+.resize-active .game-config-panel,
+.resize-active .message-panel,
+.resize-active .status-bar {
+    -fx-effect: none;
+}
+
+.resize-active .button,
+.resize-active .combo-box,
+.resize-active .text-field {
+    -fx-effect: none;
+}
+
+/* Moderate optimizations for better performance */
+.resize-active .scroll-pane,
+.resize-active .scroll-pane .viewport {
+    -fx-effect: none;
+}
+
+.resize-active .json-text-area,
+.resize-active .code-area {
+    -fx-effect: none;
+}
+
+.resize-active .refresh-progress,
+.resize-active .loading-progress {
+    -fx-effect: none;
+}
+
+.resize-active .jfoenix-toggle,
+.resize-active .persistence-toggle .box,
+.resize-active .persistence-toggle .mark {
+    -fx-effect: none;
+}
+
+/* Re-enable effects after resize completes */
+
