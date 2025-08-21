@@ -33,11 +33,11 @@
     </HBox>
     
     <!-- Main Content Area -->
-    <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER">
+    <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER" style="-fx-background-color: white;">
         
         <!-- Game Selection and Launch Button - Right beneath top bar -->
         <HBox alignment="CENTER_LEFT" spacing="20" styleClass="game-selector-row" minWidth="800" prefWidth="1000"
-              style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px; -fx-min-width: 800px; -fx-pref-width: 1000px; -fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10; -fx-border-color: #007bff; -fx-border-width: 1; -fx-border-radius: 10; -fx-padding: 10;">
+              style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px; -fx-min-width: 800px; -fx-pref-width: 1000px;">
             <Label text="Select Game:" style="-fx-text-fill: #212529; -fx-font-size: 16px; -fx-font-weight: bold; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
             <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
                      prefWidth="400" 
@@ -48,18 +48,18 @@
         </HBox>
         
         <!-- JSON Input Area - Right below game selector row -->
-        <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450" minWidth="800" prefWidth="1000" styleClass="json-input-area"
-              style="-fx-min-height: 400px; -fx-pref-height: 450px; -fx-min-width: 800px; -fx-pref-width: 1000px; -fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10; -fx-border-color: #007bff; -fx-border-width: 1; -fx-border-radius: 10; -fx-padding: 15;">
+        <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minWidth="800" prefWidth="1000" styleClass="json-input-area"
+              style="-fx-min-width: 800px; -fx-pref-width: 1000px;">
             <!-- JSON Input Editor -->
-            <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
+            <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="0" style="-fx-margin: 0;"/>
             
             <!-- JSON Output Editor -->
-            <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minHeight="400" prefHeight="450"/>
+            <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="0" style="-fx-margin: 0;"/>
         </HBox>
         
         <!-- Control Buttons and Toggles - Below JSON input area -->
         <HBox spacing="10" alignment="CENTER_LEFT" styleClass="control-section" minWidth="800" prefWidth="1000"
-              style="-fx-min-height: 80px; -fx-pref-height: 80px; -fx-max-height: 80px; -fx-min-width: 800px; -fx-pref-width: 1000px; -fx-background-color: rgba(255, 255, 255, 0.9); -fx-background-radius: 10; -fx-border-color: #007bff; -fx-border-width: 1; -fx-border-radius: 10; -fx-padding: 10;">
+              style="-fx-min-height: 80px; -fx-pref-height: 80px; -fx-max-height: 80px; -fx-min-width: 800px; -fx-pref-width: 1000px;">
             <!-- Control Buttons -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Button fx:id="clearInputButton" text="Clear Input" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
@@ -93,10 +93,10 @@
             </HBox>
         </HBox>
         
-        <!-- Message Area - Fixed Height -->
-        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="NEVER" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" prefHeight="250">
+        <!-- Message Area - Allow growth but with minimum height -->
+        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="SOMETIMES" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" minHeight="200">
             <Label text="Messages" styleClass="section-title"/>
-            <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane" prefHeight="200">
+            <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane" minHeight="150">
                 <VBox fx:id="messageContainer" spacing="5" styleClass="message-container"/>
             </ScrollPane>
         </VBox>

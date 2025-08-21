@@ -23,6 +23,7 @@ import javafx.util.Duration;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.stage.Stage;
@@ -73,7 +74,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 18, 2025       
+ * @edited August 20, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -316,17 +317,21 @@ public class GDKGameLobbyController implements Initializable {
         jsonInputEditorContainer.getChildren().add(jsonInputEditor);
         jsonOutputEditorContainer.getChildren().add(jsonOutputEditor);
         
-        // Configure JSON editors to expand properly
-        jsonInputEditor.setMinHeight(400);
-        jsonInputEditor.setPrefHeight(450);
-        jsonInputEditor.setMaxHeight(800);
-        jsonOutputEditor.setMinHeight(400);
-        jsonOutputEditor.setPrefHeight(450);
-        jsonOutputEditor.setMaxHeight(800);
+        // Remove height constraints to allow natural growth
+        // jsonInputEditor.setMinHeight(200);
+        // jsonOutputEditor.setMinHeight(200);
         
         // Configure containers to allow reasonable expansion
-        jsonInputEditorContainer.setMaxHeight(800);
-        jsonOutputEditorContainer.setMaxHeight(800);
+        // jsonInputEditorContainer.setMinHeight(200);
+        // jsonOutputEditorContainer.setMinHeight(200);
+        
+        // Ensure containers can grow vertically
+        VBox.setVgrow(jsonInputEditorContainer, Priority.ALWAYS);
+        VBox.setVgrow(jsonOutputEditorContainer, Priority.ALWAYS);
+        
+        // Ensure the JSON editors themselves can grow within their containers
+        VBox.setVgrow(jsonInputEditor, Priority.ALWAYS);
+        VBox.setVgrow(jsonOutputEditor, Priority.ALWAYS);
         
         // Message area is ready for user feedback
         

@@ -49,7 +49,7 @@ import launcher.utils.DialogUtil;
  * 
  * @author: Clement Luo
  * @date: August 5, 2025
- * @edited: August 16, 2025
+ * @edited: August 20, 2025
  * @since: 1.0
  */
 public class SingleJsonEditor extends VBox {
@@ -122,8 +122,11 @@ public class SingleJsonEditor extends VBox {
         
         // Set preferred width (height will expand automatically)
         codeArea.setPrefWidth(600);
-        // Remove fixed height to allow vertical expansion
-        codeArea.setMinHeight(100); // Set minimum height instead
+        // Remove height constraints to allow natural growth
+        // codeArea.setMinHeight(150);
+        
+        // Remove any internal margins or padding
+        codeArea.setStyle("-fx-margin: 0; -fx-padding: 0;");
         
         // Apply CSS class for styling
         codeArea.getStyleClass().add("code-area");
@@ -174,7 +177,8 @@ public class SingleJsonEditor extends VBox {
      */
     private void createLayout() {
         setSpacing(0);
-        setPadding(new Insets(0));
+        // Remove hardcoded padding to let CSS handle it
+        // setPadding(new Insets(0));
         
         // Apply CSS class to the main container
         getStyleClass().add("single-json-editor");
@@ -455,5 +459,14 @@ public class SingleJsonEditor extends VBox {
             Label titleLabel = (Label) getChildren().get(0);
             titleLabel.setText(title);
         }
+    }
+    
+    /**
+     * Set the vertical growth priority for this editor.
+     * This allows the editor to grow within its parent container.
+     */
+    public void setVerticalGrowth(Priority priority) {
+        // This method will be called by the parent container to set growth priority
+        // The actual growth priority is set by the parent using VBox.setVgrow(this, priority)
     }
 } 
