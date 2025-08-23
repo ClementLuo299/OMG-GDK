@@ -111,8 +111,6 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button metadataRequestButton;
     @FXML private Button sendMessageButton;
     @FXML private JFXToggleButton jsonPersistenceToggle;
-    @FXML private JFXToggleButton autoLaunchToggle;
-    @FXML private JFXToggleButton autoSelectGameToggle;
     
     // Application Control Components
     @FXML private Button exitButton;
@@ -565,41 +563,7 @@ public class GDKGameLobbyController implements Initializable {
             }
         });
         
-        // Auto-Launch Toggle Handler
-        // Save auto-launch state when changed
-        autoLaunchToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            // Skip messages during startup loading
-            if (isLoadingPersistenceSettings) {
-                return;
-            }
-            
-            boolean isEnabled = newValue;
-            saveAutoLaunchToggleState();
-            
-            if (isEnabled) {
-                addUserMessage("🚀 Auto-launch enabled - games will launch directly on startup");
-            } else {
-                addUserMessage("🚀 Auto-launch disabled - GDK interface will show on startup");
-            }
-        });
-        
-        // Auto-Select Game Toggle Handler
-        // Save auto-select state when changed
-        autoSelectGameToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            // Skip messages during startup loading
-            if (isLoadingPersistenceSettings) {
-                return;
-            }
-            
-            boolean isEnabled = newValue;
-            saveAutoSelectToggleState();
-            
-            if (isEnabled) {
-                addUserMessage("🎮 Auto-select enabled - games will auto-select on startup");
-            } else {
-                addUserMessage("🎮 Auto-select disabled - GDK interface will show on startup");
-            }
-        });
+
         
         // JSON Text Area Change Handler
         // Save JSON content when modified (with debouncing)
@@ -806,8 +770,7 @@ public class GDKGameLobbyController implements Initializable {
                 // Force ComboBox to refresh its display
                 gameSelector.requestLayout();
                 
-                // Restore previously selected game after modules are loaded
-                restorePreviouslySelectedGame();
+                
                 
                 // Log the final state for debugging
                 Logging.info("📊 Final UI state: " + availableGameModules.size() + " modules in ComboBox");
@@ -1907,11 +1870,7 @@ public class GDKGameLobbyController implements Initializable {
             // Load persistence toggle state
             loadPersistenceToggleState();
             
-            // Load auto-launch toggle state
-            loadAutoLaunchToggleState();
             
-            // Load auto-select toggle state
-            loadAutoSelectToggleState();
             
             // Load saved JSON content if persistence is enabled
             if (jsonPersistenceToggle.isSelected()) {
@@ -1954,51 +1913,7 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
     
-    /**
-     * Load the auto-launch toggle state from file.
-     */
-    private void loadAutoLaunchToggleState() {
-        try {
-            Path toggleFile = Paths.get(AUTO_LAUNCH_ENABLED_FILE);
-            if (Files.exists(toggleFile)) {
-                String toggleState = Files.readString(toggleFile).trim();
-                boolean isEnabled = Boolean.parseBoolean(toggleState);
-                autoLaunchToggle.setSelected(isEnabled);
-                // No startup message - only show when setting changes
-            } else {
-                // Default to disabled if no saved state
-                autoLaunchToggle.setSelected(false);
-                // No startup message - only show when setting changes
-            }
-        } catch (Exception e) {
-            Logging.error("❌ Error loading auto-launch toggle state: " + e.getMessage(), e);
-            // Default to disabled on error
-            autoLaunchToggle.setSelected(false);
-        }
-    }
-    
-    /**
-     * Load the auto-select toggle state from file.
-     */
-    private void loadAutoSelectToggleState() {
-        try {
-            Path toggleFile = Paths.get(AUTO_SELECT_ENABLED_FILE);
-            if (Files.exists(toggleFile)) {
-                String toggleState = Files.readString(toggleFile).trim();
-                boolean isEnabled = Boolean.parseBoolean(toggleState);
-                autoSelectGameToggle.setSelected(isEnabled);
-                // No startup message - only show when setting changes
-            } else {
-                // Default to disabled if no saved state
-                autoSelectGameToggle.setSelected(false);
-                // No startup message - only show when setting changes
-            }
-        } catch (Exception e) {
-            Logging.error("❌ Error loading auto-select toggle state: " + e.getMessage(), e);
-            // Default to disabled on error
-            autoSelectGameToggle.setSelected(false);
-        }
-    }
+
     
     /**
      * Load saved JSON content from file.
@@ -2065,35 +1980,7 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
     
-    /**
-     * Save auto-launch toggle state to file.
-     */
-    private void saveAutoLaunchToggleState() {
-        try {
-            ensureSavedDirectoryExists();
-            boolean isEnabled = autoLaunchToggle.isSelected();
-            Path toggleFile = Paths.get(AUTO_LAUNCH_ENABLED_FILE);
-            Files.writeString(toggleFile, String.valueOf(isEnabled));
-            Logging.info("📋 Saved auto-launch toggle state: " + (isEnabled ? "enabled" : "disabled"));
-        } catch (Exception e) {
-            Logging.error("❌ Error saving auto-launch toggle state: " + e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * Save auto-select toggle state to file.
-     */
-    private void saveAutoSelectToggleState() {
-        try {
-            ensureSavedDirectoryExists();
-            boolean isEnabled = autoSelectGameToggle.isSelected();
-            Path toggleFile = Paths.get(AUTO_SELECT_ENABLED_FILE);
-            Files.writeString(toggleFile, String.valueOf(isEnabled));
-            Logging.info("📋 Saved auto-select toggle state: " + (isEnabled ? "enabled" : "disabled"));
-        } catch (Exception e) {
-            Logging.error("❌ Error saving auto-select toggle state: " + e.getMessage(), e);
-        }
-    }
+
     
     /**
      * Clear the JSON persistence file.
@@ -2129,25 +2016,7 @@ public class GDKGameLobbyController implements Initializable {
      * Load the persisted selected game module.
      */
     private void loadPersistedSelectedGame() {
-        try {
-            // Only auto-select if the toggle is enabled
-            if (!autoSelectGameToggle.isSelected()) {
-                return;
-            }
-            
-            java.nio.file.Path p = java.nio.file.Paths.get(SELECTED_GAME_FILE);
-            if (!java.nio.file.Files.exists(p)) return;
-            String gameName = java.nio.file.Files.readString(p).trim();
-            if (gameName.isEmpty()) return;
-            for (gdk.GameModule gm : availableGameModules) {
-                if (gameName.equals(gm.getGameName())) {
-                    selectedGameModule = gm;
-                    gameSelector.getSelectionModel().select(gm);
-                    addUserMessage("📌 Auto-selected game: " + gameName);
-                    break;
-                }
-            }
-        } catch (Exception ignored) {}
+        // Auto-select functionality removed - toggle no longer available in main UI
     }
     
     /**
@@ -2155,30 +2024,7 @@ public class GDKGameLobbyController implements Initializable {
      * This method is called after the ComboBox is populated with modules.
      */
     private void restorePreviouslySelectedGame() {
-        try {
-            // Only auto-select if the toggle is enabled
-            if (!autoSelectGameToggle.isSelected()) {
-                return;
-            }
-            
-            java.nio.file.Path p = java.nio.file.Paths.get(SELECTED_GAME_FILE);
-            if (!java.nio.file.Files.exists(p)) return;
-            String gameName = java.nio.file.Files.readString(p).trim();
-            if (gameName.isEmpty()) return;
-            
-            // Find the game module with the saved name
-            for (gdk.GameModule gm : availableGameModules) {
-                if (gameName.equals(gm.getGameName())) {
-                    selectedGameModule = gm;
-                    gameSelector.getSelectionModel().select(gm);
-                    addUserMessage("📌 Auto-selected previously played game: " + gameName);
-                    Logging.info("📌 Auto-selected previously played game: " + gameName);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            Logging.error("❌ Error restoring previously selected game: " + e.getMessage(), e);
-        }
+        // Auto-select functionality removed - toggle no longer available in main UI
     }
     
     /**
@@ -2265,11 +2111,7 @@ public class GDKGameLobbyController implements Initializable {
             // Save persistence toggle state
             savePersistenceToggleState();
             
-            // Save auto-launch toggle state
-            saveAutoLaunchToggleState();
             
-            // Save auto-select toggle state
-            saveAutoSelectToggleState();
             
             // Save selected game
             if (selectedGameModule != null) {

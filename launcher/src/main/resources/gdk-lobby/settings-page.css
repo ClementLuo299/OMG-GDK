@@ -22,10 +22,12 @@
 
 /* Navigation Button Styles */
 .nav-button {
-    -fx-background-color: #007bff;
-    -fx-text-fill: white;
+    -fx-background-color: #f8f9fa;
+    -fx-text-fill: #495057;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
+    -fx-border-color: #0056b3;
+    -fx-border-width: 1;
     -fx-cursor: hand;
     -fx-padding: 8 12;
     -fx-min-width: 40px;
@@ -38,12 +40,14 @@
 }
 
 .nav-button:hover {
-    -fx-background-color: #0056b3;
+    -fx-background-color: rgba(0, 123, 255, 0.1);
+    -fx-text-fill: #007bff;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 0);
 }
 
 .nav-button:pressed {
-    -fx-background-color: #004085;
+    -fx-background-color: rgba(0, 123, 255, 0.2);
+    -fx-text-fill: #0056b3;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 1, 0, 0, 0);
 }
 

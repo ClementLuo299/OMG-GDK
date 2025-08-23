@@ -85,24 +85,7 @@
             </VBox>
         </HBox>
         
-        <!-- Global Application Controls -->
-        <HBox spacing="30" alignment="CENTER_LEFT" styleClass="control-section" VBox.vgrow="NEVER"
-              style="-fx-min-height: 40px; -fx-pref-height: 40px; -fx-max-height: 40px; -fx-padding: 20 0 10 20;">
-            <!-- Toggle Switches - Side by Side -->
-            <HBox spacing="30" alignment="CENTER_LEFT">
-                <!-- Auto-Launch Toggle -->
-                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 15; -fx-max-height: 15;">
-                    <Label text="Auto-Launch Game" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
-                    <JFXToggleButton fx:id="autoLaunchToggle" selected="false"/>
-                </HBox>
-                
-                <!-- Auto-Select Game Toggle -->
-                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 15; -fx-max-height: 15;">
-                    <Label text="Auto-Select Game" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
-                    <JFXToggleButton fx:id="autoSelectGameToggle" selected="false"/>
-                </HBox>
-            </HBox>
-        </HBox>
+
         
         <!-- Message Area - Allow growth but with minimum height -->
         <VBox styleClass="message-panel" spacing="0" VBox.vgrow="SOMETIMES" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" minHeight="200">
