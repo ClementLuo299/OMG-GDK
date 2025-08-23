@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import com.jfoenix.controls.JFXToggleButton?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="launcher.gui.SettingsPageController"
+      styleClass="settings-page-container" spacing="0" alignment="TOP_CENTER">
+    
+    <!-- Header -->
+    <HBox alignment="CENTER" spacing="20" styleClass="settings-header" VBox.vgrow="NEVER">
+        <Button fx:id="backButton" text="←" styleClass="nav-button, icon-button"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="GDK Settings" styleClass="settings-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
+    
+    <!-- Settings Content -->
+    <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="settings-scroll-pane">
+        <VBox spacing="30" styleClass="settings-content" style="-fx-padding: 30;">
+            
+            <!-- Application Settings Section -->
+            <VBox spacing="20" styleClass="settings-section">
+                <Label text="Application Settings" styleClass="section-header"/>
+                
+                <!-- Auto-Launch Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Auto-Launch Game" styleClass="setting-label"/>
+                        <Label text="Automatically launch the selected game when GDK starts" styleClass="setting-description"/>
+                    </VBox>
+                    <JFXToggleButton fx:id="settingsAutoLaunchToggle" selected="false"/>
+                </HBox>
+                
+                <!-- Auto-Select Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Auto-Select Game" styleClass="setting-label"/>
+                        <Label text="Automatically select the previously played game on startup" styleClass="setting-description"/>
+                    </VBox>
+                    <JFXToggleButton fx:id="settingsAutoSelectGameToggle" selected="false"/>
+                </HBox>
+                
+                <!-- JSON Persistence Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Save JSON Input" styleClass="setting-label"/>
+                        <Label text="Automatically save and restore JSON input content between sessions" styleClass="setting-description"/>
+                    </VBox>
+                    <JFXToggleButton fx:id="settingsJsonPersistenceToggle" selected="true"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Interface Settings Section -->
+            <VBox spacing="20" styleClass="settings-section">
+                <Label text="Interface Settings" styleClass="section-header"/>
+                
+                <!-- Theme Selection -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Theme" styleClass="setting-label"/>
+                        <Label text="Choose the visual theme for the application" styleClass="setting-description"/>
+                    </VBox>
+                    <ComboBox fx:id="settingsThemeSelector" promptText="Select Theme" prefWidth="200"/>
+                </HBox>
+                
+                <!-- Font Size Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Font Size" styleClass="setting-label"/>
+                        <Label text="Adjust the base font size for the application" styleClass="setting-description"/>
+                    </VBox>
+                    <VBox spacing="5" alignment="CENTER">
+                        <Slider fx:id="settingsFontSizeSlider" min="10" max="18" value="12" showTickLabels="true" showTickMarks="true" majorTickUnit="2" minorTickCount="0" prefWidth="200"/>
+                        <Label fx:id="settingsFontSizeLabel" text="12px" styleClass="value-label"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+            
+            <!-- Game Settings Section -->
+            <VBox spacing="20" styleClass="settings-section">
+                <Label text="Game Settings" styleClass="section-header"/>
+                
+                <!-- Auto-Refresh Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Auto-Refresh Games" styleClass="setting-label"/>
+                        <Label text="Automatically refresh the game list when modules directory changes" styleClass="setting-description"/>
+                    </VBox>
+                    <JFXToggleButton fx:id="settingsAutoRefreshToggle" selected="false"/>
+                </HBox>
+                
+                <!-- Compilation Check Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Check Compilation on Startup" styleClass="setting-label"/>
+                        <Label text="Verify game module compilation during application startup" styleClass="setting-description"/>
+                    </VBox>
+                    <JFXToggleButton fx:id="settingsCompilationCheckToggle" selected="true"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Advanced Settings Section -->
+            <VBox spacing="20" styleClass="settings-section">
+                <Label text="Advanced Settings" styleClass="section-header"/>
+                
+                <!-- Debug Mode Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Debug Mode" styleClass="setting-label"/>
+                        <Label text="Enable detailed logging and debugging information" styleClass="setting-description"/>
+                    </VBox>
+                    <JFXToggleButton fx:id="settingsDebugModeToggle" selected="false"/>
+                </HBox>
+                
+                <!-- Performance Mode Setting -->
+                <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
+                    <VBox spacing="8" HBox.hgrow="ALWAYS">
+                        <Label text="Performance Mode" styleClass="setting-label"/>
+                        <Label text="Optimize for performance over visual quality" styleClass="setting-description"/>
+                    </VBox>
+                    <JFXToggleButton fx:id="settingsPerformanceModeToggle" selected="false"/>
+                </HBox>
+            </VBox>
+            
+        </VBox>
+    </ScrollPane>
+    
+    <!-- Status Bar -->
+    <HBox alignment="CENTER_LEFT" spacing="20" styleClass="settings-status-bar" VBox.vgrow="NEVER">
+        <padding>
+            <Insets top="15" right="20" bottom="15" left="20"/>
+        </padding>
+        <Label fx:id="statusLabel" text="Settings page loaded" styleClass="status-text"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Settings are saved automatically" styleClass="status-hint"/>
+    </HBox>
+    
+</VBox> 

@@ -847,6 +847,88 @@
     -fx-pref-width: 1200px;
 }
 
+/* Main Tab Pane */
+.main-tab-pane {
+    -fx-background-color: white;
+}
+
+.main-tab-pane .tab-header-area {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+}
+
+.main-tab-pane .tab-header-background {
+    -fx-background-color: transparent;
+}
+
+.main-tab-pane .tab {
+    -fx-background-color: #e9ecef;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1 1 0 1;
+    -fx-padding: 10 20;
+}
+
+.main-tab-pane .tab:selected {
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1 1 0 1;
+}
+
+.main-tab-pane .tab-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+
+.main-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #212529;
+}
+
+/* Settings Content */
+.settings-content {
+    -fx-background-color: white;
+}
+
+.settings-section {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 20;
+}
+
+.section-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212529;
+    -fx-padding: 0 0 10 0;
+}
+
+.setting-row {
+    -fx-padding: 10 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.setting-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+
+.setting-description {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+    -fx-wrap-text: true;
+}
+
+.value-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+    -fx-font-weight: bold;
+}
+
 /* Header */
 .header {
     -fx-background-color: rgba(255, 255, 255, 0.95);

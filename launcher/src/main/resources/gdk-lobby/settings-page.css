@@ -1,0 +1,222 @@
+/* Settings Page Styles */
+
+/* Main Container */
+.settings-page-container {
+    -fx-background-color: white;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Header Styles */
+.settings-header {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 15 20;
+}
+
+.settings-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212529;
+}
+
+/* Navigation Button Styles */
+.nav-button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 12;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 0);
+}
+
+.nav-button:hover {
+    -fx-background-color: #0056b3;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 0);
+}
+
+.nav-button:pressed {
+    -fx-background-color: #004085;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 1, 0, 0, 0);
+}
+
+/* Icon Button Specific Styles */
+.icon-button {
+    -fx-font-size: 18px;
+    -fx-text-fill: white;
+}
+
+/* Scroll Pane Styles */
+.settings-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.settings-scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.settings-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: #f8f9fa;
+    -fx-pref-width: 12px;
+}
+
+.settings-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #dee2e6;
+    -fx-background-radius: 6px;
+}
+
+.settings-scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #adb5bd;
+}
+
+/* Settings Content */
+.settings-content {
+    -fx-background-color: white;
+}
+
+/* Settings Section */
+.settings-section {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8px;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 1, 0, 0, 0);
+}
+
+/* Section Header */
+.section-header {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212529;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Setting Row */
+.setting-row {
+    -fx-background-color: white;
+    -fx-background-radius: 6px;
+    -fx-padding: 15px;
+    -fx-border-color: #e9ecef;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+/* Setting Labels */
+.setting-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+
+.setting-description {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+    -fx-wrap-text: true;
+}
+
+/* Value Label */
+.value-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #495057;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+
+/* Status Bar */
+.settings-status-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #495057;
+}
+
+.status-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6c757d;
+    -fx-font-style: italic;
+}
+
+/* ComboBox Styles */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 4px;
+    -fx-border-width: 1px;
+    -fx-padding: 5px;
+}
+
+.combo-box:hover {
+    -fx-border-color: #adb5bd;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #6c757d;
+}
+
+/* Slider Styles */
+.slider {
+    -fx-show-tick-labels: true;
+    -fx-show-tick-marks: true;
+}
+
+.slider .track {
+    -fx-background-color: #e9ecef;
+    -fx-background-radius: 2px;
+}
+
+.slider .thumb {
+    -fx-background-color: #007bff;
+    -fx-background-radius: 8px;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+}
+
+.slider .axis {
+    -fx-tick-label-fill: #6c757d;
+    -fx-tick-label-font-size: 10px;
+}
+
+/* JFXToggleButton Styles */
+.jfx-toggle-button {
+    -fx-background-color: #e9ecef;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-width: 0px;
+    -fx-pref-width: 50px;
+    -fx-pref-height: 30px;
+}
+
+.jfx-toggle-button:selected {
+    -fx-background-color: #007bff;
+}
+
+.jfx-toggle-button .jfx-rippler {
+    -fx-rippler-fill: #007bff;
+}
+
+/* Button Hover Effects */
+.button:hover {
+    -fx-opacity: 0.9;
+}
+
+.button:pressed {
+    -fx-opacity: 0.8;
+} 

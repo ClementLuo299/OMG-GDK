@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="launcher.gui.SettingsPageController"
+      styleClass="settings-container" spacing="20" alignment="TOP_CENTER">
+    
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    
+    <!-- Header -->
+    <HBox alignment="CENTER" spacing="20" styleClass="settings-header" VBox.vgrow="NEVER">
+        <Button fx:id="backButton" text="← Back" styleClass="nav-button"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Settings" styleClass="settings-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="saveSettingsButton" text="Save" styleClass="save-button"/>
+    </HBox>
+    
+    <!-- Simple Content for Testing -->
+    <VBox spacing="15" alignment="TOP_LEFT" VBox.vgrow="ALWAYS">
+        <Label text="Settings Page Test" styleClass="section-header"/>
+        <Label text="If you can see this, the FXML is loading correctly!" styleClass="setting-description"/>
+        
+        <!-- Test Toggle -->
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <Label text="Test Toggle:" styleClass="setting-label"/>
+            <CheckBox fx:id="testToggle" text="Enable Test Feature"/>
+        </HBox>
+        
+        <!-- Status Label -->
+        <Label fx:id="statusLabel" text="Settings page loaded successfully" styleClass="status-text"/>
+    </VBox>
+    
+</VBox> 

@@ -10,6 +10,7 @@ import java.io.File;
 import launcher.GDKApplication;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -17,6 +18,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.Slider;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
@@ -27,7 +32,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
 import javafx.application.Platform;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,7 +82,7 @@ import launcher.utils.DialogUtil;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 20, 2025       
+ * @edited August 22, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -86,6 +94,7 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Button launchGameButton;
     @FXML private Button refreshButton;
     @FXML private ProgressIndicator refreshProgressIndicator;
+    @FXML private Button settingsButton;
     
     // Message and Logging Components
     @FXML private ScrollPane messageScrollPane;
@@ -110,6 +119,8 @@ public class GDKGameLobbyController implements Initializable {
     @FXML private Label statusLabel;
     @FXML private ProgressBar loadingProgressBar;
     @FXML private Label loadingStatusLabel;
+    
+
 
     // ==================== DEPENDENCIES ====================
     
@@ -335,9 +346,11 @@ public class GDKGameLobbyController implements Initializable {
         
         // Message area is ready for user feedback
         
-                // Log successful UI initialization for debugging purposes
+        // Log successful UI initialization for debugging purposes
         Logging.info("🎨 UI components initialized");
     }
+    
+
 
     // ==================== EVENT HANDLER SETUP ====================
     
@@ -516,6 +529,9 @@ public class GDKGameLobbyController implements Initializable {
             onApplicationShutdown(); // Save settings before exit
             Platform.exit(); // Terminate the JavaFX application
         });
+        
+        // Settings button: Open settings page
+        settingsButton.setOnAction(event -> openSettingsPage());
         
         // JSON Configuration Handlers
         // Clear input button: Remove all JSON input
@@ -1526,6 +1542,18 @@ public class GDKGameLobbyController implements Initializable {
         }
     }
     
+    /**
+     * Update the status label with a message.
+     * 
+     * @param message The status message to display
+     */
+    private void updateStatus(String message) {
+        if (statusLabel != null) {
+            statusLabel.setText(message);
+            Logging.info("📊 Status updated: " + message);
+        }
+    }
+    
     // ==================== GAME LAUNCHING ====================
     
     /**
@@ -2150,6 +2178,79 @@ public class GDKGameLobbyController implements Initializable {
             }
         } catch (Exception e) {
             Logging.error("❌ Error restoring previously selected game: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Open the settings page.
+     */
+    private void openSettingsPage() {
+        try {
+            Logging.info("⚙️ Transitioning to settings page");
+            
+            // Load the settings page FXML
+            URL fxmlUrl = getClass().getResource("/gdk-lobby/settings-page.fxml");
+            if (fxmlUrl == null) {
+                throw new RuntimeException("Could not find settings-page.fxml resource");
+            }
+            Logging.info("📁 Found FXML resource at: " + fxmlUrl);
+            
+            // Load the settings page FXML
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Logging.info("📋 FXMLLoader created successfully");
+            
+            Parent settingsRoot = loader.load();
+            Logging.info("📄 FXML loaded successfully");
+            
+            // Get the settings controller and set the main controller reference
+            SettingsPageController settingsController = loader.getController();
+            if (settingsController == null) {
+                throw new RuntimeException("Settings controller is null");
+            }
+            Logging.info("🎮 Settings controller loaded successfully");
+            
+            settingsController.setMainController(this);
+            Logging.info("🔗 Main controller reference set");
+            
+            // Get the current stage and change its scene to show settings
+            Stage currentStage = (Stage) exitButton.getScene().getWindow();
+            if (currentStage != null) {
+                // Store the current scene for returning later
+                Scene currentScene = currentStage.getScene();
+                
+                // Create the settings scene
+                Scene settingsScene = new Scene(settingsRoot);
+                
+                // Load the settings page CSS
+                try {
+                    URL cssUrl = getClass().getResource("/gdk-lobby/settings-page.css");
+                    if (cssUrl != null) {
+                        settingsRoot.getStylesheets().add(cssUrl.toExternalForm());
+                        Logging.info("🎨 CSS loaded successfully");
+                    } else {
+                        Logging.warning("⚠️ Could not find settings-page.css resource");
+                    }
+                } catch (Exception cssError) {
+                    Logging.warning("⚠️ Could not load settings page CSS: " + cssError.getMessage());
+                }
+                
+                // Store the current scene in the settings controller for navigation back
+                settingsController.setMainScene(currentScene);
+                
+                // Change the stage to show settings
+                currentStage.setScene(settingsScene);
+                currentStage.setTitle("GDK Settings");
+                
+                Logging.info("🔄 Stage transitioned to settings page");
+            } else {
+                throw new RuntimeException("Could not get current stage");
+            }
+            
+            Logging.info("✅ Settings page transition completed successfully");
+            
+        } catch (Exception e) {
+            Logging.error("❌ Error transitioning to settings page: " + e.getMessage(), e);
+            DialogUtil.showError("Error", "Failed to open settings page: " + e.getMessage());
         }
     }
     

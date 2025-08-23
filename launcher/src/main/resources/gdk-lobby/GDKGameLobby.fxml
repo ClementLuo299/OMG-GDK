@@ -6,7 +6,7 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
-
+<?import javafx.collections.FXCollections?>
 
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.text.*?>
@@ -29,6 +29,7 @@
         <HBox spacing="5" alignment="CENTER_RIGHT">
             <ProgressIndicator fx:id="refreshProgressIndicator" visible="false" prefWidth="20" prefHeight="20" styleClass="refresh-progress"/>
             <Button fx:id="refreshButton" text="↻" styleClass="nav-button, icon-button"/>
+            <Button fx:id="settingsButton" text="⚙" styleClass="nav-button, icon-button"/>
         </HBox>
     </HBox>
     
