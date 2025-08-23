@@ -16,8 +16,11 @@
     -fx-padding: 2px 20px 0px 20px !important;
     -fx-min-width: 800px;
     -fx-pref-width: 1000px;
+    -fx-min-height: 200px;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
+    -fx-translate-y: -2px;
+    -fx-pref-height: 33%;
 }
 
 /* Ensure JSON area content can grow properly */
@@ -27,7 +30,7 @@
 
 /* Control Buttons and Toggles - Below JSON input */
 .control-section {
-    -fx-padding: 0px 20px 15px 20px;
+    -fx-padding: 0px 20px 0px 20px;
     -fx-min-width: 800px;
     -fx-pref-width: 1000px;
     -fx-background-radius: 0;
@@ -304,7 +307,7 @@
     -fx-text-fill: #212529;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-padding: 0 0 5 0;
+    -fx-padding: 0 0 8 0;
 }
 
 .field-label {
@@ -531,18 +534,18 @@
 /* Message Panel */
 .message-panel {
     -fx-background-color: rgba(255, 255, 255, 0.95);
-    -fx-background-radius: 10;
-    -fx-padding: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3);
-    -fx-pref-height: 300px;
+    -fx-background-radius: 15;
+    -fx-padding: 0 20 0 20;
     -fx-min-height: 200px;
-    -fx-max-height: 400px;
     -fx-pref-width: 100%;
     -fx-min-width: 500px;
+    -fx-translate-y: -15px;
+    -fx-pref-height: 67%;
+    -fx-background-insets: 0;
 }
 
 .message-area {
-    -fx-background-color: #f8f9fa;
+    -fx-background-color: white;
     -fx-text-fill: #495057;
     -fx-font-family: "Monaco", "Consolas", "Courier New", monospace;
     -fx-font-size: 12px;
@@ -555,7 +558,7 @@
 }
 
 .message-area .content {
-    -fx-background-color: #f8f9fa;
+    -fx-background-color: white;
 }
 
 .message-area .scroll-bar:vertical {
@@ -839,7 +842,7 @@
 
 /* Game Picker Container */
 .game-picker-container {
-    -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    -fx-background-color: white;
     -fx-font-family: 'Segoe UI', Arial, sans-serif;
     -fx-pref-width: 1200px;
 }
@@ -1008,21 +1011,20 @@
 
 /* Message container and scroll pane styling */
 .message-container {
-    -fx-background-color: #f8f9fa;
-    -fx-padding: 8;
+    -fx-background-color: white;
+    -fx-padding: 6 2 2 8;
 }
 
 .message-scroll-pane {
-    -fx-background-color: #f8f9fa;
+    -fx-background-color: white;
     -fx-border-color: #17a2b8;
     -fx-border-width: 1;
     -fx-border-radius: 5;
-    -fx-pref-height: 200px;
     -fx-min-height: 150px;
 }
 
 .message-scroll-pane .viewport {
-    -fx-background-color: #f8f9fa;
+    -fx-background-color: white;
 }
 
 .message-scroll-pane .scroll-bar:vertical {

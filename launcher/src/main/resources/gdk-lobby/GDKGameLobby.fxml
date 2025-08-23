@@ -33,11 +33,11 @@
     </HBox>
     
     <!-- Main Content Area -->
-    <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER" style="-fx-background-color: white;">
+    <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-fill-height: true;">
         
         <!-- Game Selection and Launch Button - Right beneath top bar -->
-        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="game-selector-row" minWidth="800" prefWidth="1000"
-              style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px; -fx-min-width: 800px; -fx-pref-width: 1000px;">
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="game-selector-row" minWidth="600" prefWidth="1000" VBox.vgrow="NEVER"
+              style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px; -fx-min-width: 600px; -fx-pref-width: 1000px;">
             <Label text="Select Game:" style="-fx-text-fill: #212529; -fx-font-size: 16px; -fx-font-weight: bold; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
             <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
                      prefWidth="400" 
@@ -47,46 +47,56 @@
                     style="-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px; -fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 10 20; -fx-min-width: 120;"/>
         </HBox>
         
-        <!-- JSON Input Area - Right below game selector row -->
-        <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" minWidth="800" prefWidth="1000" styleClass="json-input-area"
-              style="-fx-min-width: 800px; -fx-pref-width: 1000px;">
-            <!-- JSON Input Editor -->
-            <VBox fx:id="jsonInputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="0" style="-fx-margin: 0;"/>
+        <!-- JSON Areas Side by Side with Their Respective Controls -->
+        <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="SOMETIMES" styleClass="json-input-area"
+              style="-fx-min-height: 200px; -fx-pref-height: 33%; -fx-max-height: 400px;">
             
-            <!-- JSON Output Editor -->
-            <VBox fx:id="jsonOutputEditorContainer" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" spacing="0" style="-fx-margin: 0;"/>
+            <!-- JSON Input Area with Input Controls -->
+            <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                <Label text="JSON Input" styleClass="section-title" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 14px;"/>
+                <VBox fx:id="jsonInputEditorContainer" spacing="0" VBox.vgrow="ALWAYS" style="-fx-min-height: 0; -fx-pref-height: 0;"/>
+                
+                <!-- Input-specific control buttons and Save JSON toggle -->
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0 0 0; -fx-min-height: 35; -fx-pref-height: 35; -fx-max-height: 35;">
+                    <Button fx:id="clearInputButton" text="Clear Input" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
+                    <Button fx:id="metadataRequestButton" text="Request Metadata" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
+                    <Button fx:id="sendMessageButton" text="Send Message" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
+                    
+                    <Region HBox.hgrow="ALWAYS"/>
+                    
+                    <!-- JSON Persistence Toggle -->
+                    <HBox alignment="CENTER_LEFT" spacing="2">
+                        <Label text="Save JSON" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
+                        <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true"/>
+                    </HBox>
+                </HBox>
+            </VBox>
+            
+            <!-- JSON Output Area with Output Controls -->
+            <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                <Label text="JSON Output" styleClass="section-title" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 14px;"/>
+                <VBox fx:id="jsonOutputEditorContainer" spacing="0" VBox.vgrow="ALWAYS" style="-fx-min-height: 0; -fx-pref-height: 0;"/>
+                
+                <!-- Output-specific control buttons -->
+                <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0 0 0; -fx-min-height: 35; -fx-pref-height: 35; -fx-max-height: 35;">
+                    <Button fx:id="clearOutputButton2" text="Clear Output" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
+                </HBox>
+            </VBox>
         </HBox>
         
-        <!-- Control Buttons and Toggles - Below JSON input area -->
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="control-section" minWidth="800" prefWidth="1000"
-              style="-fx-min-height: 80px; -fx-pref-height: 80px; -fx-max-height: 80px; -fx-min-width: 800px; -fx-pref-width: 1000px;">
-            <!-- Control Buttons -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button fx:id="clearInputButton" text="Clear Input" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
-                <Button fx:id="metadataRequestButton" text="Request Metadata" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
-                <Button fx:id="sendMessageButton" text="Send Message" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
-                <Button fx:id="clearOutputButton2" text="Clear Output" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 4 8; -fx-min-width: 60;"/>
-            </HBox>
-            
-            <Region HBox.hgrow="ALWAYS"/>
-            
+        <!-- Global Application Controls -->
+        <HBox spacing="30" alignment="CENTER_LEFT" styleClass="control-section" VBox.vgrow="NEVER"
+              style="-fx-min-height: 40px; -fx-pref-height: 40px; -fx-max-height: 40px; -fx-padding: 20 0 10 20;">
             <!-- Toggle Switches - Side by Side -->
-            <HBox spacing="30" alignment="CENTER_LEFT" 
-                  style="-fx-min-height: 40px; -fx-pref-height: 40px; -fx-max-height: 40px;">
-                <!-- JSON Persistence Toggle -->
-                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
-                    <Label text="Save JSON" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
-                    <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true"/>
-                </HBox>
-                
+            <HBox spacing="30" alignment="CENTER_LEFT">
                 <!-- Auto-Launch Toggle -->
-                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 15; -fx-max-height: 15;">
                     <Label text="Auto-Launch Game" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
                     <JFXToggleButton fx:id="autoLaunchToggle" selected="false"/>
                 </HBox>
                 
                 <!-- Auto-Select Game Toggle -->
-                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 20; -fx-max-height: 20;">
+                <HBox alignment="CENTER_LEFT" spacing="2" style="-fx-min-height: 15; -fx-max-height: 15;">
                     <Label text="Auto-Select Game" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
                     <JFXToggleButton fx:id="autoSelectGameToggle" selected="false"/>
                 </HBox>
@@ -94,10 +104,10 @@
         </HBox>
         
         <!-- Message Area - Allow growth but with minimum height -->
-        <VBox styleClass="message-panel" spacing="5" VBox.vgrow="SOMETIMES" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" minHeight="200">
+        <VBox styleClass="message-panel" spacing="0" VBox.vgrow="SOMETIMES" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" minHeight="200">
             <Label text="Messages" styleClass="section-title"/>
             <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane" minHeight="150">
-                <VBox fx:id="messageContainer" spacing="5" styleClass="message-container"/>
+                <VBox fx:id="messageContainer" spacing="0" styleClass="message-container"/>
             </ScrollPane>
         </VBox>
     </VBox>
