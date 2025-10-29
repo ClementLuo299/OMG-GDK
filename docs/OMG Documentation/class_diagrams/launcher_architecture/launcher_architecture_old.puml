@@ -1,0 +1,574 @@
+@startuml
+
+left to right direction
+hide empty members
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+
+title OMG Game Development Kit (GDK) - Architecture
+
+' === GDK Core ===
+package "GDK_Core" {
+
+    package "launcher" {
+
+        package "gui" {
+            class GDKGameLobbyController {
+                + void initialize(URL location, ResourceBundle resources)
+                + void setViewModel(GDKViewModel viewModel)
+                + void refreshAvailableGameModulesFast()
+                + void refreshAvailableGameModules()
+                + void checkStartupCompilationFailures()
+                + void launchGameWithSavedJson(GameModule gameModule, String savedJson)
+                + boolean launchSelectedGame()
+                + void sendMessage()
+                + void onApplicationShutdown()
+                --
+                - void setupUserInterface()
+                - void setupEventHandlers()
+                - void updateGameCountStatus()
+                - void addUserMessage(String message)
+                - void startLoadingAnimation()
+                - void stopLoadingAnimation()
+                - void detectDisabledModulesBeforeRecompilation(String path)
+                - void checkAndRecompileModule(File moduleDir)
+                - void openSettingsPage()
+                --
+                - ObjectMapper jsonDataMapper
+                - ObservableList<GameModule> availableGameModules
+                - GameModule selectedGameModule
+                - GDKViewModel applicationViewModel
+                - boolean isRefreshing
+                - boolean isLoadingPersistenceSettings
+                - static final long MESSAGE_INTERVAL_MS
+            }
+
+            GDKGameLobbyController -down-> GDK_Core.launcher.GDKApplication : uses
+            GDKGameLobbyController -down-> GDK_Core.launcher.utils.ModuleDiscovery : uses
+            GDKGameLobbyController -down-> GDK_Core.launcher.utils.ModuleCompiler : uses
+            GDKGameLobbyController -down-> GDK_Core.launcher.utils.DialogUtil : uses
+            GDKGameLobbyController -down-> GDK_Core.launcher.utils.GameLaunchUtil : uses
+            GDKGameLobbyController -down-> GDK_Core.launcher.utils.TranscriptRecorder : uses
+            GDKGameLobbyController --> GDK_Core.gdk.Logging : logs with
+            GDKGameLobbyController --> GDK_Core.gdk.GameModule : loads & launches
+            GDKGameLobbyController --> GDKViewModel : delegates logic
+
+            class GDKViewModel {
+                ' ==================== Dependencies ====================
+                - Stage primaryApplicationStage
+                - Scene mainLobbyScene
+                - GameModule currentlyRunningGame
+                - Stage serverSimulatorStage
+                - ServerSimulatorController serverSimulatorController
+                - boolean serverSimulatorRequestedClosed
+
+                ' ==================== Constructor ====================
+                + GDKViewModel()
+
+                ' ==================== Stage and Scene Management ====================
+                + void setPrimaryStage(Stage)
+                + void setMainLobbyScene(Scene)
+                + void returnToLobby()
+                + boolean isGameRunning()
+                + Scene getCurrentGameScene()
+
+                ' ==================== Game Launching and Actions ====================
+                + void handleLaunchGame(GameModule, String)
+                + void handleRefreshGameList()
+
+                ' ==================== Game Management ====================
+                - void launchGameWithScene(GameModule, String)
+                - void updateGameStateAfterSuccessfulLaunch(GameModule)
+                - void setupGameCloseHandler()
+
+                ' ==================== Server Simulator ====================
+                - void createServerSimulator()
+                - Scene loadServerSimulatorScene()
+                - void configureServerSimulatorStage(Scene)
+                - void setupServerSimulatorCloseHandler()
+
+                ' ==================== Cleanup ====================
+                - void cleanupGameAndServerSimulator()
+                - void cleanupCurrentGame()
+                - void cleanupServerSimulator()
+                - void closeServerSimulator()
+
+                ' ==================== Utilities ====================
+                - void refreshAvailableGameModules()
+                - void setupMessagingBridgeConsumer()
+                - boolean isSinglePlayerModeFromJson(String)
+                - boolean isLocalMultiplayerModeFromJson(String)
+            }
+
+            GDKViewModel --> GDK_Core.gdk.GameModule : manages
+            GDKViewModel --> GDK_Core.gdk.Logging : logs with
+            GDKViewModel --> GDK_Core.gdk.MessagingBridge : communicates via
+            GDKViewModel --> GDK_Core.launcher.utils.ModuleDiscovery : discovers modules
+            GDKViewModel --> GDK_Core.launcher.utils.ModuleCompiler : loads modules
+            GDKViewModel --> GDK_Core.launcher.utils.TranscriptRecorder : records transcripts
+            GDKViewModel --> GDK_Core.launcher.gui.ServerSimulatorController : controls
+            GDKViewModel --> GDK_Core.launcher.gui.GDKGameLobbyController : linked with
+            GDKViewModel --> GDK_Core.launcher.GDKApplication : accesses constants
+
+            class ServerSimulatorController {
+                ' ==================== FXML UI Elements ====================
+                - VBox rootContainer
+                - TextArea receivedMessagesDisplayArea
+                - TextField messageInputField
+                - Button sendMessageButton
+                - Button clearMessagesButton
+                - Button saveMessagesButton
+                - Button loadMessagesButton
+                - Button closeWindowButton
+
+                ' ==================== Dependencies ====================
+                - Stage serverSimulatorStage
+                - Consumer<String> gameMessageHandler
+                - GDKApplication gdkApplication
+
+                ' ==================== Constants ====================
+                - static final String INPUT_PERSISTENCE_FILE
+
+                ' ==================== Initialization ====================
+                + void initialize()
+                - void setupMessageInputHandling()
+                - void setupSendButtonStateManagement()
+                - void setupSaveLoadHandlers()
+                - void handleSaveMessages()
+                - void handleLoadMessages()
+                - void setupClearHandler()
+
+                ' ==================== Input Persistence ====================
+                - void saveInputContent()
+                - void loadInputContent()
+                - void clearSavedInputContent()
+
+                ' ==================== Setup Methods ====================
+                + void setStage(Stage)
+                + void setGDKApplication(GDKApplication)
+                + void setMessageHandler(Consumer<String>)
+
+                ' ==================== Message Handling ====================
+                - void handleSendMessageAction()
+                - void sendMessageToGame(String)
+                - void addSentMessageToDisplay(String)
+                - void clearMessageInputField()
+                + void addReceivedMessageToDisplay(String)
+
+                ' ==================== UI Actions ====================
+                - void handleClearMessagesAction()
+                - void handleCloseWindowAction()
+
+                ' ==================== Utility ====================
+                + VBox getRootContainer()
+                + void onClose()
+            }
+
+            ServerSimulatorController --> GDK_Core.gdk.Logging : uses
+            ServerSimulatorController --> GDK_Core.launcher.GDKApplication : coordinates with
+            ServerSimulatorController <-- GDK_Core.launcher.gui.GDKViewModel : created and managed by
+            ServerSimulatorController <-- GDK_Core.launcher.gui.GDKGameLobbyController : indirectly connected
+
+            class SettingsPageController {
+                ' ==================== FXML UI Elements ====================
+                - Button backButton
+                - Label statusLabel
+                - JFXToggleButton settingsAutoLaunchToggle
+                - JFXToggleButton settingsAutoSelectGameToggle
+                - JFXToggleButton settingsJsonPersistenceToggle
+                - ComboBox<String> settingsThemeSelector
+                - Slider settingsFontSizeSlider
+                - Label settingsFontSizeLabel
+                - JFXToggleButton settingsAutoRefreshToggle
+                - JFXToggleButton settingsCompilationCheckToggle
+                - JFXToggleButton settingsDebugModeToggle
+                - JFXToggleButton settingsPerformanceModeToggle
+
+                ' ==================== Dependencies ====================
+                - GDKGameLobbyController mainController
+                - Scene mainScene
+                - Preferences preferences
+                - boolean isInitializing
+
+                ' ==================== Initialization ====================
+                + void initialize(URL, ResourceBundle)
+                + void setMainController(GDKGameLobbyController)
+                + void setMainScene(Scene)
+
+                ' ==================== UI Setup ====================
+                - void setupUserInterface()
+                - void setupEventHandlers()
+
+                ' ==================== Settings Listeners ====================
+                - void setupSettingsListeners()
+                - <T> ChangeListener<T> createSettingsListener(String)
+
+                ' ==================== Settings Management ====================
+                - void loadSettings()
+                - void saveSetting(String, String)
+                - void saveAllSettings()
+
+                ' ==================== Controller Integration ====================
+                - void synchronizeWithMainController()
+
+                ' ==================== Utility Methods ====================
+                - void updateStatus(String)
+                - void returnToMainLobby()
+
+                ' ==================== Public API ====================
+                + boolean isAutoLaunchEnabled()
+                + boolean isAutoSelectGameEnabled()
+                + boolean isJsonPersistenceEnabled()
+                + String getSelectedTheme()
+                + int getFontSize()
+            }
+
+            SettingsPageController --> GDK_Core.gdk.Logging : logs actions
+            SettingsPageController --> GDK_Core.launcher.gui.GDKGameLobbyController : synchronizes with
+
+            class SingleJsonEditor {
+                ' ==================== Fields ====================
+                - CodeArea codeArea
+                - StringProperty textProperty
+                - String title
+
+                ' Syntax Highlighting Patterns
+                - static final String[] KEYWORDS
+                - static final Pattern PATTERN
+
+                ' ==================== Constructors ====================
+                + SingleJsonEditor(String)
+                + SingleJsonEditor()
+
+                ' ==================== Setup Methods ====================
+                - void setupCodeArea()
+                - void setupSyntaxHighlighting()
+                - void setupContextMenu()
+                - void setupKeyboardShortcuts()
+                - void createLayout()
+                - void createToolbar()
+
+                ' ==================== Syntax Highlighting ====================
+                - StyleSpans<Collection<String>> computeHighlighting(String)
+
+                ' ==================== File and Content Management ====================
+                - void formatJson()
+                - void saveToFile()
+                - void loadFromFile()
+                - void showAlert(AlertType, String, String, String)
+
+                ' ==================== Text and Property Accessors ====================
+                + StringProperty textProperty()
+                + String getText()
+                + void setText(String)
+                + void clear()
+                + CodeArea getCodeArea()
+                + String getTitle()
+                + void setTitle(String)
+                + void setVerticalGrowth(Priority)
+
+                ' ==================== Helpers ====================
+                - String getCurrentLine()
+                - String getIndentation(String)
+            }
+
+            SingleJsonEditor --> GDK_Core.launcher.utils.DialogUtil : displays alerts
+        }
+
+        package "lifecycle" {
+
+            package "start" {
+                
+                package "gui" {
+                    
+                    class UIInitializer {
+                        +initialize(Stage, StartupWindowManager): GDKGameLobbyController
+                        -initializeMainUserInterface(GDKGameLobbyController[]): Scene
+                        -initializeApplicationViewModel(Stage): GDKViewModel
+                        -configurePrimaryApplicationStage(Stage, Scene)
+                        -wireUpControllerWithViewModel(GDKViewModel, GDKGameLobbyController)
+                    }
+
+                    UIInitializer ..> GDK_Core.launcher.lifecycle.start.startup_window.StartupWindowManager : uses
+                    UIInitializer -down-> GDK_Core.launcher.gui.GDKGameLobbyController : creates
+                    UIInitializer -down-> GDK_Core.launcher.gui.GDKViewModel : creates
+                    UIInitializer ..> GDK_Core.gdk.Logging : logs events
+                    UIInitializer ..> GDK_Core.launcher.GDKApplication : loads resources
+                    UIInitializer ..> GDK_Core.launcher.lifecycle.stop.Shutdown : triggers shutdown
+                }
+
+                package "startup_window" {
+
+                    class PreStartupProgressWindow {
+                        - JFrame progressFrame
+                        - JProgressBar progressBar
+                        - JLabel statusLabel
+                        - int totalSteps
+                        - ProgressBarStyling progressBarStyling
+
+                        + PreStartupProgressWindow()
+                        + show()
+                        + hide()
+                        + updateProgress(int, String)
+                        + setTotalSteps(int)
+                        + getProgressFrame(): JFrame
+                        + updateStatusText(String)
+                        + getProgressBarStyling(): ProgressBarStyling
+                        + repaintProgressBar()
+                        + isVisible(): boolean
+                    }
+
+                    PreStartupProgressWindow *-- ProgressBarStyling : owns
+                    PreStartupProgressWindow ..> StartupWindowManager : updated by
+                    UIInitializer ..> PreStartupProgressWindow : hides on JavaFX init
+
+                    class ProgressBarStyling {
+                        - float shimmerOffset
+                        + setShimmerOffset(float)
+                        + getShimmerOffset(): float
+                        + paintDeterminate(Graphics, JComponent)
+                        + paintIndeterminate(Graphics, JComponent)
+                        - paintMultiLayeredShadow(Graphics2D, int, int)
+                        - paintGlassBackground(Graphics2D, int, int)
+                        - paintInnerShadow(Graphics2D, int, int)
+                        - paintProgressFill(Graphics2D, int, int)
+                        - paintShimmerEffect(Graphics2D, int, int)
+                        - paintElectricGlow(Graphics2D, int, int)
+                        - paintGlassHighlight(Graphics2D, int, int)
+                        - paintDepthShadow(Graphics2D, int, int)
+                        - paintAnimatedParticles(Graphics2D, int, int)
+                        - paintBorderSystem(Graphics2D, int, int)
+                    }
+
+                    class StartupWindowManager {
+                        - PreStartupProgressWindow progressWindow
+                        - AtomicInteger currentStep
+                        - int totalSteps
+                        - Timer animationTimer
+                        - Timer progressAnimationTimer
+                        - String fullMessage
+                        - int currentCharIndex
+                        - boolean isAnimating
+                        - float shimmerOffset
+
+                        + StartupWindowManager(PreStartupProgressWindow)
+                        + static initializeWithCalculatedSteps(): StartupWindowManager
+                        + setTotalSteps(int)
+                        + show()
+                        + hide()
+                        + updateProgress(int, String)
+                        + updateProgressWithDelay(int, String, int)
+                        + updateProgress(int, String, int)
+                        + getCurrentStep(): int
+                        + getTotalSteps(): int
+                        + isVisible(): boolean
+                    }
+
+                    StartupWindowManager *-- PreStartupProgressWindow : manages
+                    PreStartupProgressWindow *-- ProgressBarStyling : custom UI
+                    StartupWindowManager ..> ModuleDiscovery : reads step count
+                    StartupWindowManager ..> Shutdown : registers cleanup
+                    StartupWindowManager ..> Logging : logs info
+                }
+
+                class Startup {
+                    - JSON_PERSISTENCE_FILE : String
+                    - SELECTED_GAME_FILE : String
+                    - AUTO_LAUNCH_ENABLED_FILE : String
+
+                    + start(Stage)
+                    - isAutoLaunchEnabled(): boolean
+                    - attemptAutoLaunch(Stage): boolean
+                    - createMinimalControllerForAutoLaunch(): GDKGameLobbyController
+                    - createServerSimulatorForAutoLaunch(Stage, GameModule)
+                    - setupAutoLaunchReturnToLobby(Stage, GameModule)
+                    - startNormalGDK(Stage)
+                }
+
+                Startup ..> Logging : logs status
+                Startup ..> StartupWindowManager : initializes progress window
+                Startup ..> UIInitializer : loads lobby UI
+                Startup ..> ModuleDiscovery : scans for modules
+                Startup ..> ModuleCompiler : compiles and loads modules
+                Startup ..> GameModule : launches games
+                Startup ..> ServerSimulatorController : binds message handling
+                Startup ..> MessagingBridge : sets callbacks
+                Startup ..> Shutdown : registers cleanup
+                Startup ..> TranscriptRecorder : records sessions
+                Startup ..> GameLaunchUtil : parses and launches game config
+
+                class StartupOperations {
+                    {static} + loadModulesWithProgress(windowManager: StartupWindowManager, totalSteps: int)
+                    {static} + ensureUIReady(stage: Stage, lobbyController: GDKGameLobbyController, windowManager: StartupWindowManager)
+                    {static} - addDevelopmentDelay(reason: String)
+                    {static} + showMainStageWithFade(stage: Stage, windowManager: StartupWindowManager)
+                }
+
+                StartupOperations ..> StartupWindowManager : updates progress
+                StartupOperations ..> GDKGameLobbyController : refreshes modules
+                StartupOperations ..> ModuleDiscovery : finds modules
+                StartupOperations ..> ModuleCompiler : builds/loads modules
+                StartupOperations ..> Logging : logs status
+                StartupOperations ..> Shutdown : registers cleanup  
+                
+            }
+
+            package "stop" {
+                
+                class Shutdown {
+                    - cleanupTasks : List<Runnable>
+                    - backgroundExecutors : List<ExecutorService>
+                    - isShuttingDown : boolean
+
+                    {static} + isShuttingDown() : boolean
+                    {static} + registerCleanupTask(cleanupTask: Runnable)
+                    {static} + registerBackgroundExecutor(executor: ExecutorService)
+                    {static} + shutdown()
+                    {static} + forceShutdown()
+                }
+
+                Shutdown ..> Logging : logs lifecycle events
+            }
+        }
+
+        package "utils" {
+
+            class DialogUtil {
+                {static} + showError(title: String, message: String)
+                {static} + showError(title: String, header: String, message: String)
+                {static} + showError(title: String, header: String, message: String, exception: Exception)
+                {static} + showWarning(title: String, message: String)
+                {static} + showInfo(title: String, message: String)
+                {static} + showConfirmation(title: String, message: String) : boolean
+                {static} + showConfirmation(title: String, header: String, message: String, confirmButton: String, cancelButton: String) : boolean
+                {static} + showCustomDialog(title: String, content: Node) : Dialog<Void>
+                {static} + showExpandableDialog(title: String, header: String, content: String, expandable: Node, alertType: AlertType)
+                {static} + showStartupError(title: String, header: String, message: String)
+                {static} + showFatalError(title: String, header: String, message: String)
+                {static} + showGameError(title: String, message: String)
+                {static} + showJsonError(title: String, message: String)
+                {static} + showCompilationError(title: String, message: String)
+                {static} + runOnFXThread(runnable: Runnable)
+                {static} + styleDialogPane(alert: Alert)
+            }
+
+            class GameLaunchUtil {
+                - jsonMapper : ObjectMapper
+                {static} + launchGameWithConfiguration(gameModule: GameModule, jsonConfigurationData: Map<String,Object>, isAutoLaunch: boolean) : boolean
+                {static} + parseJsonString(jsonString: String) : Map<String,Object>
+            }
+
+            GameLaunchUtil ..> GameModule : sends config/start messages
+            GameLaunchUtil ..> Logging : logs launch info
+            GameLaunchUtil ..> TranscriptRecorder : records game I/O
+            GameLaunchUtil ..> StartMessageUtil : loads default start message
+
+            class ModuleCompiler {
+                - uiController : GDKGameLobbyController
+                - lastCompilationFailures : List<String>
+                {static} + compileModule(modulePath: String) : boolean
+                {static} + loadModule(moduleDir: File) : GameModule
+                {static} + loadModules(moduleDirectories: List<File>) : List<GameModule>
+                {static} + needsCompilation(moduleDir: File) : boolean
+                {static} + compileModulesIfNeeded(moduleDirectories: List<File>) : List<String>
+                {static} + needToBuildModules() : boolean
+                {static} + setUIController(controller: GDKGameLobbyController)
+                {static} + getUIController() : GDKGameLobbyController
+                {static} + storeCompilationFailures(failures: List<String>)
+                {static} + getLastCompilationFailures() : List<String>
+                {static} + clearCompilationFailures()
+                {static} + addCompilationFailure(moduleName: String)
+                .. Private Helpers ..
+                - findMavenCommand() : String
+                - createModuleClassLoader(moduleDir: File) : URLClassLoader
+                - validateMainClass(mainClass: Class<?>) : boolean
+            }
+
+            ModuleCompiler ..> Logging : logs compilation & loading
+            ModuleCompiler ..> GameModule : creates instances
+            ModuleCompiler ..> ModuleDiscovery : validates modules
+            ModuleCompiler ..> GDKGameLobbyController : updates UI
+
+            class ModuleDiscovery {
+                {static} + discoverModules(modulesDirectoryPath: String) : List<GameModule>
+                {static} + countValidModules(modulesDirectory: File) : int
+                {static} + getValidModuleDirectories(modulesDirectory: File) : List<File>
+                {static} + isValidModuleStructure(moduleDir: File) : boolean
+                {static} + moduleDirectoryExists(modulePath: String) : boolean
+                {static} + calculateTotalSteps() : int
+                {static} + getAllModuleDirectories(modulesDirectory: File) : List<File>
+                {static} + testModulesDirectoryAccess(modulesDirectoryPath: String) : boolean
+                {static} + diagnoseModuleDetectionIssues(modulesDirectoryPath: String)
+                {static} + moduleNeedsCompilation(moduleDir: File) : boolean
+                {static} + reportModuleCompilationStatus(modulesDirectory: File)
+                --
+                - validateMainJavaFile(mainJavaFile: File) : boolean
+                - validateMetadataJavaFile(metadataJavaFile: File) : boolean
+            }
+
+            ModuleDiscovery ..> Logging : logs diagnostics
+            ModuleDiscovery ..> GameModule : validates interface presence
+
+            class StartMessageUtil {
+                - DEFAULT_FILE_NAME : String
+                - LOCAL_MULTIPLAYER_FILE : String
+                - SINGLE_PLAYER_FILE : String
+                - ALL_MODES_FILE : String
+                --
+                {static} + loadDefaultStartMessage() : Map<String,Object>
+                {static} + loadLocalMultiplayerStartMessage() : Map<String,Object>
+                {static} + loadSinglePlayerStartMessage() : Map<String,Object>
+                {static} + loadAllModesStartMessage() : Map<String,Object>
+                --
+                {static} + loadStartMessage(filePath: Path) : Map<String,Object>
+                {static} + ensureSavedDirectoryExists()
+                --
+                - createDefaultStartMessage() : Map<String,Object>
+            }
+
+            StartMessageUtil ..> Logging : logs info/errors
+
+            class TranscriptRecorder {
+                - inSession : boolean
+                - transcriptEntries : List<Map<String,Object>>
+                --
+                {static} + startSession()
+                {static} + startSession(gameName:String, gameVersion:String)
+                {static} + recordToGame(message:Map<String,Object>)
+                {static} + recordFromGame(message:Map<String,Object>)
+                {static} + endSessionIfEndDetected(message:Map<String,Object>)
+                --
+                {static} + saveTranscript(targetFile:Path) : Path
+                {static} + saveTranscriptAsText(targetFile:Path) : Path
+                {static} + saveTranscriptBothFormats(baseFileName:String) : Path[]
+                {static} + saveCurrentTranscript() : Path[]
+                --
+                {static} + clear()
+                {static} + isInSession() : boolean
+                {static} + getTranscriptEntryCount() : int
+                {static} + printStatus()
+                {static} + getSessionSummary() : Map<String,Object>
+                --
+                - calculateSessionDuration(startTime:Object, endTime:Object) : String
+                - generateMessageFlowSummary(messages:List<Map<String,Object>>) : Map<String,Object>
+                - getMessageType(function:String) : String
+                - generateMessageSummary(function:String, details:Map<String,Object>) : String
+                - formatTimestamp(instant:Instant) : String
+            }
+        }
+
+        class GDKApplication {
+            + MODULES_DIRECTORY_PATH : String
+            + start(primaryStage: Stage)
+            + stop()
+            + main(args: String[])
+        }
+
+        GDKApplication ..> Startup : delegates start()
+        GDKApplication ..> Shutdown : delegates stop()
+        GDKApplication ..> Logging : logs shutdown hook
+    }
+}
+
+@enduml

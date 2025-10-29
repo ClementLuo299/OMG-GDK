@@ -1,0 +1,68 @@
+@startuml
+
+left to right direction
+hide empty members
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+
+title OMG Game Development Kit (GDK) - Architecture
+
+' === Game Modules ===
+package "Game Modules" {
+    package "Chatroom Module" {
+        class Metadata {
+            + String getGameName()
+            + String getGameVersion()
+            + String getGameDescription()
+            + String getGameAuthor()
+            + boolean supportsSinglePlayer()
+            + boolean supportsMultiPlayer()
+            + boolean supportsLocalMultiPlayer()
+            + boolean supportsAIOpponent()
+            + boolean supportsTournament()
+            + int getMinPlayers()
+            + int getMaxPlayers()
+            + String getMinDifficulty()
+            + String getMaxDifficulty()
+            + int getEstimatedDurationMinutes()
+            + List<String> getRequiredResources()
+        }
+
+        class Main {
+            - static String GAME_ID
+            - Metadata metadata
+            - String lastGameMode
+            - List<Map<String, Object>> lastPlayers
+            - String localPlayerId
+            - String currentPlayerSelector
+            - boolean isSinglePlayerMode
+            - TextArea chatAreaRef
+            - TextArea playersTextRef
+            - TextArea allMessagesAreaRef
+            - Label infoLabelRef
+            - Label youLabelRef
+            - Label localMultiplayerLabel
+            - ComboBox<String> playerSelector
+            - Label titleLabel
+            + Scene launchGame(Stage primaryStage)
+            + void stopGame()
+            + Map<String, Object> handleMessage(Map<String, Object> message)
+            + Metadata getMetadata()
+            - String generateRandomMessage()
+            - String buildPlayersText()
+            - void appendChat(String from, String text)
+            - void appendAllMessages(Map<String, Object> message)
+            - String getGameModeDisplayName()
+            - Scene createTestInterface(Stage primaryStage)
+        }
+
+        Main -right-|> gdk.GameModule
+        Metadata -up-|> gdk.GameMetadata
+        Main --> Metadata : composition
+        Main --> gdk.Logging : uses
+        Main --> gdk.MessagingBridge : uses
+    }
+}
+
+@enduml

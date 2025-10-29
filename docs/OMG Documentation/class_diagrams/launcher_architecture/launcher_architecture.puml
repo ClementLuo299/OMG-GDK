@@ -1,0 +1,29 @@
+@startuml
+
+left to right direction
+hide empty members
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+
+title OMG Game Development Kit (GDK) - Architecture
+
+' === GDK Core ===
+package "GDK_Core" {
+
+    package "launcher" {
+
+        class GDKApplication {
+            + MODULES_DIRECTORY_PATH : String
+            + start(primaryStage: Stage)
+            + stop()
+            + main(args: String[])
+        }
+
+        GDKApplication ..> Startup : delegates start()
+        GDKApplication ..> Shutdown : delegates stop()
+        GDKApplication ..> Logging : logs shutdown hook
+    }
+}
+
+@enduml
