@@ -121,7 +121,7 @@ public class Startup {
             // Find the selected game module
             GameModule selectedModule = null;
             for (GameModule module : discoveredModules) {
-                if (selectedGameName.equals(module.getGameName())) {
+                if (selectedGameName.equals(module.getMetadata().getGameName())) {
                     selectedModule = module;
                     break;
                 }
@@ -143,7 +143,7 @@ public class Startup {
             }
 
             // Configure the primary stage for proper game display
-            primaryApplicationStage.setTitle(selectedModule.getGameName());
+            primaryApplicationStage.setTitle(selectedModule.getMetadata().getGameName());
             primaryApplicationStage.setMinWidth(800);
             primaryApplicationStage.setMinHeight(600);
             primaryApplicationStage.setWidth(1200);
@@ -157,7 +157,7 @@ public class Startup {
             if (configSuccess) {
                 // Create a separate stage for the game so closing it doesn't shut down the app
                 Stage gameStage = new Stage();
-                gameStage.setTitle(selectedModule.getGameName());
+                gameStage.setTitle(selectedModule.getMetadata().getGameName());
                 gameStage.setMinWidth(800);
                 gameStage.setMinHeight(600);
                 gameStage.setWidth(1200);

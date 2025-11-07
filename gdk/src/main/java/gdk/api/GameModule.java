@@ -7,11 +7,11 @@ import java.util.Map;
 /**
  * Core interface for all game modules.
  * Defines the contract that all games must implement to integrate with the GDK.
- * All game modules must provide metadata information.
+ * All game modules include metadata information.
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited July 24, 2025
+ * @edited November 7, 2025
  * @since 1.0
  */
 public interface GameModule {
@@ -49,41 +49,4 @@ public interface GameModule {
      * @return The game metadata
      */
     GameMetadata getMetadata();
-    
-    /**
-     * Get the display name of the game.
-     * This is the name that will be shown in the UI.
-     * 
-     * @return The display name of the game
-     */
-    default String getGameName() {
-        return getMetadata().getGameName();
-    }
-    
-    /**
-     * Get the version of the game.
-     * 
-     * @return The game version
-     */
-    default String getGameVersion() {
-        return getMetadata().getGameVersion();
-    }
-    
-    /**
-     * Get the description of the game.
-     * 
-     * @return The game description
-     */
-    default String getGameDescription() {
-        return getMetadata().getGameDescription();
-    }
-    
-    /**
-     * Get the author of the game.
-     * 
-     * @return The game author
-     */
-    default String getGameAuthor() {
-        return getMetadata().getGameAuthor();
-    }
 } 

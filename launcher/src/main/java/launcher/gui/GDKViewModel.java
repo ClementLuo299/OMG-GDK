@@ -212,7 +212,7 @@ public class GDKViewModel {
         
         Scene gameScene = selectedGameModule.launchGame(primaryApplicationStage);
         if (gameScene != null) {
-            primaryApplicationStage.setTitle(selectedGameModule.getGameName());
+            primaryApplicationStage.setTitle(selectedGameModule.getMetadata().getGameName());
             primaryApplicationStage.setScene(gameScene);
             updateGameStateAfterSuccessfulLaunch(selectedGameModule);
             

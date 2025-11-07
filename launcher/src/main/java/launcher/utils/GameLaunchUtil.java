@@ -51,7 +51,7 @@ public class GameLaunchUtil {
             }
             
             if (!isAutoLaunch) {
-                Logging.info("🚀 Launching " + gameModule.getGameName());
+                Logging.info("🚀 Launching " + gameModule.getMetadata().getGameName());
             }
             
             // Step 3: Send JSON configuration to game if provided
@@ -63,7 +63,7 @@ public class GameLaunchUtil {
                     // Send the configuration to the game
                     Map<String, Object> response = gameModule.handleMessage(jsonConfigurationData);
                     if (response != null && !isAutoLaunch) {
-                        Logging.info("✅ Configuration acknowledged by " + gameModule.getGameName());
+                        Logging.info("✅ Configuration acknowledged by " + gameModule.getMetadata().getGameName());
                         // Record response to transcript
                         TranscriptRecorder.recordFromGame(response);
                     }
@@ -83,7 +83,7 @@ public class GameLaunchUtil {
                     
                     Map<String, Object> response = gameModule.handleMessage(startMessage);
                     if (response != null && !isAutoLaunch) {
-                        Logging.info("✅ Start message acknowledged by " + gameModule.getGameName());
+                        Logging.info("✅ Start message acknowledged by " + gameModule.getMetadata().getGameName());
                         // Record response to transcript
                         TranscriptRecorder.recordFromGame(response);
                     }

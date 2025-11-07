@@ -292,7 +292,7 @@ public class GDKGameLobbyController implements Initializable {
                     setText("Select a game...");
                 } else {
                     // Display the game name from the GameModule interface
-                    setText(gameModule.getGameName());
+                    setText(gameModule.getMetadata().getGameName());
                 }
             }
         });
@@ -352,7 +352,7 @@ public class GDKGameLobbyController implements Initializable {
         // When user selects a game from the dropdown, update the selected game and show feedback
         gameSelector.setOnAction(event -> {
             selectedGameModule = gameSelector.getValue();
-            String selectedGameName = selectedGameModule != null ? selectedGameModule.getGameName() : "None";
+            String selectedGameName = selectedGameModule != null ? selectedGameModule.getMetadata().getGameName() : "None";
             addUserMessage("🎮 Selected game: " + selectedGameName);
             // Persist selected game
             persistSelectedGame(selectedGameName);
@@ -379,7 +379,7 @@ public class GDKGameLobbyController implements Initializable {
                     Set<String> previousModuleNames = new HashSet<>();
                     if (previousModuleCount > 0) {
                         for (GameModule module : availableGameModules) {
-                            previousModuleNames.add(module.getGameName());
+                            previousModuleNames.add(module.getMetadata().getGameName());
                         }
                     }
                     
@@ -414,7 +414,7 @@ public class GDKGameLobbyController implements Initializable {
                     // Add each discovered module to our observable list
                     for (GameModule gameModule : discoveredGameModules) {
                         availableGameModules.add(gameModule); // Add to observable list for UI binding
-                        String gameName = gameModule.getGameName();
+                        String gameName = gameModule.getMetadata().getGameName();
                         String className = gameModule.getClass().getSimpleName();
                         Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
                         
@@ -460,7 +460,7 @@ public class GDKGameLobbyController implements Initializable {
                         // Check for module changes (additions/removals)
                         Set<String> currentModuleNames = new HashSet<>();
                         for (GameModule module : availableGameModules) {
-                            currentModuleNames.add(module.getGameName());
+                            currentModuleNames.add(module.getMetadata().getGameName());
                         }
                         
                         // Find removed module names
@@ -694,7 +694,7 @@ public class GDKGameLobbyController implements Initializable {
             // Check if we have any existing modules (not just count > 0)
             if (!availableGameModules.isEmpty()) {
                 for (GameModule module : availableGameModules) {
-                    previousModuleNames.add(module.getGameName());
+                    previousModuleNames.add(module.getMetadata().getGameName());
                 }
             }
             
@@ -722,7 +722,7 @@ public class GDKGameLobbyController implements Initializable {
             // Add each discovered module to our observable list
             for (GameModule gameModule : discoveredGameModules) {
                 availableGameModules.add(gameModule); // Add to observable list for UI binding
-                String gameName = gameModule.getGameName();
+                String gameName = gameModule.getMetadata().getGameName();
                 String className = gameModule.getClass().getSimpleName();
                 newlyDiscoveredModuleNames.add(gameName);
                 Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
@@ -764,7 +764,7 @@ public class GDKGameLobbyController implements Initializable {
                 // Log the final state for debugging
                 Logging.info("📊 Final UI state: " + availableGameModules.size() + " modules in ComboBox");
                 for (GameModule module : availableGameModules) {
-                    Logging.info("   - " + module.getGameName());
+                    Logging.info("   - " + module.getMetadata().getGameName());
                 }
             });
             
@@ -788,7 +788,7 @@ public class GDKGameLobbyController implements Initializable {
             Set<String> previousModuleNames = new HashSet<>();
             if (previousModuleCount > 0) {
                 for (GameModule module : availableGameModules) {
-                    previousModuleNames.add(module.getGameName());
+                    previousModuleNames.add(module.getMetadata().getGameName());
                 }
             }
             
@@ -823,7 +823,7 @@ public class GDKGameLobbyController implements Initializable {
             // Add each discovered module to our observable list
             for (GameModule gameModule : discoveredGameModules) {
                 availableGameModules.add(gameModule); // Add to observable list for UI binding
-                String gameName = gameModule.getGameName();
+                String gameName = gameModule.getMetadata().getGameName();
                 String className = gameModule.getClass().getSimpleName();
                 Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
                 
@@ -858,7 +858,7 @@ public class GDKGameLobbyController implements Initializable {
                 // Check for module changes (additions/removals)
                 Set<String> currentModuleNames = new HashSet<>();
                 for (GameModule module : availableGameModules) {
-                    currentModuleNames.add(module.getGameName());
+                    currentModuleNames.add(module.getMetadata().getGameName());
                 }
                 
                 // Find removed module names
@@ -1620,7 +1620,7 @@ public class GDKGameLobbyController implements Initializable {
         
         // Get the content from the JSON input area
         String jsonContent = jsonInputEditor.getText().trim();
-        String gameModuleName = selectedGameModule.getGameName();
+        String gameModuleName = selectedGameModule.getMetadata().getGameName();
         
         if (jsonContent.isEmpty()) {
             // If the JSON field is empty, send a placeholder message
@@ -2104,7 +2104,7 @@ public class GDKGameLobbyController implements Initializable {
             
             // Save selected game
             if (selectedGameModule != null) {
-                persistSelectedGame(selectedGameModule.getGameName());
+                persistSelectedGame(selectedGameModule.getMetadata().getGameName());
             }
             
             Logging.info("📋 Application settings saved successfully");
