@@ -5,15 +5,11 @@ hide empty members
 skinparam linetype ortho
 skinparam nodesep 60
 skinparam ranksep 60
+skinparam classAttributeIconSize 0
 
-title OMG Game Development Kit (GDK) - Architecture
+title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>Launcher GUI</font>
 
-' === GDK Core ===
-package "GDK_Core" {
-
-    package "launcher" {
-
-        package "gui" {
+package "launcher.gui" {
             class GDKGameLobbyController {
                 + void initialize(URL location, ResourceBundle resources)
                 + void setViewModel(GDKViewModel viewModel)
@@ -44,14 +40,14 @@ package "GDK_Core" {
                 - static final long MESSAGE_INTERVAL_MS
             }
 
-            GDKGameLobbyController -down-> GDK_Core.launcher.GDKApplication : uses
-            GDKGameLobbyController -down-> GDK_Core.launcher.utils.ModuleDiscovery : uses
-            GDKGameLobbyController -down-> GDK_Core.launcher.utils.ModuleCompiler : uses
-            GDKGameLobbyController -down-> GDK_Core.launcher.utils.DialogUtil : uses
-            GDKGameLobbyController -down-> GDK_Core.launcher.utils.GameLaunchUtil : uses
-            GDKGameLobbyController -down-> GDK_Core.launcher.utils.TranscriptRecorder : uses
-            GDKGameLobbyController --> GDK_Core.gdk.Logging : logs with
-            GDKGameLobbyController --> GDK_Core.gdk.GameModule : loads & launches
+            GDKGameLobbyController -down-> GDKApplication : uses
+            GDKGameLobbyController -down-> ModuleDiscovery : uses
+            GDKGameLobbyController -down-> ModuleCompiler : uses
+            GDKGameLobbyController -down-> DialogUtil : uses
+            GDKGameLobbyController -down-> GameLaunchUtil : uses
+            GDKGameLobbyController -down-> TranscriptRecorder : uses
+            GDKGameLobbyController --> Logging : logs with
+            GDKGameLobbyController --> GameModule : loads & launches
             GDKGameLobbyController --> GDKViewModel : delegates logic
 
             class GDKViewModel {
@@ -101,15 +97,15 @@ package "GDK_Core" {
                 - boolean isLocalMultiplayerModeFromJson(String)
             }
 
-            GDKViewModel --> GDK_Core.gdk.GameModule : manages
-            GDKViewModel --> GDK_Core.gdk.Logging : logs with
-            GDKViewModel --> GDK_Core.gdk.MessagingBridge : communicates via
-            GDKViewModel --> GDK_Core.launcher.utils.ModuleDiscovery : discovers modules
-            GDKViewModel --> GDK_Core.launcher.utils.ModuleCompiler : loads modules
-            GDKViewModel --> GDK_Core.launcher.utils.TranscriptRecorder : records transcripts
-            GDKViewModel --> GDK_Core.launcher.gui.ServerSimulatorController : controls
-            GDKViewModel --> GDK_Core.launcher.gui.GDKGameLobbyController : linked with
-            GDKViewModel --> GDK_Core.launcher.GDKApplication : accesses constants
+            GDKViewModel --> GameModule : manages
+            GDKViewModel --> Logging : logs with
+            GDKViewModel --> MessagingBridge : communicates via
+            GDKViewModel --> ModuleDiscovery : discovers modules
+            GDKViewModel --> ModuleCompiler : loads modules
+            GDKViewModel --> TranscriptRecorder : records transcripts
+            GDKViewModel --> ServerSimulatorController : controls
+            GDKViewModel --> GDKGameLobbyController : linked with
+            GDKViewModel --> GDKApplication : accesses constants
 
             class ServerSimulatorController {
                 ' ==================== FXML UI Elements ====================
@@ -165,10 +161,10 @@ package "GDK_Core" {
                 + void onClose()
             }
 
-            ServerSimulatorController --> GDK_Core.gdk.Logging : uses
-            ServerSimulatorController --> GDK_Core.launcher.GDKApplication : coordinates with
-            ServerSimulatorController <-- GDK_Core.launcher.gui.GDKViewModel : created and managed by
-            ServerSimulatorController <-- GDK_Core.launcher.gui.GDKGameLobbyController : indirectly connected
+            ServerSimulatorController --> Logging : uses
+            ServerSimulatorController --> GDKApplication : coordinates with
+            ServerSimulatorController <-- GDKViewModel : created and managed by
+            ServerSimulatorController <-- GDKGameLobbyController : indirectly connected
 
             class SettingsPageController {
                 ' ==================== FXML UI Elements ====================
@@ -224,8 +220,8 @@ package "GDK_Core" {
                 + int getFontSize()
             }
 
-            SettingsPageController --> GDK_Core.gdk.Logging : logs actions
-            SettingsPageController --> GDK_Core.launcher.gui.GDKGameLobbyController : synchronizes with
+            SettingsPageController --> Logging : logs actions
+            SettingsPageController --> GDKGameLobbyController : synchronizes with
 
             class SingleJsonEditor {
                 ' ==================== Fields ====================
@@ -273,9 +269,32 @@ package "GDK_Core" {
                 - String getIndentation(String)
             }
 
-            SingleJsonEditor --> GDK_Core.launcher.utils.DialogUtil : displays alerts
-        }
-    }
+            SingleJsonEditor --> DialogUtil : displays alerts
 }
+
+package "launcher" {
+    class GDKApplication
+}
+
+package "launcher.utils" {
+    class ModuleDiscovery
+    class ModuleCompiler
+    class DialogUtil
+    class GameLaunchUtil
+    class TranscriptRecorder
+}
+
+package "gdk" {
+    class Logging
+    interface GameModule
+    class MessagingBridge
+}
+
+legend right
+    <b>Legend</b>
+    --> dependency / usage
+    ..> delegation path
+    packages group actual Java packages
+end legend
 
 @enduml
