@@ -1,7 +1,7 @@
 package launcher.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gdk.Logging;
+import gdk.infrastructure.Logging;
 
 import java.io.File;
 import java.nio.file.Files;

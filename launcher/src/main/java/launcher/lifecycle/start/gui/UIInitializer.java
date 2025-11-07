@@ -3,13 +3,11 @@ package launcher.lifecycle.start.gui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.animation.PauseTransition;
-import javafx.util.Duration;
 import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
-import gdk.Logging;
+import gdk.infrastructure.Logging;
 
 import java.net.URL;
 import javafx.application.Platform;

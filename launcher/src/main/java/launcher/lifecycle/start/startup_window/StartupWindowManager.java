@@ -6,7 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import launcher.utils.ModuleDiscovery;
 import launcher.lifecycle.stop.Shutdown;
-import gdk.Logging;
+import gdk.infrastructure.Logging;
 
 /**
  * Manages the running, displaying, and lifecycle of the startup progress window.

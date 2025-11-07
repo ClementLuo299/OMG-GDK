@@ -1,13 +1,11 @@
 package launcher.gui;
 
-import gdk.Logging;
+import gdk.infrastructure.Logging;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.beans.value.ChangeListener;
@@ -15,9 +13,6 @@ import com.jfoenix.controls.JFXToggleButton;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.prefs.Preferences;
 
 /**

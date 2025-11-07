@@ -1,10 +1,8 @@
 package launcher.lifecycle.stop;
 
-import gdk.Logging;
-import javafx.application.Platform;
-import javafx.stage.Stage;
+import gdk.infrastructure.Logging;
+
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.ArrayList;

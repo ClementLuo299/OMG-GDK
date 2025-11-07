@@ -1,7 +1,7 @@
 package launcher.lifecycle.start;
 
-import gdk.GameModule;
-import gdk.Logging;
+import gdk.api.GameModule;
+import gdk.infrastructure.Logging;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import launcher.GDKApplication;

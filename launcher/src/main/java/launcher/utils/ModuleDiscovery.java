@@ -1,7 +1,7 @@
 package launcher.utils;
 
-import gdk.Logging;
-import gdk.GameModule;
+import gdk.infrastructure.Logging;
+import gdk.api.GameModule;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package launcher.utils;
 
-import gdk.GameModule;
-import gdk.Logging;
+import gdk.api.GameModule;
+import gdk.infrastructure.Logging;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 

@@ -1,7 +1,8 @@
 package launcher.lifecycle.start;
 
-import gdk.Logging;
-import gdk.GameModule;
+import gdk.infrastructure.Logging;
+import gdk.api.GameModule;
+import gdk.infrastructure.MessagingBridge;
 import launcher.utils.ModuleCompiler;
 import launcher.utils.ModuleDiscovery;
 
@@ -183,7 +184,7 @@ public class Startup {
                     launcher.utils.TranscriptRecorder.startSession(gameName, gameVersion);
                     
                     // Set up the lobby return callback for games
-                    gdk.MessagingBridge.setLobbyReturnCallback(() -> {
+                    MessagingBridge.setLobbyReturnCallback(() -> {
                         Logging.info("Auto-launched game requested return to lobby - starting GDK");
                         Platform.runLater(() -> startNormalGDK(primaryApplicationStage));
                     });
@@ -302,7 +303,7 @@ public class Startup {
                 });
                 
                 // Set up message bridge consumer for game messages exactly like normal GDK
-                gdk.MessagingBridge.setConsumer(msg -> {
+                MessagingBridge.setConsumer(msg -> {
                     try {
                         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                         String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
@@ -321,7 +322,7 @@ public class Startup {
                 });
                 
                 // Also mirror messages to lobby JSON output exactly like normal GDK
-                gdk.MessagingBridge.addConsumer(msg -> {
+                MessagingBridge.addConsumer(msg -> {
                     try {
                         // Record the message to the transcript
                         launcher.utils.TranscriptRecorder.recordFromGame(msg);
@@ -395,7 +396,7 @@ public class Startup {
         
         // Only set up the messaging bridge callback for games that use returnToLobby()
         // This is the ONLY way to return to GDK now
-        gdk.MessagingBridge.setLobbyReturnCallback(() -> {
+        MessagingBridge.setLobbyReturnCallback(() -> {
             Logging.info("Auto-launched game requested return to lobby - starting GDK");
             
             // Close the server simulator if it exists

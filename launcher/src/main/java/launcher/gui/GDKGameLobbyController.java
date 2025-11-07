@@ -1,7 +1,8 @@
 package launcher.gui;
 
-import gdk.GameModule;
-import gdk.Logging;
+import gdk.api.GameModule;
+import gdk.infrastructure.Logging;
+import gdk.infrastructure.MessagingBridge;
 import launcher.utils.ModuleDiscovery;
 import launcher.utils.ModuleCompiler;
 
@@ -18,21 +19,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.Slider;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.text.Font;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.stage.Stage;
-import javafx.stage.Modality;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -40,14 +36,10 @@ import javafx.scene.Scene;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,9 +51,6 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import launcher.utils.DialogUtil;
 
@@ -251,7 +240,7 @@ public class GDKGameLobbyController implements Initializable {
 
     private void subscribeToEndMessageMirror() {
         try {
-            gdk.MessagingBridge.addConsumer(msg -> {
+            MessagingBridge.addConsumer(msg -> {
                 try {
                     // Record the message to the transcript
                     launcher.utils.TranscriptRecorder.recordFromGame(msg);

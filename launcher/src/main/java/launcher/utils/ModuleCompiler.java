@@ -1,11 +1,10 @@
 package launcher.utils;
 
-import gdk.Logging;
-import gdk.GameModule;
+import gdk.infrastructure.Logging;
+import gdk.api.GameModule;
 import launcher.gui.GDKGameLobbyController;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;

@@ -1,16 +1,15 @@
 package launcher.gui;
 
-import gdk.GameModule;
-import gdk.Logging;
+import gdk.api.GameModule;
+import gdk.infrastructure.Logging;
+import gdk.infrastructure.MessagingBridge;
 import launcher.utils.ModuleDiscovery;
 import launcher.utils.ModuleCompiler;
 
 import java.io.File;
-import launcher.gui.ServerSimulatorController;
+
 import launcher.GDKApplication;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -204,7 +203,7 @@ public class GDKViewModel {
         setupMessagingBridgeConsumer();
         
         // Also set up transcript recording consumer
-        gdk.MessagingBridge.addConsumer(msg -> {
+        MessagingBridge.addConsumer(msg -> {
             try {
                 // Record the message to the transcript
                 launcher.utils.TranscriptRecorder.recordFromGame(msg);
@@ -258,7 +257,7 @@ public class GDKViewModel {
     private void updateGameStateAfterSuccessfulLaunch(GameModule selectedGameModule) {
         currentlyRunningGame = selectedGameModule;
         // Set up the lobby return callback for games
-        gdk.MessagingBridge.setLobbyReturnCallback(this::returnToLobby);
+        MessagingBridge.setLobbyReturnCallback(this::returnToLobby);
         
         // Start transcript recording with game metadata
         String gameName = selectedGameModule.getMetadata().getGameName();
@@ -504,7 +503,7 @@ public class GDKViewModel {
      * forwarding them to the server simulator for display and processing.
      */
     private void setupMessagingBridgeConsumer() {
-        gdk.MessagingBridge.setConsumer(msg -> {
+        MessagingBridge.setConsumer(msg -> {
             try {
                 Logging.info("🔍 DEBUG: Received message from game: " + (msg != null ? msg.get("function") : "null"));
                 
