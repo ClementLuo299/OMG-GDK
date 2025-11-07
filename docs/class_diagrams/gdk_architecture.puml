@@ -23,6 +23,14 @@ package "gdk" {
                 + String getGameAuthor()
             }
 
+            note right of GameModule
+                Default implementations provided for:
+                stopGame()
+                handleMessage(...)
+                getGameName()/getGameVersion()
+                getGameDescription()/getGameAuthor()
+            end note
+
             abstract class GameMetadata {
                 + String getGameName()
                 + String getGameVersion()
@@ -48,7 +56,7 @@ package "gdk" {
 
         package "Infrastructure" {
             class Logging {
-                - static DateTimeFormatter TIMESTAMP_FORMAT
+                - static final DateTimeFormatter TIMESTAMP_FORMAT
                 + static void info(String message)
                 + static void warning(String message)
                 + static void error(String message)
@@ -57,7 +65,7 @@ package "gdk" {
                 - static void log(String level, String message, Throwable exception)
             }
 
-            class MessagingBridge {
+            class MessagingBridge <<final>> {
                 - static CopyOnWriteArrayList<Consumer<Map<String, Object>>> consumers
                 - static LobbyReturnCallback lobbyReturnCallback
                 + static void setConsumer(Consumer<Map<String, Object>> consumer)
@@ -65,26 +73,20 @@ package "gdk" {
                 + static void publish(Map<String, Object> message)
                 + static void setLobbyReturnCallback(LobbyReturnCallback callback)
                 + static void returnToLobby()
-            }
-
-            interface LobbyReturnCallback {
-                + void returnToLobby()
+                --
+                interface LobbyReturnCallback {
+                    + void returnToLobby()
+                }
             }
 
         }
 
         GameModule --> GameMetadata : uses
-        MessagingBridge *-- LobbyReturnCallback : inner interface
-        GameModule -[hidden]-> GameMetadata
-        GameMetadata -[hidden]-> Logging
-        Logging -[hidden]-> MessagingBridge
-}
 
 legend right
     <b>Legend</b>
     --> dependency / usage
-    *-- ownership or inner type
-    returnToLobby() entry point handed back to lobby
+    <<final>> non-instantiable utility/service
 end legend
 
 @enduml
