@@ -4,6 +4,13 @@
 
 echo "🚀 Starting GDK..."
 
+# Always ensure the local GDK dependency is up-to-date
+echo "📦 Installing local GDK dependency (and its parent POM)..."
+if ! mvn -q -pl gdk -am install; then
+    echo "❌ Failed to install GDK locally."
+    exit 1
+fi
+
 # Check if launcher classes exist (minimal check)
 if [ ! -d "launcher/target/classes" ]; then
     echo "❌ Error: Launcher classes not found at launcher/target/classes"
