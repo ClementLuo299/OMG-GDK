@@ -1,1 +1,8 @@
-Beta 1.0 Original Release
+# Changelog
+
+---
+
+## [Beta 1.0] - TBA
+
+### Added
+- Original Release
