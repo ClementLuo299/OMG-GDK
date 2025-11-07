@@ -5,15 +5,11 @@ hide empty members
 skinparam linetype ortho
 skinparam nodesep 60
 skinparam ranksep 60
+skinparam classAttributeIconSize 0
 
-title OMG Game Development Kit (GDK) - Architecture
+title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>Launcher Lifecycle</font>
 
-' === GDK Core ===
-package "GDK_Core" {
-
-    package "launcher" {
-
-        package "lifecycle" {
+package "launcher.lifecycle" {
 
             package "start" {
                 
@@ -27,12 +23,12 @@ package "GDK_Core" {
                         -wireUpControllerWithViewModel(GDKViewModel, GDKGameLobbyController)
                     }
 
-                    UIInitializer ..> GDK_Core.launcher.lifecycle.start.startup_window.StartupWindowManager : uses
-                    UIInitializer -down-> GDK_Core.launcher.gui.GDKGameLobbyController : creates
-                    UIInitializer -down-> GDK_Core.launcher.gui.GDKViewModel : creates
-                    UIInitializer ..> GDK_Core.gdk.Logging : logs events
-                    UIInitializer ..> GDK_Core.launcher.GDKApplication : loads resources
-                    UIInitializer ..> GDK_Core.launcher.lifecycle.stop.Shutdown : triggers shutdown
+                    UIInitializer ..> StartupWindowManager : uses
+                    UIInitializer -down-> GDKGameLobbyController : creates
+                    UIInitializer -down-> GDKViewModel : creates
+                    UIInitializer ..> Logging : logs events
+                    UIInitializer ..> GDKApplication : loads resources
+                    UIInitializer ..> Shutdown : triggers shutdown
                 }
 
                 package "startup_window" {
@@ -168,7 +164,37 @@ package "GDK_Core" {
                 Shutdown ..> Logging : logs lifecycle events
             }
         }
-    }
 }
+
+package "launcher" {
+    class GDKApplication
+}
+
+package "launcher.gui" {
+    class GDKGameLobbyController
+    class GDKViewModel
+    class ServerSimulatorController
+}
+
+package "launcher.utils" {
+    class ModuleDiscovery
+    class ModuleCompiler
+    class TranscriptRecorder
+    class GameLaunchUtil
+}
+
+package "gdk" {
+    class Logging
+    interface GameModule
+    class MessagingBridge
+}
+
+legend right
+    <b>Legend</b>
+    --> dependency / usage
+    ..> asynchronous/deferred interaction
+    *-- composition / ownership
+    packages align with Java packages
+end legend
 
 @enduml
