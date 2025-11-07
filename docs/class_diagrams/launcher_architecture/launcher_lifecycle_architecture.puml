@@ -12,12 +12,12 @@ title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>Launcher Lifecycle</f
 package "launcher.lifecycle.start" {
 
     package "gui" {
-        class UIInitializer {
-            + GDKGameLobbyController initialize(Stage, StartupWindowManager)
-            - Scene initializeMainUserInterface(GDKGameLobbyController[])
-            - GDKViewModel initializeApplicationViewModel(Stage)
-            - void configurePrimaryApplicationStage(Stage, Scene)
-            - void wireUpControllerWithViewModel(GDKViewModel, GDKGameLobbyController)
+        class UIInitializer <<final>> {
+            {static} + GDKGameLobbyController initialize(Stage, StartupWindowManager)
+            {static} - Scene initializeMainUserInterface(GDKGameLobbyController[])
+            {static} - GDKViewModel initializeApplicationViewModel(Stage)
+            {static} - void configurePrimaryApplicationStage(Stage, Scene)
+            {static} - void wireUpControllerWithViewModel(GDKViewModel, GDKGameLobbyController)
         }
     }
 
@@ -87,13 +87,13 @@ package "launcher.lifecycle.start" {
         - static final String JSON_PERSISTENCE_FILE
         - static final String SELECTED_GAME_FILE
         - static final String AUTO_LAUNCH_ENABLED_FILE
-        + void start(Stage)
-        - boolean isAutoLaunchEnabled()
-        - boolean attemptAutoLaunch(Stage)
-        - GDKGameLobbyController createMinimalControllerForAutoLaunch()
-        - void createServerSimulatorForAutoLaunch(Stage, GameModule)
-        - void setupAutoLaunchReturnToLobby(Stage, GameModule)
-        - void startNormalGDK(Stage)
+        {static} + void start(Stage)
+        {static} - boolean isAutoLaunchEnabled()
+        {static} - boolean attemptAutoLaunch(Stage)
+        {static} - GDKGameLobbyController createMinimalControllerForAutoLaunch()
+        {static} - void createServerSimulatorForAutoLaunch(Stage, GameModule)
+        {static} - void setupAutoLaunchReturnToLobby(Stage, GameModule)
+        {static} - void startNormalGDK(Stage)
     }
 
     class StartupOperations {
