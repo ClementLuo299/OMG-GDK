@@ -78,6 +78,26 @@
                         <target>11</target>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.6.3</version>
+
+                    <configuration>
+                        <additionalOptions>-Xdoclint:none</additionalOptions>
+                        <doclint>none</doclint>
+                        <failOnError>false</failOnError>
+                    </configuration>
+                    
+                    <executions>
+                        <execution>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
