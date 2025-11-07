@@ -1,4 +1,4 @@
-package gdk;
+package gdk.api;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
