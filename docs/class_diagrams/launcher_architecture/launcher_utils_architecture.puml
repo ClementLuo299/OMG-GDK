@@ -5,15 +5,11 @@ hide empty members
 skinparam linetype ortho
 skinparam nodesep 60
 skinparam ranksep 60
+skinparam classAttributeIconSize 0
 
-title OMG Game Development Kit (GDK) - Architecture
+title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>Launcher Utilities</font>
 
-' === GDK Core ===
-package "GDK_Core" {
-
-    package "launcher" {
-
-        package "utils" {
+package "launcher.utils" {
 
             class DialogUtil {
                 {static} + showError(title: String, message: String)
@@ -137,8 +133,22 @@ package "GDK_Core" {
                 - generateMessageSummary(function:String, details:Map<String,Object>) : String
                 - formatTimestamp(instant:Instant) : String
             }
-        }
-    }
 }
+
+package "launcher.gui" {
+    class GDKGameLobbyController
+}
+
+package "gdk" {
+    interface GameModule
+    class Logging
+}
+
+legend right
+    <b>Legend</b>
+    --> dependency / usage
+    ..> async/indirect dependency
+    package names mirror Java packages
+end legend
 
 @enduml
