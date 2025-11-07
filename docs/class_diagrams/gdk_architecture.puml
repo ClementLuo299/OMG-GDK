@@ -11,7 +11,7 @@ title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>gdk folder</font>
 
 package "gdk" {
 
-        package "Game API" {
+        package "api" {
             interface GameModule {
                 + Scene launchGame(Stage primaryStage)
                 + void stopGame()
@@ -22,14 +22,6 @@ package "gdk" {
                 + String getGameDescription()
                 + String getGameAuthor()
             }
-
-            note right of GameModule
-                Default implementations provided for:
-                stopGame()
-                handleMessage(...)
-                getGameName()/getGameVersion()
-                getGameDescription()/getGameAuthor()
-            end note
 
             abstract class GameMetadata {
                 + String getGameName()
@@ -54,7 +46,7 @@ package "gdk" {
 
         }
 
-        package "Infrastructure" {
+        package "infrastructure" {
             class Logging {
                 - static final DateTimeFormatter TIMESTAMP_FORMAT
                 + static void info(String message)

@@ -1,185 +1,95 @@
 @startuml
-
 left to right direction
 hide empty members
-skinparam linetype ortho
-skinparam nodesep 60
-skinparam ranksep 60
-skinparam classAttributeIconSize 0
+skinparam nodesep 80
+skinparam ranksep 80
+skinparam packageStyle rectangle
 
-title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>Launcher Lifecycle</font>
+title OMG Game Development Kit (GDK) - Launcher Lifecycle (Simplified)
 
 package "launcher.lifecycle.start" {
-
-    package "gui" {
-        class UIInitializer <<final>> {
-            {static} + GDKGameLobbyController initialize(Stage, StartupWindowManager)
-            {static} - Scene initializeMainUserInterface(GDKGameLobbyController[])
-            {static} - GDKViewModel initializeApplicationViewModel(Stage)
-            {static} - void configurePrimaryApplicationStage(Stage, Scene)
-            {static} - void wireUpControllerWithViewModel(GDKViewModel, GDKGameLobbyController)
-        }
-    }
-
-    package "startup_window" {
-
-        class PreStartupProgressWindow {
-            - JFrame progressFrame
-            - JProgressBar progressBar
-            - JLabel statusLabel
-            - int totalSteps
-            - ProgressBarStyling progressBarStyling
-            + PreStartupProgressWindow()
-            + void show()
-            + void hide()
-            + void updateProgress(int, String)
-            + void setTotalSteps(int)
-            + JFrame getProgressFrame()
-            + void updateStatusText(String)
-            + ProgressBarStyling getProgressBarStyling()
-            + void repaintProgressBar()
-            + boolean isVisible()
-        }
-
-        class ProgressBarStyling {
-            - float shimmerOffset
-            + void setShimmerOffset(float)
-            + float getShimmerOffset()
-            + void paintDeterminate(Graphics, JComponent)
-            + void paintIndeterminate(Graphics, JComponent)
-            - void paintMultiLayeredShadow(Graphics2D, int, int)
-            - void paintGlassBackground(Graphics2D, int, int)
-            - void paintInnerShadow(Graphics2D, int, int)
-            - void paintProgressFill(Graphics2D, int, int)
-            - void paintShimmerEffect(Graphics2D, int, int)
-            - void paintElectricGlow(Graphics2D, int, int)
-            - void paintGlassHighlight(Graphics2D, int, int)
-            - void paintDepthShadow(Graphics2D, int, int)
-            - void paintAnimatedParticles(Graphics2D, int, int)
-            - void paintBorderSystem(Graphics2D, int, int)
-        }
-
-        class StartupWindowManager {
-            - PreStartupProgressWindow progressWindow
-            - AtomicInteger currentStep
-            - int totalSteps
-            - Timer animationTimer
-            - Timer progressAnimationTimer
-            - String fullMessage
-            - int currentCharIndex
-            - boolean isAnimating
-            - float shimmerOffset
-            + StartupWindowManager(PreStartupProgressWindow)
-            + static StartupWindowManager initializeWithCalculatedSteps()
-            + void setTotalSteps(int)
-            + void show()
-            + void hide()
-            + void updateProgress(int, String)
-            + void updateProgressWithDelay(int, String, int)
-            + void updateProgress(int, String, int)
-            + int getCurrentStep()
-            + int getTotalSteps()
-            + boolean isVisible()
-        }
-    }
-
-    class Startup {
-        - static final String JSON_PERSISTENCE_FILE
-        - static final String SELECTED_GAME_FILE
-        - static final String AUTO_LAUNCH_ENABLED_FILE
-        {static} + void start(Stage)
-        {static} - boolean isAutoLaunchEnabled()
-        {static} - boolean attemptAutoLaunch(Stage)
-        {static} - GDKGameLobbyController createMinimalControllerForAutoLaunch()
-        {static} - void createServerSimulatorForAutoLaunch(Stage, GameModule)
-        {static} - void setupAutoLaunchReturnToLobby(Stage, GameModule)
-        {static} - void startNormalGDK(Stage)
-    }
-
-    class StartupOperations {
-        {static} + void loadModulesWithProgress(StartupWindowManager, int)
-        {static} + void ensureUIReady(Stage, GDKGameLobbyController, StartupWindowManager)
-        {static} - void addDevelopmentDelay(String)
-        {static} + void showMainStageWithFade(Stage, StartupWindowManager)
-    }
+  package "gui" {
+    class UIInitializer <<final>>
+  }
+  package "startup_window" {
+    class PreStartupProgressWindow
+    class ProgressBarStyling
+    class StartupWindowManager
+  }
+  class Startup
+  class StartupOperations
 }
 
 package "launcher.lifecycle.stop" {
-    class Shutdown {
-        - List<Runnable> cleanupTasks
-        - List<ExecutorService> backgroundExecutors
-        - boolean isShuttingDown
-        {static} + boolean isShuttingDown()
-        {static} + void registerCleanupTask(Runnable)
-        {static} + void registerBackgroundExecutor(ExecutorService)
-        {static} + void shutdown()
-        {static} + void forceShutdown()
-    }
+  class Shutdown
 }
 
 package "launcher" {
-    class GDKApplication
+  class GDKApplication
 }
 
 package "launcher.gui" {
-    class GDKGameLobbyController
-    class GDKViewModel
-    class ServerSimulatorController
+  class GDKGameLobbyController
+  class GDKViewModel
+  class ServerSimulatorController
 }
 
 package "launcher.utils" {
-    class ModuleDiscovery
-    class ModuleCompiler
-    class TranscriptRecorder
-    class GameLaunchUtil
+  class ModuleDiscovery
+  class ModuleCompiler
+  class TranscriptRecorder
+  class GameLaunchUtil
 }
 
 package "gdk" {
-    class Logging
-    interface GameModule
-    class MessagingBridge
+  class Logging
+  class GameModule <<interface>>
+  class MessagingBridge
 }
 
-UIInitializer ..> StartupWindowManager : uses
-UIInitializer -down-> GDKGameLobbyController : creates
-UIInitializer -down-> GDKViewModel : creates
-UIInitializer ..> Logging : logs events
-UIInitializer ..> GDKApplication : loads resources
-UIInitializer ..> Shutdown : triggers shutdown
-UIInitializer ..> PreStartupProgressWindow : hides splash
+' -------------------------
+' Relationships (no labels)
+' -------------------------
+UIInitializer ..> StartupWindowManager
+UIInitializer --> GDKGameLobbyController
+UIInitializer --> GDKViewModel
+UIInitializer ..> Logging
+UIInitializer ..> GDKApplication
+UIInitializer ..> Shutdown
+UIInitializer ..> PreStartupProgressWindow
 
-PreStartupProgressWindow *-- ProgressBarStyling : owns
-StartupWindowManager *-- PreStartupProgressWindow : manages
-StartupWindowManager ..> ModuleDiscovery : reads step count
-StartupWindowManager ..> Shutdown : registers cleanup
-StartupWindowManager ..> Logging : logs info
+PreStartupProgressWindow *-- ProgressBarStyling
+StartupWindowManager *-- PreStartupProgressWindow
+StartupWindowManager ..> ModuleDiscovery
+StartupWindowManager ..> Shutdown
+StartupWindowManager ..> Logging
 
-Startup ..> Logging : logs status
-Startup ..> StartupWindowManager : initializes progress window
-Startup ..> UIInitializer : loads lobby UI
-Startup ..> ModuleDiscovery : scans for modules
-Startup ..> ModuleCompiler : compiles and loads modules
-Startup ..> GameModule : launches games
-Startup ..> ServerSimulatorController : binds message handling
-Startup ..> MessagingBridge : sets callbacks
-Startup ..> Shutdown : registers cleanup
-Startup ..> TranscriptRecorder : records sessions
-Startup ..> GameLaunchUtil : parses/launches config
+Startup ..> Logging
+Startup ..> StartupWindowManager
+Startup ..> UIInitializer
+Startup ..> ModuleDiscovery
+Startup ..> ModuleCompiler
+Startup ..> GameModule
+Startup ..> ServerSimulatorController
+Startup ..> MessagingBridge
+Startup ..> Shutdown
+Startup ..> TranscriptRecorder
+Startup ..> GameLaunchUtil
 
-StartupOperations ..> StartupWindowManager : updates progress
-StartupOperations ..> GDKGameLobbyController : refreshes modules
-StartupOperations ..> ModuleDiscovery : finds modules
-StartupOperations ..> ModuleCompiler : builds/loads modules
-StartupOperations ..> Logging : logs status
-StartupOperations ..> Shutdown : registers cleanup
+StartupOperations ..> StartupWindowManager
+StartupOperations ..> GDKGameLobbyController
+StartupOperations ..> ModuleDiscovery
+StartupOperations ..> ModuleCompiler
+StartupOperations ..> Logging
+StartupOperations ..> Shutdown
 
-Shutdown ..> Logging : logs lifecycle events
+Shutdown ..> Logging
 
 legend right
-    <b>Legend</b>
-    --> dependency / usage
-    *-- composition / ownership
-    packages follow Java package structure
+<b>Legend</b>
+<br/>--> dependency / usage
+<br/>*-- composition / ownership
+<br/>packages follow Java package structure
 end legend
 
 @enduml

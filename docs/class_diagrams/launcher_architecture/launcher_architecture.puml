@@ -1,43 +1,33 @@
 @startuml
-
 left to right direction
 hide empty members
-skinparam linetype ortho
-skinparam nodesep 60
-skinparam ranksep 60
 skinparam classAttributeIconSize 0
 
-title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>Launcher Entry Point</font>
+title <b>OMG Game Development Kit (GDK)</b>\n<font size=14>launcher folder</font>
 
-package "launcher" {
-    class GDKApplication {
-        + MODULES_DIRECTORY_PATH : String
-        + start(primaryStage: Stage)
-        + stop()
-        + main(args: String[])
-    }
+package launcher {
+  class GDKApplication {
+    + MODULES_DIRECTORY_PATH : String
+    + start(primaryStage: Stage)
+    + stop()
+    + main(args: String[])
+  }
 }
 
 package "launcher.lifecycle.start" {
-    class Startup
+  class Startup
 }
 
 package "launcher.lifecycle.stop" {
-    class Shutdown
+  class Shutdown
 }
 
-package "gdk" {
-    class Logging
+package gdk {
+  class Logging
 }
 
-GDKApplication ..> Startup : delegates start()
-GDKApplication ..> Shutdown : delegates stop()
-GDKApplication ..> Logging : shutdown hook
-
-legend right
-    <b>Legend</b>
-    ..> delegation / dependency
-    bold title highlights top-level package
-end legend
+GDKApplication --> Startup : delegates start()
+GDKApplication --> Shutdown : delegates stop()
+GDKApplication --> Logging : shutdown hook
 
 @enduml
