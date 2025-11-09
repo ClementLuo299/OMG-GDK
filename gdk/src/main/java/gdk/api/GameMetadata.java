@@ -88,13 +88,6 @@ public abstract class GameMetadata {
      */
     public abstract int getEstimatedDurationMinutes();
     
-    /**
-     * Get the list of required resources for the game.
-     * 
-     * @return List of required resources
-     */
-    public abstract List<String> getRequiredResources();
-    
     // ==================== UTILITY METHODS ====================
 
     /**
@@ -117,7 +110,6 @@ public abstract class GameMetadata {
         requirements.put("min_difficulty", getMinDifficulty());
         requirements.put("max_difficulty", getMaxDifficulty());
         requirements.put("estimated_duration_minutes", getEstimatedDurationMinutes());
-        requirements.put("required_resources", getRequiredResources());
         return requirements;
     }
     
