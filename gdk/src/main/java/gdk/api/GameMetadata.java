@@ -1,8 +1,11 @@
 package gdk.api;
 
+import gdk.infrastructure.GameMode;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Metadata class for game modules.
@@ -12,8 +15,8 @@ import java.util.List;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 12, 2025
- * @since 1.0
+ * @edited November 8, 2025
+ * @since Beta 1.0
  */
 public abstract class GameMetadata {
     
@@ -49,6 +52,8 @@ public abstract class GameMetadata {
     public abstract String getGameAuthor();
     
     // ==================== GAME MODES ====================
+
+    private Set<GameMode> supportedGameModes;
     
     /**
      * Get whether the game supports single player mode.
