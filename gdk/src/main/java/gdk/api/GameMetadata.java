@@ -1,7 +1,7 @@
 package gdk.api;
 
-import gdk.infrastructure.GameMode;
-import gdk.infrastructure.DifficultyLevel;
+import gdk.internal.GameMode;
+import gdk.internal.DifficultyLevel;
 
 import java.util.*;
 import java.util.stream.Collectors;

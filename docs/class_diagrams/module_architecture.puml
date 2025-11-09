@@ -65,8 +65,8 @@ package "Game Modules" {
 }
 
 package "GDK Core" {
-    class "gdk.infrastructure.Logging" as GdkLogging
-    class "gdk.infrastructure.MessagingBridge" as GdkMessagingBridge <<final>>
+    class "gdk.internal.Logging" as GdkLogging
+    class "gdk.internal.MessagingBridge" as GdkMessagingBridge <<final>>
     interface "gdk.api.GameModule" as GdkGameModule
     abstract class "gdk.api.GameMetadata" as GdkGameMetadata
 

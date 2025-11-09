@@ -1,8 +1,8 @@
 
 
 import gdk.api.GameMetadata;
-import gdk.infrastructure.GameMode;
-import gdk.infrastructure.DifficultyLevel;
+import gdk.internal.GameMode;
+import gdk.internal.DifficultyLevel;
 import java.util.EnumSet;
 import java.util.Set;
 

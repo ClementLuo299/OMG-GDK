@@ -1,4 +1,4 @@
-package gdk.infrastructure;
+package gdk.internal;
 
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;

@@ -1,4 +1,4 @@
-package gdk.infrastructure;
+package gdk.internal;
 
 /**
  * Enum for game mode

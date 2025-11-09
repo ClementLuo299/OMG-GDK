@@ -1,6 +1,6 @@
 package launcher.gui;
 
-import gdk.infrastructure.Logging;
+import gdk.internal.Logging;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;

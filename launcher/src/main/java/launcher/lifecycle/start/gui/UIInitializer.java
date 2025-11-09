@@ -7,7 +7,7 @@ import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
-import gdk.infrastructure.Logging;
+import gdk.internal.Logging;
 
 import java.net.URL;
 import javafx.application.Platform;

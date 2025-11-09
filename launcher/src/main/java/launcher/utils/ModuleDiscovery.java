@@ -1,6 +1,6 @@
 package launcher.utils;
 
-import gdk.infrastructure.Logging;
+import gdk.internal.Logging;
 import gdk.api.GameModule;
 
 import java.io.File;
@@ -137,7 +137,7 @@ public class ModuleDiscovery {
                 
                 // Filter out infra/hidden directories
                 if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
-                    Logging.info("⏭️ Skipping infrastructure directory: " + moduleName);
+                    Logging.info("⏭️ Skipping internal directory: " + moduleName);
                     continue;
                 }
                 
@@ -469,9 +469,9 @@ public class ModuleDiscovery {
                 String moduleName = subdir.getName();
                 Logging.info("🔍 Checking subdirectory: " + moduleName);
                 
-                // Skip infrastructure directories
+                // Skip internal directories
                 if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
-                    Logging.info("⏭️ Skipping infrastructure directory: " + moduleName);
+                    Logging.info("⏭️ Skipping internal directory: " + moduleName);
                     continue;
                 }
                 
@@ -573,7 +573,7 @@ public class ModuleDiscovery {
             for (File subdir : subdirs) {
                 String moduleName = subdir.getName();
                 
-                // Skip infrastructure directories
+                // Skip internal directories
                 if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
                     continue;
                 }

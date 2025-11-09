@@ -1,6 +1,6 @@
 package launcher.lifecycle.stop;
 
-import gdk.infrastructure.Logging;
+import gdk.internal.Logging;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;

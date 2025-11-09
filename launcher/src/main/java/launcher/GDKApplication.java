@@ -2,7 +2,7 @@ package launcher;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import gdk.infrastructure.Logging;
+import gdk.internal.Logging;
 
 import launcher.lifecycle.start.Startup;
 import launcher.lifecycle.stop.Shutdown;

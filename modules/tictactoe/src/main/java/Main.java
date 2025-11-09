@@ -1,7 +1,7 @@
 
 
 import gdk.api.GameModule;
-import gdk.infrastructure.Logging;
+import gdk.internal.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

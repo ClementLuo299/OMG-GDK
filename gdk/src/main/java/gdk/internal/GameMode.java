@@ -1,4 +1,4 @@
-package gdk.infrastructure;
+package gdk.internal;
 
 /**
  * Enum representing the various game modes supported by the GDK (Game Development Kit).

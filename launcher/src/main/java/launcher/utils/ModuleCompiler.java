@@ -1,6 +1,6 @@
 package launcher.utils;
 
-import gdk.infrastructure.Logging;
+import gdk.internal.Logging;
 import gdk.api.GameModule;
 import launcher.gui.GDKGameLobbyController;
 

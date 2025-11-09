@@ -1,8 +1,8 @@
 package launcher.gui;
 
 import gdk.api.GameModule;
-import gdk.infrastructure.Logging;
-import gdk.infrastructure.MessagingBridge;
+import gdk.internal.Logging;
+import gdk.internal.MessagingBridge;
 import launcher.utils.ModuleDiscovery;
 import launcher.utils.ModuleCompiler;
 

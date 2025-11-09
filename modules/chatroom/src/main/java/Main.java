@@ -1,6 +1,6 @@
 import gdk.api.GameModule;
-import gdk.infrastructure.Logging;
-import gdk.infrastructure.MessagingBridge;
+import gdk.internal.Logging;
+import gdk.internal.MessagingBridge;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
