@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited November 7, 2025
+ * @edited November 9, 2025
  * @since 1.0
  */
 public interface GameModule {

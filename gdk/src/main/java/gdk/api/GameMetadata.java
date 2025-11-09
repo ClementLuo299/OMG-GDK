@@ -11,9 +11,6 @@ import java.util.stream.Collectors;
  * Each game module extends this class to describe its unique configuration,
  * including supported modes, player counts, and difficulty levels.
  *
- * This simplified version omits getRequirements(), keeping only
- * essential metadata accessors for local or in-app use.
- *
  * @authors Clement Luo
  * @date July 25, 2025
  * @edited November 9, 2025
