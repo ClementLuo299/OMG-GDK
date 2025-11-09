@@ -51,45 +51,6 @@ public abstract class GameMetadata {
      */
     public abstract String getGameAuthor();
     
-    // ==================== GAME MODES ====================
-
-    private Set<GameMode> supportedGameModes;
-    
-    /**
-     * Get whether the game supports single player mode.
-     * 
-     * @return true if single player is supported, false otherwise
-     */
-    public abstract boolean supportsSinglePlayer();
-    
-    /**
-     * Get whether the game supports multi player mode.
-     * 
-     * @return true if multi player is supported, false otherwise
-     */
-    public abstract boolean supportsMultiPlayer();
-    
-    /**
-     * Get whether the game supports AI opponents.
-     * 
-     * @return true if AI opponents are supported, false otherwise
-     */
-    public abstract boolean supportsAIOpponent();
-    
-    /**
-     * Get whether the game supports local multiplayer mode.
-     * 
-     * @return true if local multiplayer is supported, false otherwise
-     */
-    public abstract boolean supportsLocalMultiPlayer();
-    
-    /**
-     * Get whether the game supports tournament mode.
-     * 
-     * @return true if tournament mode is supported, false otherwise
-     */
-    public abstract boolean supportsTournament();
-    
     // ==================== REQUIREMENTS ====================
     
     /**
@@ -135,22 +96,15 @@ public abstract class GameMetadata {
     public abstract List<String> getRequiredResources();
     
     // ==================== UTILITY METHODS ====================
-    
+
     /**
-     * Get the supported game modes as a Map.
-     * 
-     * @return Map containing supported game modes
+     * Get the set of supported game modes for this game.
+     *
+     * @return A set of supported GameMode values
      */
-    public Map<String, Object> getSupportedGameModes() {
-        Map<String, Object> gameModes = new HashMap<>();
-        gameModes.put("single_player", supportsSinglePlayer());
-        gameModes.put("multi_player", supportsMultiPlayer());
-        gameModes.put("local_multiplayer", supportsLocalMultiPlayer());
-        gameModes.put("ai_opponent", supportsAIOpponent());
-        gameModes.put("tournament", supportsTournament());
-        return gameModes;
-    }
-    
+    public abstract Set<GameMode> getSupportedGameModes();
+
+
     /**
      * Get the game requirements as a Map.
      * 
@@ -174,17 +128,20 @@ public abstract class GameMetadata {
      */
     public Map<String, Object> toMap() {
         Map<String, Object> metadata = new HashMap<>();
-        
-        // Basic game information
+
+        // Basic info
         metadata.put("name", getGameName());
         metadata.put("version", getGameVersion());
         metadata.put("description", getGameDescription());
         metadata.put("author", getGameAuthor());
-        
+
         // Game modes and requirements
-        metadata.put("supported_game_modes", getSupportedGameModes());
+        metadata.put("supported_game_modes", getSupportedGameModes()
+                .stream()
+                .map(Enum::name)
+                .toList());
         metadata.put("requirements", getRequirements());
-        
+
         return metadata;
     }
 } 
