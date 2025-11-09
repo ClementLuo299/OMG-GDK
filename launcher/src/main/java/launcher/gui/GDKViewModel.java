@@ -73,6 +73,12 @@ public class GDKViewModel {
     
     private Scene mainLobbyScene;
 
+    /** Subscription for the per-game server simulator consumer. */
+    private MessagingBridge.Subscription serverSimulatorSubscription;
+
+    /** Subscription for transcript recording during a game session. */
+    private MessagingBridge.Subscription transcriptSubscription;
+
     // ==================== CONSTRUCTOR ====================
     
     /**
@@ -203,7 +209,11 @@ public class GDKViewModel {
         setupMessagingBridgeConsumer();
         
         // Also set up transcript recording consumer
-        MessagingBridge.addConsumer(msg -> {
+        if (transcriptSubscription != null) {
+            transcriptSubscription.unsubscribe();
+            transcriptSubscription = null;
+        }
+        transcriptSubscription = MessagingBridge.addConsumer(msg -> {
             try {
                 // Record the message to the transcript
                 launcher.utils.TranscriptRecorder.recordFromGame(msg);
@@ -444,6 +454,22 @@ public class GDKViewModel {
             
             currentlyRunningGame = null;
         }
+
+        cleanupMessagingBridgeSubscriptions();
+    }
+
+    /**
+     * Remove any per-game MessagingBridge consumers that were registered.
+     */
+    private void cleanupMessagingBridgeSubscriptions() {
+        if (serverSimulatorSubscription != null) {
+            serverSimulatorSubscription.unsubscribe();
+            serverSimulatorSubscription = null;
+        }
+        if (transcriptSubscription != null) {
+            transcriptSubscription.unsubscribe();
+            transcriptSubscription = null;
+        }
     }
     
     /**
@@ -503,7 +529,12 @@ public class GDKViewModel {
      * forwarding them to the server simulator for display and processing.
      */
     private void setupMessagingBridgeConsumer() {
-        MessagingBridge.setConsumer(msg -> {
+        if (serverSimulatorSubscription != null) {
+            serverSimulatorSubscription.unsubscribe();
+            serverSimulatorSubscription = null;
+        }
+
+        serverSimulatorSubscription = MessagingBridge.addConsumer(msg -> {
             try {
                 Logging.info("🔍 DEBUG: Received message from game: " + (msg != null ? msg.get("function") : "null"));
                 
@@ -532,8 +563,7 @@ public class GDKViewModel {
                     ack.put("timestamp", java.time.Instant.now().toString());
                     currentlyRunningGame.handleMessage(ack);
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
         });
     }
 

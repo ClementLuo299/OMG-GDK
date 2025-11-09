@@ -41,6 +41,9 @@ public class Startup {
     private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
     private static final String AUTO_LAUNCH_ENABLED_FILE = "saved/gdk-auto-launch-enabled.txt";
 
+    private static MessagingBridge.Subscription autoLaunchMessageSubscription;
+    private static MessagingBridge.Subscription autoLaunchTranscriptSubscription;
+
     public static void start(Stage primaryApplicationStage) {
         Logging.info("Starting GDK application startup process");
         try {
@@ -302,8 +305,11 @@ public class Startup {
                     }
                 });
                 
+                // Clear any previous auto-launch subscriptions before installing fresh ones
+                teardownAutoLaunchSubscriptions();
+
                 // Set up message bridge consumer for game messages exactly like normal GDK
-                MessagingBridge.setConsumer(msg -> {
+                autoLaunchMessageSubscription = MessagingBridge.addConsumer(msg -> {
                     try {
                         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                         String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
@@ -322,7 +328,7 @@ public class Startup {
                 });
                 
                 // Also mirror messages to lobby JSON output exactly like normal GDK
-                MessagingBridge.addConsumer(msg -> {
+                autoLaunchTranscriptSubscription = MessagingBridge.addConsumer(msg -> {
                     try {
                         // Record the message to the transcript
                         launcher.utils.TranscriptRecorder.recordFromGame(msg);
@@ -340,6 +346,7 @@ public class Startup {
                 serverSimulatorStage.setOnCloseRequest(event -> {
                     Logging.info("🔒 Server simulator window closing");
                     serverSimulatorController.onClose();
+                    teardownAutoLaunchSubscriptions();
                     // Don't trigger return to GDK - just close the simulator
                 });
             }
@@ -351,6 +358,7 @@ public class Startup {
             Logging.info("🔧 Server simulator created successfully for auto-launched game");
         } catch (Exception e) {
             Logging.error("❌ Error creating server simulator for auto-launch: " + e.getMessage(), e);
+            teardownAutoLaunchSubscriptions();
         }
     }
     
@@ -370,6 +378,8 @@ public class Startup {
                 Logging.info("🔧 Closing server simulator for auto-launched game");
                 serverSimulatorStage.close();
             }
+            
+            teardownAutoLaunchSubscriptions();
             
             // Create an end message to trigger transcript generation
             Map<String, Object> endMessage = new HashMap<>();
@@ -407,11 +417,27 @@ public class Startup {
                 serverSimulatorStage.close();
             }
             
+            teardownAutoLaunchSubscriptions();
+            
             Platform.runLater(() -> startNormalGDK(primaryApplicationStage));
         });
         
         // Note: Now the game close handler only cleans up and generates transcript
         // It does NOT automatically return to GDK - only explicit returnToLobby() calls do
+    }
+
+    /**
+     * Remove any MessagingBridge consumers that were registered for auto-launch mode.
+     */
+    private static void teardownAutoLaunchSubscriptions() {
+        if (autoLaunchMessageSubscription != null) {
+            autoLaunchMessageSubscription.unsubscribe();
+            autoLaunchMessageSubscription = null;
+        }
+        if (autoLaunchTranscriptSubscription != null) {
+            autoLaunchTranscriptSubscription.unsubscribe();
+            autoLaunchTranscriptSubscription = null;
+        }
     }
     
     /**
@@ -435,4 +461,4 @@ public class Startup {
             throw new RuntimeException("Failed to start GDK application", startupError);
         }
     }
-} 
+}
