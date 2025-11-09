@@ -45,7 +45,7 @@ public final class StartupOperations {
             Logging.info("📁 Preparing module discovery...");
             windowManager.updateProgress(5, "Preparing module discovery...");
 
-            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
             Logging.info("🔍 Modules directory path: " + modulesDirectoryPath);
             File modulesDirectory = new File(modulesDirectoryPath);
 
@@ -196,17 +196,27 @@ public final class StartupOperations {
         Thread moduleLoadingThread = new Thread(() -> {
             try {
                 Logging.info("🔄 Starting module loading on background thread");
+                Logging.info("   Thread name: " + Thread.currentThread().getName());
+                Logging.info("   Is daemon: " + Thread.currentThread().isDaemon());
+                
                 loadModulesWithProgress(windowManager, totalSteps);
+                Logging.info("✅ loadModulesWithProgress completed");
                 
                 // Update UI on JavaFX thread after module loading completes
+                Logging.info("🔄 Scheduling UI refresh on JavaFX thread...");
                 Platform.runLater(() -> {
                     try {
+                        Logging.info("🔄 Now on JavaFX thread, refreshing available game modules...");
                         if (lobbyController != null) {
-                            Logging.info("🔄 Refreshing available game modules...");
+                            Logging.info("   Lobby controller is not null, calling refreshAvailableGameModulesFast()");
                             lobbyController.refreshAvailableGameModulesFast();
+                            Logging.info("✅ refreshAvailableGameModulesFast() completed");
+                        } else {
+                            Logging.error("❌ Lobby controller is null!");
                         }
                     } catch (Exception e) {
-                        Logging.error("❌ Error refreshing game modules: " + e.getMessage());
+                        Logging.error("❌ Error refreshing game modules: " + e.getMessage(), e);
+                        e.printStackTrace();
                     }
                 });
                 

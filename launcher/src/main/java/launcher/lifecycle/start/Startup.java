@@ -110,7 +110,7 @@ public class Startup {
             Logging.info("Auto-launch: Attempting to launch " + selectedGameName + " with saved JSON");
 
             // Discover and load modules
-            String modulesDirectoryPath = launcher.GDKApplication.MODULES_DIRECTORY_PATH;
+            String modulesDirectoryPath = launcher.GDKApplication.getModulesDirectoryPath();
             File modulesDirectory = new File(modulesDirectoryPath);
             List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDirectory);
             

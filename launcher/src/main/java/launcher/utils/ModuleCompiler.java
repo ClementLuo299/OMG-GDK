@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
 
 /**
  * Handles module compilation and loading.
@@ -72,10 +73,12 @@ public class ModuleCompiler {
     public static GameModule loadModule(File moduleDir) {
         String moduleName = moduleDir.getName();
         Logging.info("Loading module from: " + moduleName);
+        Logging.info("   Current thread: " + Thread.currentThread().getName());
+        Logging.info("   Is JavaFX thread: " + javafx.application.Platform.isFxApplicationThread());
         
         // Add timeout protection for individual module loading
         long startTime = System.currentTimeMillis();
-        long timeout = 10000; // 10 second timeout for individual module loading
+        long timeout = 30000; // 30 second timeout for individual module loading (increased for JavaFX initialization)
         
         try {
             // Validate source files first
@@ -117,7 +120,9 @@ public class ModuleCompiler {
             }
             
             // Create class loader with necessary dependencies
+            Logging.info("🔧 Creating classloader for module: " + moduleName);
             URLClassLoader classLoader = createModuleClassLoader(moduleDir);
+            Logging.info("✅ Classloader created successfully for module: " + moduleName);
             
             // Check timeout
             if (System.currentTimeMillis() - startTime > timeout) {
@@ -126,7 +131,62 @@ public class ModuleCompiler {
             }
             
             // Load and validate the Main class
-            Class<?> mainClass = classLoader.loadClass("Main");
+            Logging.info("📥 Loading Main class for module: " + moduleName);
+            Logging.info("   Elapsed time: " + (System.currentTimeMillis() - startTime) + "ms");
+            
+            // Ensure JavaFX Platform is initialized before loading JavaFX-dependent classes
+            Logging.info("   JavaFX Platform check - on FX thread: " + Platform.isFxApplicationThread());
+            try {
+                // Verify JavaFX is accessible
+                Platform.isFxApplicationThread(); // This will throw if JavaFX is not initialized
+            } catch (Exception javafxCheck) {
+                Logging.warning("   JavaFX Platform might not be initialized: " + javafxCheck.getMessage());
+            }
+            
+            Class<?> mainClass;
+            try {
+                Logging.info("   Attempting to load class 'Main'...");
+                long classLoadStart = System.currentTimeMillis();
+                mainClass = classLoader.loadClass("Main");
+                long classLoadTime = System.currentTimeMillis() - classLoadStart;
+                Logging.info("✅ Main class loaded successfully for module: " + moduleName + " (took " + classLoadTime + "ms)");
+                Logging.info("   Class name: " + mainClass.getName());
+                Logging.info("   Class loader: " + mainClass.getClassLoader().getClass().getName());
+            } catch (ClassNotFoundException e) {
+                Logging.error("❌ Main class not found for module " + moduleName + ": " + e.getMessage(), e);
+                // Try to list available classes in the target/classes directory
+                try {
+                    File classesDir = new File(moduleDir, "target/classes");
+                    if (classesDir.exists()) {
+                        Logging.info("🔍 Checking for classes in: " + classesDir.getAbsolutePath());
+                        java.nio.file.Files.walk(classesDir.toPath())
+                            .filter(p -> p.toString().endsWith(".class"))
+                            .forEach(p -> Logging.info("   Found class file: " + p.toString()));
+                    }
+                } catch (Exception listError) {
+                    Logging.error("Error listing classes: " + listError.getMessage());
+                }
+                return null;
+            } catch (NoClassDefFoundError e) {
+                Logging.error("❌ Class definition not found for module " + moduleName + ": " + e.getMessage(), e);
+                Logging.error("   This usually means a dependency is missing from the classpath");
+                e.printStackTrace();
+                return null;
+            } catch (ExceptionInInitializerError e) {
+                Logging.error("❌ Static initializer error for module " + moduleName + ": " + e.getMessage(), e);
+                Logging.error("   This means the class has a static initializer that failed");
+                if (e.getException() != null) {
+                    Logging.error("   Caused by: " + e.getException().getMessage(), e.getException());
+                }
+                e.printStackTrace();
+                return null;
+            } catch (Exception e) {
+                Logging.error("❌ Error loading Main class for module " + moduleName + ": " + e.getMessage(), e);
+                Logging.error("   Exception type: " + e.getClass().getName());
+                e.printStackTrace();
+                return null;
+            }
+            
             if (!validateMainClass(mainClass)) {
                 Logging.info("Main class validation failed for " + moduleName);
                 return null;
@@ -140,16 +200,28 @@ public class ModuleCompiler {
             
             // Create GameModule instance by instantiating the Main class
             if (GameModule.class.isAssignableFrom(mainClass)) {
-                GameModule module = (GameModule) mainClass.getDeclaredConstructor().newInstance();
-                Logging.info("Successfully created GameModule instance for " + moduleName);
-                return module;
+                Logging.info("🎯 Instantiating Main class for module: " + moduleName);
+                try {
+                    GameModule module = (GameModule) mainClass.getDeclaredConstructor().newInstance();
+                    Logging.info("✅ Instance created for module: " + moduleName);
+                    
+                    String gameName = module.getMetadata().getGameName();
+                    Logging.info("✅ Successfully loaded module: " + moduleName + " (Game: " + gameName + ")");
+                    return module;
+                } catch (Exception instantiationError) {
+                    Logging.error("❌ Failed to instantiate Main class for module " + moduleName + ": " + 
+                        instantiationError.getMessage(), instantiationError);
+                    instantiationError.printStackTrace();
+                    return null;
+                }
             } else {
-                Logging.info("Main class does not implement GameModule interface");
+                Logging.warning("Main class does not implement GameModule interface for module: " + moduleName);
                 return null;
             }
             
         } catch (Exception e) {
-            Logging.error("Error loading module " + moduleName + ": " + e.getMessage(), e);
+            Logging.error("❌ Error loading module " + moduleName + ": " + e.getMessage(), e);
+            Logging.error("   Module directory: " + moduleDir.getAbsolutePath(), e);
             return null;
         }
     }
@@ -178,12 +250,13 @@ public class ModuleCompiler {
                 GameModule module = loadModule(moduleDir);
                 if (module != null) {
                     loadedModules.add(module);
-                    Logging.info("Successfully loaded module: " + moduleDir.getName());
+                    Logging.info("✅ Module added to loaded list: " + moduleDir.getName());
                 } else {
-                    Logging.info("Failed to load module: " + moduleDir.getName());
+                    Logging.warning("⚠️ Module load returned null: " + moduleDir.getName() + 
+                        " (check logs above for details)");
                 }
             } catch (Exception e) {
-                Logging.error("Error loading module " + moduleDir.getName() + ": " + e.getMessage(), e);
+                Logging.error("❌ Exception while loading module " + moduleDir.getName() + ": " + e.getMessage(), e);
                 // Continue with other modules instead of failing completely
             }
         }
@@ -206,22 +279,93 @@ public class ModuleCompiler {
         File targetClassesDir = new File(moduleDir, "target/classes");
         if (targetClassesDir.exists()) {
             classpathUrls.add(targetClassesDir.toURI().toURL());
+            Logging.info("Added module classes to classpath: " + targetClassesDir.getAbsolutePath());
+        } else {
+            Logging.warning("Module target/classes directory does not exist: " + targetClassesDir.getAbsolutePath());
         }
         
-        // Add GDK classes
-        File gdkClassesDir = new File("../gdk/target/classes");
-        if (gdkClassesDir.exists()) {
-            classpathUrls.add(gdkClassesDir.toURI().toURL());
-            Logging.info("Added GDK classes to classpath: " + gdkClassesDir.getAbsolutePath());
+        // Resolve GDK and launcher paths relative to the module directory
+        // Modules are in modules/ subdirectory, so we need to go up to project root
+        File moduleParent = moduleDir.getParentFile(); // modules/
+        File projectRoot = moduleParent != null ? moduleParent.getParentFile() : null; // project root
+        
+        if (projectRoot != null) {
+            // Add GDK classes - try multiple possible locations
+            File[] gdkCandidates = {
+                new File(projectRoot, "gdk/target/classes"),
+                new File(moduleDir, "../../gdk/target/classes"),
+                new File("../gdk/target/classes"),
+                new File("gdk/target/classes")
+            };
+            
+            boolean gdkAdded = false;
+            for (File gdkCandidate : gdkCandidates) {
+                File gdkClassesDir = gdkCandidate.getAbsoluteFile();
+                if (gdkClassesDir.exists() && gdkClassesDir.isDirectory()) {
+                    classpathUrls.add(gdkClassesDir.toURI().toURL());
+                    Logging.info("Added GDK classes to classpath: " + gdkClassesDir.getAbsolutePath());
+                    gdkAdded = true;
+                    break;
+                }
+            }
+            
+            if (!gdkAdded) {
+                StringBuilder triedPaths = new StringBuilder();
+                for (File candidate : gdkCandidates) {
+                    if (triedPaths.length() > 0) triedPaths.append(", ");
+                    triedPaths.append(candidate.getAbsolutePath());
+                }
+                Logging.warning("GDK classes directory not found. Tried: " + triedPaths.toString());
+            }
+            
+            // Add launcher classes - try multiple possible locations
+            File[] launcherCandidates = {
+                new File(projectRoot, "launcher/target/classes"),
+                new File(moduleDir, "../../launcher/target/classes"),
+                new File("../launcher/target/classes"),
+                new File("launcher/target/classes")
+            };
+            
+            boolean launcherAdded = false;
+            for (File launcherCandidate : launcherCandidates) {
+                File launcherClassesDir = launcherCandidate.getAbsoluteFile();
+                if (launcherClassesDir.exists() && launcherClassesDir.isDirectory()) {
+                    classpathUrls.add(launcherClassesDir.toURI().toURL());
+                    Logging.info("Added launcher classes to classpath: " + launcherClassesDir.getAbsolutePath());
+                    launcherAdded = true;
+                    break;
+                }
+            }
+            
+            if (!launcherAdded) {
+                StringBuilder triedPaths = new StringBuilder();
+                for (File candidate : launcherCandidates) {
+                    if (triedPaths.length() > 0) triedPaths.append(", ");
+                    triedPaths.append(candidate.getAbsolutePath());
+                }
+                Logging.warning("Launcher classes directory not found. Tried: " + triedPaths.toString());
+            }
+        } else {
+            Logging.warning("Could not determine project root from module directory: " + moduleDir.getAbsolutePath());
+            // Fallback to relative paths
+            File gdkClassesDir = new File("../gdk/target/classes").getAbsoluteFile();
+            if (gdkClassesDir.exists()) {
+                classpathUrls.add(gdkClassesDir.toURI().toURL());
+                Logging.info("Added GDK classes to classpath (fallback): " + gdkClassesDir.getAbsolutePath());
+            }
+            
+            File launcherClassesDir = new File("../launcher/target/classes").getAbsoluteFile();
+            if (launcherClassesDir.exists()) {
+                classpathUrls.add(launcherClassesDir.toURI().toURL());
+                Logging.info("Added launcher classes to classpath (fallback): " + launcherClassesDir.getAbsolutePath());
+            }
         }
         
-        // Add launcher classes
-        File launcherClassesDir = new File("../launcher/target/classes");
-        if (launcherClassesDir.exists()) {
-            classpathUrls.add(launcherClassesDir.toURI().toURL());
-            Logging.info("Added launcher classes to classpath: " + launcherClassesDir.getAbsolutePath());
+        if (classpathUrls.isEmpty()) {
+            throw new Exception("No valid classpath URLs found for module: " + moduleDir.getAbsolutePath());
         }
         
+        Logging.info("Created classloader with " + classpathUrls.size() + " classpath entries for module: " + moduleDir.getName());
         return new URLClassLoader(classpathUrls.toArray(new URL[0]), ModuleCompiler.class.getClassLoader());
     }
     

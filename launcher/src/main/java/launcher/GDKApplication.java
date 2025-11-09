@@ -7,6 +7,9 @@ import gdk.infrastructure.Logging;
 import launcher.lifecycle.start.Startup;
 import launcher.lifecycle.stop.Shutdown;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 /**
  * Main JavaFX Application class for the OMG Game Development Kit (GDK).
@@ -24,9 +27,42 @@ public class GDKApplication extends Application {
     
     /**
      * Path to the modules directory relative to the launcher
-     * This is where game modules (JARs and compiled classes) are stored
+     * This is where game modules (JARs and compiled classes) are stored.
+     * The resolver makes sure IDE launches (project root) and CLI launches
+     * (launcher directory) can both find the modules folder.
      */
-    public static final String MODULES_DIRECTORY_PATH = "../modules";
+    public static final String MODULES_DIRECTORY_PATH = resolveModulesDirectoryPath();
+    
+    /**
+     * Helper accessor so other classes can fetch the already resolved path.
+     */
+    public static String getModulesDirectoryPath() {
+        return MODULES_DIRECTORY_PATH;
+    }
+    
+    /**
+     * Resolve the modules directory path for both CLI and IDE runs.
+     */
+    private static String resolveModulesDirectoryPath() {
+        String userDir = System.getProperty("user.dir");
+        String[] candidates = {
+            "../modules",   // Works when launcher/ is the working directory
+            "modules",      // Works when project root is the working directory
+            "../../modules" // Fallback for IDEs launching from submodules
+        };
+        
+        for (String candidate : candidates) {
+            Path candidatePath = Paths.get(candidate).toAbsolutePath().normalize();
+            if (candidatePath.toFile().isDirectory()) {
+                Logging.info("Modules directory resolved to " + candidatePath + " (user.dir=" + userDir + ")");
+                return candidatePath.toString();
+            }
+        }
+        
+        Path fallback = Paths.get("../modules").toAbsolutePath().normalize();
+        Logging.warning("Unable to locate modules directory from user.dir=" + userDir + "; defaulting to " + fallback);
+        return fallback.toString();
+    }
     
     // ==================== JAVAFX LIFECYCLE METHODS ====================
     

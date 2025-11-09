@@ -18,6 +18,9 @@ import javafx.fxml.FXMLLoader;
 import java.net.URL;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 /**
  * ViewModel for the GDK application that manages application state and business logic.
  * 
@@ -37,6 +40,9 @@ import java.util.List;
  * @since 1.0
  */
 public class GDKViewModel {
+
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+    private static final ObjectWriter JSON_PRETTY_WRITER = JSON_MAPPER.writerWithDefaultPrettyPrinter();
 
     // ==================== DEPENDENCIES ====================
     
@@ -328,10 +334,9 @@ public class GDKViewModel {
                             serverSimulatorController.addReceivedMessageToDisplay("ERROR: No game running");
                             return;
                         }
-                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
                         java.util.Map<String, Object> messageMap;
                         try {
-                            messageMap = mapper.readValue(messageText, java.util.Map.class);
+                            messageMap = JSON_MAPPER.readValue(messageText, java.util.Map.class);
                         } catch (Exception parseError) {
                             // Treat as plain chat text
                             messageMap = new java.util.HashMap<>();
@@ -352,7 +357,7 @@ public class GDKViewModel {
                         }
                         // Record from game
                         launcher.utils.TranscriptRecorder.recordFromGame(response);
-                        String responseText = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
+                        String responseText = JSON_PRETTY_WRITER.writeValueAsString(response);
                         serverSimulatorController.addReceivedMessageToDisplay(responseText);
                     } catch (Exception e) {
                         serverSimulatorController.addReceivedMessageToDisplay("ERROR: " + e.getMessage());
@@ -510,7 +515,7 @@ public class GDKViewModel {
      */
     private void refreshAvailableGameModules() {
         try {
-            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
             Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
             
             // Use ModuleDiscovery to find valid modules, then ModuleCompiler to load them
@@ -548,8 +553,7 @@ public class GDKViewModel {
                     return;
                 }
                 
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
+                String pretty = JSON_PRETTY_WRITER.writeValueAsString(msg);
                 if (serverSimulatorController != null) {
                     serverSimulatorController.addReceivedMessageToDisplay(pretty);
                 }
@@ -563,7 +567,9 @@ public class GDKViewModel {
                     ack.put("timestamp", java.time.Instant.now().toString());
                     currentlyRunningGame.handleMessage(ack);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                Logging.error("❌ Error handling MessagingBridge message: " + e.getMessage(), e);
+            }
         });
     }
 
@@ -575,8 +581,7 @@ public class GDKViewModel {
         try {
             if (jsonConfiguration != null && !jsonConfiguration.trim().isEmpty()) {
                 // Parse the JSON to check the gameMode field
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                java.util.Map<String, Object> jsonData = mapper.readValue(jsonConfiguration, java.util.Map.class);
+                java.util.Map<String, Object> jsonData = JSON_MAPPER.readValue(jsonConfiguration, java.util.Map.class);
                 
                 Object gameMode = jsonData.get("gameMode");
                 if (gameMode instanceof String) {
@@ -602,8 +607,7 @@ public class GDKViewModel {
         try {
             if (jsonConfiguration != null && !jsonConfiguration.trim().isEmpty()) {
                 // Parse the JSON to check the gameMode field
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                java.util.Map<String, Object> jsonData = mapper.readValue(jsonConfiguration, java.util.Map.class);
+                java.util.Map<String, Object> jsonData = JSON_MAPPER.readValue(jsonConfiguration, java.util.Map.class);
                 
                 Object gameMode = jsonData.get("gameMode");
                 if (gameMode instanceof String) {

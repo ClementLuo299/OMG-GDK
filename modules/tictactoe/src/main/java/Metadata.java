@@ -1,8 +1,10 @@
 
 
-import gdk.GameMetadata;
-import java.util.Arrays;
-import java.util.List;
+import gdk.api.GameMetadata;
+import gdk.infrastructure.GameMode;
+import gdk.infrastructure.DifficultyLevel;
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * Metadata for the TicTacToe Game module.
@@ -38,60 +40,37 @@ public class Metadata extends GameMetadata {
     
     // ==================== GAME MODES ====================
     
+    /** {@inheritDoc} */
     @Override
-    public boolean supportsSinglePlayer() {
-        return false;
+    public Set<GameMode> getSupportedGameModes() {
+        // TicTacToe supports multiplayer and computer opponent modes
+        return EnumSet.of(GameMode.MULTIPLAYER, GameMode.COMPUTER);
     }
     
+    /** {@inheritDoc} */
     @Override
-    public boolean supportsMultiPlayer() {
-        return true;
-    }
-    
-    @Override
-    public boolean supportsLocalMultiPlayer() {
-        return true;
-    }
-    
-    @Override
-    public boolean supportsAIOpponent() {
-        return true;
-    }
-    
-    @Override
-    public boolean supportsTournament() {
-        return true;
+    public Set<DifficultyLevel> getSupportedDifficultyLevels() {
+        // TicTacToe supports Easy, Normal, and Hard difficulty levels
+        return EnumSet.of(DifficultyLevel.EASY, DifficultyLevel.NORMAL, DifficultyLevel.HARD);
     }
     
     // ==================== REQUIREMENTS ====================
     
+    /** {@inheritDoc} */
     @Override
     public int getMinPlayers() {
         return 2;
     }
     
+    /** {@inheritDoc} */
     @Override
     public int getMaxPlayers() {
         return 2;
     }
     
-    @Override
-    public String getMinDifficulty() {
-        return "Easy";
-    }
-    
-    @Override
-    public String getMaxDifficulty() {
-        return "Hard";
-    }
-    
+    /** {@inheritDoc} */
     @Override
     public int getEstimatedDurationMinutes() {
         return 5;
-    }
-    
-    @Override
-    public List<String> getRequiredResources() {
-        return Arrays.asList("display", "input_device");
     }
 } 

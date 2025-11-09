@@ -300,6 +300,7 @@ public class GDKGameLobbyController implements Initializable {
         // Apply the same cell factory to the button cell (the part that shows the selected item)
         // This ensures consistent display between the dropdown list and the selected item
         gameSelector.setButtonCell(gameSelector.getCellFactory().call(null));
+        gameSelector.setItems(availableGameModules);
         
         // Message Area Setup
         
@@ -353,10 +354,21 @@ public class GDKGameLobbyController implements Initializable {
         gameSelector.setOnAction(event -> {
             selectedGameModule = gameSelector.getValue();
             String selectedGameName = selectedGameModule != null ? selectedGameModule.getMetadata().getGameName() : "None";
-            addUserMessage("🎮 Selected game: " + selectedGameName);
-            // Persist selected game
-            persistSelectedGame(selectedGameName);
+            
+            // Update launch button state based on selection
+            updateLaunchButtonState();
+            
+            if (selectedGameModule != null) {
+                addUserMessage("🎮 Selected game: " + selectedGameName);
+                // Persist selected game
+                persistSelectedGame(selectedGameName);
+            } else {
+                addUserMessage("⚠️ No game selected");
+            }
         });
+        
+        // Initialize launch button state (disabled until a game is selected)
+        updateLaunchButtonState();
         
         // Button Event Handlers
         // Launch button: Start the selected game with validation
@@ -371,29 +383,32 @@ public class GDKGameLobbyController implements Initializable {
             
             // Clear the message container immediately
             messageContainer.getChildren().clear();
+
+            // Snapshot current modules on the JavaFX thread for safe background use
+            List<GameModule> previousModulesSnapshot = new ArrayList<>(availableGameModules);
+            int previousCountSnapshot = previousModuleCount;
+
+            // Reset UI selections immediately to avoid launching stale modules
+            availableGameModules.clear();
+            selectedGameModule = null;
+            gameSelector.getSelectionModel().clearSelection();
             
             // Run the refresh in a background thread to keep UI responsive
             new Thread(() -> {
                 try {
                     // Store previous module names for removal detection
                     Set<String> previousModuleNames = new HashSet<>();
-                    if (previousModuleCount > 0) {
-                        for (GameModule module : availableGameModules) {
+                    if (previousCountSnapshot > 0) {
+                        for (GameModule module : previousModulesSnapshot) {
                             previousModuleNames.add(module.getMetadata().getGameName());
                         }
                     }
-                    
-                    // Clear existing game modules to start fresh
-                    availableGameModules.clear();
-                    
-                    // Clear the currently selected game module since we're refreshing
-                    selectedGameModule = null;
-                    
+
                     // Get the path to the modules directory from application constants
-                    String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+                    String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
                     
                     // Detect disabled/removed modules before recompilation
-                    if (previousModuleCount == 0) {
+                    if (previousCountSnapshot == 0) {
                         // First load - detect pre-disabled modules
                         detectDisabledModulesBeforeRecompilation(modulesDirectoryPath);
                     } else {
@@ -403,7 +418,7 @@ public class GDKGameLobbyController implements Initializable {
                     
                     // Skip compilation checks on startup for faster loading
                     // Only recompile if this is not the first load
-                    if (previousModuleCount > 0) {
+                    if (previousCountSnapshot > 0) {
                         checkAndRecompileModules(modulesDirectoryPath);
                     }
                     
@@ -413,13 +428,12 @@ public class GDKGameLobbyController implements Initializable {
                     
                     // Add each discovered module to our observable list
                     for (GameModule gameModule : discoveredGameModules) {
-                        availableGameModules.add(gameModule); // Add to observable list for UI binding
                         String gameName = gameModule.getMetadata().getGameName();
                         String className = gameModule.getClass().getSimpleName();
                         Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
                         
                         // Add user-friendly message for each detected game (only on first load)
-                        if (previousModuleCount == 0) {
+                        if (previousCountSnapshot == 0) {
                             addUserMessage("🎮 Detected game: " + gameName);
                         }
                     }
@@ -436,30 +450,37 @@ public class GDKGameLobbyController implements Initializable {
                     forceCompilationCheck(modulesDirectoryPath);
                     
                     // Update the ComboBox with the new list of games
-                    Logging.info("🔄 Updating ComboBox with " + availableGameModules.size() + " modules");
-                    gameSelector.setItems(availableGameModules);
+                    Logging.info("🔄 Updating ComboBox with " + discoveredGameModules.size() + " modules");
+                    Logging.info("🧭 Scheduling ComboBox UI update...");
                     
-                    // Clear the ComboBox selection since we refreshed
-                    gameSelector.getSelectionModel().clearSelection();
-                    
-                    // Force UI refresh on the JavaFX Application Thread
                     Platform.runLater(() -> {
-                        // Update the status label with the new count
-                        updateGameCountStatus();
-                        
-                        // Force ComboBox to refresh its display
-                        gameSelector.requestLayout();
+                        try {
+                            availableGameModules.setAll(discoveredGameModules);
+                            selectedGameModule = null;
+                            gameSelector.setItems(availableGameModules);
+                            gameSelector.getSelectionModel().clearSelection();
+                            updateGameCountStatus();
+                            updateLaunchButtonState(); // Update button state after clearing selection
+                            gameSelector.requestLayout();
+
+                            Logging.info("📋 ComboBox items after refresh: " + gameSelector.getItems().size());
+                            for (GameModule module : gameSelector.getItems()) {
+                                Logging.info("   • " + module.getMetadata().getGameName());
+                            }
+                        } catch (Exception e) {
+                            Logging.error("❌ Error updating ComboBox items on refresh: " + e.getMessage(), e);
+                        }
                     });
                     
                     // Check for module changes and provide user feedback
-                    int currentModuleCount = availableGameModules.size();
+                    int currentModuleCount = discoveredGameModules.size();
                     
-                    if (availableGameModules.isEmpty()) {
+                    if (currentModuleCount == 0) {
                         addUserMessage("⚠️ No game modules found in " + modulesDirectoryPath);
-                    } else if (previousModuleCount > 0) {
+                    } else if (previousCountSnapshot > 0) {
                         // Check for module changes (additions/removals)
                         Set<String> currentModuleNames = new HashSet<>();
-                        for (GameModule module : availableGameModules) {
+                        for (GameModule module : discoveredGameModules) {
                             currentModuleNames.add(module.getMetadata().getGameName());
                         }
                         
@@ -485,7 +506,7 @@ public class GDKGameLobbyController implements Initializable {
                         }
                         
                         addUserMessage("✅ Successfully detected " + currentModuleCount + " game(s)");
-                    } else if (previousModuleCount == 0) {
+                    } else if (previousCountSnapshot == 0) {
                         // First time loading - check for disabled modules that exist but aren't loaded
                         checkForDisabledModulesOnFirstLoad(modulesDirectoryPath, currentModuleCount);
                     } else {
@@ -689,23 +710,16 @@ public class GDKGameLobbyController implements Initializable {
      */
     public void refreshAvailableGameModulesFast() {
         try {
-            // Store previous module names for change detection
+            Logging.info("🔄 refreshAvailableGameModulesFast() called");
             Set<String> previousModuleNames = new HashSet<>();
-            // Check if we have any existing modules (not just count > 0)
-            if (!availableGameModules.isEmpty()) {
-                for (GameModule module : availableGameModules) {
-                    previousModuleNames.add(module.getMetadata().getGameName());
-                }
+            for (GameModule module : availableGameModules) {
+                previousModuleNames.add(module.getMetadata().getGameName());
             }
-            
-            // Clear existing game modules to start fresh
-            availableGameModules.clear();
-            
-            // Clear the currently selected game module since we're refreshing
-            selectedGameModule = null;
-            
+            Logging.info("📊 Previous module count: " + previousModuleNames.size());
+
             // Get the path to the modules directory from application constants
-            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+            Logging.info("📁 Modules directory path: " + modulesDirectoryPath);
             
             // Note: Progress window updates now handled by PreStartupProgressWindow in Startup class
             
@@ -713,66 +727,158 @@ public class GDKGameLobbyController implements Initializable {
             // Just discover modules from existing compiled classes
             
             // Use ModuleDiscovery and ModuleCompiler to discover all available game modules
-            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(new File(modulesDirectoryPath));
+            File modulesDir = new File(modulesDirectoryPath);
+            if (!modulesDir.exists()) {
+                Logging.error("❌ Modules directory does not exist: " + modulesDirectoryPath);
+                Platform.runLater(() -> {
+                    addUserMessage("❌ Modules directory not found: " + modulesDirectoryPath);
+                    updateGameCountStatus();
+                });
+                return;
+            }
+            
+            Logging.info("🔍 Discovering modules in: " + modulesDir.getAbsolutePath());
+            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDir);
+            Logging.info("✅ Found " + validModuleDirectories.size() + " valid module directories");
+            
+            if (validModuleDirectories.isEmpty()) {
+                Logging.warning("⚠️ No valid module directories found");
+                Platform.runLater(() -> {
+                    addUserMessage("⚠️ No valid modules found in: " + modulesDirectoryPath);
+                    updateGameCountStatus();
+                });
+                return;
+            }
+            
+            Logging.info("📦 Loading modules...");
             List<GameModule> discoveredGameModules = ModuleCompiler.loadModules(validModuleDirectories);
+            Logging.info("✅ Module loading completed. Loaded " + discoveredGameModules.size() + " modules");
+            
+            // Validate that modules were actually loaded
+            if (discoveredGameModules == null) {
+                Logging.error("❌ ModuleCompiler.loadModules() returned null!");
+                Platform.runLater(() -> {
+                    addUserMessage("❌ Error: Module loading returned null");
+                    updateGameCountStatus();
+                    updateLaunchButtonState();
+                });
+                return;
+            }
             
             // Track newly discovered modules for detailed reporting
             Set<String> newlyDiscoveredModuleNames = new HashSet<>();
+            List<String> uiMessages = new ArrayList<>();
             
-            // Add each discovered module to our observable list
             for (GameModule gameModule : discoveredGameModules) {
-                availableGameModules.add(gameModule); // Add to observable list for UI binding
-                String gameName = gameModule.getMetadata().getGameName();
-                String className = gameModule.getClass().getSimpleName();
-                newlyDiscoveredModuleNames.add(gameName);
-                Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
-                
-                // Add user-friendly message for each detected game
-                addUserMessage("🎮 Detected game: " + gameName);
-            }
-            
-            // Note: We don't check for failed module loads as requested - only track successful loads
-            
-            // Note: Progress window updates now handled by PreStartupProgressWindow in Startup class
-            
-            // Add summary message for detected games
-            if (availableGameModules.size() > 0) {
-                addUserMessage("✅ Successfully detected " + availableGameModules.size() + " game(s)");
-            } else {
-                addUserMessage("⚠️ No games detected - check modules directory");
-            }
-            
-            // Update the ComboBox with the new list of games
-            Logging.info("🔄 Updating ComboBox with " + availableGameModules.size() + " modules");
-            
-            // Force UI refresh on the JavaFX Application Thread to ensure all modules are visible
-            Platform.runLater(() -> {
-                // Update the ComboBox with the new list of games
-                gameSelector.setItems(availableGameModules);
-                
-                // Clear the ComboBox selection since we refreshed
-                gameSelector.getSelectionModel().clearSelection();
-                
-                // Update the status label with the new count
-                updateGameCountStatus();
-                
-                // Force ComboBox to refresh its display
-                gameSelector.requestLayout();
-                
-                
-                
-                // Log the final state for debugging
-                Logging.info("📊 Final UI state: " + availableGameModules.size() + " modules in ComboBox");
-                for (GameModule module : availableGameModules) {
-                    Logging.info("   - " + module.getMetadata().getGameName());
+                if (gameModule == null) {
+                    Logging.warning("⚠️ Null game module in discovered list - skipping");
+                    continue;
                 }
-            });
+                try {
+                    String gameName = gameModule.getMetadata().getGameName();
+                    String className = gameModule.getClass().getSimpleName();
+                    newlyDiscoveredModuleNames.add(gameName);
+                    Logging.info("📦 Loaded game module: " + gameName + " (" + className + ")");
+                    uiMessages.add("🎮 Detected game: " + gameName);
+                } catch (Exception e) {
+                    Logging.error("❌ Error getting metadata from game module: " + e.getMessage(), e);
+                }
+            }
             
-            // Analyze and report module changes
-            reportModuleChanges(previousModuleNames, newlyDiscoveredModuleNames);
+            if (!discoveredGameModules.isEmpty()) {
+                uiMessages.add("✅ Successfully detected " + discoveredGameModules.size() + " game(s)");
+                Logging.info("✅ Ready to update UI with " + discoveredGameModules.size() + " modules");
+            } else {
+                uiMessages.add("⚠️ No games detected - check modules directory");
+                Logging.warning("⚠️ No modules were loaded. Check logs above for loading errors.");
+            }
             
-            // Update the previous count for next comparison
-            previousModuleCount = availableGameModules.size();
+            // Create a final list of valid modules (filter out nulls)
+            final List<GameModule> validModules = new ArrayList<>();
+            for (GameModule module : discoveredGameModules) {
+                if (module != null) {
+                    validModules.add(module);
+                }
+            }
+            
+            Logging.info("📊 Valid modules to add to UI: " + validModules.size());
+            
+            // Always update UI on JavaFX thread
+            Runnable uiUpdate = () -> {
+                try {
+                    Logging.info("🎨 Updating UI on JavaFX thread...");
+                    Logging.info("   Current availableGameModules size: " + availableGameModules.size());
+                    Logging.info("   Modules to add: " + validModules.size());
+                    
+                    // Clear and update the observable list
+                    availableGameModules.clear();
+                    availableGameModules.addAll(validModules);
+                    
+                    Logging.info("   After adding, availableGameModules size: " + availableGameModules.size());
+                    
+                    // Update selected game module
+                    selectedGameModule = null;
+                    
+                    // Update ComboBox
+                    if (gameSelector != null) {
+                        gameSelector.setItems(availableGameModules);
+                        gameSelector.getSelectionModel().clearSelection();
+                        gameSelector.requestLayout();
+                        Logging.info("📋 ComboBox items after fast refresh: " + gameSelector.getItems().size());
+                        
+                        // Verify ComboBox has items
+                        if (gameSelector.getItems().isEmpty() && !validModules.isEmpty()) {
+                            Logging.error("❌ ComboBox is empty but validModules is not! This is a bug.");
+                            // Force refresh
+                            gameSelector.setItems(FXCollections.observableArrayList(validModules));
+                        }
+                    } else {
+                        Logging.error("❌ gameSelector is null!");
+                    }
+                    
+                    // Update status
+                    updateGameCountStatus();
+                    updateLaunchButtonState();
+                    
+                    // Log all modules in ComboBox
+                    if (gameSelector != null) {
+                        for (GameModule module : gameSelector.getItems()) {
+                            if (module != null) {
+                                Logging.info("   • ComboBox item: " + module.getMetadata().getGameName());
+                            }
+                        }
+                    }
+                    
+                    // Log all modules in observable list
+                    Logging.info("📊 Final UI state: " + availableGameModules.size() + " modules in ObservableList");
+                    for (GameModule module : availableGameModules) {
+                        if (module != null) {
+                            Logging.info("   - ObservableList item: " + module.getMetadata().getGameName());
+                        }
+                    }
+                    
+                    // Add user messages
+                    uiMessages.forEach(this::addUserMessage);
+                    
+                    // Report module changes
+                    reportModuleChanges(previousModuleNames, newlyDiscoveredModuleNames);
+                    previousModuleCount = availableGameModules.size();
+                    
+                    Logging.info("✅ UI update completed successfully");
+                } catch (Exception e) {
+                    Logging.error("❌ Error updating ComboBox items during fast refresh: " + e.getMessage(), e);
+                    e.printStackTrace();
+                }
+            };
+            
+            // Always run on JavaFX thread
+            if (Platform.isFxApplicationThread()) {
+                Logging.info("🔄 Already on JavaFX thread - running UI update directly");
+                uiUpdate.run();
+            } else {
+                Logging.info("🔄 Not on JavaFX thread - scheduling UI update");
+                Platform.runLater(uiUpdate);
+            }
             
         } catch (Exception e) {
             addUserMessage("❌ Error refreshing game modules: " + e.getMessage());
@@ -799,7 +905,7 @@ public class GDKGameLobbyController implements Initializable {
             selectedGameModule = null;
             
             // Get the path to the modules directory from application constants
-            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
             
             // Detect disabled/removed modules before recompilation
             if (previousModuleCount == 0) {
@@ -1065,7 +1171,7 @@ public class GDKGameLobbyController implements Initializable {
             Logging.info("🚀 Checking for compilation failures on startup...");
             
             // Get the modules directory path
-            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
             
             // Check for compilation failures detected by ModuleCompiler
             checkModuleCompilerCompilationFailures();
@@ -1292,7 +1398,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void detectNewlyRemovedModules(Set<String> previousModuleNames) {
         try {
-            String modulesDirectoryPath = GDKApplication.MODULES_DIRECTORY_PATH;
+            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
             File modulesDir = new File(modulesDirectoryPath);
             File[] subdirs = modulesDir.listFiles(File::isDirectory);
             
@@ -1495,6 +1601,23 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
+     * Update the launch button state based on whether a game is selected.
+     * Disables the button when no game is selected, enables it when a game is selected.
+     */
+    private void updateLaunchButtonState() {
+        if (launchGameButton != null) {
+            boolean hasSelectedGame = selectedGameModule != null;
+            launchGameButton.setDisable(!hasSelectedGame);
+            
+            if (hasSelectedGame) {
+                launchGameButton.setStyle("-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px; -fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 10 20; -fx-min-width: 120;");
+            } else {
+                launchGameButton.setStyle("-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px; -fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-color: transparent; -fx-cursor: default; -fx-padding: 10 20; -fx-min-width: 120; -fx-opacity: 0.6;");
+            }
+        }
+    }
+    
+    /**
      * Update the status label with a message.
      * 
      * @param message The status message to display
@@ -1515,10 +1638,38 @@ public class GDKGameLobbyController implements Initializable {
      * @param isAutoLaunch Whether this is an auto-launch (affects error handling)
      */
     private void launchSelectedGameWithConfiguration(Map<String, Object> jsonConfigurationData, boolean isAutoLaunch) {
+        // Double-check that a game is selected (defensive programming)
+        if (selectedGameModule == null) {
+            Logging.error("❌ launchSelectedGameWithConfiguration called with null selectedGameModule");
+            if (!isAutoLaunch) {
+                DialogUtil.showError("Launch Error", "No game module is selected. Please select a game from the dropdown.");
+                addUserMessage("❌ Error: No game selected for launch");
+            }
+            return;
+        }
+        
+        // Validate ViewModel is available
+        if (applicationViewModel == null) {
+            Logging.error("❌ applicationViewModel is null - cannot launch game");
+            if (!isAutoLaunch) {
+                DialogUtil.showError("Application Error", "Application ViewModel is not available. Please restart the application.");
+                addUserMessage("❌ Error: ViewModel not available");
+            }
+            return;
+        }
+        
+        String gameName = selectedGameModule.getMetadata().getGameName();
+        Logging.info("🚀 Preparing to launch game: " + gameName);
+        
         // Use the utility class for the core launch logic
         boolean configSuccess = launcher.utils.GameLaunchUtil.launchGameWithConfiguration(selectedGameModule, jsonConfigurationData, isAutoLaunch);
         
         if (!configSuccess) {
+            Logging.error("❌ Game configuration failed for: " + gameName);
+            if (!isAutoLaunch) {
+                DialogUtil.showError("Launch Error", "Failed to configure game: " + gameName + ". Check the logs for details.");
+                addUserMessage("❌ Failed to configure game: " + gameName);
+            }
             return; // Exit early if configuration failed
         }
         
@@ -1526,11 +1677,15 @@ public class GDKGameLobbyController implements Initializable {
         String jsonText = jsonInputEditor.getText().trim();
         
         // Step 5: Launch the game using the ViewModel
-        if (applicationViewModel != null) {
+        try {
+            Logging.info("🎮 Calling ViewModel to launch game: " + gameName);
             applicationViewModel.handleLaunchGame(selectedGameModule, jsonText); // Delegate to ViewModel with JSON text
-        } else {
+            addUserMessage("✅ Launching game: " + gameName);
+        } catch (Exception e) {
+            Logging.error("❌ Exception while launching game: " + gameName, e);
             if (!isAutoLaunch) {
-                DialogUtil.showError("Application Error", "ViewModel reference is not available.");
+                DialogUtil.showError("Launch Error", "Failed to launch game: " + gameName + "\n\nError: " + e.getMessage());
+                addUserMessage("❌ Error launching game: " + e.getMessage());
             }
         }
     }
@@ -1540,6 +1695,17 @@ public class GDKGameLobbyController implements Initializable {
      * This is the original method that gets called when the user presses "Launch Game".
      */
     private void launchSelectedGame() {
+        // Validate that a game is selected
+        if (selectedGameModule == null) {
+            Logging.warning("⚠️ Launch button clicked but no game is selected");
+            DialogUtil.showError("No Game Selected", 
+                "Please select a game from the dropdown before launching.");
+            addUserMessage("⚠️ Please select a game from the dropdown first");
+            return;
+        }
+        
+        Logging.info("🚀 Launch button clicked for game: " + selectedGameModule.getMetadata().getGameName());
+        
         // Parse and validate JSON syntax from UI
         Map<String, Object> jsonConfigurationData = parseJsonConfigurationData();
         if (jsonConfigurationData == null) {
