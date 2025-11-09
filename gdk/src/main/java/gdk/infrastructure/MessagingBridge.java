@@ -10,6 +10,11 @@ import java.util.function.Consumer;
  * Provides a lightweight event system where components can publish and subscribe
  * to generic metadata messages ({@code Map<String, Object>}), as well as a global
  * "return to lobby" callback.
+ *
+ * @authors Clement Luo
+ * @date August 8, 2025
+ * @edited November 9, 2025
+ * @since Beta 1.0
  */
 public final class MessagingBridge {
 

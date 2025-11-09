@@ -1,7 +1,6 @@
-
-
-import gdk.GameModule;
-import gdk.Logging;
+import gdk.api.GameModule;
+import gdk.infrastructure.Logging;
+import gdk.infrastructure.MessagingBridge;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -73,7 +72,7 @@ public class Main implements GameModule {
             endMsg.put("function", "end");
             if (localPlayerId != null) endMsg.put("playerId", localPlayerId);
             endMsg.put("timestamp", java.time.Instant.now().toString());
-            gdk.MessagingBridge.publish(endMsg);
+            MessagingBridge.publish(endMsg);
         } catch (Exception ignored) {
         }
     }
@@ -140,7 +139,7 @@ public class Main implements GameModule {
                 closeSimulatorMsg.put("reason", "single_player_mode_no_server_needed");
                 closeSimulatorMsg.put("timestamp", java.time.Instant.now().toString());
                 Logging.info("🔍 DEBUG: Sending close_server_simulator message: " + closeSimulatorMsg);
-                gdk.MessagingBridge.publish(closeSimulatorMsg);
+                MessagingBridge.publish(closeSimulatorMsg);
                 Logging.info("🔍 DEBUG: close_server_simulator message sent via MessagingBridge");
             }
             
@@ -434,7 +433,7 @@ public class Main implements GameModule {
                         aiMessage.put("from", "AI");
                         aiMessage.put("text", aiResponse);
                         aiMessage.put("timestamp", java.time.Instant.now().toString());
-                        gdk.MessagingBridge.publish(aiMessage);
+                        MessagingBridge.publish(aiMessage);
                     });
                 } else {
                     Logging.info("🔍 DEBUG: Not single player mode, skipping AI response");
@@ -446,7 +445,7 @@ public class Main implements GameModule {
                 out.put("from", sender);
                 out.put("text", text);
                 out.put("timestamp", java.time.Instant.now().toString());
-                gdk.MessagingBridge.publish(out);
+                MessagingBridge.publish(out);
                 
                 chatInput.clear();
             }
@@ -481,10 +480,10 @@ public class Main implements GameModule {
             endMessage.put("function", "end");
             endMessage.put("reason", "user_returned_to_lobby");
             endMessage.put("timestamp", java.time.Instant.now().toString());
-            gdk.MessagingBridge.publish(endMessage);
+            MessagingBridge.publish(endMessage);
             stopGame();
             // Use the messaging bridge to return to lobby instead of firing close event
-            gdk.MessagingBridge.returnToLobby();
+            MessagingBridge.returnToLobby();
         });
         
         // Add components to root
