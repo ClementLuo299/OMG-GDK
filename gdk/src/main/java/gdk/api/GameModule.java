@@ -8,7 +8,6 @@ import java.util.Map;
 /**
  * Core interface for all game modules.
  * Defines the contract that all games must implement to integrate with the GDK.
- * All game modules must include an associated metadata class.
  *
  * @authors Clement Luo
  * @date July 19, 2025
