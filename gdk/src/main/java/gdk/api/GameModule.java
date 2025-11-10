@@ -1,16 +1,14 @@
 package gdk.api;
 
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 import java.util.Map;
 
 /**
- * Core contract for all game modules in the GDK.
- * <p>
- * This interface is intentionally minimal and framework-agnostic.
- * It defines three universal responsibilities:
- * launching the game, stopping it, and handling messages.
- * <p>
- * Games should use the messaging protocol for all metadata,
- * control commands, and runtime communication.
+ * Core interface for all game modules.
+ * Defines the contract that all games must implement to integrate with the GDK.
+ * All game modules must include an associated metadata class.
  *
  * @authors Clement Luo
  * @date July 19, 2025
@@ -20,30 +18,29 @@ import java.util.Map;
 public interface GameModule {
 
     /**
-     * Launches the game and returns a platform-specific view object.
-     * <p>
-     * The returned {@link GameView} can represent any visual or logical entry point —
-     * a JavaFX Scene, a Canvas, an HTML component, or a custom rendering object.
+     * Launches the game.
      *
-     * @param context Optional environment or platform context (may be null)
-     * @return A GameView object representing the game's visual or logical entry point
+     * @param primaryStage The primary JavaFX stage
+     * @return The game scene
      */
-    GameView launchGame(Object context);
+    Scene launchGame(Stage primaryStage);
 
     /**
-     * Stops the game and cleans up resources.
-     * Implementations should gracefully shut down logic, UI, and networking.
+     * Called when the game is being closed.
+     * Use this to stop the game and clean up resources.
      */
-    default void stopGame() {}
+    default void stopGame() {
+        // Default empty implementation
+    }
 
     /**
-     * Handles an incoming message from the GDK, launcher, or another module.
-     * <p>
-     * The message format is flexible; all communication (metadata, state, commands)
-     * should be done through this mechanism.
-     *
-     * @param message A Map representing the message data
-     * @return Optional response data, or null if no response is needed
+     * Handles messages sent to the game module.
+     * 
+     * @param message The message data as a Map
+     * @return Response data as a Map, or null if no response needed
      */
-    default Map<String, Object> handleMessage(Map<String, Object> message) { return null; }
+    default Map<String, Object> handleMessage(Map<String, Object> message) {
+        // Default empty implementation
+        return null;
+    }
 }
