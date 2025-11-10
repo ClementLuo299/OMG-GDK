@@ -1,52 +1,49 @@
 package gdk.api;
 
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import java.util.Map;
 
 /**
- * Core interface for all game modules.
- * Defines the contract that all games must implement to integrate with the GDK.
- * All game modules must include an associated metadata class.
+ * Core contract for all game modules in the GDK.
+ * <p>
+ * This interface is intentionally minimal and framework-agnostic.
+ * It defines three universal responsibilities:
+ * launching the game, stopping it, and handling messages.
+ * <p>
+ * Games should use the messaging protocol for all metadata,
+ * control commands, and runtime communication.
  *
  * @authors Clement Luo
  * @date July 19, 2025
- * @edited November 9, 2025
- * @since 1.0
+ * @edited November 10, 2025
+ * @since Beta 1.0
  */
 public interface GameModule {
-    
-    /**
-     * Launches the game.
-     *
-     * @param primaryStage The primary JavaFX stage
-     * @return The game scene
-     */
-    Scene launchGame(Stage primaryStage);
 
     /**
-     * Called when the game is being closed.
-     * Use this to clean up resources.
+     * Launches the game and returns a platform-specific view object.
+     * <p>
+     * The returned {@link GameView} can represent any visual or logical entry point —
+     * a JavaFX Scene, a Canvas, an HTML component, or a custom rendering object.
+     *
+     * @param context Optional environment or platform context (may be null)
+     * @return A GameView object representing the game's visual or logical entry point
      */
-    default void stopGame() {
-        // Default empty implementation
-    }
-    
+    GameView launchGame(Object context);
+
     /**
-     * Handles messages sent to the game module.
-     * 
-     * @param message The message data as a Map
-     * @return Response data as a Map, or null if no response needed
+     * Stops the game and cleans up resources.
+     * Implementations should gracefully shut down logic, UI, and networking.
      */
-    default Map<String, Object> handleMessage(Map<String, Object> message) {
-        // Default empty implementation
-        return null;
-    }
-    
+    default void stopGame() {}
+
     /**
-     * Get the metadata for this game module.
-     * 
-     * @return The game metadata
+     * Handles an incoming message from the GDK, launcher, or another module.
+     * <p>
+     * The message format is flexible; all communication (metadata, state, commands)
+     * should be done through this mechanism.
+     *
+     * @param message A Map representing the message data
+     * @return Optional response data, or null if no response is needed
      */
-    GameMetadata getMetadata();
-} 
+    default Map<String, Object> handleMessage(Map<String, Object> message) { return null; }
+}

@@ -1,11 +1,12 @@
 package launcher;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
 import gdk.internal.Logging;
 
 import launcher.lifecycle.start.Startup;
 import launcher.lifecycle.stop.Shutdown;
+
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +19,8 @@ import java.nio.file.Paths;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited August 12, 2025     
- * @since 1.0
+ * @edited November 9, 2025
+ * @since Beta 1.0
  */
 public class GDKApplication extends Application {
     
