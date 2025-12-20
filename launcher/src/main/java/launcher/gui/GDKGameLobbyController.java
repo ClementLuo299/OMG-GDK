@@ -3,9 +3,9 @@ package launcher.gui;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import gdk.internal.MessagingBridge;
-import launcher.utils.ModuleDiscovery;
-import launcher.utils.ModuleCompiler;
-import launcher.utils.PathUtil;
+import launcher.utils.module.ModuleDiscovery;
+import launcher.utils.module.ModuleCompiler;
+import launcher.utils.path.PathUtil;
 
 import java.io.File;
 
@@ -51,7 +51,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 
-import launcher.utils.DialogUtil;
+import launcher.utils.gui.DialogUtil;
 
 
 /**
@@ -290,7 +290,7 @@ public class GDKGameLobbyController implements Initializable {
             MessagingBridge.addConsumer(msg -> {
                 try {
                     // Record the message to the transcript
-                    launcher.utils.TranscriptRecorder.recordFromGame(msg);
+                    launcher.utils.game.TranscriptRecorder.recordFromGame(msg);
                     
                     Object fn = (msg != null) ? msg.get("function") : null;
                     if (fn != null && "end".equals(String.valueOf(fn))) {
@@ -1709,7 +1709,7 @@ public class GDKGameLobbyController implements Initializable {
         Logging.info("🚀 Preparing to launch game: " + gameName);
         
         // Use the utility class for the core launch logic
-        boolean configSuccess = launcher.utils.GameLaunchUtil.launchGameWithConfiguration(selectedGameModule, jsonConfigurationData, isAutoLaunch);
+        boolean configSuccess = launcher.utils.game.GameLaunchUtil.launchGameWithConfiguration(selectedGameModule, jsonConfigurationData, isAutoLaunch);
         
         if (!configSuccess) {
             Logging.error("❌ Game configuration failed for: " + gameName);
@@ -1847,7 +1847,7 @@ public class GDKGameLobbyController implements Initializable {
             Map<String, Object> messageData = jsonDataMapper.readValue(jsonContent, Map.class);
             
             // Record message to transcript before sending
-            launcher.utils.TranscriptRecorder.recordToGame(messageData);
+            launcher.utils.game.TranscriptRecorder.recordToGame(messageData);
             
             // Send the message to the game module
             Map<String, Object> response = selectedGameModule.handleMessage(messageData);
@@ -1860,7 +1860,7 @@ public class GDKGameLobbyController implements Initializable {
                 jsonOutputEditor.setText(responseJson);
                 
                 // Record response to transcript
-                launcher.utils.TranscriptRecorder.recordFromGame(response);
+                launcher.utils.game.TranscriptRecorder.recordFromGame(response);
                 
                 // Add status message to message area
                 addUserMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");

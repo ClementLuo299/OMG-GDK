@@ -3,9 +3,9 @@ package launcher.lifecycle.start;
 import gdk.internal.Logging;
 import gdk.api.GameModule;
 import gdk.internal.MessagingBridge;
-import launcher.utils.ModuleCompiler;
-import launcher.utils.ModuleDiscovery;
-import launcher.utils.FilePaths;
+import launcher.utils.module.ModuleCompiler;
+import launcher.utils.module.ModuleDiscovery;
+import launcher.utils.path.FilePaths;
 
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -160,8 +160,8 @@ public class Startup {
             autoLaunchViewModel.setPrimaryStage(gameStage);
             
             // Use the utility class to prepare the game with configuration (identical to pressing Launch Game)
-            Map<String, Object> jsonConfigurationData = launcher.utils.GameLaunchUtil.parseJsonString(savedJson);
-            boolean configSuccess = launcher.utils.GameLaunchUtil.launchGameWithConfiguration(selectedModule, jsonConfigurationData, true);
+            Map<String, Object> jsonConfigurationData = launcher.utils.game.GameLaunchUtil.parseJsonString(savedJson);
+            boolean configSuccess = launcher.utils.game.GameLaunchUtil.launchGameWithConfiguration(selectedModule, jsonConfigurationData, true);
             
             if (configSuccess) {
                 // Use the ViewModel's handleLaunchGame method - this is the EXACT same code path as normal mode

@@ -28,7 +28,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import launcher.utils.DialogUtil;
+import launcher.utils.gui.DialogUtil;
 
 /**
  * Controller for the TicTacToe game screen.

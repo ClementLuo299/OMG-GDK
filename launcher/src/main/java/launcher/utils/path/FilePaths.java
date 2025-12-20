@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.path;
 
 /**
  * Utility class for centralized file path constants.

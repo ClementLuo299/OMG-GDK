@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.game;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -124,4 +124,5 @@ public class GameLaunchUtil {
             return null;
         }
     }
-} 
+}
+

@@ -3,9 +3,9 @@ package launcher.gui;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import gdk.internal.MessagingBridge;
-import launcher.utils.ModuleDiscovery;
-import launcher.utils.ModuleCompiler;
-import launcher.utils.PathUtil;
+import launcher.utils.module.ModuleDiscovery;
+import launcher.utils.module.ModuleCompiler;
+import launcher.utils.path.PathUtil;
 
 import java.io.File;
 
@@ -221,7 +221,7 @@ public class GDKViewModel {
         transcriptSubscription = MessagingBridge.addConsumer(msg -> {
             try {
                 // Record the message to the transcript
-                launcher.utils.TranscriptRecorder.recordFromGame(msg);
+                launcher.utils.game.TranscriptRecorder.recordFromGame(msg);
             } catch (Exception ignored) {}
         });
         
@@ -277,7 +277,7 @@ public class GDKViewModel {
         // Start transcript recording with game metadata
         String gameName = selectedGameModule.getMetadata().getGameName();
         String gameVersion = selectedGameModule.getMetadata().getGameVersion();
-        launcher.utils.TranscriptRecorder.startSession(gameName, gameVersion);
+        launcher.utils.game.TranscriptRecorder.startSession(gameName, gameVersion);
         
         Logging.info("🎮 Game launched successfully: " + gameName + " (v" + gameVersion + ")");
         Logging.info("📝 Started transcript recording for game session");
@@ -344,7 +344,7 @@ public class GDKViewModel {
                             messageMap.put("text", messageText);
                         }
                         // Record to transcript
-                        launcher.utils.TranscriptRecorder.recordToGame(messageMap);
+                        launcher.utils.game.TranscriptRecorder.recordToGame(messageMap);
                         java.util.Map<String, Object> response = currentlyRunningGame.handleMessage(messageMap);
                         if (response == null) {
                             response = new java.util.HashMap<>();
@@ -355,7 +355,7 @@ public class GDKViewModel {
                             response.put("timestamp", java.time.Instant.now().toString());
                         }
                         // Record from game
-                        launcher.utils.TranscriptRecorder.recordFromGame(response);
+                        launcher.utils.game.TranscriptRecorder.recordFromGame(response);
                         String responseText = JSON_PRETTY_WRITER.writeValueAsString(response);
                         serverSimulatorController.addReceivedMessageToDisplay(responseText);
                     } catch (Exception e) {
@@ -464,8 +464,8 @@ public class GDKViewModel {
             }
             
             // End transcript session and save transcript
-            launcher.utils.TranscriptRecorder.endSessionIfEndDetected(null);
-            launcher.utils.TranscriptRecorder.saveCurrentTranscript();
+            launcher.utils.game.TranscriptRecorder.endSessionIfEndDetected(null);
+            launcher.utils.game.TranscriptRecorder.saveCurrentTranscript();
             Logging.info("📝 Transcript session ended and saved");
             
             currentlyRunningGame = null;

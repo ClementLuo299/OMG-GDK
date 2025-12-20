@@ -5,9 +5,9 @@ import gdk.internal.Logging;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 import launcher.gui.GDKGameLobbyController;
-import launcher.utils.ModuleCompiler;
-import launcher.utils.ModuleDiscovery;
-import launcher.utils.PathUtil;
+import launcher.utils.module.ModuleCompiler;
+import launcher.utils.module.ModuleDiscovery;
+import launcher.utils.path.PathUtil;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.lifecycle.stop.Shutdown;
 

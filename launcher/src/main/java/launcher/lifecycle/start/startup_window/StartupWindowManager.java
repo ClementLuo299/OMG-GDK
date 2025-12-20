@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.utils.ModuleDiscovery;
+import launcher.utils.module.ModuleDiscovery;
 import launcher.lifecycle.stop.Shutdown;
 import gdk.internal.Logging;
 

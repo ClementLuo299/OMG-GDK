@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.gui;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -334,4 +334,5 @@ public class DialogUtil {
             DialogUtil.class.getResource("/gdk-lobby/gdk-lobby.css").toExternalForm()
         );
     }
-} 
+}
+

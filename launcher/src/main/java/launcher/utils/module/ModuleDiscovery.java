@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.module;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
@@ -593,4 +593,5 @@ public class ModuleDiscovery {
             Logging.error("💥 Error reporting compilation status: " + e.getMessage(), e);
         }
     }
-} 
+}
+

@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.path;
 
 import gdk.internal.Logging;
 

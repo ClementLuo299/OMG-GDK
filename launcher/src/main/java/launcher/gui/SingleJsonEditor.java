@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 import java.time.Duration;
 import javafx.scene.layout.Priority;
 
-import launcher.utils.DialogUtil;
+import launcher.utils.gui.DialogUtil;
 
 /**
  * A professional single-area JSON editor using RichTextFX with syntax highlighting,

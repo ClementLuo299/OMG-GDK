@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.game;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gdk.internal.Logging;
@@ -136,4 +136,5 @@ public final class StartMessageUtil {
             Logging.error("Failed to create saved directory: " + e.getMessage(), e);
         }
     }
-} 
+}
+

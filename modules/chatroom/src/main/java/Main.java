@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import launcher.utils.DialogUtil;
+import launcher.utils.gui.DialogUtil;
 
 /**
  * Chatroom Module - A multiplayer chatroom application for testing the GDK.

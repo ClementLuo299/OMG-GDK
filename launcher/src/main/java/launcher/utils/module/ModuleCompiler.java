@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.module;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
@@ -542,4 +542,5 @@ public class ModuleCompiler {
             Logging.info("💾 Added compilation failure: " + moduleName);
         }
     }
-} 
+}
+

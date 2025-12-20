@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.utils.game;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -732,4 +732,5 @@ public final class TranscriptRecorder {
      * @param endTime End timestamp string
      * @return Duration string in human-readable format
      */
-} 
+}
+
