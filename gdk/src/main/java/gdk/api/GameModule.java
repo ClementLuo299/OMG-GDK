@@ -42,4 +42,11 @@ public interface GameModule {
         // Default empty implementation
         return null;
     }
+
+    /**
+     * Returns the metadata for this game module.
+     * 
+     * @return The game metadata describing the module's configuration
+     */
+    GameMetadata getMetadata();
 }

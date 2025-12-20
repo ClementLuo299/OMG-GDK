@@ -4,10 +4,10 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.utils.ModuleCompiler;
 import launcher.utils.ModuleDiscovery;
+import launcher.utils.PathUtil;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.lifecycle.stop.Shutdown;
 
@@ -45,7 +45,7 @@ public final class StartupOperations {
             Logging.info("📁 Preparing module discovery...");
             windowManager.updateProgress(5, "Preparing module discovery...");
 
-            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             Logging.info("🔍 Modules directory path: " + modulesDirectoryPath);
             File modulesDirectory = new File(modulesDirectoryPath);
 

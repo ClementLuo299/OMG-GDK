@@ -5,10 +5,9 @@ import gdk.internal.Logging;
 import gdk.internal.MessagingBridge;
 import launcher.utils.ModuleDiscovery;
 import launcher.utils.ModuleCompiler;
+import launcher.utils.PathUtil;
 
 import java.io.File;
-
-import launcher.GDKApplication;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -515,7 +514,7 @@ public class GDKViewModel {
      */
     private void refreshAvailableGameModules() {
         try {
-            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
             
             // Use ModuleDiscovery to find valid modules, then ModuleCompiler to load them

@@ -5,10 +5,9 @@ import gdk.internal.Logging;
 import gdk.internal.MessagingBridge;
 import launcher.utils.ModuleDiscovery;
 import launcher.utils.ModuleCompiler;
+import launcher.utils.PathUtil;
 
 import java.io.File;
-
-import launcher.GDKApplication;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -404,8 +403,8 @@ public class GDKGameLobbyController implements Initializable {
                         }
                     }
 
-                    // Get the path to the modules directory from application constants
-                    String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+                    // Get the path to the modules directory
+                    String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
                     
                     // Detect disabled/removed modules before recompilation
                     if (previousCountSnapshot == 0) {
@@ -717,8 +716,8 @@ public class GDKGameLobbyController implements Initializable {
             }
             Logging.info("📊 Previous module count: " + previousModuleNames.size());
 
-            // Get the path to the modules directory from application constants
-            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+            // Get the path to the modules directory
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             Logging.info("📁 Modules directory path: " + modulesDirectoryPath);
             
             // Note: Progress window updates now handled by PreStartupProgressWindow in Startup class
@@ -904,8 +903,8 @@ public class GDKGameLobbyController implements Initializable {
             // Clear the currently selected game module since we're refreshing
             selectedGameModule = null;
             
-            // Get the path to the modules directory from application constants
-            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+            // Get the path to the modules directory
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             
             // Detect disabled/removed modules before recompilation
             if (previousModuleCount == 0) {
@@ -1171,7 +1170,7 @@ public class GDKGameLobbyController implements Initializable {
             Logging.info("🚀 Checking for compilation failures on startup...");
             
             // Get the modules directory path
-            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             
             // Check for compilation failures detected by ModuleCompiler
             checkModuleCompilerCompilationFailures();
@@ -1398,7 +1397,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private void detectNewlyRemovedModules(Set<String> previousModuleNames) {
         try {
-            String modulesDirectoryPath = GDKApplication.getModulesDirectoryPath();
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             File modulesDir = new File(modulesDirectoryPath);
             File[] subdirs = modulesDir.listFiles(File::isDirectory);
             
