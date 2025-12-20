@@ -35,7 +35,6 @@ public class Startup {
     public static void start(Stage primaryApplicationStage) {
         Logging.info("Beginning GDK application startup process");
         try {
-            
             // Auto-launch
             if (isAutoLaunchEnabled() && attemptAutoLaunch(primaryApplicationStage)) {
                 Logging.info("Auto-launch successful");
