@@ -116,6 +116,21 @@ public class GDKGameLobbyController implements Initializable {
     private GDKViewModel applicationViewModel;
     
     /**
+     * The mode this controller is running in.
+     * AUTO_LAUNCH: No GUI loaded, controller used for ViewModel management only
+     * NORMAL: Full GUI loaded, normal operation
+     */
+    public enum ControllerMode {
+        AUTO_LAUNCH,
+        NORMAL
+    }
+    
+    /**
+     * Current mode of operation for this controller
+     */
+    private ControllerMode controllerMode = ControllerMode.NORMAL;
+    
+    /**
      * List of available game modules discovered by the module loader
      */
     private ObservableList<GameModule> availableGameModules;
@@ -182,22 +197,55 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== INITIALIZATION ====================
     
     /**
+     * Set the controller mode (AUTO_LAUNCH or NORMAL).
+     * This should be called before initialize() for auto-launch mode.
+     * 
+     * @param mode The mode to set
+     */
+    public void setControllerMode(ControllerMode mode) {
+        this.controllerMode = mode;
+        Logging.info("🎮 Controller mode set to: " + mode);
+    }
+    
+    /**
+     * Get the current controller mode.
+     * 
+     * @return The current mode
+     */
+    public ControllerMode getControllerMode() {
+        return controllerMode;
+    }
+    
+    /**
      * Initialize the controller when FXML is loaded.
      * 
      * This method is called automatically by JavaFX when the FXML
      * file is loaded. It sets up all components and event handlers.
+     * In AUTO_LAUNCH mode, GUI setup is skipped.
      * 
      * @param location The location used to resolve relative paths for the root object
      * @param resources The resources used to localize the root object
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Logging.info("🎮 Initializing GDK Game Picker Controller");
+        Logging.info("🎮 Initializing GDK Game Picker Controller (mode: " + controllerMode + ")");
         
-        // Initialize dependencies
+        // Initialize dependencies (needed for both modes)
         jsonDataMapper = new ObjectMapper();
         availableGameModules = FXCollections.observableArrayList();
         
+        // Skip GUI setup in AUTO_LAUNCH mode
+        if (controllerMode == ControllerMode.AUTO_LAUNCH) {
+            Logging.info("⏭️ Skipping GUI setup for AUTO_LAUNCH mode");
+            // Still need to register with ModuleCompiler for consistency
+            ModuleCompiler.setUIController(this);
+            // Ensure saved directory exists (needed for file operations)
+            ensureSavedDirectoryExists();
+            Logging.info("✅ GDK Game Picker Controller initialized (AUTO_LAUNCH mode)");
+            return;
+        }
+        
+        // Normal mode: full GUI setup
         // Set up the UI components
         setupUserInterface();
         

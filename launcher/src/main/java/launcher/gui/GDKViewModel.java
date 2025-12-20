@@ -438,6 +438,18 @@ public class GDKViewModel {
     }
     
     /**
+     * Public cleanup method for auto-launch and other scenarios where
+     * we need to clean up without returning to a lobby scene.
+     * 
+     * This method performs the same cleanup as returnToLobby() but
+     * doesn't require a lobby scene to be set.
+     */
+    public void cleanupGameAndResources() {
+        cleanupCurrentGame();
+        cleanupServerSimulator();
+    }
+    
+    /**
      * Clean up the currently running game.
      * 
      * This method stops the game and resets the game state.

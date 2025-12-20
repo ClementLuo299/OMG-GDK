@@ -8,24 +8,19 @@ import launcher.utils.ModuleDiscovery;
 import launcher.utils.FilePaths;
 
 import javafx.stage.Stage;
-import javafx.scene.Scene;
 import javafx.application.Platform;
 
 import launcher.gui.GDKGameLobbyController;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.lifecycle.start.gui.UIInitializer;
-import launcher.gui.ServerSimulatorController;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.fxml.FXMLLoader;
-import java.util.HashMap;
 
 /**
  * Orchestrates the startup process of the GDK application.
@@ -37,8 +32,11 @@ import java.util.HashMap;
  */
 public class Startup {
 
-    private static MessagingBridge.Subscription autoLaunchMessageSubscription;
-    private static MessagingBridge.Subscription autoLaunchTranscriptSubscription;
+    /**
+     * Single controller instance used for both auto-launch and normal modes.
+     * The controller knows which mode it's running in and adapts accordingly.
+     */
+    private static launcher.gui.GDKGameLobbyController applicationController;
 
     public static void start(Stage primaryApplicationStage) {
         Logging.info("Starting GDK application startup process");
@@ -133,69 +131,53 @@ public class Startup {
 
             // Validate JSON syntax
             ObjectMapper jsonMapper = new ObjectMapper();
-            Map<String, Object> jsonData;
             try {
-                jsonData = jsonMapper.readValue(savedJson, Map.class);
+                jsonMapper.readValue(savedJson, Map.class);
             } catch (Exception e) {
                 Logging.info("Auto-launch: Invalid JSON syntax in saved data");
                 return false;
             }
 
-            // Configure the primary stage for proper game display
-            primaryApplicationStage.setTitle(selectedModule.getMetadata().getGameName());
-            primaryApplicationStage.setMinWidth(800);
-            primaryApplicationStage.setMinHeight(600);
-            primaryApplicationStage.setWidth(1200);
-            primaryApplicationStage.setHeight(900);
-            primaryApplicationStage.setOpacity(1.0);
-
+            // Create controller instance for auto-launch (ensures consistency with normal mode)
+            // Set mode to AUTO_LAUNCH so it knows to skip GUI setup
+            applicationController = new launcher.gui.GDKGameLobbyController();
+            applicationController.setControllerMode(launcher.gui.GDKGameLobbyController.ControllerMode.AUTO_LAUNCH);
+            launcher.gui.GDKViewModel autoLaunchViewModel = new launcher.gui.GDKViewModel();
+            applicationController.setViewModel(autoLaunchViewModel);
+            
+            // Create a separate stage for the game so closing it doesn't shut down the app
+            // The primaryApplicationStage remains hidden to keep the app alive
+            Stage gameStage = new Stage();
+            gameStage.setTitle(selectedModule.getMetadata().getGameName());
+            gameStage.setMinWidth(800);
+            gameStage.setMinHeight(600);
+            gameStage.setWidth(1200);
+            gameStage.setHeight(900);
+            gameStage.setOpacity(1.0);
+            
+            // Set the game stage as the primary stage for the ViewModel
+            // This allows the ViewModel to manage the game lifecycle exactly like normal mode
+            autoLaunchViewModel.setPrimaryStage(gameStage);
+            
             // Use the utility class to prepare the game with configuration (identical to pressing Launch Game)
             Map<String, Object> jsonConfigurationData = launcher.utils.GameLaunchUtil.parseJsonString(savedJson);
             boolean configSuccess = launcher.utils.GameLaunchUtil.launchGameWithConfiguration(selectedModule, jsonConfigurationData, true);
             
             if (configSuccess) {
-                // Create a separate stage for the game so closing it doesn't shut down the app
-                Stage gameStage = new Stage();
-                gameStage.setTitle(selectedModule.getMetadata().getGameName());
-                gameStage.setMinWidth(800);
-                gameStage.setMinHeight(600);
-                gameStage.setWidth(1200);
-                gameStage.setHeight(900);
-                gameStage.setOpacity(1.0);
+                // Use the ViewModel's handleLaunchGame method - this is the EXACT same code path as normal mode
+                // It will set up all MessagingBridge subscriptions, server simulator, transcript recording, etc.
+                autoLaunchViewModel.handleLaunchGame(selectedModule, savedJson);
                 
-                // Now launch the game using the separate stage
-                Scene gameScene = selectedModule.launchGame(gameStage);
+                // Set up return to lobby functionality
+                setupAutoLaunchReturnToLobby(gameStage, primaryApplicationStage);
                 
-                if (gameScene != null) {
-                    // Game launched successfully
-                    gameStage.setScene(gameScene);
-                    gameStage.show();
-                    
-                    // Create server simulator for the auto-launched game (using normal GDK method)
-                    createServerSimulatorForAutoLaunch(gameStage, selectedModule);
-                    
-                    // Set up return to lobby functionality
-                    setupAutoLaunchReturnToLobby(gameStage, selectedModule);
-                    
-                    // Start transcript recording with game metadata
-                    String gameName = selectedModule.getMetadata().getGameName();
-                    String gameVersion = selectedModule.getMetadata().getGameVersion();
-                    launcher.utils.TranscriptRecorder.startSession(gameName, gameVersion);
-                    
-                    // Set up the lobby return callback for games
-                    MessagingBridge.setLobbyReturnCallback(() -> {
-                        Logging.info("Auto-launched game requested return to lobby - starting GDK");
-                        Platform.runLater(() -> startNormalGDK(primaryApplicationStage));
-                    });
-                    
-                    Logging.info("Auto-launch: Successfully launched " + selectedGameName);
-                    return true;
-                } else {
-                    Logging.info("Auto-launch: Game returned null scene");
-                    return false;
-                }
+                // Note: Lobby return callback is set up in setupAutoLaunchReturnToLobby()
+                
+                Logging.info("Auto-launch: Successfully launched " + selectedGameName + " using ViewModel (consistent with normal mode)");
+                return true;
             } else {
                 Logging.info("Auto-launch: Game configuration failed");
+                cleanupApplicationController();
                 return false;
             }
             
@@ -205,234 +187,62 @@ public class Startup {
         }
     }
     
-    /**
-     * Create a minimal controller instance for auto-launch functionality
-     */
-    private static launcher.gui.GDKGameLobbyController createMinimalControllerForAutoLaunch() {
-        try {
-            // Create a new controller instance
-            launcher.gui.GDKGameLobbyController controller = new launcher.gui.GDKGameLobbyController();
-            
-            // Create a minimal ViewModel for the controller
-            launcher.gui.GDKViewModel viewModel = new launcher.gui.GDKViewModel();
-            viewModel.setPrimaryStage(new Stage()); // Temporary stage
-            
-            // Set the ViewModel in the controller
-            controller.setViewModel(viewModel);
-            
-            // Initialize the controller to ensure jsonDataMapper is set up
-            controller.initialize(null, null);
-            
-            return controller;
-        } catch (Exception e) {
-            Logging.error("Auto-launch: Error creating controller: " + e.getMessage(), e);
-            return null;
-        }
-    }
     
     /**
-     * Create and configure the server simulator for auto-launched games
+     * Set up the return to lobby functionality for auto-launched games.
+     * Uses the same ViewModel cleanup logic as normal mode for consistency.
+     * 
+     * @param gameStage The stage hosting the game
+     * @param primaryApplicationStage The hidden primary stage (keeps app alive)
      */
-    private static void createServerSimulatorForAutoLaunch(Stage primaryApplicationStage, GameModule gameModule) {
-        try {
-            // Create server simulator stage
-            Stage serverSimulatorStage = new Stage();
-            serverSimulatorStage.setTitle("Server Simulator");
-            serverSimulatorStage.setWidth(600);
-            serverSimulatorStage.setHeight(400);
-            
-            // Load server simulator FXML exactly like normal GDK does
-            URL fxmlResourceUrl = launcher.gui.GDKViewModel.class.getResource("/server-simulator/ServerSimulator.fxml");
-            if (fxmlResourceUrl == null) {
-                Logging.error("Server simulator FXML not found");
-                return;
-            }
-            
-            FXMLLoader fxmlLoader = new FXMLLoader(fxmlResourceUrl);
-            Scene serverSimulatorScene = new Scene(fxmlLoader.load());
-            ServerSimulatorController serverSimulatorController = fxmlLoader.getController();
-            
-            // Apply CSS styling exactly like normal GDK does
-            URL cssResourceUrl = launcher.gui.GDKViewModel.class.getResource("/server-simulator/server-simulator.css");
-            if (cssResourceUrl != null) {
-                serverSimulatorScene.getStylesheets().add(cssResourceUrl.toExternalForm());
-            }
-            
-            // Configure the server simulator stage exactly like normal GDK
-            serverSimulatorStage.setScene(serverSimulatorScene);
-            serverSimulatorStage.show();
-            
-            // Set up message handling exactly like normal GDK does
-            if (serverSimulatorController != null) {
-                serverSimulatorController.setMessageHandler(messageText -> {
-                    try {
-                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                        java.util.Map<String, Object> messageMap;
-                        try {
-                            messageMap = mapper.readValue(messageText, java.util.Map.class);
-                        } catch (Exception parseError) {
-                            // Treat as plain chat text
-                            messageMap = new java.util.HashMap<>();
-                            messageMap.put("function", "message");
-                            messageMap.put("from", "server");
-                            messageMap.put("text", messageText);
-                        }
-                        
-                        // Record to transcript
-                        launcher.utils.TranscriptRecorder.recordToGame(messageMap);
-                        
-                        // Send message to game
-                        java.util.Map<String, Object> response = gameModule.handleMessage(messageMap);
-                        if (response == null) {
-                            response = new java.util.HashMap<>();
-                            response.put("function", "ack");
-                            response.put("status", "ok");
-                            Object of = messageMap.get("function");
-                            if (of != null) response.put("of", of);
-                            response.put("timestamp", java.time.Instant.now().toString());
-                        }
-                        
-                        // Record from game
-                        launcher.utils.TranscriptRecorder.recordFromGame(response);
-                        String responseText = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
-                        serverSimulatorController.addReceivedMessageToDisplay(responseText);
-                    } catch (Exception e) {
-                        serverSimulatorController.addReceivedMessageToDisplay("ERROR: " + e.getMessage());
-                    }
-                });
-                
-                // Clear any previous auto-launch subscriptions before installing fresh ones
-                teardownAutoLaunchSubscriptions();
-
-                // Set up message bridge consumer for game messages exactly like normal GDK
-                autoLaunchMessageSubscription = MessagingBridge.addConsumer(msg -> {
-                    try {
-                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                        String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
-                        serverSimulatorController.addReceivedMessageToDisplay(pretty);
-                        
-                        // Send confirmation back to the game
-                        java.util.Map<String, Object> ack = new java.util.HashMap<>();
-                        ack.put("function", "ack");
-                        ack.put("status", "ok");
-                        Object of = (msg != null) ? msg.get("function") : null;
-                        if (of != null) ack.put("of", of);
-                        ack.put("timestamp", java.time.Instant.now().toString());
-                        gameModule.handleMessage(ack);
-                    } catch (Exception ignored) {
-                    }
-                });
-                
-                // Also mirror messages to lobby JSON output exactly like normal GDK
-                autoLaunchTranscriptSubscription = MessagingBridge.addConsumer(msg -> {
-                    try {
-                        // Record the message to the transcript
-                        launcher.utils.TranscriptRecorder.recordFromGame(msg);
-                        
-                        // Present end message or others back to the lobby UI if needed
-                        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                        String pretty = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
-                        if (serverSimulatorController != null) {
-                            serverSimulatorController.addReceivedMessageToDisplay(pretty);
-                        }
-                    } catch (Exception ignored) {}
-                });
-                
-                // Set up close handler exactly like normal GDK - just close the simulator, don't return to GDK
-                serverSimulatorStage.setOnCloseRequest(event -> {
-                    Logging.info("🔒 Server simulator window closing");
-                    serverSimulatorController.onClose();
-                    teardownAutoLaunchSubscriptions();
-                    // Don't trigger return to GDK - just close the simulator
-                });
-            }
-            
-            // Store the server simulator stage reference so we can close it when the game closes
-            // We'll use a custom property on the primary stage to store this reference
-            primaryApplicationStage.setUserData(serverSimulatorStage);
-            
-            Logging.info("🔧 Server simulator created successfully for auto-launched game");
-        } catch (Exception e) {
-            Logging.error("❌ Error creating server simulator for auto-launch: " + e.getMessage(), e);
-            teardownAutoLaunchSubscriptions();
-        }
-    }
-    
-    /**
-     * Set up the return to lobby functionality for auto-launched games
-     */
-    private static void setupAutoLaunchReturnToLobby(Stage primaryApplicationStage, GameModule gameModule) {
+    private static void setupAutoLaunchReturnToLobby(Stage gameStage, Stage primaryApplicationStage) {
         // Set up a close handler that will clean up the game and generate transcript when closed
         // Then automatically start the normal GDK interface
-        primaryApplicationStage.setOnCloseRequest(event -> {
-            Logging.info("Auto-launched game window closing - cleaning up and generating transcript");
+        gameStage.setOnCloseRequest(event -> {
+            Logging.info("Auto-launched game window closing - cleaning up via ViewModel");
             
-            // Close the server simulator if it exists
-            Object userData = primaryApplicationStage.getUserData();
-            if (userData instanceof Stage) {
-                Stage serverSimulatorStage = (Stage) userData;
-                Logging.info("🔧 Closing server simulator for auto-launched game");
-                serverSimulatorStage.close();
+            // Use ViewModel's cleanup method (same cleanup logic as normal mode)
+            // Access ViewModel through controller, just like normal mode does
+            if (applicationController != null && applicationController.getApplicationViewModel() != null) {
+                applicationController.getApplicationViewModel().cleanupGameAndResources();
             }
             
-            teardownAutoLaunchSubscriptions();
-            
-            // Create an end message to trigger transcript generation
-            Map<String, Object> endMessage = new HashMap<>();
-            endMessage.put("function", "end");
-            endMessage.put("reason", "user_closed_game_window");
-            endMessage.put("timestamp", java.time.Instant.now().toString());
-            
-            // Record the end message - this will automatically trigger transcript generation
-            // recordFromGame() calls endSessionIfEndDetected() internally, so don't call it manually
-            launcher.utils.TranscriptRecorder.recordFromGame(endMessage);
-            
-            // Clean up the game
-            try {
-                gameModule.stopGame();
-                Logging.info("🎮 Auto-launched game stopped successfully");
-            } catch (Exception e) {
-                Logging.error("❌ Error stopping auto-launched game: " + e.getMessage());
-            }
+            // Clean up the controller instance reference
+            cleanupApplicationController();
             
             // Automatically start the normal GDK interface for a seamless experience
             Logging.info("Auto-launched game closed - starting normal GDK interface");
             Platform.runLater(() -> startNormalGDK(primaryApplicationStage));
         });
         
-        // Only set up the messaging bridge callback for games that use returnToLobby()
-        // This is the ONLY way to return to GDK now
+        // Set up the messaging bridge callback for games that use returnToLobby()
         MessagingBridge.setLobbyReturnCallback(() -> {
             Logging.info("Auto-launched game requested return to lobby - starting GDK");
             
-            // Close the server simulator if it exists
-            Object userData = primaryApplicationStage.getUserData();
-            if (userData instanceof Stage) {
-                Stage serverSimulatorStage = (Stage) userData;
-                Logging.info("🔧 Closing server simulator for auto-launched game");
-                serverSimulatorStage.close();
+            // Use ViewModel's cleanup method (same cleanup logic as normal mode)
+            // Access ViewModel through controller, just like normal mode does
+            if (applicationController != null && applicationController.getApplicationViewModel() != null) {
+                applicationController.getApplicationViewModel().cleanupGameAndResources();
             }
             
-            teardownAutoLaunchSubscriptions();
+            // Clean up the controller instance reference
+            cleanupApplicationController();
             
             Platform.runLater(() -> startNormalGDK(primaryApplicationStage));
         });
-        
-        // Note: Now the game close handler only cleans up and generates transcript
-        // It does NOT automatically return to GDK - only explicit returnToLobby() calls do
     }
 
     /**
-     * Remove any MessagingBridge consumers that were registered for auto-launch mode.
+     * Clean up the application controller instance.
+     * This ensures proper cleanup of all resources (subscriptions, server simulator, etc.)
+     * The actual cleanup is performed by the ViewModel's cleanupGameAndResources() method.
      */
-    private static void teardownAutoLaunchSubscriptions() {
-        if (autoLaunchMessageSubscription != null) {
-            autoLaunchMessageSubscription.unsubscribe();
-            autoLaunchMessageSubscription = null;
-        }
-        if (autoLaunchTranscriptSubscription != null) {
-            autoLaunchTranscriptSubscription.unsubscribe();
-            autoLaunchTranscriptSubscription = null;
+    private static void cleanupApplicationController() {
+        if (applicationController != null) {
+            // Cleanup is already handled by cleanupGameAndResources() calls in setupAutoLaunchReturnToLobby()
+            // Just clear the reference
+            applicationController = null;
+            Logging.info("🧹 Application controller reference cleared");
         }
     }
     
@@ -446,6 +256,10 @@ public class Startup {
 
             // 2. UI initialization
             GDKGameLobbyController lobbyController = UIInitializer.initialize(primaryApplicationStage, windowManager);
+            
+            // Store controller (same instance used for both modes)
+            // Controller mode is NORMAL by default (set when FXML loads)
+            applicationController = lobbyController;
 
             // 3. Check readiness and show main stage
             StartupOperations.ensureUIReady(primaryApplicationStage, lobbyController, windowManager);
