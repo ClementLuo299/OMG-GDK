@@ -5,6 +5,7 @@ import gdk.api.GameModule;
 import gdk.internal.MessagingBridge;
 import launcher.utils.ModuleCompiler;
 import launcher.utils.ModuleDiscovery;
+import launcher.utils.FilePaths;
 
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -31,15 +32,10 @@ import java.util.HashMap;
  * 
  * @authors Clement Luo
  * @date August 8, 2025
- * @edited August 12, 2025  
- * @since 1.0
+ * @edited December 19, 2025  
+ * @since Beta 1.0
  */
 public class Startup {
-
-    // File paths for auto-launch functionality
-    private static final String JSON_PERSISTENCE_FILE = "saved/gdk-json-persistence.txt";
-    private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
-    private static final String AUTO_LAUNCH_ENABLED_FILE = "saved/gdk-auto-launch-enabled.txt";
 
     private static MessagingBridge.Subscription autoLaunchMessageSubscription;
     private static MessagingBridge.Subscription autoLaunchTranscriptSubscription;
@@ -71,7 +67,7 @@ public class Startup {
      */
     private static boolean isAutoLaunchEnabled() {
         try {
-            Path autoLaunchFile = Paths.get(AUTO_LAUNCH_ENABLED_FILE);
+            Path autoLaunchFile = Paths.get(FilePaths.AUTO_LAUNCH_ENABLED_FILE);
             if (!Files.exists(autoLaunchFile)) {
                 return false; // Default to disabled
             }
@@ -89,18 +85,18 @@ public class Startup {
     private static boolean attemptAutoLaunch(Stage primaryApplicationStage) {
         try {
             // Check if required files exist
-            if (!Files.exists(Paths.get(JSON_PERSISTENCE_FILE))) {
+            if (!Files.exists(Paths.get(FilePaths.JSON_PERSISTENCE_FILE))) {
                 Logging.info("Auto-launch: No saved JSON found");
                 return false;
             }
-            if (!Files.exists(Paths.get(SELECTED_GAME_FILE))) {
+            if (!Files.exists(Paths.get(FilePaths.SELECTED_GAME_FILE))) {
                 Logging.info("Auto-launch: No saved game selection found");
                 return false;
             }
 
             // Load saved JSON and game selection
-            String savedJson = Files.readString(Paths.get(JSON_PERSISTENCE_FILE)).trim();
-            String selectedGameName = Files.readString(Paths.get(SELECTED_GAME_FILE)).trim();
+            String savedJson = Files.readString(Paths.get(FilePaths.JSON_PERSISTENCE_FILE)).trim();
+            String selectedGameName = Files.readString(Paths.get(FilePaths.SELECTED_GAME_FILE)).trim();
             
             if (savedJson.isEmpty() || selectedGameName.isEmpty()) {
                 Logging.info("Auto-launch: Saved data is empty");

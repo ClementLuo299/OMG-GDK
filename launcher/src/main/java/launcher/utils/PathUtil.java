@@ -14,7 +14,7 @@ import java.nio.file.Paths;
  * 
  * @authors Clement Luo
  * @date December 19, 2025
- * @since 1.0
+ * @since Beta 1.0
  */
 public final class PathUtil {
     
