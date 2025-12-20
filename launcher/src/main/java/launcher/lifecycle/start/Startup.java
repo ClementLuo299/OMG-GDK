@@ -32,26 +32,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Startup {
 
-    /**
-     * Single controller instance used for both auto-launch and normal modes.
-     * The controller knows which mode it's running in and adapts accordingly.
-     */
-    private static launcher.gui.GDKGameLobbyController applicationController;
-
     public static void start(Stage primaryApplicationStage) {
-        Logging.info("Starting GDK application startup process");
+        Logging.info("Beginning GDK application startup process");
         try {
-            // Check if auto-launch is enabled and attempt to launch game directly
+            
+            // Auto-launch
             if (isAutoLaunchEnabled() && attemptAutoLaunch(primaryApplicationStage)) {
-                Logging.info("Auto-launch successful - bypassing GDK interface");
-                            // Keep the primary stage alive but hidden to prevent application shutdown
-            primaryApplicationStage.setTitle("GDK (Auto-Launch Mode)");
-            primaryApplicationStage.hide(); // Hide the stage completely instead of showing it
-                return; // Exit startup process, game is running
+                Logging.info("Auto-launch successful");
+                
+                // Keep the primary stage alive but hidden to prevent application shutdown
+                primaryApplicationStage.setTitle("GDK (Auto-Launch Mode)");
+                primaryApplicationStage.hide(); // Hide the stage completely instead of showing it
+
+                return; // Exit startup process, so we dont execute the normal startup process
             }
 
             // Normal GDK startup process
-            Logging.info("Auto-launch failed or disabled - proceeding with normal GDK startup");
+            Logging.info("Auto-launch failed or disabled - proceeding with normal startup");
             startNormalGDK(primaryApplicationStage);
 
         } catch (Exception startupError) {
@@ -104,7 +101,7 @@ public class Startup {
             Logging.info("Auto-launch: Attempting to launch " + selectedGameName + " with saved JSON");
 
             // Discover and load modules
-            String modulesDirectoryPath = launcher.utils.PathUtil.getModulesDirectoryPath();
+            String modulesDirectoryPath = launcher.utils.path.PathUtil.getModulesDirectoryPath();
             File modulesDirectory = new File(modulesDirectoryPath);
             List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDirectory);
             
@@ -140,10 +137,10 @@ public class Startup {
 
             // Create controller instance for auto-launch (ensures consistency with normal mode)
             // Set mode to AUTO_LAUNCH so it knows to skip GUI setup
-            applicationController = new launcher.gui.GDKGameLobbyController();
-            applicationController.setControllerMode(launcher.gui.GDKGameLobbyController.ControllerMode.AUTO_LAUNCH);
+            launcher.gui.GDKGameLobbyController autoLaunchController = new launcher.gui.GDKGameLobbyController();
+            autoLaunchController.setControllerMode(launcher.gui.GDKGameLobbyController.ControllerMode.AUTO_LAUNCH);
             launcher.gui.GDKViewModel autoLaunchViewModel = new launcher.gui.GDKViewModel();
-            applicationController.setViewModel(autoLaunchViewModel);
+            autoLaunchController.setViewModel(autoLaunchViewModel);
             
             // Create a separate stage for the game so closing it doesn't shut down the app
             // The primaryApplicationStage remains hidden to keep the app alive
@@ -168,8 +165,8 @@ public class Startup {
                 // It will set up all MessagingBridge subscriptions, server simulator, transcript recording, etc.
                 autoLaunchViewModel.handleLaunchGame(selectedModule, savedJson);
                 
-                // Set up return to lobby functionality
-                setupAutoLaunchReturnToLobby(gameStage, primaryApplicationStage);
+                // Set up return to lobby functionality (pass controller as parameter)
+                setupAutoLaunchReturnToLobby(gameStage, primaryApplicationStage, autoLaunchController);
                 
                 // Note: Lobby return callback is set up in setupAutoLaunchReturnToLobby()
                 
@@ -177,7 +174,6 @@ public class Startup {
                 return true;
             } else {
                 Logging.info("Auto-launch: Game configuration failed");
-                cleanupApplicationController();
                 return false;
             }
             
@@ -194,8 +190,9 @@ public class Startup {
      * 
      * @param gameStage The stage hosting the game
      * @param primaryApplicationStage The hidden primary stage (keeps app alive)
+     * @param controller The controller instance managing the game
      */
-    private static void setupAutoLaunchReturnToLobby(Stage gameStage, Stage primaryApplicationStage) {
+    private static void setupAutoLaunchReturnToLobby(Stage gameStage, Stage primaryApplicationStage, launcher.gui.GDKGameLobbyController controller) {
         // Set up a close handler that will clean up the game and generate transcript when closed
         // Then automatically start the normal GDK interface
         gameStage.setOnCloseRequest(event -> {
@@ -203,12 +200,9 @@ public class Startup {
             
             // Use ViewModel's cleanup method (same cleanup logic as normal mode)
             // Access ViewModel through controller, just like normal mode does
-            if (applicationController != null && applicationController.getApplicationViewModel() != null) {
-                applicationController.getApplicationViewModel().cleanupGameAndResources();
+            if (controller != null && controller.getApplicationViewModel() != null) {
+                controller.getApplicationViewModel().cleanupGameAndResources();
             }
-            
-            // Clean up the controller instance reference
-            cleanupApplicationController();
             
             // Automatically start the normal GDK interface for a seamless experience
             Logging.info("Auto-launched game closed - starting normal GDK interface");
@@ -221,29 +215,12 @@ public class Startup {
             
             // Use ViewModel's cleanup method (same cleanup logic as normal mode)
             // Access ViewModel through controller, just like normal mode does
-            if (applicationController != null && applicationController.getApplicationViewModel() != null) {
-                applicationController.getApplicationViewModel().cleanupGameAndResources();
+            if (controller != null && controller.getApplicationViewModel() != null) {
+                controller.getApplicationViewModel().cleanupGameAndResources();
             }
-            
-            // Clean up the controller instance reference
-            cleanupApplicationController();
             
             Platform.runLater(() -> startNormalGDK(primaryApplicationStage));
         });
-    }
-
-    /**
-     * Clean up the application controller instance.
-     * This ensures proper cleanup of all resources (subscriptions, server simulator, etc.)
-     * The actual cleanup is performed by the ViewModel's cleanupGameAndResources() method.
-     */
-    private static void cleanupApplicationController() {
-        if (applicationController != null) {
-            // Cleanup is already handled by cleanupGameAndResources() calls in setupAutoLaunchReturnToLobby()
-            // Just clear the reference
-            applicationController = null;
-            Logging.info("🧹 Application controller reference cleared");
-        }
     }
     
     /**
@@ -257,9 +234,8 @@ public class Startup {
             // 2. UI initialization
             GDKGameLobbyController lobbyController = UIInitializer.initialize(primaryApplicationStage, windowManager);
             
-            // Store controller (same instance used for both modes)
             // Controller mode is NORMAL by default (set when FXML loads)
-            applicationController = lobbyController;
+            // No need to store it statically - it's managed by JavaFX Scene/Stage hierarchy
 
             // 3. Check readiness and show main stage
             StartupOperations.ensureUIReady(primaryApplicationStage, lobbyController, windowManager);
