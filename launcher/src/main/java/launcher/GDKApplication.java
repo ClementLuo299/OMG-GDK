@@ -51,17 +51,23 @@ public class GDKApplication extends Application {
      * @param args Command line arguments passed to the application
      */
     public static void main(String[] args) {
-        // Add shutdown hook for unexpected termination
+        /**
+         * Add shutdown hook for unexpected termination.
+         * 
+         * This is a safety mechanism to ensure that all resources are properly cleaned up,
+         * even if the application is terminated unexpectedly.
+         */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Logging.info("🚨 Shutdown hook triggered - cleaning up resources");
+            Logging.info("Shutdown hook triggered - cleaning up resources");
             try {
                 Shutdown.forceShutdown();
             } catch (Exception e) {
-                Logging.error("💥 Error in shutdown hook: " + e.getMessage(), e);
+                Logging.error("Error in shutdown hook: " + e.getMessage(), e);
                 System.exit(1);
             }
         }, "ShutdownHook"));
         
+        //Launch the application
         launch(args);
     }
 } 
