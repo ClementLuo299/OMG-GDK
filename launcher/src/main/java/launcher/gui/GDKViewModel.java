@@ -11,6 +11,10 @@ import java.io.File;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.application.Platform;
 
 import javafx.fxml.FXMLLoader;
 
@@ -35,8 +39,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 12, 2025  
- * @since 1.0
+ * @edited December 20, 2025  
+ * @since Beta 1.0
  */
 public class GDKViewModel {
 
@@ -77,6 +81,12 @@ public class GDKViewModel {
     private boolean serverSimulatorRequestedClosed = false;
     
     private Scene mainLobbyScene;
+    
+    /**
+     * Callback to execute when returning to normal GDK (for auto-launch mode).
+     * When set, this will be called instead of returning to lobby scene.
+     */
+    private Runnable returnToNormalGDKCallback;
 
     /** Subscription for the per-game server simulator consumer. */
     private MessagingBridge.Subscription serverSimulatorSubscription;
@@ -110,13 +120,32 @@ public class GDKViewModel {
     }
     
     /**
+     * Set a callback to execute when returning to normal GDK (for auto-launch mode).
+     * When this callback is set, it will be used instead of returning to lobby scene.
+     * 
+     * @param callback The callback to execute when returning to normal GDK
+     */
+    public void setReturnToNormalGDKCallback(Runnable callback) {
+        this.returnToNormalGDKCallback = callback;
+    }
+    
+    /**
      * Public method for games to call when they want to return to the lobby.
      * This method safely cleans up the game and returns to the lobby scene.
+     * In auto-launch mode (when returnToNormalGDKCallback is set), it will start the normal GDK interface instead.
      */
     public void returnToLobby() {
         Logging.info("🎮 Game requested return to lobby via returnToLobby()");
         cleanupGameAndServerSimulator();
-        // Return to lobby scene
+        
+        // If in auto-launch mode, use the callback to start normal GDK
+        if (returnToNormalGDKCallback != null) {
+            Logging.info("🎮 Auto-launch mode: Starting normal GDK interface");
+            returnToNormalGDKCallback.run();
+            return;
+        }
+        
+        // Normal mode: Return to lobby scene
         if (mainLobbyScene != null) {
             primaryApplicationStage.setScene(mainLobbyScene);
             primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
@@ -284,19 +313,36 @@ public class GDKViewModel {
     }
     
     /**
-     * Set up the close handler for the game window.
+     * Set up the close handler and keyboard shortcuts for the game window.
      * 
      * This method configures what happens when the user closes
-     * the game window, ensuring proper cleanup.
+     * the game window, and sets up the Escape key shortcut to return to lobby.
+     * 
+     * In auto-launch mode (when returnToNormalGDKCallback is set), closing the window
+     * will shut down the application instead of returning to lobby.
      */
     private void setupGameCloseHandler() {
         primaryApplicationStage.setOnCloseRequest(event -> {
             Logging.info("🎮 Game window closing");
             cleanupGameAndServerSimulator();
-            // Return to lobby scene when game window closes
-            if (mainLobbyScene != null) {
-                primaryApplicationStage.setScene(mainLobbyScene);
-                primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
+            
+            // In auto-launch mode, shut down the application
+            if (returnToNormalGDKCallback != null) {
+                Logging.info("Auto-launched game window closing - shutting down application");
+                Platform.runLater(() -> {
+                    try {
+                        launcher.lifecycle.stop.Shutdown.shutdown();
+                    } catch (Exception e) {
+                        Logging.error("Error during shutdown: " + e.getMessage(), e);
+                        System.exit(0);
+                    }
+                });
+            } else {
+                // Normal mode: Return to lobby scene when game window closes
+                if (mainLobbyScene != null) {
+                    primaryApplicationStage.setScene(mainLobbyScene);
+                    primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
+                }
             }
         });
         
@@ -308,6 +354,32 @@ public class GDKViewModel {
             if (mainLobbyScene != null) {
                 primaryApplicationStage.setScene(mainLobbyScene);
                 primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
+            }
+        });
+        
+        // Set up keyboard shortcut (Escape key) to return to lobby as a fallback
+        // This prevents softlocks if the game doesn't have a return button or it doesn't work
+        Platform.runLater(() -> {
+            Scene gameScene = primaryApplicationStage.getScene();
+            if (gameScene != null) {
+                KeyCombination escapeKey = new KeyCodeCombination(KeyCode.ESCAPE);
+                gameScene.getAccelerators().put(escapeKey, () -> {
+                    Logging.info("🎮 Escape key pressed - returning to lobby");
+                    returnToLobby();
+                });
+                Logging.info("🎮 Escape key shortcut configured (press Escape to return to lobby)");
+            } else {
+                // If scene is still null, set up a listener for when it becomes available
+                primaryApplicationStage.sceneProperty().addListener((observable, oldScene, newScene) -> {
+                    if (newScene != null) {
+                        KeyCombination escapeKey = new KeyCodeCombination(KeyCode.ESCAPE);
+                        newScene.getAccelerators().put(escapeKey, () -> {
+                            Logging.info("🎮 Escape key pressed - returning to lobby");
+                            returnToLobby();
+                        });
+                        Logging.info("🎮 Escape key shortcut configured (press Escape to return to lobby)");
+                    }
+                });
             }
         });
     }

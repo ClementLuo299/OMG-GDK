@@ -1,7 +1,8 @@
 package launcher.utils.module;
 
-import gdk.internal.Logging;
 import gdk.api.GameModule;
+import gdk.internal.Logging;
+import launcher.utils.path.PathUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +17,8 @@ import java.util.List;
  * 
  * @authors Clement Luo
  * @date August 12, 2025
- * @edited August 12, 2025
- * @since 1.0
+ * @edited December 20, 2025
+ * @since Beta 1.0
  */
 public class ModuleDiscovery {
     
@@ -591,6 +592,48 @@ public class ModuleDiscovery {
             
         } catch (Exception e) {
             Logging.error("💥 Error reporting compilation status: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Find and load a game module by its game name.
+     * Loads modules one by one until finding a match, stopping early for efficiency.
+     * 
+     * @param gameName The name of the game to find (as returned by getGameName())
+     * @return The loaded GameModule instance, or null if not found
+     */
+    public static GameModule findModuleByName(String gameName) {
+        if (gameName == null || gameName.trim().isEmpty()) {
+            Logging.info("Module lookup: Game name is null or empty");
+            return null;
+        }
+        
+        try {
+            // Discover valid module directories
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
+            File modulesDirectory = new File(modulesDirectoryPath);
+            List<File> validModuleDirectories = getValidModuleDirectories(modulesDirectory);
+            
+            if (validModuleDirectories.isEmpty()) {
+                Logging.info("Module lookup: No valid modules found");
+                return null;
+            }
+            
+            // Load modules one by one until we find the selected game
+            for (File moduleDir : validModuleDirectories) {
+                GameModule module = ModuleCompiler.loadModule(moduleDir);
+                if (module != null && gameName.equals(module.getMetadata().getGameName())) {
+                    Logging.info("Module lookup: Found game module: " + gameName);
+                    return module;
+                }
+            }
+            
+            Logging.info("Module lookup: Game module not found: " + gameName);
+            return null;
+            
+        } catch (Exception e) {
+            Logging.error("Module lookup failed: " + e.getMessage(), e);
+            return null;
         }
     }
 }
