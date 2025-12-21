@@ -15,7 +15,7 @@ import javafx.stage.Stage;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited December 19, 2025
+ * @edited December 20, 2025
  * @since Beta 1.0
  */
 public class GDKApplication extends Application {
@@ -51,13 +51,15 @@ public class GDKApplication extends Application {
      * @param args Command line arguments passed to the application
      */
     public static void main(String[] args) {
+
         /**
          * Add shutdown hook for unexpected termination.
          * 
          * This is a safety mechanism to ensure that all resources are properly cleaned up,
          * even if the application is terminated unexpectedly.
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        Runtime.getRuntime().addShutdownHook(
+            new Thread(() -> {
             Logging.info("Shutdown hook triggered - cleaning up resources");
             try {
                 Shutdown.forceShutdown();
@@ -65,7 +67,8 @@ public class GDKApplication extends Application {
                 Logging.error("Error in shutdown hook: " + e.getMessage(), e);
                 System.exit(1);
             }
-        }, "ShutdownHook"));
+        }
+        , "ShutdownHook"));
         
         //Launch the application
         launch(args);
