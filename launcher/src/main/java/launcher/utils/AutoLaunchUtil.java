@@ -171,13 +171,16 @@ public final class AutoLaunchUtil {
     
     /**
      * Create and configure controller and viewmodel for auto-launch.
+     * Sets the primary stage on the viewmodel for consistency with normal launch.
      * 
+     * @param primaryApplicationStage The primary stage to set on the viewmodel
      * @return AutoLaunchComponents containing the configured controller and viewmodel
      */
-    public static AutoLaunchComponents createAutoLaunchComponents() {
+    public static AutoLaunchComponents createAutoLaunchComponents(Stage primaryApplicationStage) {
         GDKGameLobbyController controller = new GDKGameLobbyController();
         controller.setControllerMode(GDKGameLobbyController.ControllerMode.AUTO_LAUNCH);
         GDKViewModel viewModel = new GDKViewModel();
+        viewModel.setPrimaryStage(primaryApplicationStage);
         controller.setViewModel(viewModel);
         return new AutoLaunchComponents(controller, viewModel);
     }
