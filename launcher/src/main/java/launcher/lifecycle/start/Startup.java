@@ -3,6 +3,7 @@ package launcher.lifecycle.start;
 import gdk.internal.Logging;
 import gdk.api.GameModule;
 import gdk.internal.MessagingBridge;
+import launcher.utils.AutoLaunchUtil;
 import launcher.utils.module.ModuleCompiler;
 import launcher.utils.module.ModuleDiscovery;
 import launcher.utils.path.FilePaths;
@@ -16,7 +17,6 @@ import launcher.lifecycle.start.gui.UIInitializer;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +27,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * @authors Clement Luo
  * @date August 8, 2025
- * @edited December 19, 2025  
+ * @edited December 20, 2025  
  * @since Beta 1.0
  */
 public class Startup {
 
+    /**
+     * Main entry point for the GDK application startup process.
+     * Orchestrates the startup sequence, checking for auto-launch functionality first,
+     * and falling back to the normal GDK interface if auto-launch is disabled or fails.
+     * 
+     * @param primaryApplicationStage The primary JavaFX stage for the application
+     * @throws RuntimeException if the startup process fails
+     */
     public static void start(Stage primaryApplicationStage) {
         Logging.info("Beginning GDK application startup process");
         try {
             // Auto-launch
-            if (isAutoLaunchEnabled() && attemptAutoLaunch(primaryApplicationStage)) {
+            if (AutoLaunchUtil.isAutoLaunchEnabled() && attemptAutoLaunch(primaryApplicationStage)) {
                 Logging.info("Auto-launch successful");
                 
                 // Keep the primary stage alive but hidden to prevent application shutdown
@@ -53,23 +61,6 @@ public class Startup {
         } catch (Exception startupError) {
             Logging.error("GDK application startup failed: " + startupError.getMessage(), startupError);
             throw new RuntimeException("Failed to start GDK application", startupError);
-        }
-    }
-
-    /**
-     * Check if auto-launch functionality is enabled
-     */
-    private static boolean isAutoLaunchEnabled() {
-        try {
-            Path autoLaunchFile = Paths.get(FilePaths.AUTO_LAUNCH_ENABLED_FILE);
-            if (!Files.exists(autoLaunchFile)) {
-                return false; // Default to disabled
-            }
-            String content = Files.readString(autoLaunchFile).trim();
-            return Boolean.parseBoolean(content);
-        } catch (Exception e) {
-            Logging.error("Error checking auto-launch status: " + e.getMessage());
-            return false;
         }
     }
 
