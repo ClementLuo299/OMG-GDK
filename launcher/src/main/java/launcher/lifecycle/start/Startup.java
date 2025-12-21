@@ -110,9 +110,8 @@ public class Startup {
             // 2. UI initialization
             GDKGameLobbyController lobbyController = UIInitializer.initialize(primaryApplicationStage, windowManager);
 
-            // 3. Check readiness and show main stage
+            // 3. Check readiness (this will show main stage when ready)
             StartupOperations.ensureUIReady(primaryApplicationStage, lobbyController, windowManager);
-            StartupOperations.showMainStageWithFade(primaryApplicationStage, windowManager);
 
             Logging.info("GDK application startup completed successfully");
         } catch (Exception startupError) {
