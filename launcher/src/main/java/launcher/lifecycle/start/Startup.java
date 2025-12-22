@@ -109,6 +109,8 @@ public class Startup {
 
             // 2. UI initialization
             GDKGameLobbyController lobbyController = UIInitializer.initialize(primaryApplicationStage, windowManager);
+            // Add delay after "Loading user interface..."
+            StartupOperations.addDevelopmentDelay("After 'Loading user interface...' message");
 
             // 3. Check readiness (this will show main stage when ready)
             StartupOperations.ensureUIReady(primaryApplicationStage, lobbyController, windowManager);
