@@ -11,7 +11,7 @@ import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.lifecycle.start.gui.UIInitializer;
-import launcher.lifecycle.start.module_loading.ModuleLoadingProcess;
+import launcher.lifecycle.start.module_loading.LoadModules;
 import launcher.utils.StartupDelayUtil;
 
 
@@ -115,7 +115,7 @@ public class Startup {
             StartupDelayUtil.addDevelopmentDelay("After 'Loading user interface...' message");
 
             // 3. Start loading modules in background
-            ModuleLoadingProcess.doModuleLoading(primaryApplicationStage, lobbyController, windowManager);
+            LoadModules.doModuleLoading(primaryApplicationStage, lobbyController, windowManager);
 
             Logging.info("GDK application startup completed successfully");
         } catch (Exception startupError) {

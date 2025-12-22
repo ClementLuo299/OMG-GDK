@@ -3,6 +3,7 @@ package launcher.lifecycle.start.module_loading;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.gui.GDKGameLobbyController;
+import launcher.lifecycle.start.module_loading.thread.ModuleLoadingThread;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.lifecycle.stop.Shutdown;
 import launcher.utils.StartupDelayUtil;
@@ -10,17 +11,17 @@ import launcher.utils.StartupDelayUtil;
 import javax.swing.SwingUtilities;
 
 /**
- * Encapsulates the module loading process during startup.
- * Orchestrates the background loading of game modules and manages related cleanup tasks.
+ * Coordinates the module loading process during startup.
+ * Sets up and starts the background thread that loads game modules and manages cleanup tasks.
  * 
  * @author Clement Luo
  * @date August 9, 2025
  * @edited December 21, 2025
  * @since Beta 1.0
  */
-public final class ModuleLoadingProcess {
+public final class LoadModules {
 
-    private ModuleLoadingProcess() {}
+    private LoadModules() {}
 
     /**
      * Loads game modules in the background and prepares the UI.
