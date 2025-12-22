@@ -112,8 +112,8 @@ public class Startup {
             // Add delay after "Loading user interface..."
             StartupOperations.addDevelopmentDelay("After 'Loading user interface...' message");
 
-            // 3. Check readiness (this will show main stage when ready)
-            StartupOperations.ensureUIReady(primaryApplicationStage, lobbyController, windowManager);
+            // 3. Start loading modules in background
+            StartupOperations.startModuleLoading(primaryApplicationStage, lobbyController, windowManager);
 
             Logging.info("GDK application startup completed successfully");
         } catch (Exception startupError) {

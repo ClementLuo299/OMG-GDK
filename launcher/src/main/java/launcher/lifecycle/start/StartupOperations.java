@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * 
  * @author Clement Luo
  * @date August 9, 2025
- * @edited December 20, 2025
+ * @edited December 21, 2025
  * @since Beta 1.0
  */
 public final class StartupOperations {
@@ -36,46 +36,47 @@ public final class StartupOperations {
     private StartupOperations() {}
 
     /**
-     * Ensures the UI is ready by loading modules and performing startup checks.
+     * Loads game modules in the background and prepares the UI.
      * 
-     * This method orchestrates the startup process:
-     * 1. Shows initial progress message
-     * 2. Starts module loading in a background thread (non-blocking)
-     * 3. When modules finish loading, updates the UI with the loaded games
-     * 4. Performs final checks and marks startup as complete
-     * 5. Shows the main stage and hides the startup window (after all delays complete)
-     * 
-     * @param primaryApplicationStage The primary application stage to show when ready
-     * @param lobbyController The lobby controller that will display the loaded games
-     * @param windowManager The startup window manager for progress updates
+     * @param primaryApplicationStage The main window (hidden until modules are loaded)
+     * @param lobbyController The UI controller that will show the list of games
+     * @param windowManager The startup progress window (visible during loading)
      */
-    public static void ensureUIReady(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
+    public static void startModuleLoading(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
+        // Get the total number of steps in the startup process
         int totalSteps = windowManager.getTotalSteps();
         
-        // Step 1: Ensure window is visible and give it a moment to render
-        // This helps ensure progress updates are visible
-        Logging.info("🔄 Starting module loading process...");
+        // Step 1: Update the startup window accordingly
+        Logging.info("Starting module loading process...");
         SwingUtilities.invokeLater(() -> {
             windowManager.updateProgress(1, "Starting module loading...");
         });
         addDevelopmentDelay("After 'Starting module loading...' message");
         
-        // Small delay to ensure window is fully visible before starting module loading
+        // Step 2: Wait a tiny bit to make sure the window is fully visible
         try {
-            Thread.sleep(100); // 100ms should be enough for window to appear
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         
-        // Step 2: Start module loading in background thread
-        // This prevents the UI from freezing during module loading
+        // Step 3: Create a background thread that will load all the modules
+        // This thread does the heavy work so the UI doesn't freeze
         Thread moduleLoadingThread = createModuleLoadingThread(primaryApplicationStage, lobbyController, windowManager, totalSteps);
         
-        // Step 3: Register cleanup tasks for graceful shutdown
+        // Step 4: Make sure we clean up the thread if the app closes unexpectedly
         registerCleanupTasks(moduleLoadingThread, windowManager);
         
-        // Step 4: Start the background thread
+        // Step 5: Start the background thread
+        // After this line, the method returns immediately.
+        // The background thread continues working and will:
+        // - Load modules
+        // - Update the UI
+        // - Show the main window when done
         moduleLoadingThread.start();
+        
+        // Method returns here - the caller continues immediately
+        // Background thread keeps working in the background
     }
     
     /**
@@ -100,11 +101,11 @@ public final class StartupOperations {
                                                     int totalSteps) {
         return new Thread(() -> {
             try {
-                Logging.info("🔄 Starting module loading on background thread");
+                Logging.info("Starting module loading on background thread");
                 
                 // PHASE 1: Load all game modules
                 loadModulesWithProgress(windowManager, totalSteps);
-                Logging.info("✅ Module loading completed");
+                Logging.info("Module loading completed");
                 addDevelopmentDelay("After module loading process completed");
                 
                 // PHASE 2: Update UI with loaded games (must run on JavaFX thread)
@@ -119,22 +120,37 @@ public final class StartupOperations {
                 markStartupComplete(windowManager, totalSteps);
                 addDevelopmentDelay("After startup complete and ready");
                 
-                // PHASE 5: Show main stage and hide startup window (after all delays)
-                Logging.info("🎬 All startup tasks complete - showing main stage");
+                // PHASE 5: Show main stage and hide startup window
+                Logging.info("All startup tasks complete - showing main stage");
                 showMainStageWithFade(primaryApplicationStage, windowManager);
                 
-                Logging.info("✅ Module loading thread completed successfully");
+                Logging.info("Module loading thread completed successfully");
                 
             } catch (Exception e) {
-                Logging.error("💥 Critical error in module loading thread: " + e.getMessage(), e);
-                // Even on error, try to show the main stage
-                try {
-                    showMainStageWithFade(primaryApplicationStage, windowManager);
-                } catch (Exception showError) {
-                    Logging.error("❌ Failed to show main stage after error: " + showError.getMessage());
-                }
+                handleModuleLoadingError(e, primaryApplicationStage, windowManager);
             }
         });
+    }
+    
+    /**
+     * Handles errors that occur during module loading.
+     * Attempts to show the main stage even if errors occurred.
+     * 
+     * @param error The exception that occurred
+     * @param primaryApplicationStage The primary stage to show
+     * @param windowManager The startup window manager
+     */
+    private static void handleModuleLoadingError(Exception error, 
+                                                 Stage primaryApplicationStage, 
+                                                 StartupWindowManager windowManager) {
+        Logging.error("💥 Critical error in module loading thread: " + error.getMessage(), error);
+        
+        // Even on error, try to show the main stage
+        try {
+            showMainStageWithFade(primaryApplicationStage, windowManager);
+        } catch (Exception showError) {
+            Logging.error("❌ Failed to show main stage after error: " + showError.getMessage());
+        }
     }
     
     /**
@@ -242,7 +258,7 @@ public final class StartupOperations {
 
     /**
      * Loads game modules with progress updates.
-     * Called from ensureUIReady() on a background thread.
+     * Called from startModuleLoading() on a background thread.
      * 
      * @param windowManager The startup window manager for progress updates
      * @param totalSteps The total number of steps in the startup process
@@ -420,7 +436,7 @@ public final class StartupOperations {
 
     /**
      * Shows the main application stage with a fade-in effect.
-     * Called after ensureUIReady() completes.
+     * Called after startModuleLoading() completes.
      * 
      * @param primaryApplicationStage The primary application stage
      * @param windowManager The startup window manager to hide
@@ -438,17 +454,19 @@ public final class StartupOperations {
      * This method adds a delay with logging to make it clear what's happening.
      * The delay is only executed if ENABLE_DEVELOPMENT_DELAYS is set to true.
      * 
+     * Package-private so it can be accessed from Startup class.
+     * 
      * @param reason The reason for the delay (for logging)
      */
-    private static void addDevelopmentDelay(String reason) {
+    static void addDevelopmentDelay(String reason) {
         if (!ENABLE_DEVELOPMENT_DELAYS) {
             return; // Skip delay if disabled
         }
         
-        final long delayMs = 5000; // 5 seconds
+        final long delayMs = 3000; // 3 seconds
         final long startTime = System.currentTimeMillis();
         
-        Logging.info("⏳ DEVELOPMENT DELAY: " + reason + " - waiting 5 seconds...");
+        Logging.info("⏳ DEVELOPMENT DELAY: " + reason + " - waiting 3 seconds...");
         
         try {
             Thread.sleep(delayMs);

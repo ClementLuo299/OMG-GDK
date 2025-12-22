@@ -41,10 +41,27 @@ public class StartupWindowManager {
     public static StartupWindowManager initializeWithCalculatedSteps() {
         PreStartupProgressWindow window = new PreStartupProgressWindow();
         StartupWindowManager manager = new StartupWindowManager(window);
-        int steps = ModuleDiscovery.calculateTotalSteps();
-        manager.setTotalSteps(steps);
+        
+        // Show the window immediately with a default step count for instant feedback
+        // We'll update the step count once calculation completes
+        manager.setTotalSteps(15); // Default, will be updated
         manager.show();
         manager.updateProgress(0, "Starting GDK application...");
+        
+        // Calculate actual steps in background and update (non-blocking)
+        // This prevents delay before window appears
+        new Thread(() -> {
+            try {
+                int actualSteps = ModuleDiscovery.calculateTotalSteps();
+                SwingUtilities.invokeLater(() -> {
+                    manager.setTotalSteps(actualSteps);
+                });
+            } catch (Exception e) {
+                Logging.error("Error calculating total steps: " + e.getMessage());
+                // Keep default steps on error
+            }
+        }).start();
+        
         return manager;
     }
     
