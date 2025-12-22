@@ -4,11 +4,28 @@
 
 echo "🚀 Starting GDK..."
 
-# Always ensure the local GDK dependency is up-to-date
-echo "📦 Installing local GDK dependency (and its parent POM)..."
-if ! mvn -q -pl gdk -am install; then
-    echo "❌ Failed to install GDK locally."
-    exit 1
+# Check if GDK needs to be rebuilt (only if source files are newer than JAR)
+GDK_JAR="gdk/target/gdk-1.0.0-beta.jar"
+GDK_SOURCES="gdk/src/main/java"
+NEEDS_REBUILD=false
+
+if [ ! -f "$GDK_JAR" ]; then
+    NEEDS_REBUILD=true
+    echo "📦 GDK JAR not found, will build..."
+elif [ -d "$GDK_SOURCES" ] && [ "$GDK_SOURCES" -nt "$GDK_JAR" ]; then
+    NEEDS_REBUILD=true
+    echo "📦 GDK sources newer than JAR, will rebuild..."
+fi
+
+# Only install if needed (saves time on subsequent runs)
+if [ "$NEEDS_REBUILD" = true ]; then
+    echo "📦 Installing local GDK dependency (and its parent POM)..."
+    if ! mvn -q -pl gdk -am install; then
+        echo "❌ Failed to install GDK locally."
+        exit 1
+    fi
+else
+    echo "✅ GDK is up-to-date, skipping install..."
 fi
 
 # Check if launcher classes exist (minimal check)
@@ -28,4 +45,5 @@ export MAVEN_OPTS="-Xms512m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=50 -Dprism.
 echo "🔧 Development mode enabled - caching disabled for faster UI updates"
 echo "💡 UI changes will now be visible immediately!"
 
+# Use exec:java but with minimal Maven output for faster startup
 mvn exec:java -Dexec.mainClass="launcher.GDKApplication" -q 
