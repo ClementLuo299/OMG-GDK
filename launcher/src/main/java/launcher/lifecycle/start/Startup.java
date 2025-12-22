@@ -11,6 +11,7 @@ import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.lifecycle.start.gui.UIInitializer;
+import launcher.lifecycle.start.module_loading.ModuleLoadingProcess;
 import launcher.utils.StartupDelayUtil;
 
 

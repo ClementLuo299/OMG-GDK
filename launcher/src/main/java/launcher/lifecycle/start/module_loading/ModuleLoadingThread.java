@@ -1,4 +1,4 @@
-package launcher.lifecycle.start;
+package launcher.lifecycle.start.module_loading;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
