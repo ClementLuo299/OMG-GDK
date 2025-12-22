@@ -1,0 +1,95 @@
+package launcher.lifecycle.start;
+
+import gdk.internal.Logging;
+import javafx.stage.Stage;
+import launcher.gui.GDKGameLobbyController;
+import launcher.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.lifecycle.stop.Shutdown;
+import launcher.utils.StartupDelayUtil;
+
+import javax.swing.SwingUtilities;
+
+/**
+ * Encapsulates the module loading process during startup.
+ * Orchestrates the background loading of game modules and manages related cleanup tasks.
+ * 
+ * @author Clement Luo
+ * @date August 9, 2025
+ * @edited December 21, 2025
+ * @since Beta 1.0
+ */
+public final class ModuleLoadingProcess {
+
+    private ModuleLoadingProcess() {}
+
+    /**
+     * Loads game modules in the background and prepares the UI.
+     * 
+     * @param primaryApplicationStage The main window (hidden until modules are loaded)
+     * @param lobbyController The UI controller that will show the list of games
+     * @param windowManager The startup progress window (visible during loading)
+     */
+    public static void doModuleLoading(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
+        // Get the total number of steps in the startup process
+        int totalSteps = windowManager.getTotalSteps();
+        
+        // Step 1: Update the startup window accordingly
+        Logging.info("Starting module loading process...");
+        SwingUtilities.invokeLater(() -> {
+            windowManager.updateProgress(1, "Starting module loading...");
+        });
+        StartupDelayUtil.addDevelopmentDelay("After 'Starting module loading...' message");
+        
+        // Step 2: Wait a tiny bit to make sure the window is fully visible
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // Step 3: Create a background thread that will load all the modules
+        // This thread does the heavy work so the UI doesn't freeze
+        Thread moduleLoadingThread = ModuleLoadingThread.create(primaryApplicationStage, lobbyController, windowManager, totalSteps);
+        
+        // Step 4: Make sure we clean up the thread if the app closes unexpectedly
+        registerCleanupTasks(moduleLoadingThread, windowManager);
+        
+        // Step 5: Start the background thread
+        // After this line, the method returns immediately.
+        // The background thread continues working and will:
+        // - Load modules
+        // - Update the UI
+        // - Show the main window when done
+        moduleLoadingThread.start();
+        
+        // Method returns here - the caller continues immediately
+        // Background thread keeps working in the background
+    }
+    
+    
+    /**
+     * Registers cleanup tasks to ensure proper shutdown.
+     * These tasks will be executed when the application shuts down.
+     * 
+     * @param moduleLoadingThread The thread to interrupt on shutdown
+     * @param windowManager The window manager to hide on shutdown
+     */
+    private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindowManager windowManager) {
+        // Clean up the module loading thread if app shuts down while loading
+        Shutdown.registerCleanupTask(() -> {
+            Logging.info("Cleaning up module loading thread...");
+            if (moduleLoadingThread.isAlive()) {
+                moduleLoadingThread.interrupt();
+            }
+        });
+        
+        // Clean up the startup window manager
+        Shutdown.registerCleanupTask(() -> {
+            Logging.info("Cleaning up StartupWindowManager...");
+            if (windowManager != null) {
+                windowManager.hide();
+            }
+        });
+    }
+}
+

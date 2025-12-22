@@ -9,7 +9,8 @@ import launcher.utils.module.ModuleCompiler;
 import launcher.utils.module.ModuleDiscovery;
 import launcher.utils.path.PathUtil;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
-import launcher.lifecycle.stop.Shutdown;
+import launcher.utils.StartupDelayUtil;
+import launcher.utils.StartupTransitionUtil;
 
 import javax.swing.SwingUtilities;
 import java.io.File;
@@ -17,77 +18,26 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Encapsulates operational startup tasks (module loading, readiness checks, and stage display).
+ * Handles the background thread that loads game modules during startup.
+ * 
+ * The thread performs these steps:
+ * 1. Loads all game modules (discovery, compilation, loading)
+ * 2. Updates the UI with loaded games (on JavaFX thread)
+ * 3. Checks for compilation issues
+ * 4. Marks startup as complete
+ * 5. Shows the main stage and hides the startup window
  * 
  * @author Clement Luo
- * @date August 9, 2025
+ * @date December 21, 2025
  * @edited December 21, 2025
  * @since Beta 1.0
  */
-public final class StartupOperations {
+public final class ModuleLoadingThread {
 
-    /**
-     * Flag to enable/disable development delays.
-     * When true, adds 5-second delays between startup steps for easier debugging.
-     * Set to false for normal operation.
-     */
-    private static final boolean ENABLE_DEVELOPMENT_DELAYS = true;
+    private ModuleLoadingThread() {}
 
-    private StartupOperations() {}
-
-    /**
-     * Loads game modules in the background and prepares the UI.
-     * 
-     * @param primaryApplicationStage The main window (hidden until modules are loaded)
-     * @param lobbyController The UI controller that will show the list of games
-     * @param windowManager The startup progress window (visible during loading)
-     */
-    public static void startModuleLoading(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
-        // Get the total number of steps in the startup process
-        int totalSteps = windowManager.getTotalSteps();
-        
-        // Step 1: Update the startup window accordingly
-        Logging.info("Starting module loading process...");
-        SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(1, "Starting module loading...");
-        });
-        addDevelopmentDelay("After 'Starting module loading...' message");
-        
-        // Step 2: Wait a tiny bit to make sure the window is fully visible
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        
-        // Step 3: Create a background thread that will load all the modules
-        // This thread does the heavy work so the UI doesn't freeze
-        Thread moduleLoadingThread = createModuleLoadingThread(primaryApplicationStage, lobbyController, windowManager, totalSteps);
-        
-        // Step 4: Make sure we clean up the thread if the app closes unexpectedly
-        registerCleanupTasks(moduleLoadingThread, windowManager);
-        
-        // Step 5: Start the background thread
-        // After this line, the method returns immediately.
-        // The background thread continues working and will:
-        // - Load modules
-        // - Update the UI
-        // - Show the main window when done
-        moduleLoadingThread.start();
-        
-        // Method returns here - the caller continues immediately
-        // Background thread keeps working in the background
-    }
-    
     /**
      * Creates and configures the background thread that loads modules.
-     * 
-     * The thread performs these steps:
-     * 1. Loads all game modules (discovery, compilation, loading)
-     * 2. Updates the UI with loaded games (on JavaFX thread)
-     * 3. Checks for compilation issues
-     * 4. Marks startup as complete
-     * 5. Shows the main stage and hides the startup window
      * 
      * @param primaryApplicationStage The primary stage to show when ready
      * @param lobbyController The controller to update with loaded games
@@ -95,10 +45,10 @@ public final class StartupOperations {
      * @param totalSteps Total number of progress steps
      * @return The configured but not-yet-started thread
      */
-    private static Thread createModuleLoadingThread(Stage primaryApplicationStage,
-                                                    GDKGameLobbyController lobbyController, 
-                                                    StartupWindowManager windowManager, 
-                                                    int totalSteps) {
+    public static Thread create(Stage primaryApplicationStage,
+                                GDKGameLobbyController lobbyController, 
+                                StartupWindowManager windowManager, 
+                                int totalSteps) {
         return new Thread(() -> {
             try {
                 Logging.info("Starting module loading on background thread");
@@ -106,23 +56,23 @@ public final class StartupOperations {
                 // PHASE 1: Load all game modules
                 loadModulesWithProgress(windowManager, totalSteps);
                 Logging.info("Module loading completed");
-                addDevelopmentDelay("After module loading process completed");
+                StartupDelayUtil.addDevelopmentDelay("After module loading process completed");
                 
                 // PHASE 2: Update UI with loaded games (must run on JavaFX thread)
                 updateUIWithLoadedGames(lobbyController);
-                addDevelopmentDelay("After refreshing game modules");
+                StartupDelayUtil.addDevelopmentDelay("After refreshing game modules");
                 
                 // PHASE 3: Check for compilation issues
                 checkForCompilationIssues(lobbyController, windowManager, totalSteps);
-                addDevelopmentDelay("After checking for compilation issues");
+                StartupDelayUtil.addDevelopmentDelay("After checking for compilation issues");
                 
                 // PHASE 4: Mark startup as complete
                 markStartupComplete(windowManager, totalSteps);
-                addDevelopmentDelay("After startup complete and ready");
+                StartupDelayUtil.addDevelopmentDelay("After startup complete and ready");
                 
                 // PHASE 5: Show main stage and hide startup window
                 Logging.info("All startup tasks complete - showing main stage");
-                showMainStageWithFade(primaryApplicationStage, windowManager);
+                StartupTransitionUtil.showMainStage(primaryApplicationStage, windowManager);
                 
                 Logging.info("Module loading thread completed successfully");
                 
@@ -147,7 +97,7 @@ public final class StartupOperations {
         
         // Even on error, try to show the main stage
         try {
-            showMainStageWithFade(primaryApplicationStage, windowManager);
+            StartupTransitionUtil.showMainStage(primaryApplicationStage, windowManager);
         } catch (Exception showError) {
             Logging.error("❌ Failed to show main stage after error: " + showError.getMessage());
         }
@@ -197,7 +147,7 @@ public final class StartupOperations {
                 Logging.error("❌ Error updating progress for compilation check: " + e.getMessage());
             }
         });
-        addDevelopmentDelay("After 'Checking for compilation issues...' message");
+        StartupDelayUtil.addDevelopmentDelay("After 'Checking for compilation issues...' message");
         
         // Check compilation issues (JavaFX component - needs JavaFX thread)
         Platform.runLater(() -> {
@@ -223,47 +173,22 @@ public final class StartupOperations {
         SwingUtilities.invokeLater(() -> {
             windowManager.updateProgress(totalSteps - 1, "Startup complete");
         });
-        addDevelopmentDelay("After 'Startup complete' message");
+        StartupDelayUtil.addDevelopmentDelay("After 'Startup complete' message");
         
         SwingUtilities.invokeLater(() -> {
             windowManager.updateProgress(totalSteps, "Ready!");
         });
-        addDevelopmentDelay("After 'Ready!' message");
-    }
-    
-    /**
-     * Registers cleanup tasks to ensure proper shutdown.
-     * These tasks will be executed when the application shuts down.
-     * 
-     * @param moduleLoadingThread The thread to interrupt on shutdown
-     * @param windowManager The window manager to hide on shutdown
-     */
-    private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindowManager windowManager) {
-        // Clean up the module loading thread if app shuts down while loading
-        Shutdown.registerCleanupTask(() -> {
-            Logging.info("🧹 Cleaning up module loading thread...");
-            if (moduleLoadingThread.isAlive()) {
-                moduleLoadingThread.interrupt();
-            }
-        });
-        
-        // Clean up the startup window manager
-        Shutdown.registerCleanupTask(() -> {
-            Logging.info("🧹 Cleaning up StartupWindowManager...");
-            if (windowManager != null) {
-                windowManager.hide();
-            }
-        });
+        StartupDelayUtil.addDevelopmentDelay("After 'Ready!' message");
     }
 
     /**
      * Loads game modules with progress updates.
-     * Called from startModuleLoading() on a background thread.
+     * Called from the module loading thread.
      * 
      * @param windowManager The startup window manager for progress updates
      * @param totalSteps The total number of steps in the startup process
      */
-    public static void loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
+    private static void loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
         int currentStep = 1; // Start from step 1 since we removed the fake progress updates
         
         try {
@@ -272,7 +197,7 @@ public final class StartupOperations {
             SwingUtilities.invokeLater(() -> {
                 windowManager.updateProgress(initStep, "Initializing game modules...");
             });
-            addDevelopmentDelay("After initializing game modules");
+            StartupDelayUtil.addDevelopmentDelay("After initializing game modules");
             
             if (ModuleCompiler.needToBuildModules()) {
                 Logging.info("🔨 Modules need to be built");
@@ -280,14 +205,14 @@ public final class StartupOperations {
                 SwingUtilities.invokeLater(() -> {
                     windowManager.updateProgress(step, "Building modules...");
                 });
-                addDevelopmentDelay("After checking if modules need to be built");
+                StartupDelayUtil.addDevelopmentDelay("After checking if modules need to be built");
             } else {
                 Logging.info("✅ Using existing builds (recent compilation detected)");
                 final int step = currentStep++;
                 SwingUtilities.invokeLater(() -> {
                     windowManager.updateProgress(step, "Using existing builds (recent compilation detected)");
                 });
-                addDevelopmentDelay("After checking if modules need to be built");
+                StartupDelayUtil.addDevelopmentDelay("After checking if modules need to be built");
             }
             
             Logging.info("📁 Preparing module discovery...");
@@ -295,7 +220,7 @@ public final class StartupOperations {
             SwingUtilities.invokeLater(() -> {
                 windowManager.updateProgress(step1, "Preparing module discovery...");
             });
-            addDevelopmentDelay("After preparing module discovery");
+            StartupDelayUtil.addDevelopmentDelay("After preparing module discovery");
 
             String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             Logging.info("🔍 Modules directory path: " + modulesDirectoryPath);
@@ -307,7 +232,7 @@ public final class StartupOperations {
                 SwingUtilities.invokeLater(() -> {
                     windowManager.updateProgress(step, "Modules directory not found: " + modulesDirectoryPath);
                 });
-                addDevelopmentDelay("After 'Modules directory not found' message");
+                StartupDelayUtil.addDevelopmentDelay("After 'Modules directory not found' message");
                 
                 // Run diagnostics to help identify the issue
                 Logging.info("🔍 Running module detection diagnostics...");
@@ -324,7 +249,7 @@ public final class StartupOperations {
                     SwingUtilities.invokeLater(() -> {
                         windowManager.updateProgress(step, "Modules directory access failed - continuing without modules");
                     });
-                    addDevelopmentDelay("After 'Modules directory access failed' message");
+                    StartupDelayUtil.addDevelopmentDelay("After 'Modules directory access failed' message");
                     
                     // Run diagnostics to help identify the issue
                     Logging.info("🔍 Running module detection diagnostics...");
@@ -336,7 +261,7 @@ public final class StartupOperations {
                     SwingUtilities.invokeLater(() -> {
                         windowManager.updateProgress(step, "Discovering modules...");
                     });
-                    addDevelopmentDelay("After 'Discovering modules...' message");
+                    StartupDelayUtil.addDevelopmentDelay("After 'Discovering modules...' message");
                     
                     // Add timeout protection for module discovery
                     List<File> validModuleDirectories = new ArrayList<>();
@@ -344,7 +269,7 @@ public final class StartupOperations {
                         Logging.info("🔍 Starting module discovery...");
                         validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDirectory);
                         Logging.info("✅ Module discovery completed. Found " + validModuleDirectories.size() + " valid modules");
-                        addDevelopmentDelay("After module discovery completed - found " + validModuleDirectories.size() + " modules");
+                        StartupDelayUtil.addDevelopmentDelay("After module discovery completed - found " + validModuleDirectories.size() + " modules");
                         
                         // If no modules found, run diagnostics
                         if (validModuleDirectories.isEmpty()) {
@@ -367,7 +292,7 @@ public final class StartupOperations {
                         // Run diagnostics to help identify the issue
                         Logging.info("🔍 Running module detection diagnostics...");
                         ModuleDiscovery.diagnoseModuleDetectionIssues(modulesDirectoryPath);
-                        addDevelopmentDelay("After module discovery failure");
+                        StartupDelayUtil.addDevelopmentDelay("After module discovery failure");
                     }
                     
                     // Process each discovered module
@@ -380,7 +305,7 @@ public final class StartupOperations {
                         SwingUtilities.invokeLater(() -> {
                             windowManager.updateProgress(processingStep, "Processing module: " + finalModuleName);
                         });
-                        addDevelopmentDelay("After processing module: " + moduleName);
+                        StartupDelayUtil.addDevelopmentDelay("After processing module: " + moduleName);
                     }
                     
                     // Load the discovered modules
@@ -396,7 +321,7 @@ public final class StartupOperations {
                         if (discoveredModules.isEmpty()) {
                             Logging.warning("⚠️ No modules were loaded! Check module compilation status.");
                         }
-                        addDevelopmentDelay("After loading compiled modules - loaded " + discoveredModules.size() + " modules");
+                        StartupDelayUtil.addDevelopmentDelay("After loading compiled modules - loaded " + discoveredModules.size() + " modules");
                     } catch (Exception e) {
                         Logging.error("❌ Module loading failed: " + e.getMessage(), e);
                         e.printStackTrace(); // Print full stack trace for debugging
@@ -404,7 +329,7 @@ public final class StartupOperations {
                         SwingUtilities.invokeLater(() -> {
                             windowManager.updateProgress(loadingErrorStep, "Module loading failed - continuing with empty list");
                         });
-                        addDevelopmentDelay("After module loading failure");
+                        StartupDelayUtil.addDevelopmentDelay("After module loading failure");
                     }
                     
                     final int finalStep = currentStep++;
@@ -412,7 +337,7 @@ public final class StartupOperations {
                     SwingUtilities.invokeLater(() -> {
                         windowManager.updateProgress(finalStep, "Found " + moduleCount + " modules");
                     });
-                    addDevelopmentDelay("After reporting module count");
+                    StartupDelayUtil.addDevelopmentDelay("After reporting module count");
                 }
             }
             
@@ -421,7 +346,7 @@ public final class StartupOperations {
             SwingUtilities.invokeLater(() -> {
                 windowManager.updateProgress(finalStep, "Finalizing module loading...");
             });
-            addDevelopmentDelay("After finalizing module loading");
+            StartupDelayUtil.addDevelopmentDelay("After finalizing module loading");
             
         } catch (Exception e) {
             Logging.error("💥 Critical error during module loading: " + e.getMessage(), e);
@@ -430,52 +355,8 @@ public final class StartupOperations {
             SwingUtilities.invokeLater(() -> {
                 windowManager.updateProgress(errorStep, "Error during module loading - continuing...");
             });
-            addDevelopmentDelay("After 'Error during module loading' message");
-        }
-    }
-
-    /**
-     * Shows the main application stage with a fade-in effect.
-     * Called after startModuleLoading() completes.
-     * 
-     * @param primaryApplicationStage The primary application stage
-     * @param windowManager The startup window manager to hide
-     */
-    public static void showMainStageWithFade(Stage primaryApplicationStage, StartupWindowManager windowManager) {
-        windowManager.hide();
-        Platform.runLater(() -> {
-            primaryApplicationStage.setOpacity(1.0);
-            primaryApplicationStage.show();
-        });
-    }
-    
-    /**
-     * Add a development delay to slow down the startup process so users can read each message.
-     * This method adds a delay with logging to make it clear what's happening.
-     * The delay is only executed if ENABLE_DEVELOPMENT_DELAYS is set to true.
-     * 
-     * Package-private so it can be accessed from Startup class.
-     * 
-     * @param reason The reason for the delay (for logging)
-     */
-    static void addDevelopmentDelay(String reason) {
-        if (!ENABLE_DEVELOPMENT_DELAYS) {
-            return; // Skip delay if disabled
-        }
-        
-        final long delayMs = 3000; // 3 seconds
-        final long startTime = System.currentTimeMillis();
-        
-        Logging.info("⏳ DEVELOPMENT DELAY: " + reason + " - waiting 3 seconds...");
-        
-        try {
-            Thread.sleep(delayMs);
-            final long actualDelay = System.currentTimeMillis() - startTime;
-            Logging.info("✅ Development delay completed for: " + reason + " (actual: " + actualDelay + "ms)");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            final long actualDelay = System.currentTimeMillis() - startTime;
-            Logging.warning("⏳ Development delay INTERRUPTED for: " + reason + " (was: " + actualDelay + "ms)");
+            StartupDelayUtil.addDevelopmentDelay("After 'Error during module loading' message");
         }
     }
 }
+
