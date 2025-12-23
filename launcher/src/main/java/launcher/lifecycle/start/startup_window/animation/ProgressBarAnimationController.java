@@ -1,8 +1,9 @@
-package launcher.lifecycle.start.startup_window;
+package launcher.lifecycle.start.startup_window.animation;
 
 import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
+import launcher.lifecycle.start.startup_window.PreStartupProgressWindow;
 
 /**
  * Controls the shimmer/shine animation effect on the progress bar.

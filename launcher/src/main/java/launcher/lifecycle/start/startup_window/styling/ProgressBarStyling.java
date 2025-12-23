@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window;
+package launcher.lifecycle.start.startup_window.styling;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -152,4 +152,5 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         g2d.setStroke(new BasicStroke(0.5f));
         g2d.drawRoundRect(1, 1, width - 3, height - 3, 23, 23);
     }
-} 
+}
+

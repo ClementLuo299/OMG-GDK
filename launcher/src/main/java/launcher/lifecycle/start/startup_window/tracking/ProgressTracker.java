@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window;
+package launcher.lifecycle.start.startup_window.tracking;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

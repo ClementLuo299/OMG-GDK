@@ -1,8 +1,9 @@
-package launcher.lifecycle.start.startup_window;
+package launcher.lifecycle.start.startup_window.animation;
 
 import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
+import launcher.lifecycle.start.startup_window.PreStartupProgressWindow;
 
 /**
  * Controls smooth animation of the progress bar between steps.

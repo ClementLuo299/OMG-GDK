@@ -39,7 +39,7 @@ public final class StandardLaunch {
     public static void launch(Stage primaryApplicationStage) {
         try {
             // Step 1: Create and show startup progress window
-            StartupWindowManager windowManager = StartupWindowManager.create();
+            StartupWindowManager windowManager = StartupWindowManager.show();
             StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application...' message");
 
             // Step 2: Initialize the user interface

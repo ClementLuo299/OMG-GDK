@@ -51,20 +51,16 @@ public final class ModuleLoadingThread {
                 Logging.info("Starting module loading on background thread");
                 
                 // PHASE 1: Load all game modules
-                // Get current totalSteps from window manager (may have been updated asynchronously)
-                int currentTotalSteps = windowManager.getTotalSteps();
-                int currentStep = loadModulesWithProgress(windowManager, currentTotalSteps);
+                int currentStep = loadModulesWithProgress(windowManager, totalSteps);
                 Logging.info("Module loading completed");
                 StartupDelayUtil.addDevelopmentDelay("After module loading process completed");
                 
                 // PHASE 2: Check for compilation issues 
-                // Get current totalSteps again (may have changed during module loading)
-                final int compilationTotalSteps = windowManager.getTotalSteps();
                 // Always move forward: ensure consecutive steps
                 // Reserve last 3 steps: compilation (totalSteps-2), complete (totalSteps-1), ready (totalSteps)
-                int compilationStep = Math.max(currentStep + 1, compilationTotalSteps - 2);
-                compilationStep = Math.min(compilationStep, compilationTotalSteps - 2); // Cap at reserved step
-                checkForCompilationIssues(lobbyController, windowManager, compilationTotalSteps, compilationStep);
+                int compilationStep = Math.max(currentStep + 1, totalSteps - 2);
+                compilationStep = Math.min(compilationStep, totalSteps - 2); // Cap at reserved step
+                checkForCompilationIssues(lobbyController, windowManager, totalSteps, compilationStep);
                 StartupDelayUtil.addDevelopmentDelay("After checking for compilation issues");
                 
                 // PHASE 3: Update UI with loaded games
@@ -72,12 +68,10 @@ public final class ModuleLoadingThread {
                 StartupDelayUtil.addDevelopmentDelay("After refreshing game modules");
                 
                 // PHASE 4: Mark startup as complete
-                // Get current totalSteps one more time before final steps
-                final int finalTotalSteps = windowManager.getTotalSteps();
                 // Always move forward from compilation step - ensure consecutive steps
                 int completeStep = compilationStep + 1;
-                completeStep = Math.min(completeStep, finalTotalSteps - 1); // Cap at reserved step
-                markStartupComplete(windowManager, finalTotalSteps, completeStep);
+                completeStep = Math.min(completeStep, totalSteps - 1); // Cap at reserved step
+                markStartupComplete(windowManager, totalSteps, completeStep);
                 StartupDelayUtil.addDevelopmentDelay("After startup complete and ready");
                 
                 // PHASE 5: Show main stage and hide startup window
@@ -212,7 +206,7 @@ public final class ModuleLoadingThread {
         // - Step 1: "Loading user interface..."
         // - Step 2: "Starting module loading..."
         // - Step 3+: Module loading steps
-        ModuleLoadingProgressManager progressManager = new ModuleLoadingProgressManager(windowManager, 3);
+        ModuleLoadingProgressManager progressManager = new ModuleLoadingProgressManager(windowManager, 3, totalSteps);
         
         try {
             Logging.info("Starting module loading process with " + totalSteps + " total steps");

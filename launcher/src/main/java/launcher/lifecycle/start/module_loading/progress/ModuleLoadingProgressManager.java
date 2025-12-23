@@ -27,11 +27,11 @@ public final class ModuleLoadingProgressManager {
      * 
      * @param windowManager The startup window manager for progress updates
      * @param initialStep The starting step number (typically 2)
+     * @param totalSteps The total number of steps in the startup process
      */
-    public ModuleLoadingProgressManager(StartupWindowManager windowManager, int initialStep) {
+    public ModuleLoadingProgressManager(StartupWindowManager windowManager, int initialStep, int totalSteps) {
         this.windowManager = windowManager;
         this.startStep = initialStep;
-        int totalSteps = windowManager.getTotalSteps();
         // Reserve last 3 steps for final messages: compilation (totalSteps-2), complete (totalSteps-1), ready (totalSteps)
         // This ensures consecutive steps at the end and "Ready!" reaches 100%
         this.endStep = totalSteps - 3; // Reserve last 3 steps

@@ -2,12 +2,9 @@ package launcher.lifecycle.start.startup_window;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.basic.BasicProgressBarUI;
 
 import java.awt.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.Timer;
-import java.util.TimerTask;
+import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**
  * Pre-Startup Progress Window
