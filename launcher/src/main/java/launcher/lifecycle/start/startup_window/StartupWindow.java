@@ -1,7 +1,7 @@
 package launcher.lifecycle.start.startup_window;
 
 import javax.swing.*;
-import launcher.lifecycle.start.startup_window.create.*;
+import launcher.lifecycle.start.startup_window.initialization.*;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**

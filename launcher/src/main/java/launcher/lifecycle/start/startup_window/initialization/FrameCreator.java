@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.create;
+package launcher.lifecycle.start.startup_window.initialization;
 
 import javax.swing.JFrame;
 import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;

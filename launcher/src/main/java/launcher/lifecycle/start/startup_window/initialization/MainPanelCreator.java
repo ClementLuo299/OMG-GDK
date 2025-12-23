@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.create;
+package launcher.lifecycle.start.startup_window.initialization;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
