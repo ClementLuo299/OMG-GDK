@@ -6,7 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import launcher.lifecycle.start.startup_window.initialization.arrangement.ComponentAssembler;
 import launcher.lifecycle.start.startup_window.initialization.arrangement.WindowPositioner;
-import launcher.lifecycle.start.startup_window.initialization.components.FrameCreator;
+import launcher.lifecycle.start.startup_window.initialization.components.MainWindowCreator;
 import launcher.lifecycle.start.startup_window.initialization.components.LabelCreator;
 import launcher.lifecycle.start.startup_window.initialization.components.MainPanelCreator;
 import launcher.lifecycle.start.startup_window.initialization.components.ProgressBarCreator;
@@ -56,14 +56,14 @@ public class StartupWindowInitializer {
         System.out.println("Creating startup progress window");
         
         // Create and configure the main JFrame with transparency
-        JFrame frame = FrameCreator.create();
+        JFrame frame = MainWindowCreator.create();
         
         // Create UI components using creators
-        JLabel titleLabel = LabelCreator.createTitle();
-        JLabel subtitleLabel = LabelCreator.createSubtitle();
+        JLabel titleLabel = LabelCreator.create(LabelCreator.LabelType.TITLE);
+        JLabel subtitleLabel = LabelCreator.create(LabelCreator.LabelType.SUBTITLE);
         JProgressBar progressBar = ProgressBarCreator.create(totalSteps);
-        JLabel percentageLabel = LabelCreator.createPercentage();
-        JLabel statusLabel = LabelCreator.createStatus();
+        JLabel percentageLabel = LabelCreator.create(LabelCreator.LabelType.PERCENTAGE);
+        JLabel statusLabel = LabelCreator.create(LabelCreator.LabelType.STATUS);
         
         // Apply custom ultra-modern progress bar styling
         ProgressBarStyling styling = new ProgressBarStyling();

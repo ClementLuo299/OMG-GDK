@@ -11,7 +11,7 @@ import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
  * @edited December 23, 2025
  * @since Beta 1.0
  */
-public class FrameCreator {
+public class MainWindowCreator {
     
     /**
      * Creates and configures the main JFrame with transparency support.
@@ -19,11 +19,14 @@ public class FrameCreator {
      * @return A configured JFrame ready for use
      */
     public static JFrame create() {
+        // Create the main application window
         JFrame frame = new JFrame(StartupWindowTheme.WINDOW_TITLE);
+        
+        // Configure window behavior: prevent closing, disable resizing, keep on top
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.setResizable(false);
         frame.setAlwaysOnTop(true);
-        frame.setUndecorated(true);
+        frame.setUndecorated(true); // Remove title bar and borders for custom styling
         
         // Enable window transparency for shadow effects
         try {

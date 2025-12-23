@@ -17,6 +17,7 @@ public class LabelCreator {
     
     /**
      * Enum representing different label types with their styling.
+     * Each type has its own text, font, and color from the theme.
      */
     public enum LabelType {
         TITLE(StartupWindowTheme.TITLE_TEXT, StartupWindowTheme.TITLE_FONT, StartupWindowTheme.PRIMARY_TEXT),
@@ -28,6 +29,7 @@ public class LabelCreator {
         private final java.awt.Font font;
         private final java.awt.Color foreground;
         
+        // Each label type stores its styling configuration
         LabelType(String text, java.awt.Font font, java.awt.Color foreground) {
             this.text = text;
             this.font = font;
@@ -54,47 +56,12 @@ public class LabelCreator {
      * @return A configured label
      */
     public static JLabel create(LabelType type) {
+        // Create label with text, font, and color from the specified type
         JLabel label = new JLabel(type.getText());
         label.setFont(type.getFont());
         label.setForeground(type.getForeground());
         label.setHorizontalAlignment(SwingConstants.CENTER);
         return label;
-    }
-    
-    /**
-     * Creates a styled title label.
-     * 
-     * @return A configured title label
-     */
-    public static JLabel createTitle() {
-        return create(LabelType.TITLE);
-    }
-    
-    /**
-     * Creates a styled subtitle label.
-     * 
-     * @return A configured subtitle label
-     */
-    public static JLabel createSubtitle() {
-        return create(LabelType.SUBTITLE);
-    }
-    
-    /**
-     * Creates a styled percentage label.
-     * 
-     * @return A configured percentage label
-     */
-    public static JLabel createPercentage() {
-        return create(LabelType.PERCENTAGE);
-    }
-    
-    /**
-     * Creates a styled status label.
-     * 
-     * @return A configured status label
-     */
-    public static JLabel createStatus() {
-        return create(LabelType.STATUS);
     }
 }
 

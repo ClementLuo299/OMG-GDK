@@ -22,6 +22,8 @@ public class CenteredComponentCreator {
      * @return A panel containing the centered component
      */
     public static JPanel create(JComponent component) {
+        // Create a wrapper panel with centered flow layout
+        // This ensures components are centered horizontally within the main panel's vertical layout
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panel.setBackground(StartupWindowTheme.BACKGROUND);
         panel.add(component);

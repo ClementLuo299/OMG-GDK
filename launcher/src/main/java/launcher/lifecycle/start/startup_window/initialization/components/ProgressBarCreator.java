@@ -21,11 +21,16 @@ public class ProgressBarCreator {
      * @return A configured progress bar
      */
     public static JProgressBar create(int totalSteps) {
+        // Create progress bar with range from 0 to totalSteps
         JProgressBar progressBar = new JProgressBar(0, totalSteps);
+        
+        // Set fixed size for consistent appearance
         progressBar.setPreferredSize(new Dimension(
             StartupWindowTheme.PROGRESS_BAR_WIDTH,
             StartupWindowTheme.PROGRESS_BAR_HEIGHT
         ));
+        
+        // Disable default border and opacity for custom styling
         progressBar.setBorderPainted(false);
         progressBar.setOpaque(false);
         return progressBar;

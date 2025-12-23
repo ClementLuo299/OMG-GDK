@@ -23,7 +23,11 @@ public class MainPanelCreator {
      */
     public static JPanel create() {
         JPanel panel = new JPanel();
+        
+        // Use vertical box layout to stack components top to bottom
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        // Create compound border: outer line border + inner padding
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(
                 StartupWindowTheme.BORDER,
@@ -36,6 +40,7 @@ public class MainPanelCreator {
                 StartupWindowTheme.PANEL_PADDING
             )
         ));
+        
         panel.setBackground(StartupWindowTheme.BACKGROUND);
         return panel;
     }
