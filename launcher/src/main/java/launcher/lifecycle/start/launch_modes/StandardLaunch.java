@@ -1,4 +1,4 @@
-package launcher.lifecycle.start;
+package launcher.lifecycle.start.launch_modes;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
@@ -9,25 +9,24 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.utils.StartupDelayUtil;
 
 /**
- * Handles the normal startup path for the GDK application.
+ * Handles the standard launch path for the GDK application.
  * 
- * Normal launch initializes the full GDK interface with game selection:
+ * Standard launch initializes the full GDK interface with game selection:
  * 1. Creates and displays the startup progress window
  * 2. Initializes the user interface
  * 3. Loads game modules in the background
  * 
  * @author Clement Luo
  * @date December 22, 2025
+ * @edited December 22, 2025
  * @since Beta 1.0
  */
-public final class NormalLaunchStartup {
+public final class StandardLaunch {
 
-    private NormalLaunchStartup() {
-        // Utility class - prevent instantiation
-    }
+    private StandardLaunch() {}
 
     /**
-     * Starts the normal GDK interface with game selection.
+     * Starts the standard GDK interface with game selection.
      * 
      * This method initializes the full GDK application:
      * 1. Creates and displays the startup progress window

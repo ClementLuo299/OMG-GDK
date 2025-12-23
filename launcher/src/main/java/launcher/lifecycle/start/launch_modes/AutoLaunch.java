@@ -1,4 +1,4 @@
-package launcher.lifecycle.start;
+package launcher.lifecycle.start.launch_modes;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -9,19 +9,19 @@ import launcher.utils.AutoLaunchUtil;
 import launcher.utils.module.ModuleDiscovery;
 
 /**
- * Handles the auto-launch startup path for the GDK application.
+ * Handles the auto-launch path for the GDK application.
  * 
  * Auto-launch attempts to restore and launch a previously selected game
  * using saved configuration data. If successful, the application skips
- * the normal GDK interface and goes directly to the game.
+ * the standard GDK interface and goes directly to the game.
  * 
  * @author Clement Luo
  * @date December 22, 2025
  * @since Beta 1.0
  */
-public final class AutoLaunchStartup {
+public final class AutoLaunch {
 
-    private AutoLaunchStartup() {
+    private AutoLaunch() {
         // Utility class - prevent instantiation
     }
 
