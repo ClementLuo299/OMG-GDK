@@ -26,10 +26,17 @@ public class PreStartupProgressWindow {
     // Swing components for the pre-startup progress window UI
     private JFrame progressFrame;
     private JProgressBar progressBar;
+    private JLabel percentageLabel;
     private JLabel statusLabel;
     
     // Progress tracking for the progress bar
     private final int totalSteps; // Total steps for the progress bar (set at construction)
+    
+    // Current step value for display (integer)
+    private int currentStep = 0;
+    
+    // Smooth progress value for animation (0.0 to 1.0, can be fractional)
+    private double smoothProgress = 0.0;
     
     // Progress bar styling reference
     private ProgressBarStyling progressBarStyling; // Reference to the custom UI for animation updates
@@ -58,19 +65,22 @@ public class PreStartupProgressWindow {
         // Step 5: Apply custom ultra-modern progress bar styling
         applyCustomProgressBarStyling();
         
-        // Step 6: Create status label with styling
+        // Step 6: Create percentage label with styling
+        createPercentageLabel();
+        
+        // Step 7: Create status label with styling
         createStatusLabel();
         
-        // Step 7: Create and configure the main panel layout
+        // Step 8: Create and configure the main panel layout
         JPanel mainPanel = createMainPanel();
         
-        // Step 8: Add all components to the panel with proper spacing
+        // Step 9: Add all components to the panel with proper spacing
         addComponentsToPanel(mainPanel, titleLabel, subtitleLabel);
         
-        // Step 9: Set the main panel as the frame's content pane
+        // Step 10: Set the main panel as the frame's content pane
         progressFrame.setContentPane(mainPanel);
         
-        // Step 10: Pack and center the window on screen
+        // Step 11: Pack and center the window on screen
         packAndCenterWindow();
         
         System.out.println("✅ Pre-startup progress window created");
@@ -139,7 +149,17 @@ public class PreStartupProgressWindow {
     }
     
     /**
-     * Step 6: Create status label with styling
+     * Step 6: Create percentage label with styling
+     */
+    private void createPercentageLabel() {
+        percentageLabel = new JLabel("0%");
+        percentageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        percentageLabel.setForeground(new Color(149, 165, 166));
+        percentageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+    
+    /**
+     * Step 7: Create status label with styling
      */
     private void createStatusLabel() {
         statusLabel = new JLabel("Starting up...");
@@ -149,7 +169,7 @@ public class PreStartupProgressWindow {
     }
     
     /**
-     * Step 7: Create and configure the main panel layout
+     * Step 8: Create and configure the main panel layout
      */
     private JPanel createMainPanel() {
         JPanel mainPanel = new JPanel();
@@ -163,7 +183,7 @@ public class PreStartupProgressWindow {
     }
     
     /**
-     * Step 8: Add all components to the panel with proper spacing
+     * Step 9: Add all components to the panel with proper spacing
      */
     private void addComponentsToPanel(JPanel mainPanel, JLabel titleLabel, JLabel subtitleLabel) {
         mainPanel.add(Box.createVerticalStrut(10));
@@ -172,6 +192,8 @@ public class PreStartupProgressWindow {
         mainPanel.add(createCenteredComponent(subtitleLabel));
         mainPanel.add(Box.createVerticalStrut(20));
         mainPanel.add(createCenteredComponent(progressBar));
+        mainPanel.add(Box.createVerticalStrut(5));
+        mainPanel.add(createCenteredComponent(percentageLabel));
         mainPanel.add(Box.createVerticalStrut(10));
         mainPanel.add(createCenteredComponent(statusLabel));
         mainPanel.add(Box.createVerticalStrut(10));
@@ -238,12 +260,49 @@ public class PreStartupProgressWindow {
      */
     public void updateProgress(int step, String status) {
         SwingUtilities.invokeLater(() -> {
+            currentStep = step;
             progressBar.setValue(step);
             progressBar.setString(step + "/" + totalSteps + " (" + (step * 100 / totalSteps) + "%)");
+            
+            // Update percentage label
+            int percentage = totalSteps > 0 ? (step * 100 / totalSteps) : 0;
+            percentageLabel.setText(percentage + "%");
+            
             statusLabel.setText(status);
             
             System.out.println("📊 Progress: " + step + "/" + totalSteps + " - " + status);
         });
+    }
+    
+    /**
+     * Sets the smooth progress value for animation (0.0 to 1.0).
+     * This allows fractional progress values for smooth animation.
+     * Also updates the percentage label to reflect the smooth progress.
+     * 
+     * @param progress The progress value (0.0 to 1.0)
+     */
+    public void setSmoothProgress(double progress) {
+        smoothProgress = Math.max(0.0, Math.min(1.0, progress)); // Clamp to 0.0-1.0
+        if (progressBarStyling != null) {
+            progressBarStyling.setSmoothProgress(smoothProgress);
+        }
+        
+        // Update percentage label with smooth progress
+        if (percentageLabel != null) {
+            int percentage = (int) Math.round(smoothProgress * 100);
+            percentageLabel.setText(percentage + "%");
+        }
+        
+        progressBar.repaint();
+    }
+    
+    /**
+     * Gets the current smooth progress value.
+     * 
+     * @return The smooth progress value (0.0 to 1.0)
+     */
+    public double getSmoothProgress() {
+        return smoothProgress;
     }
     
     

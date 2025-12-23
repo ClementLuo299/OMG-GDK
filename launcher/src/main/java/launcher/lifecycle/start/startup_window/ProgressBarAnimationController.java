@@ -45,7 +45,7 @@ public class ProgressBarAnimationController {
         progressAnimationTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                shimmerOffset += 0.02f; // Much slower shimmer movement for development
+                shimmerOffset += 0.008f; // Slower, smoother shimmer movement
                 if (shimmerOffset > 1.0f) {
                     shimmerOffset = 0.0f;
                 }
@@ -56,7 +56,7 @@ public class ProgressBarAnimationController {
                     progressWindow.repaintProgressBar();
                 });
             }
-        }, 0, 500); // Much slower animation (500ms instead of 200ms) for development
+        }, 0, 16); // ~60 FPS for smooth shimmer animation
     }
     
     /**

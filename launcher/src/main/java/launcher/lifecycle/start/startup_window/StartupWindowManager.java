@@ -1,9 +1,6 @@
 package launcher.lifecycle.start.startup_window;
 
 import javax.swing.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.Timer;
-import java.util.TimerTask;
 import launcher.utils.module.ModuleDiscovery;
 import launcher.lifecycle.stop.Shutdown;
 import gdk.internal.Logging;
@@ -23,21 +20,18 @@ public class StartupWindowManager {
     /** The underlying progress window that displays startup progress to the user. */
     private final PreStartupProgressWindow progressWindow;
     
-    /** The current step number in the startup process (thread-safe). */
-    private final AtomicInteger currentStep = new AtomicInteger(0);
-    
-    /** The total number of steps in the startup process. Calculated once at creation and never changes. */
-    private final int totalSteps;
+    /** Tracks progress state (current step and total steps). */
+    private final ProgressTracker progressTracker;
     
     // ============================================================================
     // Animation Controllers
     // ============================================================================
     
-    /** Controller for text animation (animated dots appearing after status messages). */
-    private final TextAnimationController textAnimationController;
-    
     /** Controller for progress bar shimmer/shine animation effect. */
     private final ProgressBarAnimationController progressBarAnimationController;
+    
+    /** Controller for smooth progress bar animation between steps. */
+    private final SmoothProgressAnimationController smoothProgressAnimationController;
     
     /**
      * Constructs a new StartupWindowManager with the specified progress window and total steps.
@@ -47,9 +41,9 @@ public class StartupWindowManager {
      */
     private StartupWindowManager(PreStartupProgressWindow progressWindow, int totalSteps) {
         this.progressWindow = progressWindow;
-        this.totalSteps = totalSteps;
-        this.textAnimationController = new TextAnimationController(progressWindow);
+        this.progressTracker = new ProgressTracker(totalSteps);
         this.progressBarAnimationController = new ProgressBarAnimationController(progressWindow);
+        this.smoothProgressAnimationController = new SmoothProgressAnimationController(progressWindow);
     }
 
     /**
@@ -72,6 +66,8 @@ public class StartupWindowManager {
         
         PreStartupProgressWindow window = new PreStartupProgressWindow(totalSteps);
         StartupWindowManager manager = new StartupWindowManager(window, totalSteps);
+        // Initialize smooth progress to 0
+        manager.initializeSmoothProgress(0, totalSteps);
         manager.show();
         manager.updateProgress(0, "Starting GDK application...");
         
@@ -85,7 +81,7 @@ public class StartupWindowManager {
      * @return The total number of steps
      */
     public int getTotalSteps() {
-        return totalSteps;
+        return progressTracker.getTotalSteps();
     }
     
     /**
@@ -107,7 +103,7 @@ public class StartupWindowManager {
         
         // Register cleanup task with shutdown system
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("🧹 Cleaning up StartupWindowManager resources...");
+            Logging.info("Cleaning up StartupWindowManager resources");
             try {
                 // Ensure animations are stopped
                 stopAnimations();
@@ -117,67 +113,28 @@ public class StartupWindowManager {
                     progressWindow.hide();
                 }
                 
-                Logging.info("✅ StartupWindowManager cleanup completed");
+                Logging.info("StartupWindowManager cleanup completed");
             } catch (Exception e) {
-                Logging.error("❌ Error during StartupWindowManager cleanup: " + e.getMessage(), e);
+                Logging.error("Error during StartupWindowManager cleanup: " + e.getMessage(), e);
             }
         });
     }
     
     /**
-     * Updates the progress display with the current step and status message.
-     * Ensures UI updates happen on the Event Dispatch Thread (EDT) for Swing components.
+     * Initializes the smooth progress animation to a specific step.
      * 
-     * @param step The current step number (0-based)
-     * @param message The status message to display
+     * @param step The initial step value (0-based)
+     * @param totalSteps The total number of steps
      */
-    public void updateProgress(int step, String message) {
-        // Ensure UI updates happen on the EDT for Swing components
-        if (SwingUtilities.isEventDispatchThread()) {
-            updateProgressInternal(step, message);
-        } else {
-            SwingUtilities.invokeLater(() -> updateProgressInternal(step, message));
-        }
+    private void initializeSmoothProgress(int step, int totalSteps) {
+        smoothProgressAnimationController.resetToStep(step, totalSteps);
     }
     
     /**
-     * Updates the progress display with a delay to slow down the progress bar animation.
-     * This method schedules the progress update after a delay without blocking the UI.
-     * 
-     * @param step The current step number (0-based)
-     * @param message The status message to display
-     * @param delayMs The delay in milliseconds before updating the progress
-     */
-    public void updateProgressWithDelay(int step, String message, int delayMs) {
-        Timer delayTimer = new Timer();
-        delayTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                updateProgress(step, message);
-                delayTimer.cancel(); // Clean up the timer
-            }
-        }, delayMs);
-    }
-    
-    /**
-     * Internal method to update progress. Must be called on the Event Dispatch Thread.
-     * Updates the current step, progress window, and starts text animation.
-     * 
-     * @param step The current step number (0-based)
-     * @param message The status message to display
-     */
-    private void updateProgressInternal(int step, String message) {
-        currentStep.set(step);
-        progressWindow.updateProgress(step, message);
-        textAnimationController.start(message);
-    }
-    
-    /**
-     * Starts all animations (text animation and progress bar shimmer).
+     * Starts all animations (progress bar shimmer and smooth progress animation).
      * Called when the window is shown.
      */
     private void startAnimations() {
-        textAnimationController.start("");
         progressBarAnimationController.start();
     }
     
@@ -186,25 +143,87 @@ public class StartupWindowManager {
      * Called when the window is hidden or during cleanup.
      */
     private void stopAnimations() {
-        textAnimationController.stop();
         progressBarAnimationController.stop();
+        smoothProgressAnimationController.stop();
+    }
+
+    /**
+     * Updates the progress display with the current step and status message.
+     * Uses smooth animation to transition between steps instead of jumping.
+     * Estimates the step duration based on the message content.
+     * 
+     * @param step The current step number (0-based)
+     * @param message The status message to display
+     */
+    public void updateProgress(int step, String message) {
+        long estimatedDuration = estimateStepDuration(message);
+        updateProgress(step, message, estimatedDuration);
     }
     
     /**
-     * Gets the current step number in the startup process.
+     * Updates the progress display with the current step, status message, and estimated duration.
+     * Uses smooth animation timed to complete in the estimated duration (underestimated by 20%).
      * 
-     * @return The current step number (0-based)
+     * @param step The current step number (0-based)
+     * @param message The status message to display
+     * @param estimatedDurationMs Estimated duration for this step in milliseconds
      */
-    public int getCurrentStep() {
-        return currentStep.get();
+    public void updateProgress(int step, String message, long estimatedDurationMs) {
+        progressTracker.setCurrentStep(step);
+        // Update the status message and step count display
+        progressWindow.updateProgress(step, message);
+        // Start smooth animation toward the target step with estimated duration
+        smoothProgressAnimationController.animateToStep(step, progressTracker.getTotalSteps(), estimatedDurationMs);
     }
     
     /**
-     * Checks if the startup progress window is currently visible.
+     * Estimates the duration of a step based on the message content.
+     * Uses heuristics to predict how long each type of operation might take.
+     * Accounts for development delays (1500ms) that occur after progress updates.
+     * Returns conservative (underestimated) values to ensure animation completes early.
      * 
-     * @return true if the window is visible, false otherwise
+     * @param message The status message for the step
+     * @return Estimated duration in milliseconds (underestimated)
      */
-    public boolean isVisible() {
-        return progressWindow.isVisible();
+    private long estimateStepDuration(String message) {
+        String lowerMessage = message.toLowerCase();
+        
+        // Development delay time (added after most progress updates)
+        final long DEVELOPMENT_DELAY_MS = 1500;
+        
+        // Base operation time estimates
+        long baseDuration;
+        
+        // Quick operations (UI updates, simple state changes)
+        if (lowerMessage.contains("starting") || lowerMessage.contains("ready") || 
+            lowerMessage.contains("complete") || lowerMessage.contains("loading user interface")) {
+            baseDuration = 300; // ~300ms
+        }
+        // Module discovery operations
+        else if (lowerMessage.contains("discovering") || lowerMessage.contains("discovery")) {
+            baseDuration = 800; // ~800ms
+        }
+        // Compilation/build operations (usually slower)
+        else if (lowerMessage.contains("compil") || lowerMessage.contains("build") || 
+                 lowerMessage.contains("building")) {
+            baseDuration = 2000; // ~2 seconds
+        }
+        // Loading/processing operations
+        else if (lowerMessage.contains("loading") || lowerMessage.contains("processing") || 
+                 lowerMessage.contains("preparing") || lowerMessage.contains("initializing")) {
+            baseDuration = 1000; // ~1 second
+        }
+        // Checking operations
+        else if (lowerMessage.contains("checking") || lowerMessage.contains("validating")) {
+            baseDuration = 600; // ~600ms
+        }
+        // Default for unknown operations (conservative estimate)
+        else {
+            baseDuration = 500; // ~500ms default
+        }
+        
+        // Add development delay time since delays occur after progress updates
+        // Most steps have development delays, so account for them in the estimate
+        return baseDuration + DEVELOPMENT_DELAY_MS;
     }
 } 

@@ -64,7 +64,11 @@ public class TextAnimationController {
                     currentCharIndex = 0;
                 }
                 SwingUtilities.invokeLater(() -> {
-                    String animatedMessage = fullMessage + ".".repeat(currentCharIndex);
+                    // Always reserve 3 characters for dots to prevent text shifting
+                    // Use spaces for dots that aren't visible yet to maintain constant width
+                    String dots = ".".repeat(currentCharIndex);
+                    String spaces = " ".repeat(3 - currentCharIndex);
+                    String animatedMessage = fullMessage + dots + spaces;
                     progressWindow.updateStatusText(animatedMessage);
                 });
             }

@@ -12,12 +12,25 @@ public class ProgressBarStyling extends BasicProgressBarUI {
     
     private float shimmerOffset = 0.0f;
     
+    /** Smooth progress value (0.0 to 1.0) used for animation instead of progressBar.getPercentComplete(). */
+    private Double smoothProgress = null;
+    
     public void setShimmerOffset(float shimmerOffset) {
         this.shimmerOffset = shimmerOffset;
     }
     
     public float getShimmerOffset() {
         return shimmerOffset;
+    }
+    
+    /**
+     * Sets the smooth progress value for animation.
+     * When set, this overrides the progress bar's internal percentage calculation.
+     * 
+     * @param progress The progress value (0.0 to 1.0), or null to use default behavior
+     */
+    public void setSmoothProgress(Double progress) {
+        this.smoothProgress = progress;
     }
     
     @Override
@@ -31,7 +44,9 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         paintMultiLayeredShadow(g2d, width, height);
         paintGlassBackground(g2d, width, height);
         paintInnerShadow(g2d, width, height);
-        int progressWidth = (int) (width * progressBar.getPercentComplete());
+        // Use smooth progress if available, otherwise use standard progress bar percentage
+        double progressPercent = (smoothProgress != null) ? smoothProgress : progressBar.getPercentComplete();
+        int progressWidth = (int) (width * progressPercent);
         if (progressWidth > 0) {
             paintProgressFill(g2d, progressWidth, height);
             paintShimmerEffect(g2d, progressWidth, height);
