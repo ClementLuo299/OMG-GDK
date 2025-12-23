@@ -1,26 +1,26 @@
-package launcher.lifecycle.start.startup_window.initialization;
+package launcher.lifecycle.start.startup_window.initialization.labels;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
 
 /**
- * Creates a styled percentage label.
+ * Creates a styled subtitle label.
  * 
  * @author Clement Luo
  * @date December 23, 2025
  * @since Beta 1.0
  */
-public class PercentageLabelCreator {
+public class SubtitleLabelCreator {
     
     /**
-     * Creates a styled percentage label.
+     * Creates a styled subtitle label.
      * 
-     * @return A configured percentage label
+     * @return A configured subtitle label
      */
     public static JLabel create() {
-        JLabel label = new JLabel(StartupWindowTheme.INITIAL_PERCENTAGE);
-        label.setFont(StartupWindowTheme.PERCENTAGE_FONT);
+        JLabel label = new JLabel(StartupWindowTheme.INITIAL_SUBTITLE);
+        label.setFont(StartupWindowTheme.SUBTITLE_FONT);
         label.setForeground(StartupWindowTheme.SECONDARY_TEXT);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         return label;
