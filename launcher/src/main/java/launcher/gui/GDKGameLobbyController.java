@@ -172,7 +172,7 @@ public class GDKGameLobbyController implements Initializable {
      */
     private String currentProcessingModule = "";
     
-    // Note: Progress window is now handled by PreStartupProgressWindow in Startup class
+    // Note: Progress window is now handled by StartupWindow in Startup class
     
     /**
      * JSON mapper for parsing and validating JSON configuration data
@@ -698,7 +698,7 @@ public class GDKGameLobbyController implements Initializable {
      * Set the startup progress window for module loading updates
      * @param progressWindow The startup progress window
      */
-    // Note: Progress window methods removed - now handled by PreStartupProgressWindow in Startup class
+    // Note: Progress window methods removed - now handled by StartupWindow in Startup class
     
     /**
      * Get the current loading task description based on animation state
@@ -768,7 +768,7 @@ public class GDKGameLobbyController implements Initializable {
             String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             Logging.info("📁 Modules directory path: " + modulesDirectoryPath);
             
-            // Note: Progress window updates now handled by PreStartupProgressWindow in Startup class
+            // Note: Progress window updates now handled by StartupWindow in Startup class
             
             // Skip compilation checks on startup for speed
             // Just discover modules from existing compiled classes

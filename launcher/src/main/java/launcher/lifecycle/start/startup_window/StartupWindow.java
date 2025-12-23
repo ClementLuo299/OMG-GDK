@@ -7,7 +7,7 @@ import java.awt.*;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**
- * Pre-Startup Progress Window
+ * Startup Progress Window
  * 
  * Shows a progress window BEFORE JavaFX starts, using Swing for immediate display.
  * This window appears instantly when the application launches and shows progress
@@ -15,10 +15,10 @@ import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
  * 
  * @author Clement Luo
  * @date August 5, 2025
- * @edited December 22, 2025 
+ * @edited December 23, 2025 
  * @since Beta 1.0
  */
-public class PreStartupProgressWindow {
+public class StartupWindow {
     
     // Swing components for the pre-startup progress window UI
     private JFrame progressFrame;
@@ -39,13 +39,13 @@ public class PreStartupProgressWindow {
     private ProgressBarStyling progressBarStyling; // Reference to the custom UI for animation updates
     
     /**
-     * Initialize the pre-startup progress window
+     * Initialize the startup progress window
      * 
      * @param totalSteps The total number of steps for the progress bar
      */
-    public PreStartupProgressWindow(int totalSteps) {
+    public StartupWindow(int totalSteps) {
         this.totalSteps = totalSteps;
-        System.out.println("🚀 Creating pre-startup progress window...");
+        System.out.println("🚀 Creating startup progress window...");
         
         // Step 1: Create and configure the main JFrame with transparency
         createAndConfigureFrame();
@@ -80,7 +80,7 @@ public class PreStartupProgressWindow {
         // Step 11: Pack and center the window on screen
         packAndCenterWindow();
         
-        System.out.println("✅ Pre-startup progress window created");
+        System.out.println("✅ Startup progress window created");
     }
     
     /**
@@ -221,7 +221,7 @@ public class PreStartupProgressWindow {
      * Show the progress window
      */
     public void show() {
-        System.out.println("🎬 Showing pre-startup progress window");
+        System.out.println("🎬 Showing startup progress window");
         
         // Show on EDT to ensure thread safety
         if (SwingUtilities.isEventDispatchThread()) {
@@ -237,7 +237,7 @@ public class PreStartupProgressWindow {
      * Hide the progress window
      */
     public void hide() {
-        System.out.println("🏁 Hiding pre-startup progress window");
+        System.out.println("🏁 Hiding startup progress window");
         
         if (SwingUtilities.isEventDispatchThread()) {
             progressFrame.setVisible(false);

@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.animation;
 import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.PreStartupProgressWindow;
+import launcher.lifecycle.start.startup_window.StartupWindow;
 
 /**
  * Controls smooth animation of the progress bar between steps.
@@ -30,7 +30,7 @@ public class SmoothProgressAnimationController {
     private double startProgress = 0.0;
     
     /** The progress window that contains the progress bar to animate. */
-    private final PreStartupProgressWindow progressWindow;
+    private final StartupWindow progressWindow;
     
     /** Frame time in milliseconds (target ~60 FPS). */
     private static final long FRAME_TIME_MS = 16;
@@ -46,7 +46,7 @@ public class SmoothProgressAnimationController {
      * 
      * @param progressWindow The progress window containing the progress bar to animate
      */
-    public SmoothProgressAnimationController(PreStartupProgressWindow progressWindow) {
+    public SmoothProgressAnimationController(StartupWindow progressWindow) {
         this.progressWindow = progressWindow;
     }
     

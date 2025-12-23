@@ -21,7 +21,7 @@ import launcher.lifecycle.start.startup_window.estimation.StepDurationEstimator;
 public class StartupWindowManager {
     
     /** The underlying progress window that displays startup progress to the user. */
-    private final PreStartupProgressWindow progressWindow;
+    private final StartupWindow progressWindow;
     
     /** Tracks progress state (current step and total steps). */
     private final ProgressTracker progressTracker;
@@ -45,7 +45,7 @@ public class StartupWindowManager {
      * @param progressWindow The progress window to manage
      * @param totalSteps The total number of steps (calculated once and never changes)
      */
-    private StartupWindowManager(PreStartupProgressWindow progressWindow, int totalSteps) {
+    private StartupWindowManager(StartupWindow progressWindow, int totalSteps) {
         this.progressWindow = progressWindow;
         this.progressTracker = new ProgressTracker(totalSteps);
         this.progressBarAnimationController = new ProgressBarAnimationController(progressWindow);
@@ -72,7 +72,7 @@ public class StartupWindowManager {
         }
         
         // Create the window and manager
-        PreStartupProgressWindow window = new PreStartupProgressWindow(totalSteps);
+        StartupWindow window = new StartupWindow(totalSteps);
         StartupWindowManager manager = new StartupWindowManager(window, totalSteps);
 
         // Initialize smooth progress to 0 and show the window

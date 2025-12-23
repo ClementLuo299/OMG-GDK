@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.animation;
 import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.PreStartupProgressWindow;
+import launcher.lifecycle.start.startup_window.StartupWindow;
 
 /**
  * Controls the text animation for status messages in the startup window.
@@ -29,14 +29,14 @@ public class TextAnimationController {
     private boolean isAnimating = false;
     
     /** The progress window that displays the animated status text. */
-    private final PreStartupProgressWindow progressWindow;
+    private final StartupWindow progressWindow;
     
     /**
      * Constructs a new TextAnimationController.
      * 
      * @param progressWindow The progress window to update with animated text
      */
-    public TextAnimationController(PreStartupProgressWindow progressWindow) {
+    public TextAnimationController(StartupWindow progressWindow) {
         this.progressWindow = progressWindow;
     }
     
