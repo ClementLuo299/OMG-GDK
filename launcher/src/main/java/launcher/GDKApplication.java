@@ -2,7 +2,7 @@ package launcher;
 
 import gdk.internal.Logging;
 
-import launcher.lifecycle.start.Startup;
+import launcher.lifecycle.start.StartupProcess;
 import launcher.lifecycle.stop.Shutdown;
 
 import javafx.application.Application;
@@ -23,13 +23,13 @@ public class GDKApplication extends Application {
     /**
      * JavaFX application startup method called by the framework.
      * 
-     * This method delegates the startup process to the Startup class.
+     * This method delegates the startup process to the StartupProcess class.
      * 
      * @param primaryStage The primary stage provided by JavaFX
      */
     @Override
     public void start(Stage primaryStage) {
-        Startup.start(primaryStage);
+        StartupProcess.start(primaryStage);
     }
 
     /**
