@@ -29,15 +29,18 @@ public class PreStartupProgressWindow {
     private JLabel statusLabel;
     
     // Progress tracking for the progress bar
-    private int totalSteps = 15; // Default total steps for the progress bar
+    private final int totalSteps; // Total steps for the progress bar (set at construction)
     
     // Progress bar styling reference
     private ProgressBarStyling progressBarStyling; // Reference to the custom UI for animation updates
     
     /**
      * Initialize the pre-startup progress window
+     * 
+     * @param totalSteps The total number of steps for the progress bar
      */
-    public PreStartupProgressWindow() {
+    public PreStartupProgressWindow(int totalSteps) {
+        this.totalSteps = totalSteps;
         System.out.println("🚀 Creating pre-startup progress window...");
         
         // Step 1: Create and configure the main JFrame with transparency
@@ -243,16 +246,6 @@ public class PreStartupProgressWindow {
         });
     }
     
-    /**
-     * Set the total number of steps
-     * @param totalSteps The total number of initialization steps
-     */
-    public void setTotalSteps(int totalSteps) {
-        this.totalSteps = totalSteps;
-        SwingUtilities.invokeLater(() -> {
-            progressBar.setMaximum(totalSteps);
-        });
-    }
     
     /**
      * Get the progress frame for potential JavaFX integration

@@ -51,12 +51,20 @@ public final class ModuleLoadingThread {
                 Logging.info("Starting module loading on background thread");
                 
                 // PHASE 1: Load all game modules
-                loadModulesWithProgress(windowManager, totalSteps);
+                // Get current totalSteps from window manager (may have been updated asynchronously)
+                int currentTotalSteps = windowManager.getTotalSteps();
+                int currentStep = loadModulesWithProgress(windowManager, currentTotalSteps);
                 Logging.info("Module loading completed");
                 StartupDelayUtil.addDevelopmentDelay("After module loading process completed");
                 
                 // PHASE 2: Check for compilation issues 
-                checkForCompilationIssues(lobbyController, windowManager, totalSteps);
+                // Get current totalSteps again (may have changed during module loading)
+                final int compilationTotalSteps = windowManager.getTotalSteps();
+                // Always move forward: ensure consecutive steps
+                // Reserve last 3 steps: compilation (totalSteps-2), complete (totalSteps-1), ready (totalSteps)
+                int compilationStep = Math.max(currentStep + 1, compilationTotalSteps - 2);
+                compilationStep = Math.min(compilationStep, compilationTotalSteps - 2); // Cap at reserved step
+                checkForCompilationIssues(lobbyController, windowManager, compilationTotalSteps, compilationStep);
                 StartupDelayUtil.addDevelopmentDelay("After checking for compilation issues");
                 
                 // PHASE 3: Update UI with loaded games
@@ -64,7 +72,12 @@ public final class ModuleLoadingThread {
                 StartupDelayUtil.addDevelopmentDelay("After refreshing game modules");
                 
                 // PHASE 4: Mark startup as complete
-                markStartupComplete(windowManager, totalSteps);
+                // Get current totalSteps one more time before final steps
+                final int finalTotalSteps = windowManager.getTotalSteps();
+                // Always move forward from compilation step - ensure consecutive steps
+                int completeStep = compilationStep + 1;
+                completeStep = Math.min(completeStep, finalTotalSteps - 1); // Cap at reserved step
+                markStartupComplete(windowManager, finalTotalSteps, completeStep);
                 StartupDelayUtil.addDevelopmentDelay("After startup complete and ready");
                 
                 // PHASE 5: Show main stage and hide startup window
@@ -132,14 +145,16 @@ public final class ModuleLoadingThread {
      * @param lobbyController The controller to check for issues
      * @param windowManager The progress window to update (Swing component)
      * @param totalSteps Total number of progress steps
+     * @param step The step number to use (already calculated to ensure forward progression)
      */
     private static void checkForCompilationIssues(GDKGameLobbyController lobbyController, 
                                                   StartupWindowManager windowManager, 
-                                                  int totalSteps) {
-        // Update progress window
+                                                  int totalSteps,
+                                                  int step) {
+        // Update progress window with the calculated step
         SwingUtilities.invokeLater(() -> {
             try {
-                windowManager.updateProgress(totalSteps - 2, "Checking for compilation issues...");
+                windowManager.updateProgress(step, "Checking for compilation issues...");
             } catch (Exception e) {
                 Logging.error("Error updating progress for compilation check: " + e.getMessage());
             }
@@ -165,15 +180,20 @@ public final class ModuleLoadingThread {
      * 
      * @param windowManager The progress window to update (Swing component)
      * @param totalSteps Total number of progress steps
+     * @param completeStep The step number to use for "Startup complete" (already calculated to ensure forward progression)
      */
-    private static void markStartupComplete(StartupWindowManager windowManager, int totalSteps) {
+    private static void markStartupComplete(StartupWindowManager windowManager, int totalSteps, int completeStep) {
+        // Update with the calculated step for "Startup complete"
         SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(totalSteps - 1, "Startup complete");
+            windowManager.updateProgress(completeStep, "Startup complete");
         });
         StartupDelayUtil.addDevelopmentDelay("After 'Startup complete' message");
         
+        // Final step: use the next consecutive step for "Ready!" to ensure smooth progression
+        // Use totalSteps to ensure it reaches 100%
+        final int readyStep = Math.min(completeStep + 1, totalSteps); // Cap at totalSteps (the maximum)
         SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(totalSteps, "Ready!");
+            windowManager.updateProgress(readyStep, "Ready!");
         });
         StartupDelayUtil.addDevelopmentDelay("After 'Ready!' message");
     }
@@ -184,9 +204,15 @@ public final class ModuleLoadingThread {
      * 
      * @param windowManager The startup window manager for progress updates
      * @param totalSteps The total number of steps in the startup process
+     * @return The current step number after module loading completes
      */
-    private static void loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
-        ModuleLoadingProgressManager progressManager = new ModuleLoadingProgressManager(windowManager, 1);
+    private static int loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
+        // Start at step 3 because:
+        // - Step 0: "Starting GDK application..."
+        // - Step 1: "Loading user interface..."
+        // - Step 2: "Starting module loading..."
+        // - Step 3+: Module loading steps
+        ModuleLoadingProgressManager progressManager = new ModuleLoadingProgressManager(windowManager, 3);
         
         try {
             Logging.info("Starting module loading process with " + totalSteps + " total steps");
@@ -217,8 +243,13 @@ public final class ModuleLoadingThread {
             // Finalize
             ModuleLoadingSteps.finalizeModuleLoading(progressManager);
             
+            // Return the current step after finalization
+            return progressManager.getCurrentStep();
+            
         } catch (Exception e) {
             handleModuleLoadingException(progressManager, e);
+            // Return current step even on error
+            return progressManager.getCurrentStep();
         }
     }
     

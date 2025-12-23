@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
  * 
  * @author Clement Luo
  * @date August 9, 2025
- * @edited December 21, 2025
+ * @edited December 22, 2025
  * @since Beta 1.0
  */
 public final class LoadModules {
@@ -30,14 +30,14 @@ public final class LoadModules {
      * @param lobbyController The UI controller that will show the list of games
      * @param windowManager The startup progress window (visible during loading)
      */
-    public static void doModuleLoading(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
+    public static void load(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
         // Get the total number of steps in the startup process
         int totalSteps = windowManager.getTotalSteps();
         
-        // Step 1: Update the startup window accordingly
+        // Step 2: Update the startup window accordingly (step 1 is used by "Loading user interface...")
         Logging.info("Starting module loading process...");
         SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(1, "Starting module loading...");
+            windowManager.updateProgress(2, "Starting module loading...");
         });
         StartupDelayUtil.addDevelopmentDelay("After 'Starting module loading...' message");
         

@@ -268,31 +268,44 @@ public class ModuleDiscovery {
      * Base steps + one per valid module; clamped for UX.
      */
     public static int calculateTotalSteps() {
-        Logging.info("Calculating total steps based on module verification...");
+        Logging.info("Calculating total steps based on actual message count...");
         
         try {
-            // Base steps: starting, UI loading, preparation, finalization, ready
-            int baseSteps = 5;
+            // Count all messages that will be displayed:
+            // Initial: 2 messages (steps 0-1)
+            // Module loading init: 4 messages (steps 2-5)
+            // Module processing: moduleCount messages (steps 6 to 5+moduleCount)
+            // Module loading final: 3 messages (loading, found, finalizing)
+            // Final: 3 messages (compilation check, complete, ready)
+            // Total: 2 + 4 + moduleCount + 3 + 3 = 12 + moduleCount
+            
+            int initialSteps = 2; // "Starting GDK application...", "Starting module loading..."
+            int moduleInitSteps = 4; // "Initializing...", "Building...", "Preparing...", "Discovering..."
+            int moduleFinalSteps = 3; // "Loading compiled...", "Found X modules", "Finalizing..."
+            int finalSteps = 3; // "Checking compilation...", "Startup complete", "Ready!"
+            int fixedSteps = initialSteps + moduleInitSteps + moduleFinalSteps + finalSteps; // 12 fixed steps
             
             // Relative to launcher module root
             String modulesDirectoryPath = "../modules";
             File modulesDirectory = new File(modulesDirectoryPath);
             
             if (!modulesDirectory.exists()) {
-                Logging.info("Modules directory not found, using base steps only");
-                return baseSteps;
+                Logging.info("Modules directory not found, using fixed steps only");
+                return fixedSteps;
             }
             
             int validModuleCount = countValidModules(modulesDirectory);
             Logging.info("Found " + validModuleCount + " valid modules");
             
-            int totalSteps = baseSteps + validModuleCount;
+            // Total = fixed steps + one per module for processing
+            int totalSteps = fixedSteps + validModuleCount;
             // Maintain a reasonable range for the progress bar
-            totalSteps = Math.max(5, Math.min(50, totalSteps));
+            totalSteps = Math.max(fixedSteps, Math.min(100, totalSteps));
+            Logging.info("Calculated total steps: " + totalSteps + " (fixed: " + fixedSteps + ", modules: " + validModuleCount + ")");
             return totalSteps;
         } catch (Exception e) {
             Logging.error("Error calculating total steps: " + e.getMessage(), e);
-            return 10; // safe fallback
+            return 12; // safe fallback (fixed steps only)
         }
     }
     

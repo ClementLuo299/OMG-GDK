@@ -20,7 +20,7 @@ import launcher.utils.StartupDelayUtil;
  * 
  * @authors Clement Luo
  * @date August 8, 2025
- * @edited December 20, 2025  
+ * @edited December 22, 2025  
  * @since Beta 1.0
  */
 public class Startup {
@@ -107,7 +107,9 @@ public class Startup {
     private static void normalLaunch(Stage primaryApplicationStage) {
         try {
             // 1. Progress window
-            StartupWindowManager windowManager = StartupWindowManager.initializeWithCalculatedSteps();
+            StartupWindowManager windowManager = StartupWindowManager.create();
+            // Add delay after "Starting GDK application..." message
+            StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application...' message");
 
             // 2. UI initialization
             GDKGameLobbyController lobbyController = UIInitializer.initialize(primaryApplicationStage, windowManager);
@@ -115,7 +117,7 @@ public class Startup {
             StartupDelayUtil.addDevelopmentDelay("After 'Loading user interface...' message");
 
             // 3. Start loading modules in background
-            LoadModules.doModuleLoading(primaryApplicationStage, lobbyController, windowManager);
+            LoadModules.load(primaryApplicationStage, lobbyController, windowManager);
 
             Logging.info("GDK application startup completed successfully");
         } catch (Exception startupError) {

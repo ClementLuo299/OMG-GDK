@@ -33,10 +33,10 @@ public final class StartupDelayUtil {
             return; // Skip delay if disabled
         }
         
-        final long delayMs = 3000; // 3 seconds
+        final long delayMs = 1500; // 1.5 seconds
         final long startTime = System.currentTimeMillis();
         
-        Logging.info("DEVELOPMENT DELAY: " + reason + " - waiting 3 seconds...");
+        Logging.info("DEVELOPMENT DELAY: " + reason + " - waiting 1.5 seconds...");
         
         try {
             Thread.sleep(delayMs);

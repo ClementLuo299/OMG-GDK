@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 /**
  * Handles progress tracking and updates for the module loading process.
  * Manages step counting and progress window updates on the Swing EDT.
+ * Distributes steps evenly across the available range to ensure smooth progress bar movement.
  * 
  * @author Clement Luo
  * @date December 21, 2025
@@ -17,68 +18,105 @@ import javax.swing.SwingUtilities;
 public final class ModuleLoadingProgressManager {
     
     private final StartupWindowManager windowManager;
-    private int currentStep;
+    private final int startStep; // First step available for module loading (typically 2)
+    private final int endStep; // Last step available for module loading (totalSteps - 4, to reserve last 4 steps)
+    private int stepIndex; // Current index in the sequence of module loading steps (0-based)
     
     /**
-     * Creates a new progress manager.
+     * Creates a new progress manager that increments steps sequentially.
      * 
      * @param windowManager The startup window manager for progress updates
-     * @param initialStep The starting step number (typically 1)
+     * @param initialStep The starting step number (typically 2)
      */
     public ModuleLoadingProgressManager(StartupWindowManager windowManager, int initialStep) {
         this.windowManager = windowManager;
-        this.currentStep = initialStep;
+        this.startStep = initialStep;
+        int totalSteps = windowManager.getTotalSteps();
+        // Reserve last 3 steps for final messages: compilation (totalSteps-2), complete (totalSteps-1), ready (totalSteps)
+        // This ensures consecutive steps at the end and "Ready!" reaches 100%
+        this.endStep = totalSteps - 3; // Reserve last 3 steps
+        this.stepIndex = 0;
     }
     
     /**
-     * Updates progress with a message and increments the step counter.
+     * Updates progress with a message and increments to the next step.
+     * Each step is unique and increments sequentially to ensure the bar moves once per step.
      * 
      * @param message The progress message to display
      * @return The step number that was used
      */
     public int updateProgress(String message) {
-        int step = currentStep++;
-        updateProgress(step, message);
+        // Simple increment: each step gets a unique number
+        // This ensures the bar moves once per step
+        int step = startStep + stepIndex;
+        // Only cap if we would exceed endStep, but allow going up to endStep
+        if (step > endStep) {
+            step = endStep;
+        }
+        stepIndex++;
+        updateProgressDirect(step, message);
         return step;
     }
     
     /**
-     * Updates progress with a message at a specific step without incrementing.
+     * Updates progress with a message at a specific step.
+     * Ensures forward movement by using at least the next auto-incremented step.
+     * Updates the internal counter to track progress.
+     * 
+     * @param step The step number to update (will be adjusted if needed to ensure forward movement)
+     * @param message The progress message to display
+     */
+    public void updateProgress(int step, String message) {
+        // Use the maximum of the requested step and the next auto-incremented step
+        // This ensures forward movement while allowing specific step numbers when needed
+        int nextAutoStep = startStep + stepIndex;
+        int actualStep = Math.max(step, nextAutoStep);
+        
+        // Cap at endStep if needed
+        if (actualStep > endStep) {
+            actualStep = endStep;
+        }
+        
+        // Always increment stepIndex to ensure next message gets a different step
+        // Set it to at least one more than the step we just used
+        stepIndex = Math.max(stepIndex + 1, actualStep - startStep + 1);
+        
+        updateProgressDirect(actualStep, message);
+    }
+    
+    /**
+     * Internal method to update progress without modifying step index.
      * 
      * @param step The step number to update
      * @param message The progress message to display
      */
-    public void updateProgress(int step, String message) {
+    private void updateProgressDirect(int step, String message) {
+        final int finalStep = step; // Make final for lambda
         SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(step, message);
+            windowManager.updateProgress(finalStep, message);
         });
     }
     
     /**
-     * Gets the current step number.
+     * Gets the current step number (the last step that was used).
      * 
      * @return The current step number
      */
     public int getCurrentStep() {
-        return currentStep;
+        if (stepIndex == 0) {
+            return startStep;
+        }
+        int step = startStep + (stepIndex - 1);
+        return Math.min(step, endStep);
     }
     
     /**
-     * Increments the step counter and returns the new value.
+     * Gets the current step index (0-based).
      * 
-     * @return The incremented step number
+     * @return The current step index
      */
-    public int incrementStep() {
-        return currentStep++;
-    }
-    
-    /**
-     * Sets the current step to a specific value.
-     * 
-     * @param step The step number to set
-     */
-    public void setCurrentStep(int step) {
-        this.currentStep = step;
+    public int getStepIndex() {
+        return stepIndex;
     }
     
     /**
