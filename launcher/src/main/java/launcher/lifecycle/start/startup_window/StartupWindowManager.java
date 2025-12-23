@@ -30,38 +30,15 @@ public class StartupWindowManager {
     private final int totalSteps;
     
     // ============================================================================
-    // Animation Support
+    // Animation Controllers
     // ============================================================================
-    // Fields related to text animation (animated dots appearing after status messages)
     
-    /** Timer that controls the text animation (dots appearing after messages). */
-    private Timer animationTimer;
+    /** Controller for text animation (animated dots appearing after status messages). */
+    private final TextAnimationController textAnimationController;
     
-    /** The complete message text to display (before animation dots are added). */
-    private String fullMessage = "";
+    /** Controller for progress bar shimmer/shine animation effect. */
+    private final ProgressBarAnimationController progressBarAnimationController;
     
-    /** Current index for the animated dots (0-3 dots cycle). */
-    private int currentCharIndex = 0;
-    
-    /** Flag indicating whether text animation is currently active. */
-    private boolean isAnimating = false;
-    
-    // ============================================================================
-    // Progress Bar Animation
-    // ============================================================================
-    // Fields related to the shimmer/shine animation effect on the progress bar
-    
-    /** Timer that controls the progress bar shimmer/shine animation effect. */
-    private Timer progressAnimationTimer;
-    
-    /** Offset value for the shimmer animation effect on the progress bar (0.0 to 1.0). */
-    private float shimmerOffset = 0.0f;
-    
-    /**
-     * Constructs a new StartupWindowManager with the specified progress window.
-     * 
-     * @param progressWindow The progress window to manage
-     */
     /**
      * Constructs a new StartupWindowManager with the specified progress window and total steps.
      * 
@@ -71,6 +48,8 @@ public class StartupWindowManager {
     private StartupWindowManager(PreStartupProgressWindow progressWindow, int totalSteps) {
         this.progressWindow = progressWindow;
         this.totalSteps = totalSteps;
+        this.textAnimationController = new TextAnimationController(progressWindow);
+        this.progressBarAnimationController = new ProgressBarAnimationController(progressWindow);
     }
 
     /**
@@ -190,17 +169,16 @@ public class StartupWindowManager {
     private void updateProgressInternal(int step, String message) {
         currentStep.set(step);
         progressWindow.updateProgress(step, message);
-        startTextAnimation(message);
+        textAnimationController.start(message);
     }
-    
     
     /**
      * Starts all animations (text animation and progress bar shimmer).
      * Called when the window is shown.
      */
     private void startAnimations() {
-        startTextAnimation("");
-        startProgressBarAnimation();
+        textAnimationController.start("");
+        progressBarAnimationController.start();
     }
     
     /**
@@ -208,73 +186,8 @@ public class StartupWindowManager {
      * Called when the window is hidden or during cleanup.
      */
     private void stopAnimations() {
-        if (animationTimer != null) {
-            animationTimer.cancel();
-            animationTimer = null;
-        }
-        if (progressAnimationTimer != null) {
-            progressAnimationTimer.cancel();
-            progressAnimationTimer = null;
-        }
-        isAnimating = false;
-    }
-    
-    /**
-     * Starts the text animation that cycles dots after the status message.
-     * The animation cycles through 0-3 dots (., .., ..., then repeats).
-     * 
-     * @param baseMessage The base message text to animate (dots will be appended)
-     */
-    private void startTextAnimation(String baseMessage) {
-        if (animationTimer != null) {
-            animationTimer.cancel();
-        }
-        fullMessage = baseMessage;
-        currentCharIndex = 0;
-        isAnimating = true;
-        animationTimer = new Timer();
-        animationTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (!isAnimating) {
-                    return;
-                }
-                currentCharIndex++;
-                if (currentCharIndex > 3) {
-                    currentCharIndex = 0;
-                }
-                SwingUtilities.invokeLater(() -> {
-                    String animatedMessage = fullMessage + ".".repeat(currentCharIndex);
-                    progressWindow.updateStatusText(animatedMessage);
-                });
-            }
-        }, 0, 500);
-    }
-    
-    /**
-     * Starts the shimmer/shine animation effect on the progress bar.
-     * Creates a continuous animation that cycles the shimmer offset from 0.0 to 1.0.
-     */
-    private void startProgressBarAnimation() {
-        if (progressAnimationTimer != null) {
-            progressAnimationTimer.cancel();
-        }
-        progressAnimationTimer = new Timer();
-        progressAnimationTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                shimmerOffset += 0.02f; // Much slower shimmer movement for development
-                if (shimmerOffset > 1.0f) {
-                    shimmerOffset = 0.0f;
-                }
-                SwingUtilities.invokeLater(() -> {
-                    if (progressWindow.getProgressBarStyling() != null) {
-                        progressWindow.getProgressBarStyling().setShimmerOffset(shimmerOffset);
-                    }
-                    progressWindow.repaintProgressBar();
-                });
-            }
-        }, 0, 500); // Much slower animation (500ms instead of 200ms) for development
+        textAnimationController.stop();
+        progressBarAnimationController.stop();
     }
     
     /**

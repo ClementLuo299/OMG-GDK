@@ -18,8 +18,8 @@ import java.util.TimerTask;
  * 
  * @author Clement Luo
  * @date August 5, 2025
- * @edited August 8, 2025 
- * @since 1.0
+ * @edited December 22, 2025 
+ * @since Beta 1.0
  */
 public class PreStartupProgressWindow {
     
