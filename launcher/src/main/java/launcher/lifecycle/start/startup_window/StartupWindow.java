@@ -1,15 +1,11 @@
 package launcher.lifecycle.start.startup_window;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
-import java.awt.*;
+import launcher.lifecycle.start.startup_window.create.*;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**
- * Startup Progress Window
- * 
- * Shows a progress window BEFORE JavaFX starts, using Swing for immediate display.
+ * Startup progress window that is displayed before JavaFX starts, using Swing for immediate display.
  * This window appears instantly when the application launches and shows progress
  * during the JavaFX initialization phase.
  * 
@@ -27,16 +23,13 @@ public class StartupWindow {
     private JLabel statusLabel;
     
     // Progress tracking for the progress bar
-    private final int totalSteps; // Total steps for the progress bar (set at construction)
-    
-    // Current step value for display (integer)
-    private int currentStep = 0;
+    private final int totalSteps; // Total steps for the progress bar 
     
     // Smooth progress value for animation (0.0 to 1.0, can be fractional)
     private double smoothProgress = 0.0;
     
     // Progress bar styling reference
-    private ProgressBarStyling progressBarStyling; // Reference to the custom UI for animation updates
+    private ProgressBarStyling progressBarStyling; 
     
     /**
      * Initialize the startup progress window
@@ -45,183 +38,22 @@ public class StartupWindow {
      */
     public StartupWindow(int totalSteps) {
         this.totalSteps = totalSteps;
-        System.out.println("🚀 Creating startup progress window...");
         
-        // Step 1: Create and configure the main JFrame with transparency
-        createAndConfigureFrame();
+        StartupWindowInitializer.InitializationResult result = 
+            StartupWindowInitializer.initialize(totalSteps);
         
-        // Step 2: Create title label with styling
-        JLabel titleLabel = createTitleLabel();
-        
-        // Step 3: Create subtitle label with styling
-        JLabel subtitleLabel = createSubtitleLabel();
-        
-        // Step 4: Create progress bar with basic properties
-        createProgressBar();
-        
-        // Step 5: Apply custom ultra-modern progress bar styling
-        applyCustomProgressBarStyling();
-        
-        // Step 6: Create percentage label with styling
-        createPercentageLabel();
-        
-        // Step 7: Create status label with styling
-        createStatusLabel();
-        
-        // Step 8: Create and configure the main panel layout
-        JPanel mainPanel = createMainPanel();
-        
-        // Step 9: Add all components to the panel with proper spacing
-        addComponentsToPanel(mainPanel, titleLabel, subtitleLabel);
-        
-        // Step 10: Set the main panel as the frame's content pane
-        progressFrame.setContentPane(mainPanel);
-        
-        // Step 11: Pack and center the window on screen
-        packAndCenterWindow();
-        
-        System.out.println("✅ Startup progress window created");
+        this.progressFrame = result.frame;
+        this.progressBar = result.progressBar;
+        this.percentageLabel = result.percentageLabel;
+        this.statusLabel = result.statusLabel;
+        this.progressBarStyling = result.progressBarStyling;
     }
     
-    /**
-     * Step 1: Create and configure the main JFrame with transparency
-     */
-    private void createAndConfigureFrame() {
-        progressFrame = new JFrame("OMG Game Development Kit");
-        progressFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        progressFrame.setResizable(false);
-        progressFrame.setAlwaysOnTop(true);
-        progressFrame.setUndecorated(true);
-        
-        // Enable window transparency for shadow effects
-        try {
-            progressFrame.setBackground(new Color(0, 0, 0, 0));
-        } catch (Exception e) {
-            // Fallback for systems that don't support transparency
-            progressFrame.setBackground(new Color(248, 249, 250));
-        }
-    }
-    
-    /**
-     * Step 2: Create title label with styling
-     */
-    private JLabel createTitleLabel() {
-        JLabel titleLabel = new JLabel("GDK Game Development Kit");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        titleLabel.setForeground(new Color(52, 73, 94));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        return titleLabel;
-    }
-    
-    /**
-     * Step 3: Create subtitle label with styling
-     */
-    private JLabel createSubtitleLabel() {
-        JLabel subtitleLabel = new JLabel("Initializing");
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        subtitleLabel.setForeground(new Color(149, 165, 166));
-        subtitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        return subtitleLabel;
-    }
-    
-    /**
-     * Step 4: Create progress bar with basic properties
-     */
-    private void createProgressBar() {
-        progressBar = new JProgressBar(0, totalSteps);
-        progressBar.setPreferredSize(new Dimension(500, 25));
-        progressBar.setBorderPainted(false);
-        progressBar.setOpaque(false);
-    }
-    
-    /**
-     * Step 5: Apply custom ultra-modern progress bar styling
-     */
-    private void applyCustomProgressBarStyling() {
-        ProgressBarStyling styling = new ProgressBarStyling();
-        progressBar.setUI(styling);
-        
-        // Store reference to the UI for animation updates
-        this.progressBarStyling = styling;
-    }
-    
-    /**
-     * Step 6: Create percentage label with styling
-     */
-    private void createPercentageLabel() {
-        percentageLabel = new JLabel("0%");
-        percentageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        percentageLabel.setForeground(new Color(149, 165, 166));
-        percentageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    }
-    
-    /**
-     * Step 7: Create status label with styling
-     */
-    private void createStatusLabel() {
-        statusLabel = new JLabel("Starting up...");
-        statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        statusLabel.setForeground(new Color(52, 73, 94));
-        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    }
-    
-    /**
-     * Step 8: Create and configure the main panel layout
-     */
-    private JPanel createMainPanel() {
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-            new EmptyBorder(40, 40, 40, 40)
-        ));
-        mainPanel.setBackground(new Color(255, 255, 255));
-        return mainPanel;
-    }
-    
-    /**
-     * Step 9: Add all components to the panel with proper spacing
-     */
-    private void addComponentsToPanel(JPanel mainPanel, JLabel titleLabel, JLabel subtitleLabel) {
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(createCenteredComponent(titleLabel));
-        mainPanel.add(Box.createVerticalStrut(5));
-        mainPanel.add(createCenteredComponent(subtitleLabel));
-        mainPanel.add(Box.createVerticalStrut(20));
-        mainPanel.add(createCenteredComponent(progressBar));
-        mainPanel.add(Box.createVerticalStrut(5));
-        mainPanel.add(createCenteredComponent(percentageLabel));
-        mainPanel.add(Box.createVerticalStrut(10));
-        mainPanel.add(createCenteredComponent(statusLabel));
-        mainPanel.add(Box.createVerticalStrut(10));
-    }
-    
-    /**
-     * Step 10: Pack and center the window on screen
-     */
-    private void packAndCenterWindow() {
-        progressFrame.pack();
-        progressFrame.setLocationRelativeTo(null);
-    }
-    
-    /**
-     * Create a centered component
-     */
-    private JPanel createCenteredComponent(JComponent component) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panel.setBackground(new Color(255, 255, 255));
-        panel.add(component);
-        return panel;
-    }
-    
-    /**
-     * Show the progress window
-     */
     /**
      * Show the progress window
      */
     public void show() {
-        System.out.println("🎬 Showing startup progress window");
+        System.out.println("Showing startup progress window");
         
         // Show on EDT to ensure thread safety
         if (SwingUtilities.isEventDispatchThread()) {
@@ -237,7 +69,7 @@ public class StartupWindow {
      * Hide the progress window
      */
     public void hide() {
-        System.out.println("🏁 Hiding startup progress window");
+        System.out.println("Hiding startup progress window");
         
         if (SwingUtilities.isEventDispatchThread()) {
             progressFrame.setVisible(false);
@@ -257,7 +89,6 @@ public class StartupWindow {
      */
     public void updateProgress(int step, String status) {
         SwingUtilities.invokeLater(() -> {
-            currentStep = step;
             progressBar.setValue(step);
             progressBar.setString(step + "/" + totalSteps + " (" + (step * 100 / totalSteps) + "%)");
             
@@ -267,7 +98,7 @@ public class StartupWindow {
             
             statusLabel.setText(status);
             
-            System.out.println("📊 Progress: " + step + "/" + totalSteps + " - " + status);
+            System.out.println("Progress: " + step + "/" + totalSteps + " - " + status);
         });
     }
     
@@ -291,24 +122,6 @@ public class StartupWindow {
         }
         
         progressBar.repaint();
-    }
-    
-    /**
-     * Gets the current smooth progress value.
-     * 
-     * @return The smooth progress value (0.0 to 1.0)
-     */
-    public double getSmoothProgress() {
-        return smoothProgress;
-    }
-    
-    
-    /**
-     * Get the progress frame for potential JavaFX integration
-     * @return The progress frame
-     */
-    public JFrame getProgressFrame() {
-        return progressFrame;
     }
     
     /**
@@ -338,14 +151,5 @@ public class StartupWindow {
         if (progressBar != null) {
             progressBar.repaint();
         }
-    }
-    
-    /**
-     * Check if the window is currently visible.
-     * 
-     * @return true if the window is visible, false otherwise
-     */
-    public boolean isVisible() {
-        return progressFrame != null && progressFrame.isVisible();
     }
 } 
