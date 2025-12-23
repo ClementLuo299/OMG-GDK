@@ -6,13 +6,10 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import launcher.lifecycle.start.startup_window.initialization.arrangement.ComponentAssembler;
 import launcher.lifecycle.start.startup_window.initialization.arrangement.WindowPositioner;
-import launcher.lifecycle.start.startup_window.initialization.labels.PercentageLabelCreator;
-import launcher.lifecycle.start.startup_window.initialization.labels.StatusLabelCreator;
-import launcher.lifecycle.start.startup_window.initialization.labels.SubtitleLabelCreator;
-import launcher.lifecycle.start.startup_window.initialization.labels.TitleLabelCreator;
-import launcher.lifecycle.start.startup_window.initialization.other_components.FrameCreator;
-import launcher.lifecycle.start.startup_window.initialization.other_components.MainPanelCreator;
-import launcher.lifecycle.start.startup_window.initialization.other_components.ProgressBarCreator;
+import launcher.lifecycle.start.startup_window.initialization.components.FrameCreator;
+import launcher.lifecycle.start.startup_window.initialization.components.LabelCreator;
+import launcher.lifecycle.start.startup_window.initialization.components.MainPanelCreator;
+import launcher.lifecycle.start.startup_window.initialization.components.ProgressBarCreator;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**
@@ -62,11 +59,11 @@ public class StartupWindowInitializer {
         JFrame frame = FrameCreator.create();
         
         // Create UI components using creators
-        JLabel titleLabel = TitleLabelCreator.create();
-        JLabel subtitleLabel = SubtitleLabelCreator.create();
+        JLabel titleLabel = LabelCreator.createTitle();
+        JLabel subtitleLabel = LabelCreator.createSubtitle();
         JProgressBar progressBar = ProgressBarCreator.create(totalSteps);
-        JLabel percentageLabel = PercentageLabelCreator.create();
-        JLabel statusLabel = StatusLabelCreator.create();
+        JLabel percentageLabel = LabelCreator.createPercentage();
+        JLabel statusLabel = LabelCreator.createStatus();
         
         // Apply custom ultra-modern progress bar styling
         ProgressBarStyling styling = new ProgressBarStyling();

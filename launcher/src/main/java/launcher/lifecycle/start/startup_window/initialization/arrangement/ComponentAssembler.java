@@ -4,7 +4,7 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import launcher.lifecycle.start.startup_window.initialization.other_components.CenteredComponentCreator;
+import launcher.lifecycle.start.startup_window.initialization.components.CenteredComponentCreator;
 import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
 
 /**

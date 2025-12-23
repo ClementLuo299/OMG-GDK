@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.initialization.other_components;
+package launcher.lifecycle.start.startup_window.initialization.components;
 
 import java.awt.FlowLayout;
 import javax.swing.JComponent;
@@ -10,6 +10,7 @@ import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
  * 
  * @author Clement Luo
  * @date December 23, 2025
+ * @edited December 23, 2025
  * @since Beta 1.0
  */
 public class CenteredComponentCreator {
