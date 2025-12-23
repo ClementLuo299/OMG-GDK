@@ -4,10 +4,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import launcher.lifecycle.start.startup_window.initialization.arrangement.ComponentAssembler;
+import launcher.lifecycle.start.startup_window.initialization.arrangement.WindowPositioner;
 import launcher.lifecycle.start.startup_window.initialization.labels.PercentageLabelCreator;
 import launcher.lifecycle.start.startup_window.initialization.labels.StatusLabelCreator;
 import launcher.lifecycle.start.startup_window.initialization.labels.SubtitleLabelCreator;
 import launcher.lifecycle.start.startup_window.initialization.labels.TitleLabelCreator;
+import launcher.lifecycle.start.startup_window.initialization.other_components.FrameCreator;
+import launcher.lifecycle.start.startup_window.initialization.other_components.MainPanelCreator;
+import launcher.lifecycle.start.startup_window.initialization.other_components.ProgressBarCreator;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**

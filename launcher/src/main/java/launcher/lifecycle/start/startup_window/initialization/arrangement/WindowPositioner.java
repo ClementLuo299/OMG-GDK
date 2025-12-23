@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.initialization;
+package launcher.lifecycle.start.startup_window.initialization.arrangement;
 
 import javax.swing.JFrame;
 
