@@ -18,6 +18,7 @@ import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
  * 
  * @author Clement Luo
  * @date December 23, 2025
+ * @edited December 23, 2025
  * @since Beta 1.0
  */
 public class StartupWindowInitializer {

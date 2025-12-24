@@ -12,6 +12,7 @@ import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
  * 
  * @author Clement Luo
  * @date December 23, 2025
+ * @edited December 23, 2025
  * @since Beta 1.0
  */
 public class ComponentAssembler {
@@ -34,6 +35,7 @@ public class ComponentAssembler {
             JLabel percentageLabel,
             JLabel statusLabel) {
         
+        // Add components to the main panel with proper spacing
         mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_MEDIUM));
         mainPanel.add(CenteredComponentCreator.create(titleLabel));
         mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_SMALL));
