@@ -11,7 +11,7 @@ import launcher.lifecycle.start.startup_window.StartupWindow;
  * 
  * @author Clement Luo
  * @date December 22, 2025
- * @edited December 22, 2025
+ * @edited December 23, 2025
  * @since Beta 1.0
  */
 public class ProgressBarAnimationController {
@@ -44,20 +44,33 @@ public class ProgressBarAnimationController {
         }
         progressAnimationTimer = new Timer();
         progressAnimationTimer.scheduleAtFixedRate(new TimerTask() {
+            private boolean isMovingForward = true;
+            
             @Override
             public void run() {
-                shimmerOffset += 0.008f; // Slower, smoother shimmer movement
-                if (shimmerOffset > 1.0f) {
-                    shimmerOffset = 0.0f;
-                }
-                SwingUtilities.invokeLater(() -> {
-                    if (progressWindow.getProgressBarStyling() != null) {
-                        progressWindow.getProgressBarStyling().setShimmerOffset(shimmerOffset);
+                // Animate back and forth between 0.0 and 1.0
+                if (isMovingForward) {
+                    shimmerOffset += 0.01f;
+                    if (shimmerOffset >= 1.0f) {
+                        shimmerOffset = 1.0f;
+                        isMovingForward = false;
                     }
-                    progressWindow.repaintProgressBar();
+                } else {
+                    shimmerOffset -= 0.01f;
+                    if (shimmerOffset <= 0.0f) {
+                        shimmerOffset = 0.0f;
+                        isMovingForward = true;
+                    }
+                }
+                
+                SwingUtilities.invokeLater(() -> {
+                    // Shimmer animation disabled - no longer updating shimmer offset
+                    // progressWindow.getProgressBarStyling().setShimmerOffset(shimmerOffset);
+                    // Repainting not needed since shimmer is disabled
+                    // progressWindow.repaintProgressBar();
                 });
             }
-        }, 0, 16); // ~60 FPS for smooth shimmer animation
+        }, 0, 16); // ~60 FPS for smooth color animation
     }
     
     /**

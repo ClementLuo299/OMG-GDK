@@ -33,29 +33,29 @@ public class StepDurationEstimator {
         // Quick operations (UI updates, simple state changes)
         if (lowerMessage.contains("starting") || lowerMessage.contains("ready") || 
             lowerMessage.contains("complete") || lowerMessage.contains("loading user interface")) {
-            baseDuration = 300; // ~300ms
+            baseDuration = 500; // ~500ms (increased from 300ms)
         }
         // Module discovery operations
         else if (lowerMessage.contains("discovering") || lowerMessage.contains("discovery")) {
-            baseDuration = 800; // ~800ms
+            baseDuration = 1200; // ~1.2 seconds (increased from 800ms)
         }
         // Compilation/build operations (usually slower)
         else if (lowerMessage.contains("compil") || lowerMessage.contains("build") || 
                  lowerMessage.contains("building")) {
-            baseDuration = 2000; // ~2 seconds
+            baseDuration = 2800; // ~2.8 seconds (increased from 2000ms)
         }
         // Loading/processing operations
         else if (lowerMessage.contains("loading") || lowerMessage.contains("processing") || 
                  lowerMessage.contains("preparing") || lowerMessage.contains("initializing")) {
-            baseDuration = 1000; // ~1 second
+            baseDuration = 1500; // ~1.5 seconds (increased from 1000ms)
         }
         // Checking operations
         else if (lowerMessage.contains("checking") || lowerMessage.contains("validating")) {
-            baseDuration = 600; // ~600ms
+            baseDuration = 900; // ~900ms (increased from 600ms)
         }
         // Default for unknown operations (conservative estimate)
         else {
-            baseDuration = 500; // ~500ms default
+            baseDuration = 800; // ~800ms default (increased from 500ms)
         }
         
         // Add development delay time since delays occur after progress updates

@@ -8,6 +8,8 @@ import launcher.lifecycle.start.startup_window.animation.SmoothProgressAnimation
 import launcher.lifecycle.start.startup_window.tracking.ProgressTracker;
 import launcher.lifecycle.start.startup_window.estimation.StepDurationEstimator;
 
+import javax.swing.SwingUtilities;
+
 /**
  * Manages the running, displaying, and lifecycle of the startup progress window.
  * This class handles showing, hiding, updating progress, and managing animations
@@ -54,6 +56,22 @@ public class StartupWindowManager {
     }
 
     /**
+     * Calculates the total steps for the startup process.
+     * 
+     * @return The total number of steps, or 15 as a fallback if calculation fails
+     */
+    private static int calculateTotalSteps() {
+        try {
+            int steps = ModuleDiscovery.calculateTotalSteps();
+            Logging.info("Calculated total steps: " + steps);
+            return steps;
+        } catch (Exception e) {
+            Logging.error("Error calculating total steps: " + e.getMessage() + ", using default 15");
+            return 15; // Fallback to default on error
+        }
+    }
+    
+    /**
      * Creates a StartupWindowManager with automatically calculated total steps.
      * Calculates the total steps synchronously before displaying the window to ensure
      * accurate progress tracking from the start.
@@ -62,23 +80,37 @@ public class StartupWindowManager {
      */
     public static StartupWindowManager show() {
         // Calculate total steps before creating the window to ensure accuracy
-        int totalSteps;
+        final int totalSteps = calculateTotalSteps();
+        
+        // Create the window and manager on the EDT (Swing components must be created on EDT)
+        final StartupWindow[] windowRef = new StartupWindow[1];
+        final StartupWindowManager[] managerRef = new StartupWindowManager[1];
+        
         try {
-            totalSteps = ModuleDiscovery.calculateTotalSteps();
-            Logging.info("Calculated total steps: " + totalSteps);
+            if (SwingUtilities.isEventDispatchThread()) {
+                // Already on EDT, create directly
+                windowRef[0] = new StartupWindow(totalSteps);
+                managerRef[0] = new StartupWindowManager(windowRef[0], totalSteps);
+            } else {
+                // Not on EDT, use invokeAndWait to create on EDT
+                SwingUtilities.invokeAndWait(() -> {
+                    windowRef[0] = new StartupWindow(totalSteps);
+                    managerRef[0] = new StartupWindowManager(windowRef[0], totalSteps);
+                });
+            }
         } catch (Exception e) {
-            Logging.error("Error calculating total steps: " + e.getMessage() + ", using default 15");
-            totalSteps = 15; // Fallback to default on error
+            Logging.error("Error creating startup window: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to create startup window", e);
         }
         
-        // Create the window and manager
-        StartupWindow window = new StartupWindow(totalSteps);
-        StartupWindowManager manager = new StartupWindowManager(window, totalSteps);
+        StartupWindow window = windowRef[0];
+        StartupWindowManager manager = managerRef[0];
 
         // Initialize smooth progress to 0 and show the window
         manager.smoothProgressAnimationController.resetToStep(0, totalSteps);
         window.show();
-        manager.progressBarAnimationController.start();
+        // Shimmer animation disabled - removed for static progress bar
+        // manager.progressBarAnimationController.start();
         manager.updateProgress(0, "Starting GDK application...");
         
         return manager;

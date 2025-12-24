@@ -89,28 +89,28 @@ public class SmoothProgressAnimationController {
         // Calculate the progress increment for this step (distance to travel)
         double progressIncrement = Math.abs(newTargetProgress - startProgress);
         
-        // Underestimate the duration by 10% to ensure animation completes slightly before step finishes
-        this.animationDurationMs = (long) (estimatedDurationMs * 0.9);
+        // Use 95% of estimated duration (reduced underestimation) to keep animation moving longer
+        // This prevents the bar from stopping too early
+        this.animationDurationMs = (long) (estimatedDurationMs * 0.95);
         
         // Ensure minimum duration based on progress increment to make movement visible
-        // For very small increments, use a much longer minimum duration to ensure visible movement
-        // Use an inverse relationship: smaller increments need much longer times
+        // Increased minimums to prevent stopping
         long minDuration;
         if (progressIncrement < 0.005) {
-            // For increments less than 0.5%, use at least 1000ms to ensure visibility
-            minDuration = 1000;
+            // For increments less than 0.5%, use at least 1500ms to ensure visibility
+            minDuration = 1500;
         } else if (progressIncrement < 0.01) {
-            // For increments 0.5-1%, use at least 800ms
-            minDuration = 800;
+            // For increments 0.5-1%, use at least 1200ms
+            minDuration = 1200;
         } else if (progressIncrement < 0.02) {
-            // For increments 1-2%, use at least 600ms
-            minDuration = 600;
+            // For increments 1-2%, use at least 1000ms
+            minDuration = 1000;
         } else if (progressIncrement < 0.05) {
-            // For increments 2-5%, use 500ms minimum
-            minDuration = 500;
+            // For increments 2-5%, use 800ms minimum
+            minDuration = 800;
         } else {
-            // For larger increments, use 400ms minimum
-            minDuration = 400;
+            // For larger increments, use 600ms minimum
+            minDuration = 600;
         }
         
         if (this.animationDurationMs < minDuration) {

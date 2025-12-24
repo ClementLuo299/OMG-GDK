@@ -30,9 +30,10 @@ public class ProgressBarCreator {
             StartupWindowTheme.PROGRESS_BAR_HEIGHT
         ));
         
-        // Disable default border and opacity for custom styling
+        // Disable default border for custom styling
+        // Keep opaque=true to ensure proper clipping of painting area
         progressBar.setBorderPainted(false);
-        progressBar.setOpaque(false);
+        progressBar.setOpaque(true);
         return progressBar;
     }
 }
