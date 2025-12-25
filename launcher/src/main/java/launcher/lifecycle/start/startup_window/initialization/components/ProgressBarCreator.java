@@ -34,6 +34,8 @@ public class ProgressBarCreator {
         // Keep opaque=true to ensure proper clipping of painting area
         progressBar.setBorderPainted(false);
         progressBar.setOpaque(true);
+        // Set background to white to match the panel background
+        progressBar.setBackground(StartupWindowTheme.BACKGROUND);
         return progressBar;
     }
 }

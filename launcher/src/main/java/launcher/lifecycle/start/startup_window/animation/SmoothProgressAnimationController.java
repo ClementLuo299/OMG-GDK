@@ -1,6 +1,6 @@
 package launcher.lifecycle.start.startup_window.animation;
 
-import javax.swing.*;
+import javafx.application.Platform;
 import java.util.Timer;
 import java.util.TimerTask;
 import launcher.lifecycle.start.startup_window.StartupWindow;
@@ -154,8 +154,8 @@ public class SmoothProgressAnimationController {
                     currentDisplayedProgress = startProgress + (targetProgress - startProgress) * timeProgress;
                 }
                 
-                // Update the progress bar on EDT
-                SwingUtilities.invokeLater(() -> {
+                // Update the progress bar on JavaFX Application Thread
+                Platform.runLater(() -> {
                     progressWindow.setSmoothProgress(currentDisplayedProgress);
                 });
                 

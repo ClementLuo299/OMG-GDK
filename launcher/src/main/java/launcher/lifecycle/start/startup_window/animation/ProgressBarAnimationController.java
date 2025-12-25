@@ -1,6 +1,6 @@
 package launcher.lifecycle.start.startup_window.animation;
 
-import javax.swing.*;
+import javafx.application.Platform;
 import java.util.Timer;
 import java.util.TimerTask;
 import launcher.lifecycle.start.startup_window.StartupWindow;
@@ -63,7 +63,7 @@ public class ProgressBarAnimationController {
                     }
                 }
                 
-                SwingUtilities.invokeLater(() -> {
+                Platform.runLater(() -> {
                     // Shimmer animation disabled - no longer updating shimmer offset
                     // progressWindow.getProgressBarStyling().setShimmerOffset(shimmerOffset);
                     // Repainting not needed since shimmer is disabled

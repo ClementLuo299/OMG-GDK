@@ -4,9 +4,7 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.RoundRectangle2D;
 
 /**
  * Custom flat and minimal progress bar UI with modern styling.
@@ -92,13 +90,9 @@ public class ProgressBarStyling extends BasicProgressBarUI {
     }
     
     private void paintModernBackground(Graphics2D g2d, int width, int height) {
-        // Modern flat background - subtle gray with slight gradient
+        // Modern flat background - match the panel background (white)
         int arcSize = getArcSize(height);
-        GradientPaint bgGradient = new GradientPaint(
-            0, 0, new Color(248, 248, 248),
-            0, height, new Color(242, 242, 242)
-        );
-        g2d.setPaint(bgGradient);
+        g2d.setColor(StartupWindowTheme.BACKGROUND);
         // Perfect pill shape: arc height equals full height
         g2d.fillRoundRect(0, 0, width, height, arcSize, arcSize);
     }
@@ -111,12 +105,13 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         
         // Double-check: ensure progress width never exceeds total width
         int actualProgressWidth = Math.min(progressWidth, totalWidth);
-        int arcSize = getArcSize(height);
+        double radius = height / 2.0;
         
         // Save current clip
         Shape currentClip = g2d.getClip();
         
         // Create a STRICT clip that is exactly the progress bounds
+        // This ensures nothing can be drawn outside the progress area
         Rectangle progressBounds = new Rectangle(0, 0, actualProgressWidth, height);
         Area progressClipArea = new Area(progressBounds);
         if (currentClip != null) {
@@ -124,50 +119,38 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         }
         g2d.setClip(progressClipArea);
         
-        // Build a shape with rounded left corners using GeneralPath
-        // This gives us precise control to ensure it never exceeds bounds
-        GeneralPath fillPath = new GeneralPath();
+        // Always create a shape with rounded left corners
+        // The clipping will ensure it never extends beyond actualProgressWidth
+        GeneralPath path = new GeneralPath();
         
-        double radius = height / 2.0;
+        // Start from the left edge, at the radius point (middle of left rounded corner)
+        path.moveTo(0, radius);
         
-        if (actualProgressWidth >= height) {
-            // Progress is wide enough for rounded left corners
-            // Build the path point by point to ensure it's always within bounds
-            
-            // Start at top-left, just below the rounded corner
-            fillPath.moveTo(0, radius);
-            
-            // Draw left semicircle (top half) - using arc
-            fillPath.quadTo(0, 0, radius, 0);
-            
-            // Top edge (straight line to right)
-            fillPath.lineTo(actualProgressWidth, 0);
-            
-            // Right edge (straight line down)
-            fillPath.lineTo(actualProgressWidth, height);
-            
-            // Bottom edge (straight line back to left)
-            fillPath.lineTo(radius, height);
-            
-            // Draw left semicircle (bottom half)
-            fillPath.quadTo(0, height, 0, height - radius);
-            
-            // Close the path
-            fillPath.closePath();
-        } else {
-            // Progress is too narrow - use a simple rectangle
-            fillPath.moveTo(0, 0);
-            fillPath.lineTo(actualProgressWidth, 0);
-            fillPath.lineTo(actualProgressWidth, height);
-            fillPath.lineTo(0, height);
-            fillPath.closePath();
-        }
+        // Draw left rounded corner (top arc)
+        path.quadTo(0, 0, radius, 0);
         
-        // Intersect the path with progress bounds to ensure no overflow
-        Area fillArea = new Area(fillPath);
+        // Top edge (straight line to right)
+        path.lineTo(actualProgressWidth, 0);
+        
+        // Right edge (straight line down - no rounding)
+        path.lineTo(actualProgressWidth, height);
+        
+        // Bottom edge (straight line back to left)
+        path.lineTo(radius, height);
+        
+        // Draw left rounded corner (bottom arc)
+        path.quadTo(0, height, 0, height - radius);
+        
+        // Close the path
+        path.closePath();
+        
+        Shape fillShape = path;
+        
+        // Intersect the shape with the progress bounds to ensure no overflow
+        Area fillArea = new Area(fillShape);
         Area boundsArea = new Area(progressBounds);
         fillArea.intersect(boundsArea);
-        Shape fillShape = fillArea;
+        Shape clippedShape = fillArea;
         
         // Modern indigo/violet gradient
         int gradientEnd = Math.max(actualProgressWidth, 1);
@@ -177,8 +160,8 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         );
         g2d.setPaint(mainGradient);
         
-        // Fill the shape - the clip ensures it cannot overflow
-        g2d.fill(fillShape);
+        // Fill the shape - both the clip and intersection ensure it cannot overflow
+        g2d.fill(clippedShape);
         
         // Restore clip
         g2d.setClip(currentClip);

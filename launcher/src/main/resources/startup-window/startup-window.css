@@ -1,0 +1,54 @@
+/* Startup Window Styles */
+
+.root {
+    -fx-background-color: white;
+    -fx-border-color: rgb(230, 230, 230);
+    -fx-border-width: 1px;
+}
+
+#titleLabel {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 28pt;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgb(52, 73, 94);
+}
+
+#subtitleLabel {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 16pt;
+    -fx-text-fill: rgb(149, 165, 166);
+}
+
+#percentageLabel {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14pt;
+    -fx-text-fill: rgb(149, 165, 166);
+}
+
+#statusLabel {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 16pt;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgb(52, 73, 94);
+}
+
+/* Custom Progress Bar Styling - Pill Shape */
+#progressBar {
+    -fx-background-color: white;
+    -fx-background-radius: 12.5px;
+    -fx-border-color: rgb(220, 220, 220);
+    -fx-border-radius: 12.5px;
+    -fx-border-width: 1px;
+}
+
+#progressBar .track {
+    -fx-background-color: white;
+    -fx-background-radius: 12.5px;
+}
+
+#progressBar .bar {
+    -fx-background-color: linear-gradient(to right, rgb(99, 102, 241), rgb(67, 56, 202));
+    -fx-background-radius: 12.5px 0 0 12.5px;
+    -fx-background-insets: 0;
+}
+
