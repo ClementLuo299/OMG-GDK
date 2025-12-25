@@ -55,8 +55,61 @@ public class StartupWindowTheme {
     // Fonts - System Font Stack with Better Typography
     // ============================================================================
     
-    /** Font family stack - tries system fonts first, falls back to generic */
+    /** Path to custom font file in resources */
+    private static final String CUSTOM_FONT_PATH = "/startup-window/fonts/static/Inter_18pt-Regular.ttf";
+    
+    /** Custom font family name (will be set if custom font loads successfully) */
+    private static String customFontFamily = null;
+    
+    /**
+     * Attempts to load a custom font from resources.
+     * Place your font file in: src/main/resources/startup-window/fonts/
+     * 
+     * Recommended fonts to download:
+     * - Inter: https://fonts.google.com/specimen/Inter (very popular, modern)
+     * - Poppins: https://fonts.google.com/specimen/Poppins (friendly, geometric)
+     * - Montserrat: https://fonts.google.com/specimen/Montserrat (clean, professional)
+     * - Manrope: https://fonts.google.com/specimen/Manrope (modern, rounded)
+     * - Space Grotesk: https://fonts.google.com/specimen/Space+Grotesk (unique, tech-friendly)
+     * 
+     * Download the Regular (400) and Bold (700) weights, rename them to:
+     * - [FontName]-Regular.ttf (e.g., Inter-Regular.ttf)
+     * - [FontName]-Bold.ttf (e.g., Inter-Bold.ttf)
+     * 
+     * @return The font family name if loaded successfully, null otherwise
+     */
+    private static String loadCustomFont() {
+        try {
+            java.io.InputStream fontStream = StartupWindowTheme.class.getResourceAsStream(CUSTOM_FONT_PATH);
+            if (fontStream == null) {
+                // Font file not found - this is okay, we'll use system fonts
+                return null;
+            }
+            
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+            
+            String fontFamily = customFont.getFamily();
+            fontStream.close();
+            
+            System.out.println("✅ Custom font loaded: " + fontFamily);
+            return fontFamily;
+        } catch (Exception e) {
+            System.out.println("⚠️ Could not load custom font from " + CUSTOM_FONT_PATH + ": " + e.getMessage());
+            return null;
+        }
+    }
+    
+    /** Font family stack - tries custom font first, then system fonts, falls back to generic */
     private static String getSystemFontFamily() {
+        // Try to load custom font first
+        customFontFamily = loadCustomFont();
+        if (customFontFamily != null) {
+            return customFontFamily;
+        }
+        
+        // Fall back to system fonts
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         String[] fonts = ge.getAvailableFontFamilyNames();
         
@@ -94,11 +147,80 @@ public class StartupWindowTheme {
     /**
      * Creates a font with high-quality rendering hints applied.
      * Uses derived fonts for better control over font attributes.
+     * If using a custom font, attempts to load the appropriate weight.
      */
     private static Font createFont(String family, int style, int size) {
+        // If using custom font, try to load the specific weight file
+        if (customFontFamily != null && customFontFamily.equals(family)) {
+            Font customWeightFont = loadCustomFontWeight(style == Font.BOLD);
+            if (customWeightFont != null) {
+                return customWeightFont.deriveFont((float) size);
+            }
+        }
+        
+        // Fall back to standard font creation
         Font baseFont = new Font(family, style, size);
         // Use derived font for better rendering
         return baseFont.deriveFont((float) size);
+    }
+    
+    /**
+     * Loads a specific weight of the custom font (Regular or Bold).
+     * Handles both naming conventions:
+     * - Inter_18pt-Regular.ttf / Inter_18pt-Bold.ttf (Inter font package)
+     * - Inter-Regular.ttf / Inter-Bold.ttf (standard naming)
+     * 
+     * @param bold Whether to load the bold weight
+     * @return The loaded font, or null if not found
+     */
+    private static Font loadCustomFontWeight(boolean bold) {
+        try {
+            // Handle Inter font package naming (Inter_18pt-Regular.ttf -> Inter_18pt-Bold.ttf)
+            // or standard naming (Inter-Regular.ttf -> Inter-Bold.ttf)
+            String fontPath;
+            if (CUSTOM_FONT_PATH.contains("_18pt-")) {
+                fontPath = bold 
+                    ? CUSTOM_FONT_PATH.replace("_18pt-Regular.ttf", "_18pt-Bold.ttf")
+                    : CUSTOM_FONT_PATH;
+            } else {
+                fontPath = bold 
+                    ? CUSTOM_FONT_PATH.replace("-Regular.ttf", "-Bold.ttf")
+                    : CUSTOM_FONT_PATH;
+            }
+            
+            java.io.InputStream fontStream = StartupWindowTheme.class.getResourceAsStream(fontPath);
+            if (fontStream == null) {
+                // Bold weight not found, fall back to deriving bold from regular
+                if (bold) {
+                    fontStream = StartupWindowTheme.class.getResourceAsStream(CUSTOM_FONT_PATH);
+                    if (fontStream != null) {
+                        Font regularFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
+                        fontStream.close();
+                        return regularFont.deriveFont(Font.BOLD);
+                    }
+                }
+                return null;
+            }
+            
+            Font weightFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
+            fontStream.close();
+            return weightFont;
+        } catch (Exception e) {
+            // If specific weight fails, try to derive it from regular
+            if (bold) {
+                try {
+                    java.io.InputStream fontStream = StartupWindowTheme.class.getResourceAsStream(CUSTOM_FONT_PATH);
+                    if (fontStream != null) {
+                        Font regularFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
+                        fontStream.close();
+                        return regularFont.deriveFont(Font.BOLD);
+                    }
+                } catch (Exception e2) {
+                    // Ignore
+                }
+            }
+            return null;
+        }
     }
     
     /** Title font (bold, larger, 32pt) - for main heading */
