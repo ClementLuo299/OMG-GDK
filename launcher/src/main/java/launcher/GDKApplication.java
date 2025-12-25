@@ -4,7 +4,6 @@ import gdk.internal.Logging;
 
 import launcher.lifecycle.start.StartupProcess;
 import launcher.lifecycle.stop.Shutdown;
-import launcher.utils.FontLoader;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -20,16 +19,6 @@ import javafx.stage.Stage;
  * @since Beta 1.0
  */
 public class GDKApplication extends Application {
-    
-    /**
-     * JavaFX application initialization method called before start().
-     * Loads the Inter font for use throughout the application.
-     */
-    @Override
-    public void init() {
-        // Load Inter font early so it's available for all JavaFX and Swing components
-        FontLoader.loadFonts();
-    }
     
     /**
      * JavaFX application startup method called by the framework.

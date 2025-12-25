@@ -6,6 +6,7 @@ import launcher.lifecycle.start.launch_modes.AutoLaunch;
 import launcher.lifecycle.start.launch_modes.StandardLaunch;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.utils.AutoLaunchUtil;
+import launcher.utils.FontLoader;
 
 /**
  * Orchestrates the startup process of the GDK application.
@@ -38,6 +39,9 @@ public final class StartupProcess {
      */
     public static void start(Stage primaryApplicationStage) {
         Logging.info("Beginning GDK application startup process");
+        
+        // Load Inter font early so it's available for all Swing and JavaFX components
+        FontLoader.loadFonts();
         
         // Show startup window immediately before any other work
         StartupWindowManager windowManager = StartupWindowManager.show();
