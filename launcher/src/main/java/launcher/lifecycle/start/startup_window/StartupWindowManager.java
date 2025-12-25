@@ -50,9 +50,45 @@ public class StartupWindowManager {
     private StartupWindowManager(StartupWindow progressWindow, int totalSteps) {
         this.progressWindow = progressWindow;
         this.progressTracker = new ProgressTracker(totalSteps);
-        this.progressBarAnimationController = new ProgressBarAnimationController(progressWindow);
-        this.smoothProgressAnimationController = new SmoothProgressAnimationController(progressWindow);
+        this.progressBarAnimationController = new ProgressBarAnimationController(this);
+        this.smoothProgressAnimationController = new SmoothProgressAnimationController(this);
         this.stepDurationEstimator = new StepDurationEstimator();
+    }
+    
+    /**
+     * Sets the smooth progress value for animation (0.0 to 1.0).
+     * Used by animation controllers for smooth progress bar animation.
+     * 
+     * @param progress The progress value (0.0 to 1.0)
+     */
+    public void setSmoothProgress(double progress) {
+        double clampedProgress = Math.max(0.0, Math.min(1.0, progress));
+        if (progressWindow.progressBarStyling != null) {
+            progressWindow.progressBarStyling.setSmoothProgress(clampedProgress);
+        }
+        
+        if (progressWindow.percentageLabel != null) {
+            SwingUtilities.invokeLater(() -> {
+                int percentage = (int) Math.round(clampedProgress * 100);
+                progressWindow.percentageLabel.setText(percentage + "%");
+            });
+        }
+        
+        progressWindow.progressBar.repaint();
+    }
+    
+    /**
+     * Updates the status text.
+     * Used by animation controllers for text animation.
+     * 
+     * @param text The text to display
+     */
+    public void updateStatusText(String text) {
+        if (progressWindow.statusLabel != null) {
+            SwingUtilities.invokeLater(() -> {
+                progressWindow.statusLabel.setText(text);
+            });
+        }
     }
 
     /**
@@ -183,10 +219,15 @@ public class StartupWindowManager {
         // Update the current step
         progressTracker.setCurrentStep(step);
 
-        // Update the progress window with the current step and status message
-        progressWindow.updateProgress(step, message);
+        // Update the progress bar string (but let smooth animation handle the visual progress)
+        SwingUtilities.invokeLater(() -> {
+            progressWindow.progressBar.setString(step + "/" + progressWindow.totalSteps + " (" + (step * 100 / progressWindow.totalSteps) + "%)");
+        });
+        
+        updateStatusText(message);
 
         // Estimate the duration of the step and start the smooth animation toward the target step
+        // The smooth animation will handle updating the visual progress bar
         long estimatedDuration = stepDurationEstimator.estimateDuration(message);
         smoothProgressAnimationController.animateToStep(step, progressTracker.getTotalSteps(), estimatedDuration);
     }

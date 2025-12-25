@@ -6,8 +6,6 @@ import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**
  * Startup progress window that is displayed before JavaFX starts, using Swing for immediate display.
- * This window appears instantly when the application launches and shows progress
- * during the JavaFX initialization phase.
  * 
  * @author Clement Luo
  * @date August 5, 2025
@@ -17,19 +15,14 @@ import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 public class StartupWindow {
     
     // Swing components for the pre-startup progress window UI
-    private JFrame progressFrame;
-    private JProgressBar progressBar;
-    private JLabel percentageLabel;
-    private JLabel statusLabel;
+    final JFrame progressFrame;
+    final JProgressBar progressBar;
+    final JLabel percentageLabel;
+    final JLabel statusLabel;
+    final ProgressBarStyling progressBarStyling;
     
-    // Progress tracking for the progress bar
-    private final int totalSteps; // Total steps for the progress bar 
-    
-    // Smooth progress value for animation (0.0 to 1.0, can be fractional)
-    private double smoothProgress = 0.0;
-    
-    // Progress bar styling reference
-    private ProgressBarStyling progressBarStyling; 
+    // Total steps for the progress bar
+    final int totalSteps; 
     
     /**
      * Initialize the startup progress window
@@ -50,12 +43,10 @@ public class StartupWindow {
     }
     
     /**
-     * Show the progress window
+     * Shows the progress window.
      */
     public void show() {
-        System.out.println("Showing startup progress window");
-        
-        // Show on EDT to ensure thread safety
+        // Show the progress window on the Event Dispatch Thread
         if (SwingUtilities.isEventDispatchThread()) {
             progressFrame.setVisible(true);
         } else {
@@ -66,11 +57,9 @@ public class StartupWindow {
     }
     
     /**
-     * Hide the progress window
+     * Hides and disposes the progress window.
      */
     public void hide() {
-        System.out.println("Hiding startup progress window");
-        
         if (SwingUtilities.isEventDispatchThread()) {
             progressFrame.setVisible(false);
             progressFrame.dispose();
@@ -81,76 +70,4 @@ public class StartupWindow {
             });
         }
     }
-    
-    /**
-     * Update progress and status
-     * @param step The current step (0 to totalSteps)
-     * @param status The status message
-     */
-    public void updateProgress(int step, String status) {
-        SwingUtilities.invokeLater(() -> {
-            progressBar.setValue(step);
-            progressBar.setString(step + "/" + totalSteps + " (" + (step * 100 / totalSteps) + "%)");
-            
-            // Update percentage label
-            int percentage = totalSteps > 0 ? (step * 100 / totalSteps) : 0;
-            percentageLabel.setText(percentage + "%");
-            
-            statusLabel.setText(status);
-            
-            System.out.println("Progress: " + step + "/" + totalSteps + " - " + status);
-        });
-    }
-    
-    /**
-     * Sets the smooth progress value for animation (0.0 to 1.0).
-     * This allows fractional progress values for smooth animation.
-     * Also updates the percentage label to reflect the smooth progress.
-     * 
-     * @param progress The progress value (0.0 to 1.0)
-     */
-    public void setSmoothProgress(double progress) {
-        smoothProgress = Math.max(0.0, Math.min(1.0, progress)); // Clamp to 0.0-1.0
-        if (progressBarStyling != null) {
-            progressBarStyling.setSmoothProgress(smoothProgress);
-        }
-        
-        // Update percentage label with smooth progress
-        if (percentageLabel != null) {
-            int percentage = (int) Math.round(smoothProgress * 100);
-            percentageLabel.setText(percentage + "%");
-        }
-        
-        progressBar.repaint();
-    }
-    
-    /**
-     * Update the status text without animation.
-     * 
-     * @param text The text to display
-     */
-    public void updateStatusText(String text) {
-        if (statusLabel != null) {
-            statusLabel.setText(text);
-        }
-    }
-    
-    /**
-     * Get the progress bar styling instance.
-     * 
-     * @return The progress bar styling instance
-     */
-    public ProgressBarStyling getProgressBarStyling() {
-        return progressBarStyling;
-    }
-    
-    /**
-     * Repaint the progress bar.
-     */
-    public void repaintProgressBar() {
-        if (progressBar != null) {
-            progressBar.repaint();
-        }
-    }
-    
 }

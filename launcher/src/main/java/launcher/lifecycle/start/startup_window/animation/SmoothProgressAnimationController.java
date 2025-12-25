@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.animation;
 import javax.swing.SwingUtilities;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.StartupWindow;
+import launcher.lifecycle.start.startup_window.StartupWindowManager;
 
 /**
  * Controls smooth animation of the progress bar between steps.
@@ -29,8 +29,8 @@ public class SmoothProgressAnimationController {
     /** The starting progress value when current animation began. */
     private double startProgress = 0.0;
     
-    /** The progress window that contains the progress bar to animate. */
-    private final StartupWindow progressWindow;
+    /** The window manager that manages the progress window. */
+    private final StartupWindowManager windowManager;
     
     /** Frame time in milliseconds (target ~60 FPS). */
     private static final long FRAME_TIME_MS = 16;
@@ -44,10 +44,10 @@ public class SmoothProgressAnimationController {
     /**
      * Constructs a new SmoothProgressAnimationController.
      * 
-     * @param progressWindow The progress window containing the progress bar to animate
+     * @param windowManager The window manager that manages the progress window
      */
-    public SmoothProgressAnimationController(StartupWindow progressWindow) {
-        this.progressWindow = progressWindow;
+    public SmoothProgressAnimationController(StartupWindowManager windowManager) {
+        this.windowManager = windowManager;
     }
     
     /**
@@ -156,7 +156,7 @@ public class SmoothProgressAnimationController {
                 
                 // Update the progress bar on EDT
                 SwingUtilities.invokeLater(() -> {
-                    progressWindow.setSmoothProgress(currentDisplayedProgress);
+                    windowManager.setSmoothProgress(currentDisplayedProgress);
                 });
                 
                 // If animation is complete, we can stop (but keep running for future animations)
@@ -194,6 +194,11 @@ public class SmoothProgressAnimationController {
         }
         animationStartTime = System.currentTimeMillis();
         animationDurationMs = 0;
+        
+        // Immediately update the UI to match the reset state
+        SwingUtilities.invokeLater(() -> {
+            windowManager.setSmoothProgress(currentDisplayedProgress);
+        });
     }
 }
 
