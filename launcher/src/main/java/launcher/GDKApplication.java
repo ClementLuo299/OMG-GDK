@@ -8,7 +8,6 @@ import launcher.lifecycle.stop.Shutdown;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-
 /**
  * Main JavaFX Application class for the OMG Game Development Kit (GDK).
  * This class serves as the entry point for the GDK launcher application.
