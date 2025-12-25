@@ -51,7 +51,7 @@
 }
 
 .single-json-editor .title-label {
-    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-text-fill: #2c3e50;
@@ -158,7 +158,7 @@
 /* Main Container */
 .game-lobby-container {
     -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
 }
 
 /* Top Navigation */
@@ -843,7 +843,7 @@
 /* Game Picker Container */
 .game-picker-container {
     -fx-background-color: white;
-    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     -fx-pref-width: 1200px;
 }
 

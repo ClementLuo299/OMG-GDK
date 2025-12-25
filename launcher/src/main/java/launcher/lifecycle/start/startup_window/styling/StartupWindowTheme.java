@@ -33,6 +33,9 @@ public class StartupWindowTheme {
     /** Border color (very subtle gray) */
     public static final Color BORDER = new Color(232, 232, 237);
     
+    /** Progress bar border color (more visible) */
+    public static final Color PROGRESS_BORDER = new Color(200, 200, 210);
+    
     /** Fallback background color for systems without transparency support */
     public static final Color FALLBACK_BACKGROUND = new Color(248, 249, 250);
     

@@ -185,11 +185,11 @@ public class ProgressBarStyling extends BasicProgressBarUI {
     }
     
     private void paintModernBorder(Graphics2D g2d, int width, int height) {
-        // Very subtle border - almost invisible
-        g2d.setColor(StartupWindowTheme.BORDER);
-        g2d.setStroke(new BasicStroke(0.5f));
+        // More visible border for better definition
+        g2d.setColor(StartupWindowTheme.PROGRESS_BORDER);
+        g2d.setStroke(new BasicStroke(1.0f));
         RoundRectangle2D borderRect = new RoundRectangle2D.Float(
-            0.25f, 0.25f, width - 0.5f, height - 0.5f,
+            0.5f, 0.5f, width - 1.0f, height - 1.0f,
             StartupWindowTheme.PROGRESS_CORNER_RADIUS,
             StartupWindowTheme.PROGRESS_CORNER_RADIUS
         );

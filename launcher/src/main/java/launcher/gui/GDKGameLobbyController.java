@@ -353,7 +353,7 @@ public class GDKGameLobbyController implements Initializable {
         
         // Apply consistent styling to the message container for better readability
         // Uses a modern font stack with fallbacks and appropriate size
-        messageContainer.setStyle("-fx-font-family: 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
+        messageContainer.setStyle("-fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
         
         // Create SingleJsonEditor instances programmatically
         jsonInputEditor = new SingleJsonEditor("JSON Input");

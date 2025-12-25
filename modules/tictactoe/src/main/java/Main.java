@@ -115,7 +115,7 @@ public class Main implements GameModule {
     private Scene createSimpleGameScene(Stage primaryStage) {
         javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(15);
         root.setPadding(new javafx.geometry.Insets(20));
-        root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Segoe UI', Arial, sans-serif;");
+        root.setStyle("-fx-background-color: #f8f9fa; -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;");
         
         // Title
         javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("Tic Tac Toe");

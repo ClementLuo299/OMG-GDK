@@ -3,7 +3,7 @@
 /* Main Container */
 .settings-page-container {
     -fx-background-color: white;
-    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
 }
 
 /* Header Styles */

@@ -41,11 +41,11 @@ public class StartupWindowFast implements IStartupWindow {
     private void createWindow() {
         // Create components programmatically (much faster than FXML)
         Label titleLabel = new Label("GDK Game Development Kit");
-        titleLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
+        titleLabel.setFont(Font.font("Inter", FontWeight.BOLD, 28));
         titleLabel.setTextFill(Color.rgb(52, 73, 94));
         
         Label subtitleLabel = new Label("Initializing");
-        subtitleLabel.setFont(Font.font("Segoe UI", 16));
+        subtitleLabel.setFont(Font.font("Inter", 16));
         subtitleLabel.setTextFill(Color.rgb(149, 165, 166));
         
         progressBar = new ProgressBar(0.0);
@@ -54,12 +54,12 @@ public class StartupWindowFast implements IStartupWindow {
         progressBar.setId("progressBar");
         
         percentageLabel = new Label("0%");
-        percentageLabel.setFont(Font.font("Segoe UI", 14));
+        percentageLabel.setFont(Font.font("Inter", 14));
         percentageLabel.setTextFill(Color.rgb(149, 165, 166));
         percentageLabel.setId("percentageLabel");
         
         statusLabel = new Label("Starting up...");
-        statusLabel.setFont(Font.font("Segoe UI", FontWeight.BOLD, 16));
+        statusLabel.setFont(Font.font("Inter", FontWeight.BOLD, 16));
         statusLabel.setTextFill(Color.rgb(52, 73, 94));
         statusLabel.setId("statusLabel");
         
