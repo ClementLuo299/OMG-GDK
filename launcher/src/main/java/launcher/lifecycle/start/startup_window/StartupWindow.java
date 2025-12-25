@@ -1,39 +1,35 @@
 package launcher.lifecycle.start.startup_window;
 
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
-
-import java.io.IOException;
-import java.net.URL;
+import javax.swing.*;
+import launcher.lifecycle.start.startup_window.initialization.*;
+import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**
- * Startup progress window that displays progress during application initialization.
- * This window uses JavaFX for modern styling and smooth animations.
+ * Startup progress window that is displayed before JavaFX starts, using Swing for immediate display.
+ * This window appears instantly when the application launches and shows progress
+ * during the JavaFX initialization phase.
  * 
  * @author Clement Luo
  * @date August 5, 2025
  * @edited December 24, 2025 
  * @since Beta 1.0
  */
-public class StartupWindow {
+public class StartupWindow implements IStartupWindow {
     
-    // JavaFX components for the startup progress window UI
-    private Stage progressStage;
-    private ProgressBar progressBar;
-    private Label percentageLabel;
-    private Label statusLabel;
+    // Swing components for the pre-startup progress window UI
+    private JFrame progressFrame;
+    private JProgressBar progressBar;
+    private JLabel percentageLabel;
+    private JLabel statusLabel;
     
     // Progress tracking for the progress bar
     private final int totalSteps; // Total steps for the progress bar 
     
     // Smooth progress value for animation (0.0 to 1.0, can be fractional)
     private double smoothProgress = 0.0;
+    
+    // Progress bar styling reference
+    private ProgressBarStyling progressBarStyling; 
     
     /**
      * Initialize the startup progress window
@@ -43,46 +39,14 @@ public class StartupWindow {
     public StartupWindow(int totalSteps) {
         this.totalSteps = totalSteps;
         
-        try {
-            // Load FXML
-            URL fxmlUrl = getClass().getResource("/startup-window/StartupWindow.fxml");
-            if (fxmlUrl == null) {
-                throw new IOException("Could not find StartupWindow.fxml");
-            }
-            
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            javafx.scene.Parent root = loader.load();
-            
-            // Create scene from root
-            Scene scene = new Scene(root);
-            
-            // Load CSS
-            scene.getStylesheets().add(getClass().getResource("/startup-window/startup-window.css").toExternalForm());
-            
-            // Create and configure stage
-            progressStage = new Stage(StageStyle.UNDECORATED);
-            progressStage.setTitle(StartupWindowTheme.WINDOW_TITLE);
-            progressStage.setScene(scene);
-            progressStage.setAlwaysOnTop(true);
-            progressStage.setResizable(false);
-            
-            // Get references to UI components
-            progressBar = (ProgressBar) scene.lookup("#progressBar");
-            percentageLabel = (Label) scene.lookup("#percentageLabel");
-            statusLabel = (Label) scene.lookup("#statusLabel");
-            
-            // Set initial approximate position to avoid appearing at (0,0)
-            javafx.stage.Screen screen = javafx.stage.Screen.getPrimary();
-            javafx.geometry.Rectangle2D visualBounds = screen.getVisualBounds();
-            progressStage.setX(visualBounds.getMinX() + visualBounds.getWidth() / 2.0);
-            progressStage.setY(visualBounds.getMinY() + visualBounds.getHeight() / 2.0);
-            
-            // Do minimal sizing - full layout will happen in show()
-            progressStage.sizeToScene();
-            
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load startup window FXML", e);
-        }
+        StartupWindowInitializer.InitializationResult result = 
+            StartupWindowInitializer.initialize(totalSteps);
+        
+        this.progressFrame = result.frame;
+        this.progressBar = result.progressBar;
+        this.percentageLabel = result.percentageLabel;
+        this.statusLabel = result.statusLabel;
+        this.progressBarStyling = result.progressBarStyling;
     }
     
     /**
@@ -91,42 +55,13 @@ public class StartupWindow {
     public void show() {
         System.out.println("Showing startup progress window");
         
-        // Show on JavaFX Application Thread
-        Runnable showWindow = () -> {
-            // Show the window immediately for faster appearance
-            progressStage.show();
-            
-            // Apply CSS and layout after showing (non-blocking)
-            Platform.runLater(() -> {
-                // Force CSS application and layout for proper sizing
-                progressStage.getScene().getRoot().applyCss();
-                progressStage.getScene().getRoot().layout();
-                
-                // Size the window to fit its content
-                progressStage.sizeToScene();
-                
-                // Position the window - slightly lower than center for better visual balance
-                javafx.stage.Screen screen = javafx.stage.Screen.getPrimary();
-                javafx.geometry.Rectangle2D visualBounds = screen.getVisualBounds();
-                
-                // Get the actual window dimensions
-                double windowWidth = progressStage.getWidth();
-                double windowHeight = progressStage.getHeight();
-                
-                // Calculate center position with a slight downward offset (about 5% of screen height)
-                double centerX = visualBounds.getMinX() + (visualBounds.getWidth() - windowWidth) / 2.0;
-                double centerY = visualBounds.getMinY() + (visualBounds.getHeight() - windowHeight) / 2.0 + (visualBounds.getHeight() * 0.05);
-                
-                // Set the position
-                progressStage.setX(centerX);
-                progressStage.setY(centerY);
-            });
-        };
-        
-        if (Platform.isFxApplicationThread()) {
-            showWindow.run();
+        // Show on EDT to ensure thread safety
+        if (SwingUtilities.isEventDispatchThread()) {
+            progressFrame.setVisible(true);
         } else {
-            Platform.runLater(showWindow);
+            SwingUtilities.invokeLater(() -> {
+                progressFrame.setVisible(true);
+            });
         }
     }
     
@@ -136,13 +71,13 @@ public class StartupWindow {
     public void hide() {
         System.out.println("Hiding startup progress window");
         
-        if (Platform.isFxApplicationThread()) {
-            progressStage.hide();
-            progressStage.close();
+        if (SwingUtilities.isEventDispatchThread()) {
+            progressFrame.setVisible(false);
+            progressFrame.dispose();
         } else {
-            Platform.runLater(() -> {
-                progressStage.hide();
-                progressStage.close();
+            SwingUtilities.invokeLater(() -> {
+                progressFrame.setVisible(false);
+                progressFrame.dispose();
             });
         }
     }
@@ -153,10 +88,9 @@ public class StartupWindow {
      * @param status The status message
      */
     public void updateProgress(int step, String status) {
-        Platform.runLater(() -> {
-            // Calculate progress (0.0 to 1.0)
-            double progress = totalSteps > 0 ? (double) step / totalSteps : 0.0;
-            progressBar.setProgress(progress);
+        SwingUtilities.invokeLater(() -> {
+            progressBar.setValue(step);
+            progressBar.setString(step + "/" + totalSteps + " (" + (step * 100 / totalSteps) + "%)");
             
             // Update percentage label
             int percentage = totalSteps > 0 ? (step * 100 / totalSteps) : 0;
@@ -177,16 +111,17 @@ public class StartupWindow {
      */
     public void setSmoothProgress(double progress) {
         smoothProgress = Math.max(0.0, Math.min(1.0, progress)); // Clamp to 0.0-1.0
+        if (progressBarStyling != null) {
+            progressBarStyling.setSmoothProgress(smoothProgress);
+        }
         
-        Platform.runLater(() -> {
-            progressBar.setProgress(smoothProgress);
-            
-            // Update percentage label with smooth progress
-            if (percentageLabel != null) {
-                int percentage = (int) Math.round(smoothProgress * 100);
-                percentageLabel.setText(percentage + "%");
-            }
-        });
+        // Update percentage label with smooth progress
+        if (percentageLabel != null) {
+            int percentage = (int) Math.round(smoothProgress * 100);
+            percentageLabel.setText(percentage + "%");
+        }
+        
+        progressBar.repaint();
     }
     
     /**
@@ -196,16 +131,36 @@ public class StartupWindow {
      */
     public void updateStatusText(String text) {
         if (statusLabel != null) {
-            Platform.runLater(() -> statusLabel.setText(text));
+            statusLabel.setText(text);
         }
     }
     
     /**
-     * Get the progress bar component.
+     * Get the progress bar styling instance.
      * 
-     * @return The progress bar
+     * @return The progress bar styling instance
      */
-    public ProgressBar getProgressBar() {
-        return progressBar;
+    public ProgressBarStyling getProgressBarStyling() {
+        return progressBarStyling;
+    }
+    
+    /**
+     * Repaint the progress bar.
+     */
+    public void repaintProgressBar() {
+        if (progressBar != null) {
+            progressBar.repaint();
+        }
+    }
+    
+    /**
+     * Get the progress bar component (for compatibility with IStartupWindow interface).
+     * Returns null since Swing doesn't have a direct equivalent.
+     * 
+     * @return null (Swing doesn't have JavaFX ProgressBar)
+     */
+    @Override
+    public javafx.scene.control.ProgressBar getProgressBar() {
+        return null; // Swing doesn't have JavaFX ProgressBar
     }
 }

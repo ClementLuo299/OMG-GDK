@@ -8,7 +8,7 @@ import launcher.lifecycle.start.startup_window.animation.SmoothProgressAnimation
 import launcher.lifecycle.start.startup_window.tracking.ProgressTracker;
 import launcher.lifecycle.start.startup_window.estimation.StepDurationEstimator;
 
-import javafx.application.Platform;
+import javax.swing.SwingUtilities;
 
 /**
  * Manages the running, displaying, and lifecycle of the startup progress window.
@@ -23,7 +23,7 @@ import javafx.application.Platform;
 public class StartupWindowManager {
     
     /** The underlying progress window that displays startup progress to the user. */
-    private final StartupWindow progressWindow;
+    private final IStartupWindow progressWindow;
     
     /** Tracks progress state (current step and total steps). */
     private final ProgressTracker progressTracker;
@@ -47,7 +47,7 @@ public class StartupWindowManager {
      * @param progressWindow The progress window to manage
      * @param totalSteps The total number of steps (calculated once and never changes)
      */
-    private StartupWindowManager(StartupWindow progressWindow, int totalSteps) {
+    private StartupWindowManager(IStartupWindow progressWindow, int totalSteps) {
         this.progressWindow = progressWindow;
         this.progressTracker = new ProgressTracker(totalSteps);
         this.progressBarAnimationController = new ProgressBarAnimationController(progressWindow);
@@ -83,57 +83,37 @@ public class StartupWindowManager {
         final int estimatedSteps = 15;
         
         // Create the window and manager on the JavaFX Application Thread
-        final StartupWindow[] windowRef = new StartupWindow[1];
+        final IStartupWindow[] windowRef = new IStartupWindow[1];
         final StartupWindowManager[] managerRef = new StartupWindowManager[1];
         
         try {
-            if (Platform.isFxApplicationThread()) {
-                // Already on FX thread, create directly
+            if (SwingUtilities.isEventDispatchThread()) {
+                // Already on EDT, create directly
                 windowRef[0] = new StartupWindow(estimatedSteps);
                 managerRef[0] = new StartupWindowManager(windowRef[0], estimatedSteps);
             } else {
-                // Not on FX thread, use Platform.runLater to create on FX thread
-                // Use a lock to wait for the creation to complete
-                final Object lock = new Object();
-                final boolean[] completed = new boolean[1];
-                
-                Platform.runLater(() -> {
+                // Not on EDT, use invokeAndWait to create on EDT
+                SwingUtilities.invokeAndWait(() -> {
                     try {
                         windowRef[0] = new StartupWindow(estimatedSteps);
                         managerRef[0] = new StartupWindowManager(windowRef[0], estimatedSteps);
                     } catch (Exception e) {
                         Logging.error("Error creating startup window: " + e.getMessage(), e);
                         throw new RuntimeException("Failed to create startup window", e);
-                    } finally {
-                        synchronized (lock) {
-                            completed[0] = true;
-                            lock.notify();
-                        }
                     }
                 });
-                
-                // Wait for the creation to complete
-                synchronized (lock) {
-                    while (!completed[0]) {
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            throw new RuntimeException("Interrupted while creating startup window", e);
-                        }
-                    }
-                }
             }
         } catch (Exception e) {
             Logging.error("Error creating startup window: " + e.getMessage(), e);
             throw new RuntimeException("Failed to create startup window", e);
         }
         
-        StartupWindow window = windowRef[0];
+        IStartupWindow window = windowRef[0];
         StartupWindowManager manager = managerRef[0];
 
         // Show the window immediately
         window.show();
+        
         manager.smoothProgressAnimationController.resetToStep(0, estimatedSteps);
         manager.updateProgress(0, "Starting GDK application...");
         
@@ -142,13 +122,8 @@ public class StartupWindowManager {
             try {
                 final int actualSteps = calculateTotalSteps();
                 if (actualSteps != estimatedSteps) {
-                    Platform.runLater(() -> {
-                        // Update the progress tracker with actual steps
-                        // Note: This is a simplified update - the progress tracker
-                        // will need to handle the step count change
-                        Logging.info("Updating total steps from " + estimatedSteps + " to " + actualSteps);
-                        // The progress will continue with the new total
-                    });
+                    Logging.info("Calculated total steps: " + actualSteps + " (estimated: " + estimatedSteps + ")");
+                    // Note: The progress will continue with the estimated total for simplicity
                 }
             } catch (Exception e) {
                 Logging.error("Error calculating total steps in background: " + e.getMessage(), e);

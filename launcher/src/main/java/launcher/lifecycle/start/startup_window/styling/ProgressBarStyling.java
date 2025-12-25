@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
 
 /**
  * Custom flat and minimal progress bar UI with modern styling.
@@ -83,18 +82,11 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         paintDeterminate(g, c);
     }
     
-    private int getArcSize(int height) {
-        // For perfect pill shape, arc height should equal the full height
-        // This creates maximum rounded ends
-        return height;
-    }
-    
     private void paintModernBackground(Graphics2D g2d, int width, int height) {
         // Modern flat background - match the panel background (white)
-        int arcSize = getArcSize(height);
         g2d.setColor(StartupWindowTheme.BACKGROUND);
-        // Perfect pill shape: arc height equals full height
-        g2d.fillRoundRect(0, 0, width, height, arcSize, arcSize);
+        // Simple rectangle - no rounded corners
+        g2d.fillRect(0, 0, width, height);
     }
     
     private void paintModernProgressFill(Graphics2D g2d, int progressWidth, int totalWidth, int height) {
@@ -105,13 +97,11 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         
         // Double-check: ensure progress width never exceeds total width
         int actualProgressWidth = Math.min(progressWidth, totalWidth);
-        double radius = height / 2.0;
         
         // Save current clip
         Shape currentClip = g2d.getClip();
         
         // Create a STRICT clip that is exactly the progress bounds
-        // This ensures nothing can be drawn outside the progress area
         Rectangle progressBounds = new Rectangle(0, 0, actualProgressWidth, height);
         Area progressClipArea = new Area(progressBounds);
         if (currentClip != null) {
@@ -119,38 +109,8 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         }
         g2d.setClip(progressClipArea);
         
-        // Always create a shape with rounded left corners
-        // The clipping will ensure it never extends beyond actualProgressWidth
-        GeneralPath path = new GeneralPath();
-        
-        // Start from the left edge, at the radius point (middle of left rounded corner)
-        path.moveTo(0, radius);
-        
-        // Draw left rounded corner (top arc)
-        path.quadTo(0, 0, radius, 0);
-        
-        // Top edge (straight line to right)
-        path.lineTo(actualProgressWidth, 0);
-        
-        // Right edge (straight line down - no rounding)
-        path.lineTo(actualProgressWidth, height);
-        
-        // Bottom edge (straight line back to left)
-        path.lineTo(radius, height);
-        
-        // Draw left rounded corner (bottom arc)
-        path.quadTo(0, height, 0, height - radius);
-        
-        // Close the path
-        path.closePath();
-        
-        Shape fillShape = path;
-        
-        // Intersect the shape with the progress bounds to ensure no overflow
-        Area fillArea = new Area(fillShape);
-        Area boundsArea = new Area(progressBounds);
-        fillArea.intersect(boundsArea);
-        Shape clippedShape = fillArea;
+        // Simple rectangle - no rounded corners
+        Rectangle fillRect = new Rectangle(0, 0, actualProgressWidth, height);
         
         // Modern indigo/violet gradient
         int gradientEnd = Math.max(actualProgressWidth, 1);
@@ -160,8 +120,8 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         );
         g2d.setPaint(mainGradient);
         
-        // Fill the shape - both the clip and intersection ensure it cannot overflow
-        g2d.fill(clippedShape);
+        // Fill the rectangle
+        g2d.fill(fillRect);
         
         // Restore clip
         g2d.setClip(currentClip);
@@ -169,10 +129,10 @@ public class ProgressBarStyling extends BasicProgressBarUI {
     
     private void paintModernBorder(Graphics2D g2d, int width, int height) {
         // Clean, minimal border - single subtle stroke
-        int arcSize = getArcSize(height);
         g2d.setColor(new Color(220, 220, 220));
         g2d.setStroke(new BasicStroke(1.0f));
-        g2d.drawRoundRect(0, 0, width - 1, height - 1, arcSize, arcSize);
+        // Simple rectangle border - no rounded corners
+        g2d.drawRect(0, 0, width - 1, height - 1);
     }
 }
 

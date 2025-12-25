@@ -1,8 +1,7 @@
 package launcher.lifecycle.start.startup_window.styling;
 
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import java.awt.Color;
+import java.awt.Font;
 
 /**
  * Centralized theme and styling constants for the startup window.
@@ -19,25 +18,22 @@ public class StartupWindowTheme {
     // ============================================================================
     
     /** Primary text color (dark blue-gray) */
-    public static final Color PRIMARY_TEXT = Color.rgb(52, 73, 94);
+    public static final Color PRIMARY_TEXT = new Color(52, 73, 94);
     
     /** Secondary text color (light gray) */
-    public static final Color SECONDARY_TEXT = Color.rgb(149, 165, 166);
+    public static final Color SECONDARY_TEXT = new Color(149, 165, 166);
     
     /** Background color (white) */
-    public static final Color BACKGROUND = Color.rgb(255, 255, 255);
+    public static final Color BACKGROUND = new Color(255, 255, 255);
     
     /** Border color (light gray) */
-    public static final Color BORDER = Color.rgb(230, 230, 230);
+    public static final Color BORDER = new Color(230, 230, 230);
     
     /** Fallback background color for systems without transparency support */
-    public static final Color FALLBACK_BACKGROUND = Color.rgb(248, 249, 250);
+    public static final Color FALLBACK_BACKGROUND = new Color(248, 249, 250);
     
-    /** Progress bar fill color start (indigo/violet) */
-    public static final Color PROGRESS_FILL_START = Color.rgb(99, 102, 241);
-    
-    /** Progress bar fill color end (deeper indigo) */
-    public static final Color PROGRESS_FILL_END = Color.rgb(67, 56, 202);
+    /** Transparent color for window transparency */
+    public static final Color TRANSPARENT = new Color(0, 0, 0, 0);
     
     // ============================================================================
     // Fonts
@@ -47,24 +43,16 @@ public class StartupWindowTheme {
     public static final String FONT_FAMILY = "Segoe UI";
     
     /** Title font (bold, 28pt) */
-    public static Font getTitleFont() {
-        return Font.font(FONT_FAMILY, FontWeight.BOLD, 28);
-    }
+    public static final Font TITLE_FONT = new Font(FONT_FAMILY, Font.BOLD, 28);
     
     /** Subtitle font (plain, 16pt) */
-    public static Font getSubtitleFont() {
-        return Font.font(FONT_FAMILY, FontWeight.NORMAL, 16);
-    }
+    public static final Font SUBTITLE_FONT = new Font(FONT_FAMILY, Font.PLAIN, 16);
     
     /** Status font (bold, 16pt) */
-    public static Font getStatusFont() {
-        return Font.font(FONT_FAMILY, FontWeight.BOLD, 16);
-    }
+    public static final Font STATUS_FONT = new Font(FONT_FAMILY, Font.BOLD, 16);
     
     /** Percentage font (plain, 14pt) */
-    public static Font getPercentageFont() {
-        return Font.font(FONT_FAMILY, FontWeight.NORMAL, 14);
-    }
+    public static final Font PERCENTAGE_FONT = new Font(FONT_FAMILY, Font.PLAIN, 14);
     
     // ============================================================================
     // Sizes and Dimensions

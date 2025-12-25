@@ -36,10 +36,11 @@ public final class StandardLaunch {
      * @param primaryApplicationStage The primary JavaFX stage
      * @throws RuntimeException if the startup process fails
      */
-    public static void launch(Stage primaryApplicationStage) {
+    public static void launch(Stage primaryApplicationStage, StartupWindowManager windowManager) {
         try {
-            // Step 1: Create and show startup progress window
-            StartupWindowManager windowManager = StartupWindowManager.show();
+            // Startup window is already shown by StartupProcess
+            // Step 1: Update progress
+            windowManager.updateProgress(0, "Starting GDK application...");
             StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application...' message");
 
             // Step 2: Initialize the user interface

@@ -1,9 +1,9 @@
 package launcher.lifecycle.start.startup_window.animation;
 
-import javafx.application.Platform;
+import javax.swing.SwingUtilities;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.StartupWindow;
+import launcher.lifecycle.start.startup_window.IStartupWindow;
 
 /**
  * Controls smooth animation of the progress bar between steps.
@@ -30,7 +30,7 @@ public class SmoothProgressAnimationController {
     private double startProgress = 0.0;
     
     /** The progress window that contains the progress bar to animate. */
-    private final StartupWindow progressWindow;
+    private final IStartupWindow progressWindow;
     
     /** Frame time in milliseconds (target ~60 FPS). */
     private static final long FRAME_TIME_MS = 16;
@@ -46,7 +46,7 @@ public class SmoothProgressAnimationController {
      * 
      * @param progressWindow The progress window containing the progress bar to animate
      */
-    public SmoothProgressAnimationController(StartupWindow progressWindow) {
+    public SmoothProgressAnimationController(IStartupWindow progressWindow) {
         this.progressWindow = progressWindow;
     }
     
@@ -154,8 +154,8 @@ public class SmoothProgressAnimationController {
                     currentDisplayedProgress = startProgress + (targetProgress - startProgress) * timeProgress;
                 }
                 
-                // Update the progress bar on JavaFX Application Thread
-                Platform.runLater(() -> {
+                // Update the progress bar on EDT
+                SwingUtilities.invokeLater(() -> {
                     progressWindow.setSmoothProgress(currentDisplayedProgress);
                 });
                 
