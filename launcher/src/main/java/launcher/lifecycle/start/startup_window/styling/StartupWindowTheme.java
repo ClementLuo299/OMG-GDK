@@ -59,14 +59,14 @@ public class StartupWindowTheme {
     // ============================================================================
     
     /** Path to custom font file in resources */
-    private static final String CUSTOM_FONT_PATH = "/startup-window/fonts/static/Inter_18pt-Regular.ttf";
+    private static final String CUSTOM_FONT_PATH = "/startup-window/Inter_18pt-Regular.ttf";
     
     /** Custom font family name (will be set if custom font loads successfully) */
     private static String customFontFamily = null;
     
     /**
      * Attempts to load a custom font from resources.
-     * Place your font file in: src/main/resources/startup-window/fonts/
+     * Place your font file in: src/main/resources/startup-window/
      * 
      * Recommended fonts to download:
      * - Inter: https://fonts.google.com/specimen/Inter (very popular, modern)

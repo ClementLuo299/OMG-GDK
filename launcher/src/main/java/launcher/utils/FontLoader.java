@@ -17,10 +17,10 @@ import java.io.InputStream;
 public class FontLoader {
     
     /** Path to Inter Regular font in resources */
-    private static final String INTER_REGULAR_PATH = "/startup-window/fonts/static/Inter_18pt-Regular.ttf";
+    private static final String INTER_REGULAR_PATH = "/startup-window/Inter_18pt-Regular.ttf";
     
     /** Path to Inter Bold font in resources */
-    private static final String INTER_BOLD_PATH = "/startup-window/fonts/static/Inter_18pt-Bold.ttf";
+    private static final String INTER_BOLD_PATH = "/startup-window/Inter_18pt-Bold.ttf";
     
     /** Font family name for Inter */
     public static final String INTER_FONT_FAMILY = "Inter";

@@ -16,7 +16,7 @@ import javafx.stage.Stage;
  *
  * @authors Clement Luo
  * @date July 20, 2025
- * @edited December 20, 2025
+ * @edited December 24, 2025
  * @since Beta 1.0
  */
 public class GDKApplication extends Application {
