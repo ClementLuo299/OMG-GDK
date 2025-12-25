@@ -4,9 +4,10 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.awt.geom.Area;
+import java.awt.geom.RoundRectangle2D;
 
 /**
- * Custom flat and minimal progress bar UI with modern styling.
+ * Custom modern progress bar UI with rounded corners, glow effects, and vibrant gradients.
  */
 public class ProgressBarStyling extends BasicProgressBarUI {
     
@@ -49,8 +50,9 @@ public class ProgressBarStyling extends BasicProgressBarUI {
             
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             
-            // Modern flat background
+            // Modern rounded background
             paintModernBackground(g2d, width, height);
             
             // Use smooth progress if available, otherwise use standard progress bar percentage
@@ -64,10 +66,10 @@ public class ProgressBarStyling extends BasicProgressBarUI {
             // Calculate progress width and ensure it never exceeds width
             int progressWidth = Math.min((int) (width * adjustedProgress), width);
             
-            // Always draw progress fill (it will always be at least the minimum)
+            // Draw progress fill with glow effect
             paintModernProgressFill(g2d, progressWidth, width, height);
             
-            // Clean, minimal border
+            // Subtle border (very light)
             paintModernBorder(g2d, width, height);
             
             // Restore original clip
@@ -83,10 +85,14 @@ public class ProgressBarStyling extends BasicProgressBarUI {
     }
     
     private void paintModernBackground(Graphics2D g2d, int width, int height) {
-        // Modern flat background - match the panel background (white)
+        // Modern rounded background - match the panel background
         g2d.setColor(StartupWindowTheme.BACKGROUND);
-        // Simple rectangle - no rounded corners
-        g2d.fillRect(0, 0, width, height);
+        RoundRectangle2D roundedRect = new RoundRectangle2D.Float(
+            0, 0, width, height,
+            StartupWindowTheme.PROGRESS_CORNER_RADIUS,
+            StartupWindowTheme.PROGRESS_CORNER_RADIUS
+        );
+        g2d.fill(roundedRect);
     }
     
     private void paintModernProgressFill(Graphics2D g2d, int progressWidth, int totalWidth, int height) {
@@ -97,42 +103,97 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         
         // Double-check: ensure progress width never exceeds total width
         int actualProgressWidth = Math.min(progressWidth, totalWidth);
+        int cornerRadius = StartupWindowTheme.PROGRESS_CORNER_RADIUS;
         
         // Save current clip
         Shape currentClip = g2d.getClip();
         
-        // Create a STRICT clip that is exactly the progress bounds
-        Rectangle progressBounds = new Rectangle(0, 0, actualProgressWidth, height);
-        Area progressClipArea = new Area(progressBounds);
+        // Create a rounded rectangle clip for the progress fill
+        RoundRectangle2D progressShape = new RoundRectangle2D.Float(
+            0, 0, actualProgressWidth, height,
+            cornerRadius, cornerRadius
+        );
+        Area progressClipArea = new Area(progressShape);
         if (currentClip != null) {
             progressClipArea.intersect(new Area(currentClip));
         }
         g2d.setClip(progressClipArea);
         
-        // Simple rectangle - no rounded corners
-        Rectangle fillRect = new Rectangle(0, 0, actualProgressWidth, height);
+        // Draw glow effect (subtle inner glow)
+        if (actualProgressWidth > cornerRadius) {
+            paintGlowEffect(g2d, actualProgressWidth, height);
+        }
         
-        // Modern indigo/violet gradient
+        // Vibrant purple-to-blue gradient
         int gradientEnd = Math.max(actualProgressWidth, 1);
         GradientPaint mainGradient = new GradientPaint(
-            0, 0, new Color(99, 102, 241), // Modern indigo/violet
-            gradientEnd, 0, new Color(67, 56, 202)  // Deeper indigo
+            0, 0, StartupWindowTheme.PROGRESS_START, // Vibrant purple
+            gradientEnd, 0, StartupWindowTheme.PROGRESS_END  // Vibrant blue
         );
         g2d.setPaint(mainGradient);
         
-        // Fill the rectangle
+        // Fill the rounded rectangle
+        RoundRectangle2D fillRect = new RoundRectangle2D.Float(
+            0, 0, actualProgressWidth, height,
+            cornerRadius, cornerRadius
+        );
         g2d.fill(fillRect);
+        
+        // Add subtle highlight on top edge for depth
+        if (actualProgressWidth > 4) {
+            g2d.setPaint(new GradientPaint(
+                0, 0, new Color(255, 255, 255, 40),
+                0, height / 3, new Color(255, 255, 255, 0)
+            ));
+            g2d.fill(fillRect);
+        }
         
         // Restore clip
         g2d.setClip(currentClip);
     }
     
+    /**
+     * Paints a subtle glow effect around the progress fill.
+     * Uses multiple semi-transparent layers to create a soft glow.
+     */
+    private void paintGlowEffect(Graphics2D g2d, int width, int height) {
+        int cornerRadius = StartupWindowTheme.PROGRESS_CORNER_RADIUS;
+        Color glowColor = StartupWindowTheme.PROGRESS_GLOW;
+        
+        // Draw multiple layers with decreasing opacity for soft glow
+        Composite originalComposite = g2d.getComposite();
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+        
+        for (int i = 1; i <= 3; i++) {
+            float offset = i * 1.5f;
+            float alpha = 0.4f / i; // Decreasing opacity
+            
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+            g2d.setColor(new Color(glowColor.getRed(), glowColor.getGreen(), glowColor.getBlue(), 
+                (int)(255 * alpha)));
+            
+            RoundRectangle2D glowShape = new RoundRectangle2D.Float(
+                -offset, -offset,
+                width + offset * 2, height + offset * 2,
+                cornerRadius + offset,
+                cornerRadius + offset
+            );
+            g2d.fill(glowShape);
+        }
+        
+        g2d.setComposite(originalComposite);
+    }
+    
     private void paintModernBorder(Graphics2D g2d, int width, int height) {
-        // Clean, minimal border - single subtle stroke
-        g2d.setColor(new Color(220, 220, 220));
-        g2d.setStroke(new BasicStroke(1.0f));
-        // Simple rectangle border - no rounded corners
-        g2d.drawRect(0, 0, width - 1, height - 1);
+        // Very subtle border - almost invisible
+        g2d.setColor(StartupWindowTheme.BORDER);
+        g2d.setStroke(new BasicStroke(0.5f));
+        RoundRectangle2D borderRect = new RoundRectangle2D.Float(
+            0.25f, 0.25f, width - 0.5f, height - 0.5f,
+            StartupWindowTheme.PROGRESS_CORNER_RADIUS,
+            StartupWindowTheme.PROGRESS_CORNER_RADIUS
+        );
+        g2d.draw(borderRect);
     }
 }
 

@@ -35,18 +35,19 @@ public class ComponentAssembler {
             JLabel percentageLabel,
             JLabel statusLabel) {
         
-        // Add components to the main panel with proper spacing
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_MEDIUM));
+        // Add components to the main panel with improved modern spacing
+        // Using 8px grid system for consistent vertical rhythm
+        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_XS)); // Small top margin
         mainPanel.add(CenteredComponentCreator.create(titleLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_SMALL));
+        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_SMALL)); // Title to subtitle
         mainPanel.add(CenteredComponentCreator.create(subtitleLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_LARGE));
+        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_LARGE)); // Subtitle to progress bar
         mainPanel.add(CenteredComponentCreator.create(progressBar));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_SMALL));
+        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_SMALL)); // Progress bar to percentage
         mainPanel.add(CenteredComponentCreator.create(percentageLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_MEDIUM));
+        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_MEDIUM)); // Percentage to status
         mainPanel.add(CenteredComponentCreator.create(statusLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_MEDIUM));
+        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_XS)); // Small bottom margin
     }
 }
 

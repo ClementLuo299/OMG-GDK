@@ -11,6 +11,7 @@ import launcher.lifecycle.start.startup_window.initialization.components.LabelCr
 import launcher.lifecycle.start.startup_window.initialization.components.MainPanelCreator;
 import launcher.lifecycle.start.startup_window.initialization.components.ProgressBarCreator;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
+import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
 
 /**
  * Initializes and assembles all components for the startup window.
@@ -55,6 +56,7 @@ public class StartupWindowInitializer {
      */
     public static InitializationResult initialize(int totalSteps) {
         System.out.println("Creating startup progress window");
+        System.out.println("Using font: " + StartupWindowTheme.getCurrentFontFamily());
         
         // Create and configure the main JFrame with transparency
         JFrame frame = MainWindowCreator.create();
