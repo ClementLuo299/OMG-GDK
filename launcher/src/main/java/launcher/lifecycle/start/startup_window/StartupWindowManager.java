@@ -23,7 +23,7 @@ import javax.swing.SwingUtilities;
 public class StartupWindowManager {
     
     /** The underlying progress window that displays startup progress to the user. */
-    private final IStartupWindow progressWindow;
+    private final StartupWindow progressWindow;
     
     /** Tracks progress state (current step and total steps). */
     private final ProgressTracker progressTracker;
@@ -47,7 +47,7 @@ public class StartupWindowManager {
      * @param progressWindow The progress window to manage
      * @param totalSteps The total number of steps (calculated once and never changes)
      */
-    private StartupWindowManager(IStartupWindow progressWindow, int totalSteps) {
+    private StartupWindowManager(StartupWindow progressWindow, int totalSteps) {
         this.progressWindow = progressWindow;
         this.progressTracker = new ProgressTracker(totalSteps);
         this.progressBarAnimationController = new ProgressBarAnimationController(progressWindow);
@@ -83,7 +83,7 @@ public class StartupWindowManager {
         final int estimatedSteps = 15;
         
         // Create the window and manager on the JavaFX Application Thread
-        final IStartupWindow[] windowRef = new IStartupWindow[1];
+        final StartupWindow[] windowRef = new StartupWindow[1];
         final StartupWindowManager[] managerRef = new StartupWindowManager[1];
         
         try {
@@ -108,7 +108,7 @@ public class StartupWindowManager {
             throw new RuntimeException("Failed to create startup window", e);
         }
         
-        IStartupWindow window = windowRef[0];
+        StartupWindow window = windowRef[0];
         StartupWindowManager manager = managerRef[0];
 
         // Show the window immediately

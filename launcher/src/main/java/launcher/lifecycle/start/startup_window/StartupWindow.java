@@ -14,7 +14,7 @@ import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
  * @edited December 24, 2025 
  * @since Beta 1.0
  */
-public class StartupWindow implements IStartupWindow {
+public class StartupWindow {
     
     // Swing components for the pre-startup progress window UI
     private JFrame progressFrame;
@@ -153,14 +153,4 @@ public class StartupWindow implements IStartupWindow {
         }
     }
     
-    /**
-     * Get the progress bar component (for compatibility with IStartupWindow interface).
-     * Returns null since Swing doesn't have a direct equivalent.
-     * 
-     * @return null (Swing doesn't have JavaFX ProgressBar)
-     */
-    @Override
-    public javafx.scene.control.ProgressBar getProgressBar() {
-        return null; // Swing doesn't have JavaFX ProgressBar
-    }
 }
