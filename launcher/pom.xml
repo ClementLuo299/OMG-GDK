@@ -110,10 +110,6 @@
                    <artifactId>richtextfx</artifactId>
                    <version>0.11.0</version>
                </dependency>
-
-               
-
-               
            </dependencies>
 
     <build>

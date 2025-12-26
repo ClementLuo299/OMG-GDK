@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.initialization.components;
+package launcher.lifecycle.start.startup_window.component_construction.components;
 
 import java.awt.Dimension;
 import javax.swing.JProgressBar;

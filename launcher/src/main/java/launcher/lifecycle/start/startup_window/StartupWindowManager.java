@@ -1,45 +1,34 @@
 package launcher.lifecycle.start.startup_window;
 
-import launcher.utils.module.ModuleDiscovery;
-import launcher.lifecycle.stop.Shutdown;
 import gdk.internal.Logging;
 import launcher.lifecycle.start.startup_window.animation.ProgressBarAnimationController;
 import launcher.lifecycle.start.startup_window.animation.SmoothProgressAnimationController;
-import launcher.lifecycle.start.startup_window.tracking.ProgressTracker;
+import launcher.lifecycle.start.startup_window.progress.ProgressTracker;
 import launcher.lifecycle.start.startup_window.estimation.StepDurationEstimator;
+import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
+import launcher.lifecycle.start.startup_window.lifecycle.WindowLifecycleManager;
+import launcher.lifecycle.start.startup_window.progress.ProgressUpdateCoordinator;
+import launcher.utils.module.ModuleDiscovery;
 
 import javax.swing.SwingUtilities;
 
 /**
- * Manages the running, displaying, and lifecycle of the startup progress window.
- * This class handles showing, hiding, updating progress, and managing animations
- * for the startup window after it has been created.
+ * Coordinates the startup progress window system.
+ * This class acts as a facade/coordinator that delegates to specialized components
+ * for window lifecycle, progress updates, UI handling, and step calculation.
  * 
  * @authors Clement Luo
  * @date August 12, 2025
- * @edited December 24, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
 public class StartupWindowManager {
     
-    /** The underlying progress window that displays startup progress to the user. */
-    private final StartupWindow progressWindow;
+    /** Manages window lifecycle (show/hide/cleanup). */
+    private final WindowLifecycleManager windowLifecycleManager;
     
-    /** Tracks progress state (current step and total steps). */
-    private final ProgressTracker progressTracker;
-    
-    // ============================================================================
-    // Animation Controllers
-    // ============================================================================
-    
-    /** Controller for progress bar shimmer/shine animation effect. */
-    private final ProgressBarAnimationController progressBarAnimationController;
-    
-    /** Controller for smooth progress bar animation between steps. */
-    private final SmoothProgressAnimationController smoothProgressAnimationController;
-    
-    /** Estimates step durations based on message content. */
-    private final StepDurationEstimator stepDurationEstimator;
+    /** Coordinates progress updates. */
+    private final ProgressUpdateCoordinator progressUpdateCoordinator;
     
     /**
      * Constructs a new StartupWindowManager with the specified progress window and total steps.
@@ -48,63 +37,31 @@ public class StartupWindowManager {
      * @param totalSteps The total number of steps (calculated once and never changes)
      */
     private StartupWindowManager(StartupWindow progressWindow, int totalSteps) {
-        this.progressWindow = progressWindow;
-        this.progressTracker = new ProgressTracker(totalSteps);
-        this.progressBarAnimationController = new ProgressBarAnimationController(this);
-        this.smoothProgressAnimationController = new SmoothProgressAnimationController(this);
-        this.stepDurationEstimator = new StepDurationEstimator();
-    }
-    
-    /**
-     * Sets the smooth progress value for animation (0.0 to 1.0).
-     * Used by animation controllers for smooth progress bar animation.
-     * 
-     * @param progress The progress value (0.0 to 1.0)
-     */
-    public void setSmoothProgress(double progress) {
-        double clampedProgress = Math.max(0.0, Math.min(1.0, progress));
-        if (progressWindow.progressBarStyling != null) {
-            progressWindow.progressBarStyling.setSmoothProgress(clampedProgress);
-        }
         
-        if (progressWindow.percentageLabel != null) {
-            SwingUtilities.invokeLater(() -> {
-                int percentage = (int) Math.round(clampedProgress * 100);
-                progressWindow.percentageLabel.setText(percentage + "%");
-            });
-        }
+        // Create shared components
+        ProgressTracker progressTracker = new ProgressTracker(totalSteps);
+        StepDurationEstimator stepDurationEstimator = new StepDurationEstimator();
+        StartupWindowUIUpdateHandler uiUpdateHandler = new StartupWindowUIUpdateHandler(progressWindow);
         
-        progressWindow.progressBar.repaint();
-    }
-    
-    /**
-     * Updates the status text.
-     * Used by animation controllers for text animation.
-     * 
-     * @param text The text to display
-     */
-    public void updateStatusText(String text) {
-        if (progressWindow.statusLabel != null) {
-            SwingUtilities.invokeLater(() -> {
-                progressWindow.statusLabel.setText(text);
-            });
-        }
-    }
-
-    /**
-     * Calculates the total steps for the startup process.
-     * 
-     * @return The total number of steps, or 15 as a fallback if calculation fails
-     */
-    private static int calculateTotalSteps() {
-        try {
-            int steps = ModuleDiscovery.calculateTotalSteps();
-            Logging.info("Calculated total steps: " + steps);
-            return steps;
-        } catch (Exception e) {
-            Logging.error("Error calculating total steps: " + e.getMessage() + ", using default 15");
-            return 15; // Fallback to default on error
-        }
+        // Create animation controllers
+        ProgressBarAnimationController progressBarAnimationController = new ProgressBarAnimationController();
+        SmoothProgressAnimationController smoothProgressAnimationController = 
+            new SmoothProgressAnimationController(uiUpdateHandler);
+        
+        // Create specialized managers
+        this.windowLifecycleManager = new WindowLifecycleManager(
+            progressWindow,
+            progressBarAnimationController,
+            smoothProgressAnimationController
+        );
+        
+        this.progressUpdateCoordinator = new ProgressUpdateCoordinator(
+            progressTracker,
+            stepDurationEstimator,
+            smoothProgressAnimationController,
+            uiUpdateHandler,
+            totalSteps
+        );
     }
     
     /**
@@ -114,21 +71,21 @@ public class StartupWindowManager {
      * 
      * @return A new StartupWindowManager instance with the window already visible
      */
-    public static StartupWindowManager show() {
-        // Use a default step count to show window immediately
+    public static StartupWindowManager createAndShow() {
+        // Use an estimated step count to show window immediately (actual count calculated later)
         final int estimatedSteps = 15;
         
-        // Create the window and manager on the JavaFX Application Thread
+        // Create the window and manager on the Event Dispatch Thread (required for Swing)
         final StartupWindow[] windowRef = new StartupWindow[1];
         final StartupWindowManager[] managerRef = new StartupWindowManager[1];
         
         try {
             if (SwingUtilities.isEventDispatchThread()) {
-                // Already on EDT, create directly
+                // Already on EDT - create components directly
                 windowRef[0] = new StartupWindow(estimatedSteps);
                 managerRef[0] = new StartupWindowManager(windowRef[0], estimatedSteps);
             } else {
-                // Not on EDT, use invokeAndWait to create on EDT
+                // Not on EDT - dispatch to EDT and wait for completion
                 SwingUtilities.invokeAndWait(() -> {
                     try {
                         windowRef[0] = new StartupWindow(estimatedSteps);
@@ -140,29 +97,25 @@ public class StartupWindowManager {
                 });
             }
         } catch (Exception e) {
+            // Handle both direct creation failures and EDT dispatch failures
             Logging.error("Error creating startup window: " + e.getMessage(), e);
             throw new RuntimeException("Failed to create startup window", e);
         }
         
-        StartupWindow window = windowRef[0];
+        // Get the manager
         StartupWindowManager manager = managerRef[0];
 
-        // Show the window immediately
-        window.show();
-        
-        manager.smoothProgressAnimationController.resetToStep(0, estimatedSteps);
+        // Display the window and initialize progress
+        manager.windowLifecycleManager.show();
+        manager.progressUpdateCoordinator.resetToStep(0, estimatedSteps);
         manager.updateProgress(0, "Starting GDK application...");
         
-        // Calculate actual steps in background and update if different
+        // Calculate actual step count in background (doesn't block window display)
         new Thread(() -> {
-            try {
-                final int actualSteps = calculateTotalSteps();
-                if (actualSteps != estimatedSteps) {
-                    Logging.info("Calculated total steps: " + actualSteps + " (estimated: " + estimatedSteps + ")");
-                    // Note: The progress will continue with the estimated total for simplicity
-                }
-            } catch (Exception e) {
-                Logging.error("Error calculating total steps in background: " + e.getMessage(), e);
+            final int actualSteps = ModuleDiscovery.calculateTotalSteps();
+            if (actualSteps != estimatedSteps) {
+                Logging.info("Calculated total steps: " + actualSteps + " (estimated: " + estimatedSteps + ")");
+                // Note: The progress will continue with the estimated total for simplicity
             }
         }, "StartupWindow-StepCalculator").start();
         
@@ -174,29 +127,7 @@ public class StartupWindowManager {
      * Also registers cleanup tasks with the shutdown system to ensure proper resource cleanup.
      */
     public void hide() {
-        // Stop all animations
-        progressBarAnimationController.stop();
-        smoothProgressAnimationController.stop();
-        progressWindow.hide();
-        
-        // Register cleanup task with shutdown system
-        Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up StartupWindowManager resources");
-            try {
-                // Ensure animations are stopped (redundant but safe - already stopped above)
-                progressBarAnimationController.stop();
-                smoothProgressAnimationController.stop();
-                
-                // Dispose of the progress window
-                if (progressWindow != null) {
-                    progressWindow.hide();
-                }
-                
-                Logging.info("StartupWindowManager cleanup completed");
-            } catch (Exception e) {
-                Logging.error("Error during StartupWindowManager cleanup: " + e.getMessage(), e);
-            }
-        });
+        windowLifecycleManager.hide();
     }
     
     /**
@@ -206,7 +137,7 @@ public class StartupWindowManager {
      * @return The total number of steps
      */
     public int getTotalSteps() {
-        return progressTracker.getTotalSteps();
+        return progressUpdateCoordinator.getTotalSteps();
     }
 
     /**
@@ -216,19 +147,6 @@ public class StartupWindowManager {
      * @param message The status message to display
      */
     public void updateProgress(int step, String message) {
-        // Update the current step
-        progressTracker.setCurrentStep(step);
-
-        // Update the progress bar string (but let smooth animation handle the visual progress)
-        SwingUtilities.invokeLater(() -> {
-            progressWindow.progressBar.setString(step + "/" + progressWindow.totalSteps + " (" + (step * 100 / progressWindow.totalSteps) + "%)");
-        });
-        
-        updateStatusText(message);
-
-        // Estimate the duration of the step and start the smooth animation toward the target step
-        // The smooth animation will handle updating the visual progress bar
-        long estimatedDuration = stepDurationEstimator.estimateDuration(message);
-        smoothProgressAnimationController.animateToStep(step, progressTracker.getTotalSteps(), estimatedDuration);
+        progressUpdateCoordinator.updateProgress(step, message);
     }
 } 

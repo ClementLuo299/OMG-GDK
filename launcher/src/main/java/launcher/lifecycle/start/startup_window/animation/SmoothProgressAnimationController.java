@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.animation;
 import javax.swing.SwingUtilities;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.lifecycle.start.startup_window.ui.UIUpdateHandler;
 
 /**
  * Controls smooth animation of the progress bar between steps.
@@ -13,6 +13,7 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
  * 
  * @author Clement Luo
  * @date December 22, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
 public class SmoothProgressAnimationController {
@@ -29,8 +30,8 @@ public class SmoothProgressAnimationController {
     /** The starting progress value when current animation began. */
     private double startProgress = 0.0;
     
-    /** The window manager that manages the progress window. */
-    private final StartupWindowManager windowManager;
+    /** The UI update handler for updating UI components. */
+    private final UIUpdateHandler uiUpdateHandler;
     
     /** Frame time in milliseconds (target ~60 FPS). */
     private static final long FRAME_TIME_MS = 16;
@@ -44,10 +45,10 @@ public class SmoothProgressAnimationController {
     /**
      * Constructs a new SmoothProgressAnimationController.
      * 
-     * @param windowManager The window manager that manages the progress window
+     * @param uiUpdateHandler The UI update handler for updating UI components
      */
-    public SmoothProgressAnimationController(StartupWindowManager windowManager) {
-        this.windowManager = windowManager;
+    public SmoothProgressAnimationController(UIUpdateHandler uiUpdateHandler) {
+        this.uiUpdateHandler = uiUpdateHandler;
     }
     
     /**
@@ -156,7 +157,7 @@ public class SmoothProgressAnimationController {
                 
                 // Update the progress bar on EDT
                 SwingUtilities.invokeLater(() -> {
-                    windowManager.setSmoothProgress(currentDisplayedProgress);
+                    uiUpdateHandler.setSmoothProgress(currentDisplayedProgress);
                 });
                 
                 // If animation is complete, we can stop (but keep running for future animations)
@@ -197,7 +198,7 @@ public class SmoothProgressAnimationController {
         
         // Immediately update the UI to match the reset state
         SwingUtilities.invokeLater(() -> {
-            windowManager.setSmoothProgress(currentDisplayedProgress);
+            uiUpdateHandler.setSmoothProgress(currentDisplayedProgress);
         });
     }
 }

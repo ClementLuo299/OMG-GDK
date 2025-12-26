@@ -3,7 +3,6 @@ package launcher.lifecycle.start.startup_window.animation;
 import javax.swing.SwingUtilities;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.StartupWindowManager;
 
 /**
  * Controls the shimmer/shine animation effect on the progress bar.
@@ -11,7 +10,7 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
  * 
  * @author Clement Luo
  * @date December 22, 2025
- * @edited December 23, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
 public class ProgressBarAnimationController {
@@ -22,16 +21,10 @@ public class ProgressBarAnimationController {
     /** Offset value for the shimmer animation effect on the progress bar (0.0 to 1.0). */
     private float shimmerOffset = 0.0f;
     
-    /** The window manager that manages the progress window. */
-    private final StartupWindowManager windowManager;
-    
     /**
      * Constructs a new ProgressBarAnimationController.
-     * 
-     * @param windowManager The window manager that manages the progress window
      */
-    public ProgressBarAnimationController(StartupWindowManager windowManager) {
-        this.windowManager = windowManager;
+    public ProgressBarAnimationController() {
     }
     
     /**

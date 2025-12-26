@@ -1,7 +1,7 @@
 package launcher.lifecycle.start.startup_window;
 
 import javax.swing.*;
-import launcher.lifecycle.start.startup_window.initialization.*;
+import launcher.lifecycle.start.startup_window.component_construction.*;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 
 /**
@@ -9,7 +9,7 @@ import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
  * 
  * @author Clement Luo
  * @date August 5, 2025
- * @edited December 24, 2025 
+ * @edited December 26, 2025 
  * @since Beta 1.0
  */
 public class StartupWindow {
@@ -69,5 +69,50 @@ public class StartupWindow {
                 progressFrame.dispose();
             });
         }
+    }
+    
+    /**
+     * Gets the progress bar component.
+     * 
+     * @return The progress bar
+     */
+    public JProgressBar getProgressBar() {
+        return progressBar;
+    }
+    
+    /**
+     * Gets the percentage label component.
+     * 
+     * @return The percentage label
+     */
+    public JLabel getPercentageLabel() {
+        return percentageLabel;
+    }
+    
+    /**
+     * Gets the status label component.
+     * 
+     * @return The status label
+     */
+    public JLabel getStatusLabel() {
+        return statusLabel;
+    }
+    
+    /**
+     * Gets the progress bar styling component.
+     * 
+     * @return The progress bar styling
+     */
+    public ProgressBarStyling getProgressBarStyling() {
+        return progressBarStyling;
+    }
+    
+    /**
+     * Gets the total number of steps.
+     * 
+     * @return The total steps
+     */
+    public int getTotalSteps() {
+        return totalSteps;
     }
 }

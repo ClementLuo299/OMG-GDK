@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.animation;
 import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.lifecycle.start.startup_window.ui.UIUpdateHandler;
 
 /**
  * Controls the text animation for status messages in the startup window.
@@ -11,7 +11,7 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
  * 
  * @author Clement Luo
  * @date December 22, 2025
- * @edited December 22, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
 public class TextAnimationController {
@@ -28,16 +28,16 @@ public class TextAnimationController {
     /** Flag indicating whether text animation is currently active. */
     private boolean isAnimating = false;
     
-    /** The window manager that manages the progress window. */
-    private final StartupWindowManager windowManager;
+    /** The UI update handler for updating UI components. */
+    private final UIUpdateHandler uiUpdateHandler;
     
     /**
      * Constructs a new TextAnimationController.
      * 
-     * @param windowManager The window manager that manages the progress window
+     * @param uiUpdateHandler The UI update handler for updating UI components
      */
-    public TextAnimationController(StartupWindowManager windowManager) {
-        this.windowManager = windowManager;
+    public TextAnimationController(UIUpdateHandler uiUpdateHandler) {
+        this.uiUpdateHandler = uiUpdateHandler;
     }
     
     /**
@@ -70,7 +70,7 @@ public class TextAnimationController {
                     String dots = ".".repeat(currentCharIndex);
                     String spaces = " ".repeat(3 - currentCharIndex);
                     String animatedMessage = fullMessage + dots + spaces;
-                    windowManager.updateStatusText(animatedMessage);
+                    uiUpdateHandler.updateStatusText(animatedMessage);
                 });
             }
         }, 0, 500);

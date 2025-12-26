@@ -1,15 +1,15 @@
-package launcher.lifecycle.start.startup_window.initialization;
+package launcher.lifecycle.start.startup_window.component_construction;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import launcher.lifecycle.start.startup_window.initialization.arrangement.ComponentAssembler;
-import launcher.lifecycle.start.startup_window.initialization.arrangement.WindowPositioner;
-import launcher.lifecycle.start.startup_window.initialization.components.MainWindowCreator;
-import launcher.lifecycle.start.startup_window.initialization.components.LabelCreator;
-import launcher.lifecycle.start.startup_window.initialization.components.MainPanelCreator;
-import launcher.lifecycle.start.startup_window.initialization.components.ProgressBarCreator;
+import launcher.lifecycle.start.startup_window.component_construction.arrangement.ComponentAssembler;
+import launcher.lifecycle.start.startup_window.component_construction.arrangement.WindowPositioner;
+import launcher.lifecycle.start.startup_window.component_construction.components.MainWindowCreator;
+import launcher.lifecycle.start.startup_window.component_construction.components.LabelCreator;
+import launcher.lifecycle.start.startup_window.component_construction.components.MainPanelCreator;
+import launcher.lifecycle.start.startup_window.component_construction.components.ProgressBarCreator;
 import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
 

@@ -1,10 +1,10 @@
-package launcher.lifecycle.start.startup_window.initialization.arrangement;
+package launcher.lifecycle.start.startup_window.component_construction.arrangement;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import launcher.lifecycle.start.startup_window.initialization.components.CenteredComponentCreator;
+import launcher.lifecycle.start.startup_window.component_construction.components.CenteredComponentCreator;
 import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
 
 /**

@@ -38,7 +38,7 @@ public final class StartupProcess {
         ResourceInitializer.initialize();
         
         // Show startup window
-        StartupWindowManager windowManager = StartupWindowManager.show();
+        StartupWindowManager windowManager = StartupWindowManager.createAndShow();
         
         // Execute launch mode
         try {
