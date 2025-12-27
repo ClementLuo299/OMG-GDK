@@ -1,193 +1,83 @@
 package launcher.lifecycle.start.gui;
 
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import launcher.GDKApplication;
 import launcher.gui.GDKGameLobbyController;
 import launcher.gui.GDKViewModel;
+import launcher.lifecycle.start.gui.initialization.SceneLoader;
+import launcher.lifecycle.start.gui.initialization.StageInitializer;
+import launcher.lifecycle.start.gui.optimization.PerformanceOptimizer;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
-import gdk.internal.Logging;
-
-import java.net.URL;
-import javafx.application.Platform;
 
 /**
  * Initializes the main user interface components.
+ * Orchestrates the UI setup process by coordinating scene loading, ViewModel creation,
+ * stage configuration, and controller-ViewModel wiring.
  * 
  * @author Clement Luo
  * @date August 8, 2025
- * @edited August 18, 2025
+ * @edited December 26, 2025
  * @since 1.0
  */
 public final class UIInitializer {
 
     private UIInitializer() {}
 
+    /**
+     * Initializes the main user interface components for the GDK application.
+     * Orchestrates the complete UI setup process including loading the FXML scene,
+     * creating the ViewModel, configuring the primary stage, and wiring up the controller.
+     * 
+     * @param primaryApplicationStage The primary JavaFX stage for the application
+     * @param windowManager The startup window manager for progress updates
+     * @return The initialized GDKGameLobbyController
+     */
     public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindowManager windowManager) {
         windowManager.updateProgress(1, "Loading user interface");
-        GDKGameLobbyController[] controllerHolder = new GDKGameLobbyController[1];
-        Scene mainLobbyScene = initializeMainUserInterface(controllerHolder);
-        GDKGameLobbyController lobbyController = controllerHolder[0];
-        GDKViewModel applicationViewModel = initializeApplicationViewModel(primaryApplicationStage);
+        
+        // Load the main scene from FXML
+        SceneLoader.SceneLoadResult loadResult = SceneLoader.loadMainScene();
+        Scene mainLobbyScene = loadResult.scene;
+        GDKGameLobbyController lobbyController = loadResult.controller;
+        
+        // Create and configure the ViewModel
+        GDKViewModel applicationViewModel = createViewModel(primaryApplicationStage);
         applicationViewModel.setMainLobbyScene(mainLobbyScene);
-        configurePrimaryApplicationStage(primaryApplicationStage, mainLobbyScene);
+        
+        // Initialize the primary stage
+        StageInitializer.initialize(primaryApplicationStage, mainLobbyScene);
+        
+        // Apply performance optimizations
+        PerformanceOptimizer.optimize(primaryApplicationStage, mainLobbyScene);
+        
+        // Wire up the controller with the ViewModel
         wireUpControllerWithViewModel(applicationViewModel, lobbyController);
+        
         return lobbyController;
     }
 
-    private static Scene initializeMainUserInterface(GDKGameLobbyController[] controllerHolder) {
-        try {
-            URL fxmlResourceUrl = GDKApplication.class.getResource("/gdk-lobby/GDKGameLobby.fxml");
-            if (fxmlResourceUrl == null) {
-                throw new RuntimeException("FXML resource not found: /gdk-lobby/GDKGameLobby.fxml");
-            }
-            FXMLLoader fxmlLoader = new FXMLLoader(fxmlResourceUrl);
-            fxmlLoader.setClassLoader(GDKApplication.class.getClassLoader());
-            Scene mainLobbyScene = new Scene(fxmlLoader.load());
-            GDKGameLobbyController lobbyController = fxmlLoader.getController();
-            controllerHolder[0] = lobbyController;
-            URL cssResourceUrl = GDKApplication.class.getResource("/gdk-lobby/gdk-lobby.css");
-            if (cssResourceUrl != null) {
-                mainLobbyScene.getStylesheets().add(cssResourceUrl.toExternalForm());
-            }
-            if (lobbyController == null) {
-                throw new RuntimeException("Lobby controller is null - FXML loading may have failed");
-            }
-            return mainLobbyScene;
-        } catch (Exception uiInitializationError) {
-            throw new RuntimeException("Failed to initialize main user interface", uiInitializationError);
-        }
+    /**
+     * Creates and initializes the application ViewModel.
+     * Sets up the ViewModel with the primary stage reference for managing application state.
+     * 
+     * @param primaryApplicationStage The primary JavaFX stage to associate with the ViewModel
+     * @return The initialized GDKViewModel instance
+     */
+    private static GDKViewModel createViewModel(Stage primaryApplicationStage) {
+        GDKViewModel applicationViewModel = new GDKViewModel();
+        applicationViewModel.setPrimaryStage(primaryApplicationStage);
+        return applicationViewModel;
     }
 
-    private static GDKViewModel initializeApplicationViewModel(Stage primaryApplicationStage) {
-        try {
-            GDKViewModel applicationViewModel = new GDKViewModel();
-            applicationViewModel.setPrimaryStage(primaryApplicationStage);
-            return applicationViewModel;
-        } catch (Exception viewModelInitializationError) {
-            throw new RuntimeException("Failed to initialize ViewModel", viewModelInitializationError);
-        }
-    }
-
-    private static void configurePrimaryApplicationStage(Stage primaryApplicationStage, Scene mainLobbyScene) {
-        try {
-            primaryApplicationStage.setScene(mainLobbyScene);
-            primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
-            primaryApplicationStage.setMinWidth(800);
-            primaryApplicationStage.setMinHeight(600);
-            primaryApplicationStage.setWidth(1200);
-            primaryApplicationStage.setHeight(900);
-            primaryApplicationStage.setOpacity(0.0);
-            
-            // Add close handler for proper cleanup
-            primaryApplicationStage.setOnCloseRequest(event -> {
-                Logging.info("🚪 Main GDK window closing - initiating shutdown");
-                try {
-                    // Trigger the shutdown process
-                    launcher.lifecycle.stop.Shutdown.shutdown();
-                } catch (Exception e) {
-                    Logging.error("❌ Error during shutdown: " + e.getMessage(), e);
-                    // Force exit if shutdown fails
-                    System.exit(1);
-                }
-            });
-            
-            // Lightweight resize performance optimization - doesn't change layout
-            primaryApplicationStage.widthProperty().addListener((obs, oldVal, newVal) -> {
-                // Add performance class during resize
-                mainLobbyScene.getRoot().getStyleClass().add("resize-active");
-                
-                // Use JavaFX's built-in resize optimization
-                Platform.runLater(() -> {
-                    // Reduce layout complexity during resize
-                    mainLobbyScene.getRoot().setCache(true);
-                    mainLobbyScene.getRoot().setCacheHint(javafx.scene.CacheHint.SPEED);
-                });
-                
-                // Remove after a short delay to re-enable effects
-                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(150));
-                pause.setOnFinished(event -> {
-                    mainLobbyScene.getRoot().getStyleClass().remove("resize-active");
-                    
-                    // Restore normal rendering after resize
-                    Platform.runLater(() -> {
-                        mainLobbyScene.getRoot().setCache(false);
-                    });
-                });
-                pause.play();
-            });
-            
-            primaryApplicationStage.heightProperty().addListener((obs, oldVal, newVal) -> {
-                // Add performance class during resize
-                mainLobbyScene.getRoot().getStyleClass().add("resize-active");
-                
-                // Use JavaFX's built-in resize optimization
-                Platform.runLater(() -> {
-                    // Reduce layout complexity during resize
-                    mainLobbyScene.getRoot().setCache(true);
-                    mainLobbyScene.getRoot().setCacheHint(javafx.scene.CacheHint.SPEED);
-                });
-                
-                // Remove after a short delay to re-enable effects
-                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(150));
-                pause.setOnFinished(event -> {
-                    mainLobbyScene.getRoot().getStyleClass().remove("resize-active");
-                    
-                    // Restore normal rendering after resize
-                    Platform.runLater(() -> {
-                        mainLobbyScene.getRoot().setCache(false);
-                    });
-                });
-                pause.play();
-            });
-            
-            // Enable hardware acceleration for better performance
-            try {
-                // Force hardware acceleration
-                System.setProperty("prism.order", "d3d,opengl,sw");
-                System.setProperty("prism.vsync", "false");
-                System.setProperty("prism.forceGPU", "true");
-                System.setProperty("prism.text", "native");
-                
-                // Optimize JavaFX rendering
-                System.setProperty("javafx.animation.fullspeed", "true");
-                System.setProperty("javafx.animation.pulse", "60");
-                System.setProperty("javafx.animation.force", "false");
-                
-                // Disable expensive features during resize
-                System.setProperty("prism.disableRegionCaching", "true");
-                System.setProperty("prism.disableBlending", "false");
-                
-                // Additional optimizations for better resize performance
-                System.setProperty("prism.verbose", "false");
-                System.setProperty("prism.debug", "false");
-                System.setProperty("prism.trace", "false");
-                
-                Logging.info("🚀 Hardware acceleration and performance optimizations enabled");
-            } catch (Exception e) {
-                Logging.warning("⚠️ Could not enable hardware acceleration: " + e.getMessage());
-            }
-            
-            // Optimize the main layout container for better resize performance
-            Platform.runLater(() -> {
-                // Enable caching for the main container
-                mainLobbyScene.getRoot().setCache(true);
-                mainLobbyScene.getRoot().setCacheHint(javafx.scene.CacheHint.SPEED);
-                
-                // Optimize specific containers that might cause slowdown
-                if (mainLobbyScene.getRoot() instanceof javafx.scene.layout.VBox) {
-                    javafx.scene.layout.VBox rootVBox = (javafx.scene.layout.VBox) mainLobbyScene.getRoot();
-                    rootVBox.setCache(true);
-                    rootVBox.setCacheHint(javafx.scene.CacheHint.SPEED);
-                }
-            });
-            
-        } catch (Exception stageConfigurationError) {
-            throw new RuntimeException("Failed to configure primary application stage", stageConfigurationError);
-        }
-    }
-
+    /**
+     * Wires up the controller with the ViewModel to establish the connection between
+     * the UI controller and the application's data model. This enables the controller
+     * to access and update the ViewModel's state.
+     * 
+     * @param applicationViewModel The ViewModel instance containing application state
+     * @param lobbyController The lobby controller to connect with the ViewModel
+     * @throws RuntimeException if the controller is null or wiring fails
+     */
     private static void wireUpControllerWithViewModel(GDKViewModel applicationViewModel, GDKGameLobbyController lobbyController) {
         try {
             if (lobbyController != null) {
