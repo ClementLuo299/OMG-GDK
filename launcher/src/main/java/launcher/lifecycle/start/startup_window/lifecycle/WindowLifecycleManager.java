@@ -3,7 +3,6 @@ package launcher.lifecycle.start.startup_window.lifecycle;
 import launcher.lifecycle.start.startup_window.StartupWindow;
 import launcher.lifecycle.stop.Shutdown;
 import gdk.internal.Logging;
-import launcher.lifecycle.start.startup_window.animation.ProgressBarAnimationController;
 import launcher.lifecycle.start.startup_window.animation.SmoothProgressAnimationController;
 
 /**
@@ -19,9 +18,6 @@ public class WindowLifecycleManager {
     /** The startup window to manage. */
     private final StartupWindow progressWindow;
     
-    /** Controller for progress bar shimmer/shine animation effect. */
-    private final ProgressBarAnimationController progressBarAnimationController;
-    
     /** Controller for smooth progress bar animation between steps. */
     private final SmoothProgressAnimationController smoothProgressAnimationController;
     
@@ -29,15 +25,12 @@ public class WindowLifecycleManager {
      * Constructs a new WindowLifecycleManager.
      * 
      * @param progressWindow The startup window to manage
-     * @param progressBarAnimationController The progress bar animation controller
      * @param smoothProgressAnimationController The smooth progress animation controller
      */
     public WindowLifecycleManager(
             StartupWindow progressWindow,
-            ProgressBarAnimationController progressBarAnimationController,
             SmoothProgressAnimationController smoothProgressAnimationController) {
         this.progressWindow = progressWindow;
-        this.progressBarAnimationController = progressBarAnimationController;
         this.smoothProgressAnimationController = smoothProgressAnimationController;
     }
     
@@ -54,7 +47,6 @@ public class WindowLifecycleManager {
      */
     public void hide() {
         // Stop all animations
-        progressBarAnimationController.stop();
         smoothProgressAnimationController.stop();
         progressWindow.hide();
         
@@ -63,7 +55,6 @@ public class WindowLifecycleManager {
             Logging.info("Cleaning up WindowLifecycleManager resources");
             try {
                 // Ensure animations are stopped (redundant but safe - already stopped above)
-                progressBarAnimationController.stop();
                 smoothProgressAnimationController.stop();
                 
                 // Dispose of the progress window
