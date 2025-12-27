@@ -10,8 +10,8 @@ import launcher.lifecycle.start.startup_window.component_construction.components
 import launcher.lifecycle.start.startup_window.component_construction.components.LabelCreator;
 import launcher.lifecycle.start.startup_window.component_construction.components.MainPanelCreator;
 import launcher.lifecycle.start.startup_window.component_construction.components.ProgressBarCreator;
-import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.components.ProgressBarStyling;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Builds and assembles all components for the startup window.

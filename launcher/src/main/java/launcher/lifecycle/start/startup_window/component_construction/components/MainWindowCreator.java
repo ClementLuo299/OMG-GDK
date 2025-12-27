@@ -1,7 +1,7 @@
 package launcher.lifecycle.start.startup_window.component_construction.components;
 
 import javax.swing.JFrame;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Creates and configures the main JFrame with transparency support.

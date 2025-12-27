@@ -2,7 +2,7 @@ package launcher.lifecycle.start.startup_window;
 
 import javax.swing.*;
 import launcher.lifecycle.start.startup_window.component_construction.*;
-import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
+import launcher.lifecycle.start.startup_window.styling.components.ProgressBarStyling;
 
 /**
  * Startup progress window that is displayed before JavaFX starts, using Swing for immediate display.

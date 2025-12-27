@@ -2,7 +2,7 @@ package launcher.lifecycle.start.startup_window.component_construction.component
 
 import java.awt.Dimension;
 import javax.swing.JProgressBar;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Creates a progress bar with basic properties.

@@ -1,13 +1,19 @@
-package launcher.lifecycle.start.startup_window.styling;
+package launcher.lifecycle.start.startup_window.styling.components;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Custom modern progress bar UI with rounded corners, glow effects, and vibrant gradients.
+ * 
+ * @author Clement Luo
+ * @date August 8, 2025
+ * @edited December 26, 2025
+ * @since Beta 1.0
  */
 public class ProgressBarStyling extends BasicProgressBarUI {
     
@@ -24,6 +30,14 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         this.smoothProgress = progress;
     }
     
+    /**
+     * Paints the determinate progress bar with modern styling including rounded corners,
+     * gradients, glow effects, and borders. This method orchestrates the entire rendering
+     * process by calling specialized painting methods for each visual component.
+     * 
+     * @param g The graphics context used for painting
+     * @param c The component (progress bar) being painted
+     */
     @Override
     protected void paintDeterminate(Graphics g, JComponent c) {
         Graphics2D g2d = (Graphics2D) g.create();
@@ -53,7 +67,7 @@ public class ProgressBarStyling extends BasicProgressBarUI {
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             
             // Modern rounded background
-            paintModernBackground(g2d, width, height);
+            paintBackground(g2d, width, height);
             
             // Use smooth progress if available, otherwise use standard progress bar percentage
             double progressPercent = (smoothProgress != null) ? smoothProgress : progressBar.getPercentComplete();
@@ -67,10 +81,10 @@ public class ProgressBarStyling extends BasicProgressBarUI {
             int progressWidth = Math.min((int) (width * adjustedProgress), width);
             
             // Draw progress fill with glow effect
-            paintModernProgressFill(g2d, progressWidth, width, height);
+            paintProgressFill(g2d, progressWidth, width, height);
             
             // Subtle border (very light)
-            paintModernBorder(g2d, width, height);
+            paintBorder(g2d, width, height);
             
             // Restore original clip
             g2d.setClip(originalClip);
@@ -79,12 +93,15 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         }
     }
     
-    @Override
-    protected void paintIndeterminate(Graphics g, JComponent c) {
-        paintDeterminate(g, c);
-    }
-    
-    private void paintModernBackground(Graphics2D g2d, int width, int height) {
+    /**
+     * Paints the rounded background of the progress bar.
+     * Uses the theme's background color to match the panel appearance.
+     * 
+     * @param g2d The graphics context for 2D rendering
+     * @param width The width of the progress bar
+     * @param height The height of the progress bar
+     */
+    private void paintBackground(Graphics2D g2d, int width, int height) {
         // Modern rounded background - match the panel background
         g2d.setColor(StartupWindowTheme.BACKGROUND);
         RoundRectangle2D roundedRect = new RoundRectangle2D.Float(
@@ -95,7 +112,17 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         g2d.fill(roundedRect);
     }
     
-    private void paintModernProgressFill(Graphics2D g2d, int progressWidth, int totalWidth, int height) {
+    /**
+     * Paints the progress fill with rounded corners, gradient colors, glow effects, and highlights.
+     * This method renders the actual progress indicator that shows how much of the task is complete.
+     * It applies clipping to ensure the fill stays within bounds and adds visual effects for depth.
+     * 
+     * @param g2d The graphics context for 2D rendering
+     * @param progressWidth The width of the filled portion (based on progress percentage)
+     * @param totalWidth The total width of the progress bar
+     * @param height The height of the progress bar
+     */
+    private void paintProgressFill(Graphics2D g2d, int progressWidth, int totalWidth, int height) {
         // Skip if dimensions are invalid
         if (progressWidth <= 0 || totalWidth <= 0 || height <= 0) {
             return;
@@ -154,7 +181,12 @@ public class ProgressBarStyling extends BasicProgressBarUI {
     
     /**
      * Paints a subtle glow effect around the progress fill.
-     * Uses multiple semi-transparent layers to create a soft glow.
+     * Uses multiple semi-transparent layers with decreasing opacity to create a soft,
+     * layered glow effect that extends beyond the progress fill boundaries.
+     * 
+     * @param g2d The graphics context for 2D rendering
+     * @param width The width of the progress fill area
+     * @param height The height of the progress fill area
      */
     private void paintGlowEffect(Graphics2D g2d, int width, int height) {
         int cornerRadius = StartupWindowTheme.PROGRESS_CORNER_RADIUS;
@@ -184,7 +216,15 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         g2d.setComposite(originalComposite);
     }
     
-    private void paintModernBorder(Graphics2D g2d, int width, int height) {
+    /**
+     * Paints a subtle border around the entire progress bar with rounded corners.
+     * Uses the theme's border color and a 1-pixel stroke for definition.
+     * 
+     * @param g2d The graphics context for 2D rendering
+     * @param width The width of the progress bar
+     * @param height The height of the progress bar
+     */
+    private void paintBorder(Graphics2D g2d, int width, int height) {
         // More visible border for better definition
         g2d.setColor(StartupWindowTheme.PROGRESS_BORDER);
         g2d.setStroke(new BasicStroke(1.0f));

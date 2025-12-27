@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.styling;
+package launcher.lifecycle.start.startup_window.styling.components;
 
 import javax.swing.JLabel;
 import java.awt.*;
@@ -8,13 +8,18 @@ import java.text.AttributedString;
 /**
  * A modern JLabel with support for letter spacing (tracking).
  * Uses AttributedString to apply typography enhancements.
+ * 
+ * @author Clement Luo
+ * @date December 24, 2025
+ * @edited December 26, 2025
+ * @since Beta 1.0
  */
-public class ModernLabel extends JLabel {
+public class StyledLabel extends JLabel {
     
     private float letterSpacing = 0.0f;
     private String originalText = "";
     
-    public ModernLabel(String text) {
+    public StyledLabel(String text) {
         super(text);
         this.originalText = text;
     }

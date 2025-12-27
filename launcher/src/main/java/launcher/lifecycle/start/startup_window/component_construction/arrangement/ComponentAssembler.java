@@ -5,7 +5,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import launcher.lifecycle.start.startup_window.component_construction.components.CenteredComponentCreator;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Assembles all components into the main panel with proper spacing.

@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.component_construction.component
 import java.awt.FlowLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Creates a centered wrapper panel for a component.

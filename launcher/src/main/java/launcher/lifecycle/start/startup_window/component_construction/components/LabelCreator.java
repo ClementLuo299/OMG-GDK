@@ -2,8 +2,8 @@ package launcher.lifecycle.start.startup_window.component_construction.component
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import launcher.lifecycle.start.startup_window.styling.ModernLabel;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.components.StyledLabel;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Creates styled labels for the startup window with modern typography.
@@ -67,8 +67,8 @@ public class LabelCreator {
      * @return A configured label with letter spacing support
      */
     public static JLabel create(LabelType type) {
-        // Use ModernLabel for letter spacing support
-        ModernLabel label = new ModernLabel(type.getText());
+        // Use StyledLabel for letter spacing support
+        StyledLabel label = new StyledLabel(type.getText());
         label.setFont(type.getFont());
         label.setForeground(type.getForeground());
         label.setHorizontalAlignment(SwingConstants.CENTER);

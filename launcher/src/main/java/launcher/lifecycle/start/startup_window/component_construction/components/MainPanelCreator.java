@@ -3,8 +3,8 @@ package launcher.lifecycle.start.startup_window.component_construction.component
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import launcher.lifecycle.start.startup_window.styling.RoundedPanel;
-import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.components.RoundedPanel;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * Creates the main panel with proper layout and modern styling.

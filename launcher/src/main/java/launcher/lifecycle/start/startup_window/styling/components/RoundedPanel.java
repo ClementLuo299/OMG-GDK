@@ -1,24 +1,44 @@
-package launcher.lifecycle.start.startup_window.styling;
+package launcher.lifecycle.start.startup_window.styling.components;
 
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
 
 /**
  * A JPanel with rounded corners and optional shadow effect.
  * Used for modern UI styling.
+ * 
+ * @author Clement Luo
+ * @date December 24, 2025
+ * @edited December 26, 2025
+ * @since Beta 1.0
  */
 public class RoundedPanel extends JPanel {
     
     private final int cornerRadius;
     private final boolean drawShadow;
     
+    /**
+     * Constructs a RoundedPanel with specified corner radius and shadow option.
+     * The panel is set to be non-opaque to allow rounded corners to display properly.
+     * 
+     * @param cornerRadius The radius for the rounded corners
+     * @param drawShadow Whether to draw a shadow effect around the panel
+     */
     public RoundedPanel(int cornerRadius, boolean drawShadow) {
         this.cornerRadius = cornerRadius;
         this.drawShadow = drawShadow;
         setOpaque(false); // Make transparent to show rounded corners
     }
     
+    /**
+     * Paints the panel with rounded corners, optional shadow, background, and border.
+     * This method orchestrates the rendering by calling specialized painting methods
+     * and applying high-quality rendering hints for smooth appearance.
+     * 
+     * @param g The graphics context used for painting
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -56,6 +76,15 @@ public class RoundedPanel extends JPanel {
         }
     }
     
+    /**
+     * Paints a soft shadow effect around the panel using multiple layers with decreasing opacity.
+     * The shadow is created by drawing multiple rounded rectangles with progressively smaller
+     * size and lower opacity to create a smooth, blurred shadow appearance.
+     * 
+     * @param g2d The graphics context for 2D rendering
+     * @param width The width of the panel
+     * @param height The height of the panel
+     */
     private void paintShadow(Graphics2D g2d, int width, int height) {
         int shadowBlur = StartupWindowTheme.SHADOW_BLUR;
         int shadowOffset = StartupWindowTheme.SHADOW_OFFSET;

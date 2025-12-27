@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.styling;
+package launcher.lifecycle.start.startup_window.styling.theme;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -13,6 +13,7 @@ import java.text.AttributedString;
  * 
  * @author Clement Luo
  * @date December 23, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
 public class StartupWindowTheme {
@@ -64,20 +65,27 @@ public class StartupWindowTheme {
     /** Custom font family name (will be set if custom font loads successfully) */
     private static String customFontFamily = null;
     
+    // ============================================================================
+    // Public Methods
+    // ============================================================================
+    
+    /**
+     * Gets the currently selected font family name.
+     * Useful for debugging or logging.
+     * 
+     * @return The current font family name
+     */
+    public static String getCurrentFontFamily() {
+        return FONT_FAMILY;
+    }
+    
+    // ============================================================================
+    // Private Font Loading Methods
+    // ============================================================================
+    
     /**
      * Attempts to load a custom font from resources.
      * Place your font file in: src/main/resources/startup-window/
-     * 
-     * Recommended fonts to download:
-     * - Inter: https://fonts.google.com/specimen/Inter (very popular, modern)
-     * - Poppins: https://fonts.google.com/specimen/Poppins (friendly, geometric)
-     * - Montserrat: https://fonts.google.com/specimen/Montserrat (clean, professional)
-     * - Manrope: https://fonts.google.com/specimen/Manrope (modern, rounded)
-     * - Space Grotesk: https://fonts.google.com/specimen/Space+Grotesk (unique, tech-friendly)
-     * 
-     * Download the Regular (400) and Bold (700) weights, rename them to:
-     * - [FontName]-Regular.ttf (e.g., Inter-Regular.ttf)
-     * - [FontName]-Bold.ttf (e.g., Inter-Bold.ttf)
      * 
      * @return The font family name if loaded successfully, null otherwise
      */
@@ -96,75 +104,12 @@ public class StartupWindowTheme {
             String fontFamily = customFont.getFamily();
             fontStream.close();
             
-            System.out.println("✅ Custom font loaded: " + fontFamily);
+            System.out.println("Custom font loaded: " + fontFamily);
             return fontFamily;
         } catch (Exception e) {
-            System.out.println("⚠️ Could not load custom font from " + CUSTOM_FONT_PATH + ": " + e.getMessage());
+            System.out.println("Could not load custom font from " + CUSTOM_FONT_PATH + ": " + e.getMessage());
             return null;
         }
-    }
-    
-    /** Font family stack - tries custom font first, then system fonts, falls back to generic */
-    private static String getSystemFontFamily() {
-        // Try to load custom font first
-        customFontFamily = loadCustomFont();
-        if (customFontFamily != null) {
-            return customFontFamily;
-        }
-        
-        // Fall back to system fonts
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        String[] fonts = ge.getAvailableFontFamilyNames();
-        
-        // Try modern system fonts in order of preference
-        // Expanded list with more fallbacks for better cross-platform support
-        String[] preferredFonts = {
-            // macOS - modern system fonts
-            "SF Pro Display", "SF Pro Text", "SF Mono", "Helvetica Neue",
-            // Windows - modern system fonts
-            "Segoe UI", "Segoe UI Variable", "Segoe UI Semibold",
-            // Linux/Android - modern fonts
-            "Roboto", "Roboto Medium", "Noto Sans", "Ubuntu", "Cantarell",
-            // Cross-platform alternatives
-            "Inter", "Source Sans Pro", "Open Sans", "Lato",
-            // Classic fallbacks
-            "Arial", "Helvetica", "Verdana",
-            // Logical font names (Java fallback)
-            "SansSerif", "Dialog", "DialogInput"
-        };
-        
-        for (String preferred : preferredFonts) {
-            for (String available : fonts) {
-                if (available.equalsIgnoreCase(preferred)) {
-                    return preferred;
-                }
-            }
-        }
-        
-        // Final fallback to logical font name
-        return "SansSerif";
-    }
-    
-    public static final String FONT_FAMILY = getSystemFontFamily();
-    
-    /**
-     * Creates a font with high-quality rendering hints applied.
-     * Uses derived fonts for better control over font attributes.
-     * If using a custom font, attempts to load the appropriate weight.
-     */
-    private static Font createFont(String family, int style, int size) {
-        // If using custom font, try to load the specific weight file
-        if (customFontFamily != null && customFontFamily.equals(family)) {
-            Font customWeightFont = loadCustomFontWeight(style == Font.BOLD);
-            if (customWeightFont != null) {
-                return customWeightFont.deriveFont((float) size);
-            }
-        }
-        
-        // Fall back to standard font creation
-        Font baseFont = new Font(family, style, size);
-        // Use derived font for better rendering
-        return baseFont.deriveFont((float) size);
     }
     
     /**
@@ -226,6 +171,81 @@ public class StartupWindowTheme {
         }
     }
     
+    /**
+     * Determines the best available font family for the system.
+     * Tries to load a custom font first, then falls back to modern system fonts
+     * in order of preference (macOS, Windows, Linux), and finally uses a generic
+     * logical font name if nothing else is available.
+     * 
+     * @return The font family name to use for the application
+     */
+    private static String getSystemFontFamily() {
+        // Try to load custom font first
+        customFontFamily = loadCustomFont();
+        if (customFontFamily != null) {
+            return customFontFamily;
+        }
+        
+        // Fall back to system fonts
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String[] fonts = ge.getAvailableFontFamilyNames();
+        
+        // Try modern system fonts in order of preference
+        // Expanded list with more fallbacks for better cross-platform support
+        String[] preferredFonts = {
+            // macOS - modern system fonts
+            "SF Pro Display", "SF Pro Text", "SF Mono", "Helvetica Neue",
+            // Windows - modern system fonts
+            "Segoe UI", "Segoe UI Variable", "Segoe UI Semibold",
+            // Linux/Android - modern fonts
+            "Roboto", "Roboto Medium", "Noto Sans", "Ubuntu", "Cantarell",
+            // Cross-platform alternatives
+            "Inter", "Source Sans Pro", "Open Sans", "Lato",
+            // Classic fallbacks
+            "Arial", "Helvetica", "Verdana",
+            // Logical font names (Java fallback)
+            "SansSerif", "Dialog", "DialogInput"
+        };
+        
+        for (String preferred : preferredFonts) {
+            for (String available : fonts) {
+                if (available.equalsIgnoreCase(preferred)) {
+                    return preferred;
+                }
+            }
+        }
+        
+        // Final fallback to logical font name
+        return "SansSerif";
+    }
+    
+    /**
+     * Creates a font with high-quality rendering hints applied.
+     * Uses derived fonts for better control over font attributes.
+     * If using a custom font, attempts to load the appropriate weight.
+     * 
+     * @param family The font family name
+     * @param style The font style (Font.PLAIN, Font.BOLD, etc.)
+     * @param size The font size in points
+     * @return The created font
+     */
+    private static Font createFont(String family, int style, int size) {
+        // If using custom font, try to load the specific weight file
+        if (customFontFamily != null && customFontFamily.equals(family)) {
+            Font customWeightFont = loadCustomFontWeight(style == Font.BOLD);
+            if (customWeightFont != null) {
+                return customWeightFont.deriveFont((float) size);
+            }
+        }
+        
+        // Fall back to standard font creation
+        Font baseFont = new Font(family, style, size);
+        // Use derived font for better rendering
+        return baseFont.deriveFont((float) size);
+    }
+    
+    public static final String FONT_FAMILY = getSystemFontFamily();
+    
     /** Title font (bold, larger, 32pt) - for main heading */
     public static final Font TITLE_FONT = createFont(FONT_FAMILY, Font.BOLD, 32);
     
@@ -237,14 +257,6 @@ public class StartupWindowTheme {
     
     /** Percentage font (regular weight, 15pt) - for percentage display */
     public static final Font PERCENTAGE_FONT = createFont(FONT_FAMILY, Font.PLAIN, 15);
-    
-    /**
-     * Gets the currently selected font family name.
-     * Useful for debugging or logging.
-     */
-    public static String getCurrentFontFamily() {
-        return FONT_FAMILY;
-    }
     
     // ============================================================================
     // Sizes and Dimensions
@@ -323,6 +335,11 @@ public class StartupWindowTheme {
      * Creates a font with letter spacing adjustment.
      * Note: Java's Font doesn't directly support letter-spacing, but we can use
      * AttributedString for rendering with tracking.
+     * 
+     * @param text The text to create an attributed string for
+     * @param font The font to apply
+     * @param tracking The letter spacing tracking value
+     * @return An AttributedString with the font and tracking applied
      */
     public static AttributedString createTextWithSpacing(String text, Font font, float tracking) {
         AttributedString attributed = new AttributedString(text);
@@ -333,7 +350,11 @@ public class StartupWindowTheme {
         return attributed;
     }
     
-    // Private constructor to prevent instantiation
+    // ============================================================================
+    // Constructor
+    // ============================================================================
+    
+    /** Private constructor to prevent instantiation */
     private StartupWindowTheme() {
         throw new AssertionError("Utility class should not be instantiated");
     }
