@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.animation;
 import javax.swing.SwingUtilities;
 import java.util.Timer;
 import java.util.TimerTask;
-import launcher.lifecycle.start.startup_window.ui.UIUpdateHandler;
+import launcher.lifecycle.start.startup_window.window_control.StartupWindowUIController;
 
 /**
  * Controls smooth animation of the progress bar between steps.
@@ -30,8 +30,8 @@ public class BarAnimationController {
     /** The starting progress value when current animation began. */
     private double startProgress = 0.0;
     
-    /** The UI update handler for updating UI components. */
-    private final UIUpdateHandler uiUpdateHandler;
+    /** The UI controller for updating UI components. */
+    private final StartupWindowUIController uiController;
     
     /** Frame time in milliseconds (target ~60 FPS). */
     private static final long FRAME_TIME_MS = 16;
@@ -45,10 +45,10 @@ public class BarAnimationController {
     /**
      * Constructs a new BarAnimationController.
      * 
-     * @param uiUpdateHandler The UI update handler for updating UI components
+     * @param uiController The UI controller for updating UI components
      */
-    public BarAnimationController(UIUpdateHandler uiUpdateHandler) {
-        this.uiUpdateHandler = uiUpdateHandler;
+    public BarAnimationController(StartupWindowUIController uiController) {
+        this.uiController = uiController;
     }
     
     // ============================================================================
@@ -153,7 +153,7 @@ public class BarAnimationController {
         
         // Immediately update the UI to match the reset state
         SwingUtilities.invokeLater(() -> {
-            uiUpdateHandler.setSmoothProgress(currentDisplayedProgress);
+            uiController.setSmoothProgress(currentDisplayedProgress);
         });
     }
     
@@ -201,7 +201,7 @@ public class BarAnimationController {
                 
                 // Update the progress bar on EDT
                 SwingUtilities.invokeLater(() -> {
-                    uiUpdateHandler.setSmoothProgress(currentDisplayedProgress);
+                    uiController.setSmoothProgress(currentDisplayedProgress);
                 });
                 
                 // If animation is complete, we can stop (but keep running for future animations)

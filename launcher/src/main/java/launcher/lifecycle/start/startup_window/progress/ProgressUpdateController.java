@@ -1,6 +1,6 @@
 package launcher.lifecycle.start.startup_window.progress;
 import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
-import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
+import launcher.lifecycle.start.startup_window.window_control.StartupWindowUIController;
 
 /**
  * Controls progress updates for the startup window.
@@ -23,8 +23,8 @@ public class ProgressUpdateController {
     /** Controller for smooth progress bar animation between steps. */
     private final BarAnimationController barAnimationController;
     
-    /** Handler for UI component updates. */
-    private final StartupWindowUIUpdateHandler uiUpdateHandler;
+    /** Controller for UI component updates. */
+    private final StartupWindowUIController uiController;
     
     /** Total steps for the startup process. */
     private final int totalSteps;
@@ -35,19 +35,19 @@ public class ProgressUpdateController {
      * @param progressTracker The progress tracker for state management
      * @param durationEstimator The duration estimator for step duration estimation
      * @param barAnimationController The progress bar animation controller
-     * @param uiUpdateHandler The UI update handler
+     * @param uiController The UI controller for updating UI components
      * @param totalSteps The total number of steps
      */
     public ProgressUpdateController(
             ProgressTracker progressTracker,
             DurationEstimator durationEstimator,
             BarAnimationController barAnimationController,
-            StartupWindowUIUpdateHandler uiUpdateHandler,
+            StartupWindowUIController uiController,
             int totalSteps) {
         this.progressTracker = progressTracker;
         this.durationEstimator = durationEstimator;
         this.barAnimationController = barAnimationController;
-        this.uiUpdateHandler = uiUpdateHandler;
+        this.uiController = uiController;
         this.totalSteps = totalSteps;
     }
     
@@ -63,10 +63,10 @@ public class ProgressUpdateController {
         progressTracker.setCurrentStep(step);
 
         // Update the progress bar string (but let smooth animation handle the visual progress)
-        uiUpdateHandler.updateProgressBarString(step, totalSteps);
+        uiController.updateProgressBarString(step, totalSteps);
         
         // Update the status text
-        uiUpdateHandler.updateStatusText(message);
+        uiController.updateStatusText(message);
 
         // Estimate the duration of the step and start the smooth animation toward the target step
         // The smooth animation will handle updating the visual progress bar

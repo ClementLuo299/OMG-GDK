@@ -4,7 +4,7 @@ import gdk.internal.Logging;
 import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
 import launcher.lifecycle.start.startup_window.progress.ProgressTracker;
 import launcher.lifecycle.start.startup_window.progress.DurationEstimator;
-import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
+import launcher.lifecycle.start.startup_window.window_control.StartupWindowUIController;
 import launcher.lifecycle.start.startup_window.window_control.WindowController;
 import launcher.lifecycle.start.startup_window.progress.ProgressUpdateController;
 import launcher.utils.module.ModuleDiscovery;
@@ -40,11 +40,11 @@ public class StartupWindowManager {
         // Create shared components
         ProgressTracker progressTracker = new ProgressTracker(totalSteps);
         DurationEstimator durationEstimator = new DurationEstimator();
-        StartupWindowUIUpdateHandler uiUpdateHandler = new StartupWindowUIUpdateHandler(progressWindow);
+        StartupWindowUIController uiController = new StartupWindowUIController(progressWindow);
         
         // Create animation controllers
         BarAnimationController barAnimationController = 
-            new BarAnimationController(uiUpdateHandler);
+            new BarAnimationController(uiController);
         
         // Create specialized managers
         this.windowController = new WindowController(
@@ -56,7 +56,7 @@ public class StartupWindowManager {
             progressTracker,
             durationEstimator,
             barAnimationController,
-            uiUpdateHandler,
+            uiController,
             totalSteps
         );
     }

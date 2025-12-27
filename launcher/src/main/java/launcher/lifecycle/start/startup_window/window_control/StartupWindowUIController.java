@@ -1,28 +1,29 @@
-package launcher.lifecycle.start.startup_window.ui;
+package launcher.lifecycle.start.startup_window.window_control;
 
 import launcher.lifecycle.start.startup_window.StartupWindow;
 import javax.swing.SwingUtilities;
 
 /**
- * Handles UI component updates for the startup window.
+ * Controller for updating UI components in the startup window.
  * This class is responsible for updating progress bars, labels, and other UI elements
  * in a thread-safe manner using the Event Dispatch Thread.
  * 
  * @author Clement Luo
  * @date December 26, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class StartupWindowUIUpdateHandler implements UIUpdateHandler {
+public class StartupWindowUIController {
     
     /** The startup window containing the UI components to update. */
     private final StartupWindow progressWindow;
     
     /**
-     * Constructs a new StartupWindowUIUpdateHandler.
+     * Constructs a new StartupWindowUIController.
      * 
      * @param progressWindow The startup window containing UI components
      */
-    public StartupWindowUIUpdateHandler(StartupWindow progressWindow) {
+    public StartupWindowUIController(StartupWindow progressWindow) {
         this.progressWindow = progressWindow;
     }
     
@@ -32,13 +33,16 @@ public class StartupWindowUIUpdateHandler implements UIUpdateHandler {
      * 
      * @param progress The progress value (0.0 to 1.0)
      */
-    @Override
     public void setSmoothProgress(double progress) {
+        // Clamp the progress value between 0.0 and 1.0
         double clampedProgress = Math.max(0.0, Math.min(1.0, progress));
+
+        // Update the progress bar styling
         if (progressWindow.getProgressBarStyling() != null) {
             progressWindow.getProgressBarStyling().setSmoothProgress(clampedProgress);
         }
         
+        // Update the percentage label
         if (progressWindow.getPercentageLabel() != null) {
             SwingUtilities.invokeLater(() -> {
                 int percentage = (int) Math.round(clampedProgress * 100);
@@ -46,6 +50,7 @@ public class StartupWindowUIUpdateHandler implements UIUpdateHandler {
             });
         }
         
+        // Repaint the progress bar
         progressWindow.getProgressBar().repaint();
     }
     
@@ -54,7 +59,6 @@ public class StartupWindowUIUpdateHandler implements UIUpdateHandler {
      * 
      * @param text The text to display
      */
-    @Override
     public void updateStatusText(String text) {
         if (progressWindow.getStatusLabel() != null) {
             SwingUtilities.invokeLater(() -> {
