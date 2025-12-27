@@ -32,8 +32,8 @@ public class StartupWindow {
     public StartupWindow(int totalSteps) {
         this.totalSteps = totalSteps;
         
-        StartupWindowInitializer.InitializationResult result = 
-            StartupWindowInitializer.initialize(totalSteps);
+        StartupWindowBuilder.InitializationResult result = 
+            StartupWindowBuilder.build(totalSteps);
         
         this.progressFrame = result.frame;
         this.progressBar = result.progressBar;

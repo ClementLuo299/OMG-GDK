@@ -14,15 +14,15 @@ import launcher.lifecycle.start.startup_window.styling.ProgressBarStyling;
 import launcher.lifecycle.start.startup_window.styling.StartupWindowTheme;
 
 /**
- * Initializes and assembles all components for the startup window.
+ * Builds and assembles all components for the startup window.
  * Handles the complete setup process from component creation to final assembly.
  * 
  * @author Clement Luo
  * @date December 23, 2025
- * @edited December 23, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class StartupWindowInitializer {
+public class StartupWindowBuilder {
     
     /**
      * Result class containing all initialized components.
@@ -49,12 +49,12 @@ public class StartupWindowInitializer {
     }
     
     /**
-     * Initializes the complete startup window with all components.
+     * Builds the complete startup window with all components.
      * 
      * @param totalSteps The total number of steps for the progress bar
      * @return An InitializationResult containing all initialized components
      */
-    public static InitializationResult initialize(int totalSteps) {
+    public static InitializationResult build(int totalSteps) {
         System.out.println("Creating startup progress window");
         System.out.println("Using font: " + StartupWindowTheme.getCurrentFontFamily());
         
