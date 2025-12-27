@@ -1,7 +1,7 @@
 package launcher.lifecycle.start.startup_window;
 
 import gdk.internal.Logging;
-import launcher.lifecycle.start.startup_window.animation.SmoothProgressAnimationController;
+import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
 import launcher.lifecycle.start.startup_window.progress.ProgressTracker;
 import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
 import launcher.lifecycle.start.startup_window.lifecycle.WindowLifecycleManager;
@@ -41,18 +41,18 @@ public class StartupWindowManager {
         StartupWindowUIUpdateHandler uiUpdateHandler = new StartupWindowUIUpdateHandler(progressWindow);
         
         // Create animation controllers
-        SmoothProgressAnimationController smoothProgressAnimationController = 
-            new SmoothProgressAnimationController(uiUpdateHandler);
+        BarAnimationController barAnimationController = 
+            new BarAnimationController(uiUpdateHandler);
         
         // Create specialized managers
         this.windowLifecycleManager = new WindowLifecycleManager(
             progressWindow,
-            smoothProgressAnimationController
+            barAnimationController
         );
         
         this.progressUpdateCoordinator = new ProgressUpdateCoordinator(
             progressTracker,
-            smoothProgressAnimationController,
+            barAnimationController,
             uiUpdateHandler,
             totalSteps
         );

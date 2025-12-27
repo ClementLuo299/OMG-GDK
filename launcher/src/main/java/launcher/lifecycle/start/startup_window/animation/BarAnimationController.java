@@ -13,10 +13,10 @@ import launcher.lifecycle.start.startup_window.ui.UIUpdateHandler;
  * 
  * @author Clement Luo
  * @date December 22, 2025
- * @edited December 27, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class SmoothProgressAnimationController {
+public class BarAnimationController {
     
     /** Timer that controls the smooth progress animation. */
     private Timer animationTimer;
@@ -43,11 +43,11 @@ public class SmoothProgressAnimationController {
     private long animationDurationMs = 0;
     
     /**
-     * Constructs a new SmoothProgressAnimationController.
+     * Constructs a new BarAnimationController.
      * 
      * @param uiUpdateHandler The UI update handler for updating UI components
      */
-    public SmoothProgressAnimationController(UIUpdateHandler uiUpdateHandler) {
+    public BarAnimationController(UIUpdateHandler uiUpdateHandler) {
         this.uiUpdateHandler = uiUpdateHandler;
     }
     

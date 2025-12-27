@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.lifecycle;
 import launcher.lifecycle.start.startup_window.StartupWindow;
 import launcher.lifecycle.stop.Shutdown;
 import gdk.internal.Logging;
-import launcher.lifecycle.start.startup_window.animation.SmoothProgressAnimationController;
+import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
 
 /**
  * Manages the lifecycle of the startup window including showing, hiding, and cleanup.
@@ -19,19 +19,19 @@ public class WindowLifecycleManager {
     private final StartupWindow progressWindow;
     
     /** Controller for smooth progress bar animation between steps. */
-    private final SmoothProgressAnimationController smoothProgressAnimationController;
+    private final BarAnimationController barAnimationController;
     
     /**
      * Constructs a new WindowLifecycleManager.
      * 
      * @param progressWindow The startup window to manage
-     * @param smoothProgressAnimationController The smooth progress animation controller
+     * @param barAnimationController The progress bar animation controller
      */
     public WindowLifecycleManager(
             StartupWindow progressWindow,
-            SmoothProgressAnimationController smoothProgressAnimationController) {
+            BarAnimationController barAnimationController) {
         this.progressWindow = progressWindow;
-        this.smoothProgressAnimationController = smoothProgressAnimationController;
+        this.barAnimationController = barAnimationController;
     }
     
     /**
@@ -47,7 +47,7 @@ public class WindowLifecycleManager {
      */
     public void hide() {
         // Stop all animations
-        smoothProgressAnimationController.stop();
+        barAnimationController.stop();
         progressWindow.hide();
         
         // Register cleanup task with shutdown system
@@ -55,7 +55,7 @@ public class WindowLifecycleManager {
             Logging.info("Cleaning up WindowLifecycleManager resources");
             try {
                 // Ensure animations are stopped (redundant but safe - already stopped above)
-                smoothProgressAnimationController.stop();
+                barAnimationController.stop();
                 
                 // Dispose of the progress window
                 if (progressWindow != null) {
