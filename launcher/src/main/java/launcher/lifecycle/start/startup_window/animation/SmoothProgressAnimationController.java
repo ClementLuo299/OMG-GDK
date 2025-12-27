@@ -13,7 +13,7 @@ import launcher.lifecycle.start.startup_window.ui.UIUpdateHandler;
  * 
  * @author Clement Luo
  * @date December 22, 2025
- * @edited December 26, 2025
+ * @edited December 27, 2025
  * @since Beta 1.0
  */
 public class SmoothProgressAnimationController {
@@ -51,16 +51,9 @@ public class SmoothProgressAnimationController {
         this.uiUpdateHandler = uiUpdateHandler;
     }
     
-    /**
-     * Sets the target progress value and starts smooth animation toward it.
-     * Uses a default animation duration if none is specified.
-     * 
-     * @param targetStep The target step value (0-based)
-     * @param totalSteps The total number of steps
-     */
-    public void animateToStep(int targetStep, int totalSteps) {
-        animateToStep(targetStep, totalSteps, 500); // Default 500ms animation
-    }
+    // ============================================================================
+    // Public API Methods
+    // ============================================================================
     
     /**
      * Sets the target progress value and starts smooth animation toward it.
@@ -128,6 +121,57 @@ public class SmoothProgressAnimationController {
     }
     
     /**
+     * Sets the target progress value and starts smooth animation toward it.
+     * Uses a default animation duration if none is specified.
+     * 
+     * @param targetStep The target step value (0-based)
+     * @param totalSteps The total number of steps
+     */
+    public void animateToStep(int targetStep, int totalSteps) {
+        animateToStep(targetStep, totalSteps, 500); // Default 500ms animation
+    }
+    
+    /**
+     * Resets the displayed progress to the given value immediately (no animation).
+     * 
+     * @param step The step value to reset to (0-based)
+     * @param totalSteps The total number of steps
+     */
+    public void resetToStep(int step, int totalSteps) {
+        if (totalSteps == 0) {
+            currentDisplayedProgress = 0.0;
+            targetProgress = 0.0;
+            startProgress = 0.0;
+        } else {
+            double progress = (double) step / totalSteps;
+            currentDisplayedProgress = progress;
+            targetProgress = progress;
+            startProgress = progress;
+        }
+        animationStartTime = System.currentTimeMillis();
+        animationDurationMs = 0;
+        
+        // Immediately update the UI to match the reset state
+        SwingUtilities.invokeLater(() -> {
+            uiUpdateHandler.setSmoothProgress(currentDisplayedProgress);
+        });
+    }
+    
+    /**
+     * Stops the smooth progress animation and cleans up the timer.
+     */
+    public void stop() {
+        if (animationTimer != null) {
+            animationTimer.cancel();
+            animationTimer = null;
+        }
+    }
+    
+    // ============================================================================
+    // Private Helper Methods
+    // ============================================================================
+    
+    /**
      * Starts the animation loop that smoothly updates the progress bar.
      * Uses time-based interpolation to match the predicted duration.
      */
@@ -164,42 +208,6 @@ public class SmoothProgressAnimationController {
                 // The timer will keep running to handle new animations
             }
         }, 0, FRAME_TIME_MS); // ~60 FPS
-    }
-    
-    /**
-     * Stops the smooth progress animation and cleans up the timer.
-     */
-    public void stop() {
-        if (animationTimer != null) {
-            animationTimer.cancel();
-            animationTimer = null;
-        }
-    }
-    
-    /**
-     * Resets the displayed progress to the given value immediately (no animation).
-     * 
-     * @param step The step value to reset to (0-based)
-     * @param totalSteps The total number of steps
-     */
-    public void resetToStep(int step, int totalSteps) {
-        if (totalSteps == 0) {
-            currentDisplayedProgress = 0.0;
-            targetProgress = 0.0;
-            startProgress = 0.0;
-        } else {
-            double progress = (double) step / totalSteps;
-            currentDisplayedProgress = progress;
-            targetProgress = progress;
-            startProgress = progress;
-        }
-        animationStartTime = System.currentTimeMillis();
-        animationDurationMs = 0;
-        
-        // Immediately update the UI to match the reset state
-        SwingUtilities.invokeLater(() -> {
-            uiUpdateHandler.setSmoothProgress(currentDisplayedProgress);
-        });
     }
 }
 
