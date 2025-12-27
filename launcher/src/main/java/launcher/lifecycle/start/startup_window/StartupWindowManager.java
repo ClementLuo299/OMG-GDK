@@ -4,7 +4,6 @@ import gdk.internal.Logging;
 import launcher.lifecycle.start.startup_window.animation.ProgressBarAnimationController;
 import launcher.lifecycle.start.startup_window.animation.SmoothProgressAnimationController;
 import launcher.lifecycle.start.startup_window.progress.ProgressTracker;
-import launcher.lifecycle.start.startup_window.estimation.StepDurationEstimator;
 import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
 import launcher.lifecycle.start.startup_window.lifecycle.WindowLifecycleManager;
 import launcher.lifecycle.start.startup_window.progress.ProgressUpdateCoordinator;
@@ -40,7 +39,6 @@ public class StartupWindowManager {
         
         // Create shared components
         ProgressTracker progressTracker = new ProgressTracker(totalSteps);
-        StepDurationEstimator stepDurationEstimator = new StepDurationEstimator();
         StartupWindowUIUpdateHandler uiUpdateHandler = new StartupWindowUIUpdateHandler(progressWindow);
         
         // Create animation controllers
@@ -57,7 +55,6 @@ public class StartupWindowManager {
         
         this.progressUpdateCoordinator = new ProgressUpdateCoordinator(
             progressTracker,
-            stepDurationEstimator,
             smoothProgressAnimationController,
             uiUpdateHandler,
             totalSteps
