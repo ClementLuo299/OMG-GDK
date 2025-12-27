@@ -310,7 +310,7 @@ public class StartupWindowTheme {
     public static final String INITIAL_SUBTITLE = "Initializing";
     
     /** Initial status text */
-    public static final String INITIAL_STATUS = "Starting up...";
+    public static final String INITIAL_STATUS = "Starting up";
     
     /** Initial percentage text */
     public static final String INITIAL_PERCENTAGE = "0%";

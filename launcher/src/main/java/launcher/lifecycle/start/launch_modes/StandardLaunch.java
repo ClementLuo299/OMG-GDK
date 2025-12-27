@@ -40,13 +40,13 @@ public final class StandardLaunch {
         try {
             // Startup window is already shown by StartupProcess
             // Step 1: Update progress
-            windowManager.updateProgress(0, "Starting GDK application...");
-            StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application...' message");
+            windowManager.updateProgress(0, "Starting GDK application");
+            StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application' message");
 
             // Step 2: Initialize the user interface
             GDKGameLobbyController lobbyController = 
                 UIInitializer.initialize(primaryApplicationStage, windowManager);
-            StartupDelayUtil.addDevelopmentDelay("After 'Loading user interface...' message");
+            StartupDelayUtil.addDevelopmentDelay("After 'Loading user interface' message");
 
             // Step 3: Start loading modules in the background
             LoadModules.load(primaryApplicationStage, lobbyController, windowManager);

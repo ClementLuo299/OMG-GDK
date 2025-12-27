@@ -148,12 +148,12 @@ public final class ModuleLoadingThread {
         // Update progress window with the calculated step
         SwingUtilities.invokeLater(() -> {
             try {
-                windowManager.updateProgress(step, "Checking for compilation issues...");
+                windowManager.updateProgress(step, "Checking for compilation issues");
             } catch (Exception e) {
                 Logging.error("Error updating progress for compilation check: " + e.getMessage());
             }
         });
-        StartupDelayUtil.addDevelopmentDelay("After 'Checking for compilation issues...' message");
+        StartupDelayUtil.addDevelopmentDelay("After 'Checking for compilation issues' message");
         
         // Check compilation issues
         Platform.runLater(() -> {
@@ -202,9 +202,9 @@ public final class ModuleLoadingThread {
      */
     private static int loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
         // Start at step 3 because:
-        // - Step 0: "Starting GDK application..."
-        // - Step 1: "Loading user interface..."
-        // - Step 2: "Starting module loading..."
+        // - Step 0: "Starting GDK application"
+        // - Step 1: "Loading user interface"
+        // - Step 2: "Starting module loading"
         // - Step 3+: Module loading steps
         ModuleLoadingProgressManager progressManager = new ModuleLoadingProgressManager(windowManager, 3, totalSteps);
         
@@ -215,8 +215,8 @@ public final class ModuleLoadingThread {
             ModuleLoadingSteps.initializeModuleLoading(progressManager);
             
             // Discover modules
-            progressManager.updateProgressWithDelay("Discovering modules...", 
-                "After 'Discovering modules...' message");
+            progressManager.updateProgressWithDelay("Discovering modules", 
+                "After 'Discovering modules' message");
             ModuleDiscoverySteps.DiscoveryResult discoveryResult = 
                 ModuleDiscoverySteps.discover();
             
@@ -257,7 +257,7 @@ public final class ModuleLoadingThread {
                                                     Exception e) {
         Logging.error("Critical error during module loading: " + e.getMessage(), e);
         e.printStackTrace();
-        progressManager.updateProgress("Error during module loading - continuing...");
+        progressManager.updateProgress("Error during module loading - continuing");
         StartupDelayUtil.addDevelopmentDelay("After 'Error during module loading' message");
     }
 }

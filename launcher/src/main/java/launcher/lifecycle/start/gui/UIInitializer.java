@@ -25,7 +25,7 @@ public final class UIInitializer {
     private UIInitializer() {}
 
     public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindowManager windowManager) {
-        windowManager.updateProgress(1, "Loading user interface...");
+        windowManager.updateProgress(1, "Loading user interface");
         GDKGameLobbyController[] controllerHolder = new GDKGameLobbyController[1];
         Scene mainLobbyScene = initializeMainUserInterface(controllerHolder);
         GDKGameLobbyController lobbyController = controllerHolder[0];

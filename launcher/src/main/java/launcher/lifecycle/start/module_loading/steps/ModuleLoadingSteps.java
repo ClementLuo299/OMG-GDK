@@ -58,12 +58,12 @@ public final class ModuleLoadingSteps {
      * @param progressManager The progress manager
      */
     public static void initializeModuleLoading(ModuleLoadingProgressManager progressManager) {
-        progressManager.updateProgressWithDelay("Initializing game modules...", 
+        progressManager.updateProgressWithDelay("Initializing game modules", 
             "After initializing game modules");
         
         if (ModuleCompiler.needToBuildModules()) {
             Logging.info("Modules need to be built");
-            progressManager.updateProgressWithDelay("Building modules...", 
+            progressManager.updateProgressWithDelay("Building modules", 
                 "After checking if modules need to be built");
         } else {
             Logging.info("Using existing builds (recent compilation detected)");
@@ -72,7 +72,7 @@ public final class ModuleLoadingSteps {
         }
         
         Logging.info("Preparing module discovery...");
-        progressManager.updateProgressWithDelay("Preparing module discovery...", 
+        progressManager.updateProgressWithDelay("Preparing module discovery", 
             "After preparing module discovery");
     }
     
@@ -110,7 +110,7 @@ public final class ModuleLoadingSteps {
         
         try {
             Logging.info("Starting module loading...");
-            progressManager.updateProgress("Loading compiled modules...");
+            progressManager.updateProgress("Loading compiled modules");
             discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
             Logging.info("Module loading completed. Successfully loaded " + discoveredModules.size() + " modules");
             
@@ -150,7 +150,7 @@ public final class ModuleLoadingSteps {
      */
     public static void finalizeModuleLoading(ModuleLoadingProgressManager progressManager) {
         Logging.info("Finalizing module loading...");
-        progressManager.updateProgressWithDelay("Finalizing module loading...", 
+        progressManager.updateProgressWithDelay("Finalizing module loading", 
             "After finalizing module loading");
     }
 }

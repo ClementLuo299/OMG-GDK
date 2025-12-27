@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.startup_window.lifecycle;
+package launcher.lifecycle.start.startup_window.window_control;
 
 import launcher.lifecycle.start.startup_window.StartupWindow;
 import launcher.lifecycle.stop.Shutdown;
@@ -6,14 +6,15 @@ import gdk.internal.Logging;
 import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
 
 /**
- * Manages the lifecycle of the startup window including showing, hiding, and cleanup.
- * This class handles window visibility and ensures proper resource cleanup on shutdown.
+ * Controls the visibility and lifecycle of a startup window instance.
+ * Handles showing, hiding, and cleanup of the window and its associated resources.
  * 
  * @author Clement Luo
  * @date December 26, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class WindowLifecycleManager {
+public class WindowController {
     
     /** The startup window to manage. */
     private final StartupWindow progressWindow;
@@ -22,12 +23,12 @@ public class WindowLifecycleManager {
     private final BarAnimationController barAnimationController;
     
     /**
-     * Constructs a new WindowLifecycleManager.
+     * Constructs a new WindowController.
      * 
      * @param progressWindow The startup window to manage
      * @param barAnimationController The progress bar animation controller
      */
-    public WindowLifecycleManager(
+    public WindowController(
             StartupWindow progressWindow,
             BarAnimationController barAnimationController) {
         this.progressWindow = progressWindow;
@@ -52,7 +53,7 @@ public class WindowLifecycleManager {
         
         // Register cleanup task with shutdown system
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up WindowLifecycleManager resources");
+            Logging.info("Cleaning up WindowController resources");
             try {
                 // Ensure animations are stopped (redundant but safe - already stopped above)
                 barAnimationController.stop();
@@ -62,9 +63,9 @@ public class WindowLifecycleManager {
                     progressWindow.hide();
                 }
                 
-                Logging.info("WindowLifecycleManager cleanup completed");
+                Logging.info("WindowController cleanup completed");
             } catch (Exception e) {
-                Logging.error("Error during WindowLifecycleManager cleanup: " + e.getMessage(), e);
+                Logging.error("Error during WindowController cleanup: " + e.getMessage(), e);
             }
         });
     }

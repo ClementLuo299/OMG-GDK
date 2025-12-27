@@ -4,7 +4,7 @@ import gdk.internal.Logging;
 import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
 import launcher.lifecycle.start.startup_window.progress.ProgressTracker;
 import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
-import launcher.lifecycle.start.startup_window.lifecycle.WindowLifecycleManager;
+import launcher.lifecycle.start.startup_window.window_control.WindowController;
 import launcher.lifecycle.start.startup_window.progress.ProgressUpdateCoordinator;
 import launcher.utils.module.ModuleDiscovery;
 
@@ -22,8 +22,8 @@ import javax.swing.SwingUtilities;
  */
 public class StartupWindowManager {
     
-    /** Manages window lifecycle (show/hide/cleanup). */
-    private final WindowLifecycleManager windowLifecycleManager;
+    /** Controls window visibility and lifecycle (show/hide/cleanup). */
+    private final WindowController windowController;
     
     /** Coordinates progress updates. */
     private final ProgressUpdateCoordinator progressUpdateCoordinator;
@@ -45,7 +45,7 @@ public class StartupWindowManager {
             new BarAnimationController(uiUpdateHandler);
         
         // Create specialized managers
-        this.windowLifecycleManager = new WindowLifecycleManager(
+        this.windowController = new WindowController(
             progressWindow,
             barAnimationController
         );
@@ -100,9 +100,9 @@ public class StartupWindowManager {
         StartupWindowManager manager = managerRef[0];
 
         // Display the window and initialize progress
-        manager.windowLifecycleManager.show();
+        manager.windowController.show();
         manager.progressUpdateCoordinator.resetToStep(0, estimatedSteps);
-        manager.updateProgress(0, "Starting GDK application...");
+        manager.updateProgress(0, "Starting GDK Application");
         
         // Calculate actual step count in background (doesn't block window display)
         new Thread(() -> {
@@ -121,7 +121,7 @@ public class StartupWindowManager {
      * Also registers cleanup tasks with the shutdown system to ensure proper resource cleanup.
      */
     public void hide() {
-        windowLifecycleManager.hide();
+        windowController.hide();
     }
     
     /**

@@ -34,12 +34,12 @@ public final class LoadModules {
         // Get the total number of steps in the startup process
         int totalSteps = windowManager.getTotalSteps();
         
-        // Step 2: Update the startup window accordingly (step 1 is used by "Loading user interface...")
+        // Step 2: Update the startup window accordingly (step 1 is used by "Loading user interface")
         Logging.info("Starting module loading process...");
         SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(2, "Starting module loading...");
+            windowManager.updateProgress(2, "Starting module loading");
         });
-        StartupDelayUtil.addDevelopmentDelay("After 'Starting module loading...' message");
+        StartupDelayUtil.addDevelopmentDelay("After 'Starting module loading' message");
         
         // Step 2: Wait a tiny bit to make sure the window is fully visible
         try {
