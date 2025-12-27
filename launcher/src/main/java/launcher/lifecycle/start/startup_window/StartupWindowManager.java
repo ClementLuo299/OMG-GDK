@@ -3,9 +3,10 @@ package launcher.lifecycle.start.startup_window;
 import gdk.internal.Logging;
 import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
 import launcher.lifecycle.start.startup_window.progress.ProgressTracker;
+import launcher.lifecycle.start.startup_window.progress.DurationEstimator;
 import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
 import launcher.lifecycle.start.startup_window.window_control.WindowController;
-import launcher.lifecycle.start.startup_window.progress.ProgressUpdateCoordinator;
+import launcher.lifecycle.start.startup_window.progress.ProgressUpdateController;
 import launcher.utils.module.ModuleDiscovery;
 
 import javax.swing.SwingUtilities;
@@ -25,8 +26,8 @@ public class StartupWindowManager {
     /** Controls window visibility and lifecycle (show/hide/cleanup). */
     private final WindowController windowController;
     
-    /** Coordinates progress updates. */
-    private final ProgressUpdateCoordinator progressUpdateCoordinator;
+    /** Controls progress updates. */
+    private final ProgressUpdateController progressUpdateController;
     
     /**
      * Constructs a new StartupWindowManager with the specified progress window and total steps.
@@ -38,6 +39,7 @@ public class StartupWindowManager {
         
         // Create shared components
         ProgressTracker progressTracker = new ProgressTracker(totalSteps);
+        DurationEstimator durationEstimator = new DurationEstimator();
         StartupWindowUIUpdateHandler uiUpdateHandler = new StartupWindowUIUpdateHandler(progressWindow);
         
         // Create animation controllers
@@ -50,8 +52,9 @@ public class StartupWindowManager {
             barAnimationController
         );
         
-        this.progressUpdateCoordinator = new ProgressUpdateCoordinator(
+        this.progressUpdateController = new ProgressUpdateController(
             progressTracker,
+            durationEstimator,
             barAnimationController,
             uiUpdateHandler,
             totalSteps
@@ -101,7 +104,7 @@ public class StartupWindowManager {
 
         // Display the window and initialize progress
         manager.windowController.show();
-        manager.progressUpdateCoordinator.resetToStep(0, estimatedSteps);
+        manager.progressUpdateController.resetToStep(0, estimatedSteps);
         manager.updateProgress(0, "Starting GDK Application");
         
         // Calculate actual step count in background (doesn't block window display)
@@ -131,7 +134,7 @@ public class StartupWindowManager {
      * @return The total number of steps
      */
     public int getTotalSteps() {
-        return progressUpdateCoordinator.getTotalSteps();
+        return progressUpdateController.getTotalSteps();
     }
 
     /**
@@ -141,6 +144,6 @@ public class StartupWindowManager {
      * @param message The status message to display
      */
     public void updateProgress(int step, String message) {
-        progressUpdateCoordinator.updateProgress(step, message);
+        progressUpdateController.updateProgress(step, message);
     }
 } 

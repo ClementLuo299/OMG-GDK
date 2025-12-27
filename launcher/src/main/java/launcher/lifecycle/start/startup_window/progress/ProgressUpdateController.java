@@ -3,7 +3,7 @@ import launcher.lifecycle.start.startup_window.animation.BarAnimationController;
 import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
 
 /**
- * Coordinates progress updates for the startup window.
+ * Controls progress updates for the startup window.
  * This class orchestrates progress tracking, duration estimation, animation,
  * and UI updates when the progress changes.
  * 
@@ -12,10 +12,13 @@ import launcher.lifecycle.start.startup_window.ui.StartupWindowUIUpdateHandler;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class ProgressUpdateCoordinator {
+public class ProgressUpdateController {
     
-    /** Tracks progress state (current step and total steps) and estimates step durations. */
+    /** Tracks progress state (current step and total steps). */
     private final ProgressTracker progressTracker;
+    
+    /** Estimates step durations based on message content. */
+    private final DurationEstimator durationEstimator;
     
     /** Controller for smooth progress bar animation between steps. */
     private final BarAnimationController barAnimationController;
@@ -27,19 +30,22 @@ public class ProgressUpdateCoordinator {
     private final int totalSteps;
     
     /**
-     * Constructs a new ProgressUpdateCoordinator.
+     * Constructs a new ProgressUpdateController.
      * 
-     * @param progressTracker The progress tracker for state management and duration estimation
+     * @param progressTracker The progress tracker for state management
+     * @param durationEstimator The duration estimator for step duration estimation
      * @param barAnimationController The progress bar animation controller
      * @param uiUpdateHandler The UI update handler
      * @param totalSteps The total number of steps
      */
-    public ProgressUpdateCoordinator(
+    public ProgressUpdateController(
             ProgressTracker progressTracker,
+            DurationEstimator durationEstimator,
             BarAnimationController barAnimationController,
             StartupWindowUIUpdateHandler uiUpdateHandler,
             int totalSteps) {
         this.progressTracker = progressTracker;
+        this.durationEstimator = durationEstimator;
         this.barAnimationController = barAnimationController;
         this.uiUpdateHandler = uiUpdateHandler;
         this.totalSteps = totalSteps;
@@ -64,7 +70,7 @@ public class ProgressUpdateCoordinator {
 
         // Estimate the duration of the step and start the smooth animation toward the target step
         // The smooth animation will handle updating the visual progress bar
-        long estimatedDuration = progressTracker.estimateDuration(message);
+        long estimatedDuration = durationEstimator.estimateDuration(message);
         barAnimationController.animateToStep(step, progressTracker.getTotalSteps(), estimatedDuration);
     }
     
