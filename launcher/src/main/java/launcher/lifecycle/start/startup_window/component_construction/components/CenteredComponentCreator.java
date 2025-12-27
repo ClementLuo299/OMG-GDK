@@ -3,7 +3,7 @@ package launcher.lifecycle.start.startup_window.component_construction.component
 import java.awt.FlowLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Colors;
 
 /**
  * Creates a centered wrapper panel for a component.
@@ -25,7 +25,7 @@ public class CenteredComponentCreator {
         // Create a wrapper panel with centered flow layout
         // This ensures components are centered horizontally within the main panel's vertical layout
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        panel.setBackground(StartupWindowTheme.BACKGROUND);
+        panel.setBackground(Colors.BACKGROUND);
         panel.add(component);
         return panel;
     }

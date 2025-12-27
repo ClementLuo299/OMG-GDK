@@ -4,7 +4,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import launcher.lifecycle.start.startup_window.styling.components.RoundedPanel;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Dimensions;
 
 /**
  * Creates the main panel with proper layout and modern styling.
@@ -25,7 +25,7 @@ public class MainPanelCreator {
     public static JPanel create() {
         // Use custom rounded panel with shadow
         RoundedPanel panel = new RoundedPanel(
-            StartupWindowTheme.CORNER_RADIUS,
+            Dimensions.CORNER_RADIUS,
             true // Enable shadow
         );
         
@@ -34,10 +34,10 @@ public class MainPanelCreator {
         
         // Add padding using border (shadow is drawn by the panel itself)
         panel.setBorder(new EmptyBorder(
-            StartupWindowTheme.PANEL_PADDING,
-            StartupWindowTheme.PANEL_PADDING,
-            StartupWindowTheme.PANEL_PADDING,
-            StartupWindowTheme.PANEL_PADDING
+            Dimensions.PANEL_PADDING,
+            Dimensions.PANEL_PADDING,
+            Dimensions.PANEL_PADDING,
+            Dimensions.PANEL_PADDING
         ));
         
         return panel;

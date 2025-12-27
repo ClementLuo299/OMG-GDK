@@ -5,7 +5,8 @@ import javax.swing.plaf.basic.BasicProgressBarUI;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Colors;
+import launcher.lifecycle.start.startup_window.styling.theme.Dimensions;
 
 /**
  * Custom modern progress bar UI with rounded corners, glow effects, and vibrant gradients.
@@ -103,11 +104,11 @@ public class ProgressBarStyling extends BasicProgressBarUI {
      */
     private void paintBackground(Graphics2D g2d, int width, int height) {
         // Modern rounded background - match the panel background
-        g2d.setColor(StartupWindowTheme.BACKGROUND);
+        g2d.setColor(Colors.BACKGROUND);
         RoundRectangle2D roundedRect = new RoundRectangle2D.Float(
             0, 0, width, height,
-            StartupWindowTheme.PROGRESS_CORNER_RADIUS,
-            StartupWindowTheme.PROGRESS_CORNER_RADIUS
+            Dimensions.PROGRESS_CORNER_RADIUS,
+            Dimensions.PROGRESS_CORNER_RADIUS
         );
         g2d.fill(roundedRect);
     }
@@ -130,7 +131,7 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         
         // Double-check: ensure progress width never exceeds total width
         int actualProgressWidth = Math.min(progressWidth, totalWidth);
-        int cornerRadius = StartupWindowTheme.PROGRESS_CORNER_RADIUS;
+        int cornerRadius = Dimensions.PROGRESS_CORNER_RADIUS;
         
         // Save current clip
         Shape currentClip = g2d.getClip();
@@ -154,8 +155,8 @@ public class ProgressBarStyling extends BasicProgressBarUI {
         // Vibrant purple-to-blue gradient
         int gradientEnd = Math.max(actualProgressWidth, 1);
         GradientPaint mainGradient = new GradientPaint(
-            0, 0, StartupWindowTheme.PROGRESS_START, // Vibrant purple
-            gradientEnd, 0, StartupWindowTheme.PROGRESS_END  // Vibrant blue
+            0, 0, Colors.PROGRESS_START, // Vibrant purple
+            gradientEnd, 0, Colors.PROGRESS_END  // Vibrant blue
         );
         g2d.setPaint(mainGradient);
         
@@ -189,8 +190,8 @@ public class ProgressBarStyling extends BasicProgressBarUI {
      * @param height The height of the progress fill area
      */
     private void paintGlowEffect(Graphics2D g2d, int width, int height) {
-        int cornerRadius = StartupWindowTheme.PROGRESS_CORNER_RADIUS;
-        Color glowColor = StartupWindowTheme.PROGRESS_GLOW;
+        int cornerRadius = Dimensions.PROGRESS_CORNER_RADIUS;
+        Color glowColor = Colors.PROGRESS_GLOW;
         
         // Draw multiple layers with decreasing opacity for soft glow
         Composite originalComposite = g2d.getComposite();
@@ -226,12 +227,12 @@ public class ProgressBarStyling extends BasicProgressBarUI {
      */
     private void paintBorder(Graphics2D g2d, int width, int height) {
         // More visible border for better definition
-        g2d.setColor(StartupWindowTheme.PROGRESS_BORDER);
+        g2d.setColor(Colors.PROGRESS_BORDER);
         g2d.setStroke(new BasicStroke(1.0f));
         RoundRectangle2D borderRect = new RoundRectangle2D.Float(
             0.5f, 0.5f, width - 1.0f, height - 1.0f,
-            StartupWindowTheme.PROGRESS_CORNER_RADIUS,
-            StartupWindowTheme.PROGRESS_CORNER_RADIUS
+            Dimensions.PROGRESS_CORNER_RADIUS,
+            Dimensions.PROGRESS_CORNER_RADIUS
         );
         g2d.draw(borderRect);
     }

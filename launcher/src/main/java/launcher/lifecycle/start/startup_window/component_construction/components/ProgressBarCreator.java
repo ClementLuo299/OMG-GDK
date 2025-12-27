@@ -2,7 +2,8 @@ package launcher.lifecycle.start.startup_window.component_construction.component
 
 import java.awt.Dimension;
 import javax.swing.JProgressBar;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Colors;
+import launcher.lifecycle.start.startup_window.styling.theme.Dimensions;
 
 /**
  * Creates a progress bar with basic properties.
@@ -26,8 +27,8 @@ public class ProgressBarCreator {
         
         // Set fixed size for consistent appearance
         progressBar.setPreferredSize(new Dimension(
-            StartupWindowTheme.PROGRESS_BAR_WIDTH,
-            StartupWindowTheme.PROGRESS_BAR_HEIGHT
+            Dimensions.PROGRESS_BAR_WIDTH,
+            Dimensions.PROGRESS_BAR_HEIGHT
         ));
         
         // Disable default border for custom styling
@@ -35,7 +36,7 @@ public class ProgressBarCreator {
         progressBar.setBorderPainted(false);
         progressBar.setOpaque(true);
         // Set background to white to match the panel background
-        progressBar.setBackground(StartupWindowTheme.BACKGROUND);
+        progressBar.setBackground(Colors.BACKGROUND);
         return progressBar;
     }
 }

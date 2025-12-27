@@ -5,7 +5,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import launcher.lifecycle.start.startup_window.component_construction.components.CenteredComponentCreator;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Spacing;
 
 /**
  * Assembles all components into the main panel with proper spacing.
@@ -37,17 +37,17 @@ public class ComponentAssembler {
         
         // Add components to the main panel with improved modern spacing
         // Using 8px grid system for consistent vertical rhythm
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_XS)); // Small top margin
+        mainPanel.add(Box.createVerticalStrut(Spacing.SPACING_XS)); // Small top margin
         mainPanel.add(CenteredComponentCreator.create(titleLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_SMALL)); // Title to subtitle
+        mainPanel.add(Box.createVerticalStrut(Spacing.SPACING_SMALL)); // Title to subtitle
         mainPanel.add(CenteredComponentCreator.create(subtitleLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_LARGE)); // Subtitle to progress bar
+        mainPanel.add(Box.createVerticalStrut(Spacing.SPACING_LARGE)); // Subtitle to progress bar
         mainPanel.add(CenteredComponentCreator.create(progressBar));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_SMALL)); // Progress bar to percentage
+        mainPanel.add(Box.createVerticalStrut(Spacing.SPACING_SMALL)); // Progress bar to percentage
         mainPanel.add(CenteredComponentCreator.create(percentageLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_MEDIUM)); // Percentage to status
+        mainPanel.add(Box.createVerticalStrut(Spacing.SPACING_MEDIUM)); // Percentage to status
         mainPanel.add(CenteredComponentCreator.create(statusLabel));
-        mainPanel.add(Box.createVerticalStrut(StartupWindowTheme.SPACING_XS)); // Small bottom margin
+        mainPanel.add(Box.createVerticalStrut(Spacing.SPACING_XS)); // Small bottom margin
     }
 }
 

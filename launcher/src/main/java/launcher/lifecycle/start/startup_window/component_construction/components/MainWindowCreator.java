@@ -1,7 +1,8 @@
 package launcher.lifecycle.start.startup_window.component_construction.components;
 
 import javax.swing.JFrame;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Colors;
+import launcher.lifecycle.start.startup_window.styling.theme.TextContent;
 
 /**
  * Creates and configures the main JFrame with transparency support.
@@ -20,7 +21,7 @@ public class MainWindowCreator {
      */
     public static JFrame create() {
         // Create the main application window
-        JFrame frame = new JFrame(StartupWindowTheme.WINDOW_TITLE);
+        JFrame frame = new JFrame(TextContent.WINDOW_TITLE);
         
         // Configure window behavior: prevent closing, disable resizing, keep on top
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -30,10 +31,10 @@ public class MainWindowCreator {
         
         // Enable window transparency for shadow effects
         try {
-            frame.setBackground(StartupWindowTheme.TRANSPARENT);
+            frame.setBackground(Colors.TRANSPARENT);
         } catch (Exception e) {
             // Fallback for systems that don't support transparency
-            frame.setBackground(StartupWindowTheme.FALLBACK_BACKGROUND);
+            frame.setBackground(Colors.FALLBACK_BACKGROUND);
         }
         
         return frame;

@@ -3,7 +3,8 @@ package launcher.lifecycle.start.startup_window.styling.components;
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Colors;
+import launcher.lifecycle.start.startup_window.styling.theme.Dimensions;
 
 /**
  * A JPanel with rounded corners and optional shadow effect.
@@ -57,18 +58,18 @@ public class RoundedPanel extends JPanel {
             
             // Draw rounded background
             RoundRectangle2D roundedRect = new RoundRectangle2D.Float(
-                drawShadow ? StartupWindowTheme.SHADOW_OFFSET : 0,
-                drawShadow ? StartupWindowTheme.SHADOW_OFFSET : 0,
-                width - (drawShadow ? StartupWindowTheme.SHADOW_OFFSET * 2 : 0),
-                height - (drawShadow ? StartupWindowTheme.SHADOW_OFFSET * 2 : 0),
+                drawShadow ? Dimensions.SHADOW_OFFSET : 0,
+                drawShadow ? Dimensions.SHADOW_OFFSET : 0,
+                width - (drawShadow ? Dimensions.SHADOW_OFFSET * 2 : 0),
+                height - (drawShadow ? Dimensions.SHADOW_OFFSET * 2 : 0),
                 cornerRadius, cornerRadius
             );
             
-            g2d.setColor(StartupWindowTheme.BACKGROUND);
+            g2d.setColor(Colors.BACKGROUND);
             g2d.fill(roundedRect);
             
             // Draw subtle border
-            g2d.setColor(StartupWindowTheme.BORDER);
+            g2d.setColor(Colors.BORDER);
             g2d.setStroke(new BasicStroke(0.5f));
             g2d.draw(roundedRect);
         } finally {
@@ -86,9 +87,9 @@ public class RoundedPanel extends JPanel {
      * @param height The height of the panel
      */
     private void paintShadow(Graphics2D g2d, int width, int height) {
-        int shadowBlur = StartupWindowTheme.SHADOW_BLUR;
-        int shadowOffset = StartupWindowTheme.SHADOW_OFFSET;
-        Color shadowColor = StartupWindowTheme.SHADOW_COLOR;
+        int shadowBlur = Dimensions.SHADOW_BLUR;
+        int shadowOffset = Dimensions.SHADOW_OFFSET;
+        Color shadowColor = Colors.SHADOW_COLOR;
         
         // Draw multiple shadow layers for soft shadow effect
         for (int i = 0; i < shadowBlur; i++) {

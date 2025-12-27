@@ -3,7 +3,9 @@ package launcher.lifecycle.start.startup_window.component_construction.component
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import launcher.lifecycle.start.startup_window.styling.components.StyledLabel;
-import launcher.lifecycle.start.startup_window.styling.theme.StartupWindowTheme;
+import launcher.lifecycle.start.startup_window.styling.theme.Colors;
+import launcher.lifecycle.start.startup_window.styling.theme.TextContent;
+import launcher.lifecycle.start.startup_window.styling.theme.Typography;
 
 /**
  * Creates styled labels for the startup window with modern typography.
@@ -22,13 +24,13 @@ public class LabelCreator {
      */
     public enum LabelType {
         // Title: larger, bold, with slight letter spacing
-        TITLE(StartupWindowTheme.TITLE_TEXT, StartupWindowTheme.TITLE_FONT, StartupWindowTheme.PRIMARY_TEXT, 0.02f),
+        TITLE(TextContent.TITLE_TEXT, Typography.TITLE_FONT, Colors.PRIMARY_TEXT, 0.02f),
         // Subtitle: lighter weight, subtle letter spacing
-        SUBTITLE(StartupWindowTheme.INITIAL_SUBTITLE, StartupWindowTheme.SUBTITLE_FONT, StartupWindowTheme.SECONDARY_TEXT, 0.01f),
+        SUBTITLE(TextContent.INITIAL_SUBTITLE, Typography.SUBTITLE_FONT, Colors.SECONDARY_TEXT, 0.01f),
         // Percentage: medium weight, no letter spacing
-        PERCENTAGE(StartupWindowTheme.INITIAL_PERCENTAGE, StartupWindowTheme.PERCENTAGE_FONT, StartupWindowTheme.SECONDARY_TEXT, 0.0f),
+        PERCENTAGE(TextContent.INITIAL_PERCENTAGE, Typography.PERCENTAGE_FONT, Colors.SECONDARY_TEXT, 0.0f),
         // Status: bold, slight letter spacing
-        STATUS(StartupWindowTheme.INITIAL_STATUS, StartupWindowTheme.STATUS_FONT, StartupWindowTheme.PRIMARY_TEXT, 0.01f);
+        STATUS(TextContent.INITIAL_STATUS, Typography.STATUS_FONT, Colors.PRIMARY_TEXT, 0.01f);
         
         private final String text;
         private final java.awt.Font font;
