@@ -58,22 +58,22 @@ public final class ModuleLoadingSteps {
      * @param progressManager The progress manager
      */
     public static void initializeModuleLoading(ModuleLoadingProgressManager progressManager) {
-        progressManager.updateProgressWithDelay("Initializing game modules", 
-            "After initializing game modules");
+        progressManager.updateProgress("Initializing game modules");
+        StartupDelayUtil.addDevelopmentDelay("After initializing game modules");
         
         if (ModuleCompiler.needToBuildModules()) {
             Logging.info("Modules need to be built");
-            progressManager.updateProgressWithDelay("Building modules", 
-                "After checking if modules need to be built");
+            progressManager.updateProgress("Building modules");
+            StartupDelayUtil.addDevelopmentDelay("After checking if modules need to be built");
         } else {
             Logging.info("Using existing builds (recent compilation detected)");
-            progressManager.updateProgressWithDelay("Using existing builds (recent compilation detected)", 
-                "After checking if modules need to be built");
+            progressManager.updateProgress("Using existing builds (recent compilation detected)");
+            StartupDelayUtil.addDevelopmentDelay("After checking if modules need to be built");
         }
         
         Logging.info("Preparing module discovery...");
-        progressManager.updateProgressWithDelay("Preparing module discovery", 
-            "After preparing module discovery");
+        progressManager.updateProgress("Preparing module discovery");
+        StartupDelayUtil.addDevelopmentDelay("After preparing module discovery");
     }
     
     /**
@@ -92,8 +92,8 @@ public final class ModuleLoadingSteps {
             }
             String moduleName = moduleDir.getName();
             Logging.info("Processing module: " + moduleName);
-            progressManager.updateProgressWithDelay("Processing module: " + moduleName, 
-                "After processing module: " + moduleName);
+            progressManager.updateProgress("Processing module: " + moduleName);
+            StartupDelayUtil.addDevelopmentDelay("After processing module: " + moduleName);
         }
     }
     
@@ -139,8 +139,8 @@ public final class ModuleLoadingSteps {
     private static void reportModuleCount(ModuleLoadingProgressManager progressManager,
                                          List<GameModule> discoveredModules) {
         int moduleCount = discoveredModules.size();
-        progressManager.updateProgressWithDelay("Found " + moduleCount + " modules", 
-            "After reporting module count");
+        progressManager.updateProgress("Found " + moduleCount + " modules");
+        StartupDelayUtil.addDevelopmentDelay("After reporting module count");
     }
     
     /**
@@ -150,8 +150,8 @@ public final class ModuleLoadingSteps {
      */
     public static void finalizeModuleLoading(ModuleLoadingProgressManager progressManager) {
         Logging.info("Finalizing module loading...");
-        progressManager.updateProgressWithDelay("Finalizing module loading", 
-            "After finalizing module loading");
+        progressManager.updateProgress("Finalizing module loading");
+        StartupDelayUtil.addDevelopmentDelay("After finalizing module loading");
     }
 }
 

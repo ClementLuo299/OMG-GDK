@@ -215,8 +215,8 @@ public final class ModuleLoadingThread {
             ModuleLoadingSteps.initializeModuleLoading(progressManager);
             
             // Discover modules
-            progressManager.updateProgressWithDelay("Discovering modules", 
-                "After 'Discovering modules' message");
+            progressManager.updateProgress("Discovering modules");
+            StartupDelayUtil.addDevelopmentDelay("After 'Discovering modules' message");
             ModuleDiscoverySteps.DiscoveryResult discoveryResult = 
                 ModuleDiscoverySteps.discover();
             

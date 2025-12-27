@@ -1,7 +1,6 @@
 package launcher.lifecycle.start.module_loading.progress;
 
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
-import launcher.utils.StartupDelayUtil;
 
 import javax.swing.SwingUtilities;
 
@@ -12,7 +11,7 @@ import javax.swing.SwingUtilities;
  * 
  * @author Clement Luo
  * @date December 21, 2025
- * @edited December 21, 2025
+ * @edited December 26, 2025
  * @since Beta 1.0
  */
 public final class ModuleLoadingProgressManager {
@@ -59,45 +58,6 @@ public final class ModuleLoadingProgressManager {
     }
     
     /**
-     * Updates progress with a message at a specific step.
-     * Ensures forward movement by using at least the next auto-incremented step.
-     * Updates the internal counter to track progress.
-     * 
-     * @param step The step number to update (will be adjusted if needed to ensure forward movement)
-     * @param message The progress message to display
-     */
-    public void updateProgress(int step, String message) {
-        // Use the maximum of the requested step and the next auto-incremented step
-        // This ensures forward movement while allowing specific step numbers when needed
-        int nextAutoStep = startStep + stepIndex;
-        int actualStep = Math.max(step, nextAutoStep);
-        
-        // Cap at endStep if needed
-        if (actualStep > endStep) {
-            actualStep = endStep;
-        }
-        
-        // Always increment stepIndex to ensure next message gets a different step
-        // Set it to at least one more than the step we just used
-        stepIndex = Math.max(stepIndex + 1, actualStep - startStep + 1);
-        
-        updateProgressDirect(actualStep, message);
-    }
-    
-    /**
-     * Internal method to update progress without modifying step index.
-     * 
-     * @param step The step number to update
-     * @param message The progress message to display
-     */
-    private void updateProgressDirect(int step, String message) {
-        final int finalStep = step; // Make final for lambda
-        SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(finalStep, message);
-        });
-    }
-    
-    /**
      * Gets the current step number (the last step that was used).
      * 
      * @return The current step number
@@ -111,25 +71,16 @@ public final class ModuleLoadingProgressManager {
     }
     
     /**
-     * Gets the current step index (0-based).
+     * Internal method to update progress without modifying step index.
      * 
-     * @return The current step index
+     * @param step The step number to update
+     * @param message The progress message to display
      */
-    public int getStepIndex() {
-        return stepIndex;
-    }
-    
-    /**
-     * Updates progress and adds a development delay.
-     * 
-     * @param message The progress message
-     * @param delayMessage The delay message for debugging
-     * @return The step number that was used
-     */
-    public int updateProgressWithDelay(String message, String delayMessage) {
-        int step = updateProgress(message);
-        StartupDelayUtil.addDevelopmentDelay(delayMessage);
-        return step;
+    private void updateProgressDirect(int step, String message) {
+        final int finalStep = step; // Make final for lambda
+        SwingUtilities.invokeLater(() -> {
+            windowManager.updateProgress(finalStep, message);
+        });
     }
 }
 
