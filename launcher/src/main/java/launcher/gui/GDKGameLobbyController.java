@@ -1526,7 +1526,7 @@ public class GDKGameLobbyController implements Initializable {
         try {
             String moduleName = moduleDir.getName();
             
-            // Check if Main.java exists in source (using same logic as ModuleLoader)
+            // Check if Main.java exists in source (using same logic as ModuleRuntimeLoader)
             
             // Check for Main.java directly in src/main/java/ (standardized structure)
             File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");

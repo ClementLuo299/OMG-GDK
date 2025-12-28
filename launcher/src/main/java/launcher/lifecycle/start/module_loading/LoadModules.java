@@ -3,7 +3,7 @@ package launcher.lifecycle.start.module_loading;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.gui.GDKGameLobbyController;
-import launcher.lifecycle.start.module_loading.thread.ModuleLoadingThread;
+import launcher.lifecycle.start.module_loading.startup.ModuleLoadingThread;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.lifecycle.stop.Shutdown;
 import launcher.utils.StartupDelayUtil;
