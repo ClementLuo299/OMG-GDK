@@ -17,7 +17,7 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
  * @author Clement Luo
  * @date August 8, 2025
  * @edited December 26, 2025
- * @since 1.0
+ * @since Beta 1.0
  */
 public final class UIInitializer {
 
