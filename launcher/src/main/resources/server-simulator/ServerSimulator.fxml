@@ -1,36 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Server Simulator FXML Layout
+    
+    This is a utility window for testing game-server communication.
+    It allows users to:
+    - View messages received from games
+    - Send test messages to games (JSON or plain text)
+    - Save and load message history
+    - Clear the message display
+    
+    Controller: launcher.gui.server_simulator.ServerSimulatorController
+    Layout: Vertical box (VBox) with message display, input area, and controls
+-->
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
+<!-- Main container for the server simulator window -->
 <VBox fx:id="rootContainer" spacing="10" styleClass="server-simulator"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="launcher.gui.ServerSimulatorController">
+      fx:controller="launcher.gui.server_simulator.ServerSimulatorController">
     <children>
+        <!-- Page title -->
         <Label text="Server Simulator" styleClass="title-label" />
 
+        <!-- 
+            MESSAGE DISPLAY SECTION
+            Shows messages received from games with timestamps
+        -->
         <VBox spacing="5" styleClass="message-section">
             <Label text="Messages:" />
+            <!-- Text area displaying received messages (read-only) -->
             <TextArea fx:id="receivedMessagesDisplayArea" prefRowCount="10" editable="false" wrapText="true" styleClass="message-area" />
         </VBox>
 
+        <!-- 
+            MESSAGE INPUT SECTION
+            Allows users to type and send messages to games
+        -->
         <VBox spacing="5" styleClass="message-section">
             <Label text="Send Message (JSON or plain text):" />
             <HBox spacing="5">
+                <!-- Text field for entering messages to send -->
                 <TextField fx:id="messageInputField" promptText="Enter JSON or text..." HBox.hgrow="ALWAYS" />
+                <!-- Button to send the message to the currently running game -->
                 <Button fx:id="sendMessageButton" text="Send" />
             </HBox>
         </VBox>
 
+        <!-- 
+            CONTROL BUTTONS SECTION
+            Actions for managing the message history and closing the window
+        -->
         <HBox spacing="5" styleClass="button-section">
+            <!-- Clear all messages from the display -->
             <Button fx:id="clearMessagesButton" text="Clear Messages" />
+            <!-- Save current messages to a file -->
             <Button fx:id="saveMessagesButton" text="Save Messages" />
+            <!-- Load previously saved messages from a file -->
             <Button fx:id="loadMessagesButton" text="Load Messages" />
+            <!-- Close the server simulator window -->
             <Button fx:id="closeWindowButton" text="Close" />
         </HBox>
     </children>
+    
+    <!-- Padding around the entire window -->
     <padding>
         <Insets top="10" right="10" bottom="10" left="10" />
     </padding>
-</VBox> 
+</VBox>

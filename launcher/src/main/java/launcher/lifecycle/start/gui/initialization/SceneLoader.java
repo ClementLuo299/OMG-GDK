@@ -45,9 +45,9 @@ public final class SceneLoader {
     public static SceneLoadResult loadMainScene() {
         try {
             // Load the main user interface from FXML
-            URL fxmlResourceUrl = GDKApplication.class.getResource("/gdk-lobby/GDKGameLobby.fxml");
+            URL fxmlResourceUrl = GDKApplication.class.getResource("/lobby/GDKGameLobby.fxml");
             if (fxmlResourceUrl == null) {
-                throw new RuntimeException("FXML resource not found: /gdk-lobby/GDKGameLobby.fxml");
+                throw new RuntimeException("FXML resource not found: /lobby/GDKGameLobby.fxml");
             }
             
             // Create the FXMLLoader and load the scene
@@ -62,7 +62,7 @@ public final class SceneLoader {
             }
             
             // Apply CSS styling if available
-            URL cssResourceUrl = GDKApplication.class.getResource("/gdk-lobby/gdk-lobby.css");
+            URL cssResourceUrl = GDKApplication.class.getResource("/lobby/gdk-lobby.css");
             if (cssResourceUrl != null) {
                 mainLobbyScene.getStylesheets().add(cssResourceUrl.toExternalForm());
             }

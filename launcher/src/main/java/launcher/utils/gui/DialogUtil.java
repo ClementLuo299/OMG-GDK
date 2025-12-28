@@ -331,7 +331,7 @@ public class DialogUtil {
     public static void styleDialogPane(Alert alert) {
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.getStylesheets().add(
-            DialogUtil.class.getResource("/gdk-lobby/gdk-lobby.css").toExternalForm()
+            DialogUtil.class.getResource("/lobby/gdk-lobby.css").toExternalForm()
         );
     }
 }

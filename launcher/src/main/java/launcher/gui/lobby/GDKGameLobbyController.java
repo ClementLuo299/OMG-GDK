@@ -950,7 +950,7 @@ public class GDKGameLobbyController implements Initializable {
             Logging.info("⚙️ Transitioning to settings page");
             
             // Load the settings page FXML
-            URL fxmlUrl = getClass().getResource("/gdk-lobby/settings-page.fxml");
+            URL fxmlUrl = getClass().getResource("/settings-page/settings-page.fxml");
             if (fxmlUrl == null) {
                 throw new RuntimeException("Could not find settings-page.fxml resource");
             }
@@ -984,7 +984,7 @@ public class GDKGameLobbyController implements Initializable {
                 
                 // Load the settings page CSS
                 try {
-                    URL cssUrl = getClass().getResource("/gdk-lobby/settings-page.css");
+                    URL cssUrl = getClass().getResource("/settings-page/settings-page.css");
                     if (cssUrl != null) {
                         settingsRoot.getStylesheets().add(cssUrl.toExternalForm());
                         Logging.info("🎨 CSS loaded successfully");

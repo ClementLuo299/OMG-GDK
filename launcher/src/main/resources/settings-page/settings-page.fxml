@@ -1,31 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Settings Page FXML Layout
+    
+    This is the settings interface where users can configure:
+    - Application behavior (auto-launch, auto-select, JSON persistence)
+    - Interface preferences (theme, font size)
+    - Game-related settings (auto-refresh, compilation checks)
+    - Advanced options (debug mode, performance mode)
+    
+    Controller: launcher.gui.settings_page.SettingsPageController
+    Layout: Vertical box (VBox) with header, scrollable content, and status bar
+-->
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import com.jfoenix.controls.JFXToggleButton?>
 
+<!-- Main container for the settings page -->
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="launcher.gui.SettingsPageController"
+      fx:controller="launcher.gui.settings_page.SettingsPageController"
       styleClass="settings-page-container" spacing="0" alignment="TOP_CENTER">
     
-    <!-- Header -->
+    <!-- 
+        HEADER SECTION
+        Contains back button and page title
+    -->
     <HBox alignment="CENTER" spacing="20" styleClass="settings-header" VBox.vgrow="NEVER">
+        <!-- Back button to return to the main lobby -->
         <Button fx:id="backButton" text="←" styleClass="nav-button, icon-button"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <!-- Page title -->
         <Label text="GDK Settings" styleClass="settings-title"/>
         <Region HBox.hgrow="ALWAYS"/>
     </HBox>
     
-    <!-- Settings Content -->
+    <!-- 
+        SETTINGS CONTENT AREA
+        Scrollable container for all settings sections
+    -->
     <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="settings-scroll-pane">
         <VBox spacing="30" styleClass="settings-content" style="-fx-padding: 30;">
             
-            <!-- Application Settings Section -->
+            <!-- 
+                APPLICATION SETTINGS SECTION
+                Controls application startup and session behavior
+            -->
             <VBox spacing="20" styleClass="settings-section">
                 <Label text="Application Settings" styleClass="section-header"/>
                 
-                <!-- Auto-Launch Setting -->
+                <!-- Auto-Launch Setting: Automatically launch selected game on startup -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Auto-Launch Game" styleClass="setting-label"/>
@@ -34,7 +58,7 @@
                     <JFXToggleButton fx:id="settingsAutoLaunchToggle" selected="false"/>
                 </HBox>
                 
-                <!-- Auto-Select Setting -->
+                <!-- Auto-Select Setting: Automatically select previously played game -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Auto-Select Game" styleClass="setting-label"/>
@@ -43,7 +67,7 @@
                     <JFXToggleButton fx:id="settingsAutoSelectGameToggle" selected="false"/>
                 </HBox>
                 
-                <!-- JSON Persistence Setting -->
+                <!-- JSON Persistence Setting: Save and restore JSON input between sessions -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Save JSON Input" styleClass="setting-label"/>
@@ -53,11 +77,14 @@
                 </HBox>
             </VBox>
             
-            <!-- Interface Settings Section -->
+            <!-- 
+                INTERFACE SETTINGS SECTION
+                Controls visual appearance and UI preferences
+            -->
             <VBox spacing="20" styleClass="settings-section">
                 <Label text="Interface Settings" styleClass="section-header"/>
                 
-                <!-- Theme Selection -->
+                <!-- Theme Selection: Choose visual theme for the application -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Theme" styleClass="setting-label"/>
@@ -66,24 +93,29 @@
                     <ComboBox fx:id="settingsThemeSelector" promptText="Select Theme" prefWidth="200"/>
                 </HBox>
                 
-                <!-- Font Size Setting -->
+                <!-- Font Size Setting: Adjust base font size -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Font Size" styleClass="setting-label"/>
                         <Label text="Adjust the base font size for the application" styleClass="setting-description"/>
                     </VBox>
                     <VBox spacing="5" alignment="CENTER">
+                        <!-- Slider to adjust font size (10-18px range) -->
                         <Slider fx:id="settingsFontSizeSlider" min="10" max="18" value="12" showTickLabels="true" showTickMarks="true" majorTickUnit="2" minorTickCount="0" prefWidth="200"/>
+                        <!-- Label showing current font size value -->
                         <Label fx:id="settingsFontSizeLabel" text="12px" styleClass="value-label"/>
                     </VBox>
                 </HBox>
             </VBox>
             
-            <!-- Game Settings Section -->
+            <!-- 
+                GAME SETTINGS SECTION
+                Controls game module discovery and compilation behavior
+            -->
             <VBox spacing="20" styleClass="settings-section">
                 <Label text="Game Settings" styleClass="section-header"/>
                 
-                <!-- Auto-Refresh Setting -->
+                <!-- Auto-Refresh Setting: Refresh game list when modules directory changes -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Auto-Refresh Games" styleClass="setting-label"/>
@@ -92,7 +124,7 @@
                     <JFXToggleButton fx:id="settingsAutoRefreshToggle" selected="false"/>
                 </HBox>
                 
-                <!-- Compilation Check Setting -->
+                <!-- Compilation Check Setting: Verify module compilation on startup -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Check Compilation on Startup" styleClass="setting-label"/>
@@ -102,11 +134,14 @@
                 </HBox>
             </VBox>
             
-            <!-- Advanced Settings Section -->
+            <!-- 
+                ADVANCED SETTINGS SECTION
+                Developer and debugging options
+            -->
             <VBox spacing="20" styleClass="settings-section">
                 <Label text="Advanced Settings" styleClass="section-header"/>
                 
-                <!-- Debug Mode Setting -->
+                <!-- Debug Mode Setting: Enable detailed logging and debugging -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Debug Mode" styleClass="setting-label"/>
@@ -115,7 +150,7 @@
                     <JFXToggleButton fx:id="settingsDebugModeToggle" selected="false"/>
                 </HBox>
                 
-                <!-- Performance Mode Setting -->
+                <!-- Performance Mode Setting: Optimize for performance over visuals -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Performance Mode" styleClass="setting-label"/>
@@ -128,14 +163,19 @@
         </VBox>
     </ScrollPane>
     
-    <!-- Status Bar -->
+    <!-- 
+        STATUS BAR (Bottom)
+        Shows current status and hints
+    -->
     <HBox alignment="CENTER_LEFT" spacing="20" styleClass="settings-status-bar" VBox.vgrow="NEVER">
         <padding>
             <Insets top="15" right="20" bottom="15" left="20"/>
         </padding>
+        <!-- Label showing current status messages -->
         <Label fx:id="statusLabel" text="Settings page loaded" styleClass="status-text"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <!-- Hint text about automatic saving -->
         <Label text="Settings are saved automatically" styleClass="status-hint"/>
     </HBox>
     
-</VBox> 
+</VBox>

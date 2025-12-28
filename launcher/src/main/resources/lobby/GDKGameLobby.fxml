@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    GDK Game Lobby FXML Layout
+    
+    This is the main lobby interface where users can:
+    - Select and launch game modules
+    - Enter JSON configuration data
+    - View game messages and output
+    - Access settings
+    
+    Controller: launcher.gui.lobby.GDKGameLobbyController
+    Layout: Vertical box (VBox) with header, content area, and status bar
+-->
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -11,61 +23,95 @@
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
+
+<!-- Main container for the entire lobby interface -->
 <VBox fx:id="mainContainer" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-                       fx:controller="launcher.gui.GDKGameLobbyController"
+      fx:controller="launcher.gui.lobby.GDKGameLobbyController"
       styleClass="game-picker-container" spacing="0" alignment="TOP_LEFT">
     
     <padding>
         <Insets top="0" right="0" bottom="0" left="0"/>
     </padding>
     
-    <!-- Header -->
+    <!-- 
+        HEADER SECTION
+        Contains navigation buttons (exit, refresh, settings) and application title
+    -->
     <HBox alignment="CENTER" spacing="20" styleClass="header" VBox.vgrow="NEVER">
+        <!-- Exit button to close the application -->
         <Button fx:id="exitButton" text="✕" styleClass="nav-button, icon-button"/>
         <Region HBox.hgrow="ALWAYS"/>
+        
+        <!-- Application title displayed in the center -->
         <Label fx:id="gameTitleLabel" text="OMG Game Development Kit" styleClass="main-title"/>
         <Region HBox.hgrow="ALWAYS"/>
+        
+        <!-- Right side controls: refresh indicator, refresh button, settings button -->
         <HBox spacing="5" alignment="CENTER_RIGHT">
+            <!-- Progress indicator shown when refreshing game modules -->
             <ProgressIndicator fx:id="refreshProgressIndicator" visible="false" prefWidth="20" prefHeight="20" styleClass="refresh-progress"/>
+            <!-- Refresh button to reload available game modules -->
             <Button fx:id="refreshButton" text="↻" styleClass="nav-button, icon-button"/>
+            <!-- Settings button to open the settings page -->
             <Button fx:id="settingsButton" text="⚙" styleClass="nav-button, icon-button"/>
         </HBox>
     </HBox>
     
-    <!-- Main Content Area -->
+    <!-- 
+        MAIN CONTENT AREA
+        Contains game selection, JSON editors, and message display
+    -->
     <VBox spacing="0" VBox.vgrow="ALWAYS" alignment="TOP_CENTER" style="-fx-background-color: white; -fx-fill-height: true;">
         
-        <!-- Game Selection and Launch Button - Right beneath top bar -->
+        <!-- 
+            GAME SELECTION ROW
+            Allows users to select a game from the dropdown and launch it
+        -->
         <HBox alignment="CENTER_LEFT" spacing="20" styleClass="game-selector-row" minWidth="600" prefWidth="1000" VBox.vgrow="NEVER"
               style="-fx-min-height: 65px; -fx-pref-height: 65px; -fx-max-height: 65px; -fx-min-width: 600px; -fx-pref-width: 1000px;">
             <Label text="Select Game:" style="-fx-text-fill: #212529; -fx-font-size: 16px; -fx-font-weight: bold; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px;"/>
+            <!-- Dropdown to select from available game modules -->
             <ComboBox fx:id="gameSelector" promptText="Choose a game module" 
                      prefWidth="400" 
                      style="-fx-min-height: 45px; -fx-max-height: 45px; -fx-pref-height: 45px; -fx-background-color: #ffffff; -fx-text-fill: #212529; -fx-border-color: #ced4da; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 12; -fx-font-size: 12px;"/>
             <Region HBox.hgrow="ALWAYS"/>
+            <!-- Button to launch the selected game with JSON configuration -->
             <Button fx:id="launchGameButton" text="Launch Game" 
                     style="-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px; -fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 10 20; -fx-min-width: 120;"/>
         </HBox>
         
-        <!-- JSON Areas Side by Side with Their Respective Controls -->
+        <!-- 
+            JSON CONFIGURATION AREA
+            Side-by-side JSON input and output editors with their controls
+        -->
         <HBox spacing="15" HBox.hgrow="ALWAYS" VBox.vgrow="SOMETIMES" styleClass="json-input-area"
               style="-fx-min-height: 200px; -fx-pref-height: 33%; -fx-max-height: 400px;">
             
-            <!-- JSON Input Area with Input Controls -->
+            <!-- 
+                JSON INPUT SECTION (Left Side)
+                Users enter JSON configuration data here
+            -->
             <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                 <Label text="JSON Input" styleClass="section-title" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 14px;"/>
+                <!-- Container for the JSON input editor (dynamically created SingleJsonEditor) -->
                 <VBox fx:id="jsonInputEditorContainer" spacing="0" VBox.vgrow="ALWAYS" style="-fx-min-height: 0; -fx-pref-height: 0;"/>
                 
-                <!-- Input-specific control buttons and Save JSON toggle -->
+                <!-- 
+                    JSON INPUT CONTROLS
+                    Buttons to clear input, request metadata, send messages, and toggle persistence
+                -->
                 <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0 0 0; -fx-min-height: 35; -fx-pref-height: 35; -fx-max-height: 35;">
+                    <!-- Clear all JSON input -->
                     <Button fx:id="clearInputButton" text="Clear Input" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
+                    <!-- Fill input with a metadata request JSON template -->
                     <Button fx:id="metadataRequestButton" text="Request Metadata" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
+                    <!-- Send the JSON input as a message to the selected game -->
                     <Button fx:id="sendMessageButton" text="Send Message" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
                     
                     <Region HBox.hgrow="ALWAYS"/>
                     
-                    <!-- JSON Persistence Toggle -->
+                    <!-- Toggle to enable/disable automatic saving of JSON input -->
                     <HBox alignment="CENTER_LEFT" spacing="2">
                         <Label text="Save JSON" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 12px;"/>
                         <JFXToggleButton fx:id="jsonPersistenceToggle" selected="true"/>
@@ -73,38 +119,55 @@
                 </HBox>
             </VBox>
             
-            <!-- JSON Output Area with Output Controls -->
+            <!-- 
+                JSON OUTPUT SECTION (Right Side)
+                Displays JSON responses from the game
+            -->
             <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                 <Label text="JSON Output" styleClass="section-title" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 14px;"/>
+                <!-- Container for the JSON output editor (dynamically created SingleJsonEditor) -->
                 <VBox fx:id="jsonOutputEditorContainer" spacing="0" VBox.vgrow="ALWAYS" style="-fx-min-height: 0; -fx-pref-height: 0;"/>
                 
-                <!-- Output-specific control buttons -->
+                <!-- 
+                    JSON OUTPUT CONTROLS
+                    Button to clear the output area
+                -->
                 <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0 0 0; -fx-min-height: 35; -fx-pref-height: 35; -fx-max-height: 35;">
+                    <!-- Clear all JSON output -->
                     <Button fx:id="clearOutputButton2" text="Clear Output" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
                 </HBox>
             </VBox>
         </HBox>
         
-
-        
-        <!-- Message Area - Allow growth but with minimum height -->
+        <!-- 
+            MESSAGE AREA
+            Displays informational messages, game output, and status updates
+        -->
         <VBox styleClass="message-panel" spacing="0" VBox.vgrow="SOMETIMES" HBox.hgrow="ALWAYS" alignment="TOP_LEFT" minWidth="400" minHeight="200">
             <Label text="Messages" styleClass="section-title"/>
+            <!-- Scrollable area for messages -->
             <ScrollPane fx:id="messageScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" styleClass="message-scroll-pane" minHeight="150">
+                <!-- Container where individual message labels are added dynamically -->
                 <VBox fx:id="messageContainer" spacing="0" styleClass="message-container"/>
             </ScrollPane>
         </VBox>
     </VBox>
     
-    <!-- Status Bar -->
+    <!-- 
+        STATUS BAR (Bottom)
+        Shows loading progress, status messages, and game count
+    -->
     <HBox alignment="CENTER_LEFT" spacing="20" styleClass="status-bar" VBox.vgrow="NEVER">
         <padding>
             <Insets top="10" right="15" bottom="10" left="15"/>
         </padding>
+        <!-- Progress bar shown during module loading/compilation -->
         <ProgressBar fx:id="loadingProgressBar" visible="false" prefWidth="250" styleClass="loading-progress"/>
+        <!-- Label showing current loading status (e.g., "Compiling module...") -->
         <Label fx:id="loadingStatusLabel" text="" visible="false" styleClass="loading-status-text"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <!-- Label showing number of available games -->
         <Label fx:id="statusLabel" text="Available Games: 0" styleClass="status-text"/>
     </HBox>
     
-</VBox> 
+</VBox>
