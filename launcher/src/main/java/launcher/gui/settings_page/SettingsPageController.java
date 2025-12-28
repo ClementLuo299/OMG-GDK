@@ -1,4 +1,4 @@
-package launcher.gui;
+package launcher.gui.settings_page;
 
 import gdk.internal.Logging;
 import javafx.fxml.FXML;
@@ -14,6 +14,8 @@ import com.jfoenix.controls.JFXToggleButton;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
+
+import launcher.gui.lobby.GDKGameLobbyController;
 
 /**
  * Controller for the GDK Settings Page.

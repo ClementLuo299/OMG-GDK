@@ -3,8 +3,8 @@ package launcher.lifecycle.start.launch_modes;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.gui.GDKGameLobbyController;
-import launcher.gui.GDKViewModel;
+import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.GDKViewModel;
 import launcher.utils.AutoLaunchUtil;
 import launcher.utils.module.ModuleDiscovery;
 

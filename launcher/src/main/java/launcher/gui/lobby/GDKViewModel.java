@@ -1,4 +1,4 @@
-package launcher.gui;
+package launcher.gui.lobby;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -20,6 +20,8 @@ import javafx.fxml.FXMLLoader;
 
 import java.net.URL;
 import java.util.List;
+
+import launcher.gui.server_simulator.ServerSimulatorController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;

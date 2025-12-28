@@ -1,4 +1,4 @@
-package launcher.gui;
+package launcher.gui.server_simulator;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

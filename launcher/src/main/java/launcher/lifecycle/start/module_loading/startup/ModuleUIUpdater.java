@@ -1,7 +1,7 @@
 package launcher.lifecycle.start.module_loading.startup;
 
 import gdk.internal.Logging;
-import launcher.gui.GDKGameLobbyController;
+import launcher.gui.lobby.GDKGameLobbyController;
 import javafx.application.Platform;
 
 /**

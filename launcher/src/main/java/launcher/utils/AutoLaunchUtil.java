@@ -2,8 +2,8 @@ package launcher.utils;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.gui.GDKGameLobbyController;
-import launcher.gui.GDKViewModel;
+import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.GDKViewModel;
 import launcher.utils.path.FilePaths;
 
 import javafx.stage.Stage;

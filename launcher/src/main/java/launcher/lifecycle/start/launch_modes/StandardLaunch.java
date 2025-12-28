@@ -2,7 +2,7 @@ package launcher.lifecycle.start.launch_modes;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.gui.GDKGameLobbyController;
+import launcher.gui.lobby.GDKGameLobbyController;
 import launcher.lifecycle.start.gui.UIInitializer;
 import launcher.lifecycle.start.module_loading.LoadModules;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
