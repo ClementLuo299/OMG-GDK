@@ -13,7 +13,8 @@ import java.util.Set;
  * Handles updating status labels, button states, and reporting module changes.
  * 
  * @authors Clement Luo
- * @date January 2025
+ * @date December 27, 2025
+ * @edited December 27, 2025
  * @since 1.0
  */
 public class UIStateManager {

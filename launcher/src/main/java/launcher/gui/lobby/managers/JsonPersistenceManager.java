@@ -14,7 +14,8 @@ import java.nio.file.Paths;
  * Handles saving and loading JSON content, toggle state, and selected game.
  * 
  * @authors Clement Luo
- * @date January 2025
+ * @date December 27, 2025
+ * @edited December 27, 2025
  * @since 1.0
  */
 public class JsonPersistenceManager {

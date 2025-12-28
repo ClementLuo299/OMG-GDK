@@ -17,7 +17,8 @@ import java.util.Queue;
  * all messages are shown while preventing UI spam.
  * 
  * @authors Clement Luo
- * @date January 2025
+ * @date December 27, 2025
+ * @edited December 27, 2025
  * @since 1.0
  */
 public class MessageManager {

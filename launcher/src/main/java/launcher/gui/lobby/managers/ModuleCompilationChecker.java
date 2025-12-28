@@ -19,7 +19,8 @@ import java.util.List;
  * and attempts to compile modules when needed.
  * 
  * @authors Clement Luo
- * @date January 2025
+ * @date December 27, 2025
+ * @edited December 27, 2025
  * @since 1.0
  */
 public class ModuleCompilationChecker {

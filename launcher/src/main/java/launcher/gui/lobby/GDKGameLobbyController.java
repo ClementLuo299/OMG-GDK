@@ -66,7 +66,7 @@ import launcher.gui.settings_page.SettingsPageController;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited August 22, 2025       
+ * @edited December 27, 2025       
  * @since 1.0
  */
 public class GDKGameLobbyController implements Initializable {
