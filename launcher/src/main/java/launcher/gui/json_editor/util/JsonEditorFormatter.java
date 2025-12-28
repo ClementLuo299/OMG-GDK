@@ -1,0 +1,36 @@
+package launcher.gui.json_editor.util;
+
+import org.fxmisc.richtext.CodeArea;
+
+/**
+ * Handles JSON formatting for CodeArea components.
+ * 
+ * @author Clement Luo
+ * @date December 27, 2025
+ * @since 1.0
+ */
+public class JsonEditorFormatter {
+    
+    /**
+     * Format the JSON content in the given code area.
+     * 
+     * @param codeArea The code area containing JSON to format
+     */
+    public static void format(CodeArea codeArea) {
+        String formattedJson = JsonFormatter.format(codeArea.getText().trim());
+        if (formattedJson != null) {
+            codeArea.replaceText(formattedJson);
+        }
+    }
+    
+    /**
+     * Create a Runnable that formats the given code area when executed.
+     * 
+     * @param codeArea The code area to format
+     * @return A Runnable that formats the code area
+     */
+    public static Runnable createFormatAction(CodeArea codeArea) {
+        return () -> format(codeArea);
+    }
+}
+

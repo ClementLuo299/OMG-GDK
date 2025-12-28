@@ -1,0 +1,38 @@
+package launcher.gui.json_editor.config;
+
+import org.fxmisc.richtext.CodeArea;
+import launcher.gui.json_editor.features.JsonSyntaxHighlighter;
+import launcher.gui.json_editor.features.JsonEditorContextMenu;
+import launcher.gui.json_editor.features.JsonEditorKeyboardShortcuts;
+import launcher.gui.json_editor.util.JsonEditorFormatter;
+
+/**
+ * Sets up all editor features for a JSON editor CodeArea.
+ * Orchestrates syntax highlighting, context menu, and keyboard shortcuts.
+ * 
+ * @author Clement Luo
+ * @date December 27, 2025
+ * @since 1.0
+ */
+public class JsonEditorFeaturesSetup {
+    
+    /**
+     * Set up all editor features for the given code area.
+     * 
+     * @param codeArea The code area to set up features for
+     */
+    public static void setup(CodeArea codeArea) {
+        // Set up syntax highlighting
+        JsonSyntaxHighlighter.setup(codeArea);
+        
+        // Create format action
+        Runnable formatAction = JsonEditorFormatter.createFormatAction(codeArea);
+        
+        // Set up context menu with format action
+        JsonEditorContextMenu.setup(codeArea, formatAction);
+        
+        // Set up keyboard shortcuts with format action
+        JsonEditorKeyboardShortcuts.setup(codeArea, formatAction);
+    }
+}
+

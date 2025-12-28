@@ -223,7 +223,7 @@ package "launcher.gui" {
             SettingsPageController --> Logging : logs actions
             SettingsPageController --> GDKGameLobbyController : synchronizes with
 
-            class SingleJsonEditor {
+            class JsonEditor {
                 ' ==================== Fields ====================
                 - CodeArea codeArea
                 - StringProperty textProperty
@@ -234,8 +234,8 @@ package "launcher.gui" {
                 - static final Pattern PATTERN
 
                 ' ==================== Constructors ====================
-                + SingleJsonEditor(String)
-                + SingleJsonEditor()
+                + JsonEditor(String)
+                + JsonEditor()
 
                 ' ==================== Setup Methods ====================
                 - void setupCodeArea()
@@ -269,7 +269,7 @@ package "launcher.gui" {
                 - String getIndentation(String)
             }
 
-            SingleJsonEditor --> DialogUtil : displays alerts
+            JsonEditor --> DialogUtil : displays alerts
 }
 
 package "launcher" {

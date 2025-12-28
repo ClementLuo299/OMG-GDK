@@ -94,7 +94,7 @@
             -->
             <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                 <Label text="JSON Input" styleClass="section-title" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 14px;"/>
-                <!-- Container for the JSON input editor (dynamically created SingleJsonEditor) -->
+                <!-- Container for the JSON input editor (dynamically created JsonEditor) -->
                 <VBox fx:id="jsonInputEditorContainer" spacing="0" VBox.vgrow="ALWAYS" style="-fx-min-height: 0; -fx-pref-height: 0;"/>
                 
                 <!-- 
@@ -125,7 +125,7 @@
             -->
             <VBox spacing="5" alignment="TOP_LEFT" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                 <Label text="JSON Output" styleClass="section-title" style="-fx-font-weight: bold; -fx-text-fill: #495057; -fx-font-size: 14px;"/>
-                <!-- Container for the JSON output editor (dynamically created SingleJsonEditor) -->
+                <!-- Container for the JSON output editor (dynamically created JsonEditor) -->
                 <VBox fx:id="jsonOutputEditorContainer" spacing="0" VBox.vgrow="ALWAYS" style="-fx-min-height: 0; -fx-pref-height: 0;"/>
                 
                 <!-- 

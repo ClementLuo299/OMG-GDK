@@ -2,7 +2,7 @@ package launcher.gui.lobby.managers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.gui.json_editor.SingleJsonEditor;
+import launcher.gui.json_editor.JsonEditor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,8 +29,8 @@ public class JsonConfigurationHandler {
     }
     
     private final ObjectMapper jsonDataMapper;
-    private final SingleJsonEditor jsonInputEditor;
-    private final SingleJsonEditor jsonOutputEditor;
+    private final JsonEditor jsonInputEditor;
+    private final JsonEditor jsonOutputEditor;
     private final MessageReporter messageReporter;
     
     /**
@@ -41,8 +41,8 @@ public class JsonConfigurationHandler {
      * @param jsonOutputEditor The output JSON editor
      * @param messageReporter Callback to report messages to the UI
      */
-    public JsonConfigurationHandler(ObjectMapper jsonDataMapper, SingleJsonEditor jsonInputEditor, 
-                                   SingleJsonEditor jsonOutputEditor, MessageReporter messageReporter) {
+    public JsonConfigurationHandler(ObjectMapper jsonDataMapper, JsonEditor jsonInputEditor, 
+                                   JsonEditor jsonOutputEditor, MessageReporter messageReporter) {
         this.jsonDataMapper = jsonDataMapper;
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;

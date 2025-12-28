@@ -46,7 +46,7 @@ import launcher.gui.lobby.managers.UIStateManager;
 import launcher.gui.lobby.subcontrollers.GameSelectionController;
 import launcher.gui.lobby.subcontrollers.JsonConfigurationController;
 import launcher.gui.lobby.subcontrollers.ApplicationControlController;
-import launcher.gui.json_editor.SingleJsonEditor;
+import launcher.gui.json_editor.JsonEditor;
 import launcher.gui.settings_page.SettingsPageController;
 
 
@@ -87,8 +87,8 @@ public class GDKGameLobbyController implements Initializable {
     // JSON Configuration Components
     @FXML private VBox jsonInputEditorContainer;
     @FXML private VBox jsonOutputEditorContainer;
-    private SingleJsonEditor jsonInputEditor;
-    private SingleJsonEditor jsonOutputEditor;
+    private JsonEditor jsonInputEditor;
+    private JsonEditor jsonOutputEditor;
     @FXML private Button clearInputButton;
 
     @FXML private Button clearOutputButton2;
@@ -251,8 +251,8 @@ public class GDKGameLobbyController implements Initializable {
         
         // Normal mode: full GUI setup
         // Create JSON editors first (needed for managers)
-        jsonInputEditor = new SingleJsonEditor("JSON Input");
-        jsonOutputEditor = new SingleJsonEditor("JSON Output");
+        jsonInputEditor = new JsonEditor("JSON Input");
+        jsonOutputEditor = new JsonEditor("JSON Output");
         
         // Initialize managers
         messageManager = new MessageManager(messageContainer, messageScrollPane);

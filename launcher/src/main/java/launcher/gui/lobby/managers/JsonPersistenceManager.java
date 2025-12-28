@@ -1,7 +1,7 @@
 package launcher.gui.lobby.managers;
 
 import gdk.internal.Logging;
-import launcher.gui.json_editor.SingleJsonEditor;
+import launcher.gui.json_editor.JsonEditor;
 import com.jfoenix.controls.JFXToggleButton;
 
 import java.nio.file.Files;
@@ -24,7 +24,7 @@ public class JsonPersistenceManager {
     private static final String PERSISTENCE_TOGGLE_FILE = "saved/gdk-persistence-toggle.txt";
     private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
     
-    private final SingleJsonEditor jsonInputEditor;
+    private final JsonEditor jsonInputEditor;
     private final JFXToggleButton jsonPersistenceToggle;
     
     private boolean isLoadingPersistenceSettings = false;
@@ -35,7 +35,7 @@ public class JsonPersistenceManager {
      * @param jsonInputEditor The JSON input editor to save/load
      * @param jsonPersistenceToggle The toggle button for persistence state
      */
-    public JsonPersistenceManager(SingleJsonEditor jsonInputEditor, JFXToggleButton jsonPersistenceToggle) {
+    public JsonPersistenceManager(JsonEditor jsonInputEditor, JFXToggleButton jsonPersistenceToggle) {
         this.jsonInputEditor = jsonInputEditor;
         this.jsonPersistenceToggle = jsonPersistenceToggle;
     }

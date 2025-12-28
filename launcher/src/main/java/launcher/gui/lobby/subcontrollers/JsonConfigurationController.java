@@ -1,7 +1,7 @@
 package launcher.gui.lobby.subcontrollers;
 
 import gdk.api.GameModule;
-import launcher.gui.json_editor.SingleJsonEditor;
+import launcher.gui.json_editor.JsonEditor;
 import launcher.gui.lobby.managers.JsonConfigurationHandler;
 import launcher.gui.lobby.managers.JsonPersistenceManager;
 import launcher.gui.lobby.managers.MessageManager;
@@ -24,8 +24,8 @@ public class JsonConfigurationController {
     // UI Components
     private final VBox jsonInputEditorContainer;
     private final VBox jsonOutputEditorContainer;
-    private final SingleJsonEditor jsonInputEditor;
-    private final SingleJsonEditor jsonOutputEditor;
+    private final JsonEditor jsonInputEditor;
+    private final JsonEditor jsonOutputEditor;
     private final Button clearInputButton;
     private final Button clearOutputButton;
     private final Button metadataRequestButton;
@@ -59,8 +59,8 @@ public class JsonConfigurationController {
     public JsonConfigurationController(
             VBox jsonInputEditorContainer,
             VBox jsonOutputEditorContainer,
-            SingleJsonEditor jsonInputEditor,
-            SingleJsonEditor jsonOutputEditor,
+            JsonEditor jsonInputEditor,
+            JsonEditor jsonOutputEditor,
             Button clearInputButton,
             Button clearOutputButton,
             Button metadataRequestButton,
@@ -98,7 +98,7 @@ public class JsonConfigurationController {
      * 
      * @return The input editor
      */
-    public SingleJsonEditor getJsonInputEditor() {
+    public JsonEditor getJsonInputEditor() {
         return jsonInputEditor;
     }
     
@@ -107,7 +107,7 @@ public class JsonConfigurationController {
      * 
      * @return The output editor
      */
-    public SingleJsonEditor getJsonOutputEditor() {
+    public JsonEditor getJsonOutputEditor() {
         return jsonOutputEditor;
     }
     
