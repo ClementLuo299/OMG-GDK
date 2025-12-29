@@ -1,4 +1,4 @@
-package launcher.gui.json_editor.config;
+package launcher.gui.json_editor.building;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.Priority;
@@ -10,9 +10,10 @@ import org.fxmisc.richtext.CodeArea;
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
-public class JsonEditorLayoutBuilder {
+public class BuildLayout {
     
     /**
      * Build the complete layout for a JSON editor.

@@ -1,18 +1,19 @@
-package launcher.gui.json_editor.config;
+package launcher.gui.json_editor.building;
 
 import javafx.beans.property.StringProperty;
 import org.fxmisc.richtext.CodeArea;
 import launcher.gui.json_editor.features.JsonEditorAutoIndent;
 
 /**
- * Configures CodeArea components for JSON editing with line numbers,
+ * Configures the core CodeArea component for JSON editing with line numbers,
  * styling, and auto-indentation.
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
-public class JsonEditorCodeAreaConfigurator {
+public class ConfigureCodeArea {
     
     private static final int PREFERRED_WIDTH = 600;
     

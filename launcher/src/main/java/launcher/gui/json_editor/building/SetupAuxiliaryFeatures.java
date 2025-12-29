@@ -1,4 +1,4 @@
-package launcher.gui.json_editor.config;
+package launcher.gui.json_editor.building;
 
 import org.fxmisc.richtext.CodeArea;
 import launcher.gui.json_editor.features.JsonSyntaxHighlighter;
@@ -12,9 +12,10 @@ import launcher.gui.json_editor.util.JsonEditorFormatter;
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
-public class JsonEditorFeaturesSetup {
+public class SetupAuxiliaryFeatures {
     
     /**
      * Set up all editor features for the given code area.

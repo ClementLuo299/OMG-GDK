@@ -4,9 +4,9 @@ import javafx.scene.layout.VBox;
 import javafx.beans.property.StringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import org.fxmisc.richtext.CodeArea;
-import launcher.gui.json_editor.config.JsonEditorCodeAreaConfigurator;
-import launcher.gui.json_editor.config.JsonEditorFeaturesSetup;
-import launcher.gui.json_editor.config.JsonEditorLayoutBuilder;
+import launcher.gui.json_editor.building.ConfigureCodeArea;
+import launcher.gui.json_editor.building.SetupAuxiliaryFeatures;
+import launcher.gui.json_editor.building.BuildLayout;
 
 /**
  * A professional JSON editor using RichTextFX with syntax highlighting,
@@ -36,13 +36,13 @@ public class JsonEditor extends VBox {
         
         // Create and configure the code area
         this.codeArea = new CodeArea();
-        JsonEditorCodeAreaConfigurator.configure(codeArea, textProperty);
+        ConfigureCodeArea.configure(codeArea, textProperty);
         
         // Set up all editor features
-        JsonEditorFeaturesSetup.setup(codeArea);
+        SetupAuxiliaryFeatures.setup(codeArea);
         
         // Build the layout
-        JsonEditorLayoutBuilder.build(this, this.title, codeArea);
+        BuildLayout.build(this, this.title, codeArea);
     }
 
     /**
