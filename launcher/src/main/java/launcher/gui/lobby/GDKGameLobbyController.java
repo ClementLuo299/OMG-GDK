@@ -85,16 +85,6 @@ public class GDKGameLobbyController implements Initializable {
     private GDKViewModel applicationViewModel;
     
     /**
-     * The mode this controller is running in.
-     * AUTO_LAUNCH: No GUI loaded, controller used for ViewModel management only
-     * NORMAL: Full GUI loaded, normal operation
-     */
-    public enum ControllerMode {
-        AUTO_LAUNCH,
-        NORMAL
-    }
-    
-    /**
      * Current mode of operation for this controller
      */
     private ControllerMode controllerMode = ControllerMode.NORMAL;

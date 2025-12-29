@@ -178,7 +178,7 @@ public final class AutoLaunchUtil {
      */
     public static AutoLaunchComponents createAutoLaunchComponents(Stage primaryApplicationStage) {
         GDKGameLobbyController controller = new GDKGameLobbyController();
-        controller.setControllerMode(GDKGameLobbyController.ControllerMode.AUTO_LAUNCH);
+        controller.setControllerMode(launcher.gui.lobby.ControllerMode.AUTO_LAUNCH);
         GDKViewModel viewModel = new GDKViewModel();
         viewModel.setPrimaryStage(primaryApplicationStage);
         controller.setViewModel(viewModel);
