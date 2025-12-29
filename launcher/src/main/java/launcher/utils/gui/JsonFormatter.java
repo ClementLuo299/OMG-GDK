@@ -1,13 +1,12 @@
-package launcher.gui.json_editor.util;
-
-import launcher.utils.gui.DialogUtil;
+package launcher.utils.gui;
 
 /**
  * Utility class for formatting JSON content.
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
 public class JsonFormatter {
     

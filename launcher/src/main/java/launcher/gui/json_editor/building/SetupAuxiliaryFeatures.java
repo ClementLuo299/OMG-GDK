@@ -4,7 +4,6 @@ import org.fxmisc.richtext.CodeArea;
 import launcher.gui.json_editor.features.CodeColorHighlight;
 import launcher.gui.json_editor.features.JsonEditorContextMenu;
 import launcher.gui.json_editor.features.KeyboardShortcuts;
-import launcher.gui.json_editor.util.JsonEditorFormatter;
 
 /**
  * Sets up all editor features for a JSON editor CodeArea.
@@ -27,7 +26,7 @@ public class SetupAuxiliaryFeatures {
         CodeColorHighlight.setup(codeArea);
         
         // Create format action
-        Runnable formatAction = JsonEditorFormatter.createFormatAction(codeArea);
+        Runnable formatAction = CodeAreaJsonFormatter.createFormatAction(codeArea);
         
         // Set up context menu with format action
         JsonEditorContextMenu.setup(codeArea, formatAction);

@@ -1,15 +1,17 @@
-package launcher.gui.json_editor.util;
+package launcher.gui.json_editor.building;
 
 import org.fxmisc.richtext.CodeArea;
+import launcher.utils.gui.JsonFormatter;
 
 /**
  * Handles JSON formatting for CodeArea components.
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
-public class JsonEditorFormatter {
+public class CodeAreaJsonFormatter {
     
     /**
      * Format the JSON content in the given code area.
