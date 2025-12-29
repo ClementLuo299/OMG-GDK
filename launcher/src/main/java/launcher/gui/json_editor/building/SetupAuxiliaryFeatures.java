@@ -1,9 +1,9 @@
 package launcher.gui.json_editor.building;
 
 import org.fxmisc.richtext.CodeArea;
-import launcher.gui.json_editor.features.JsonSyntaxHighlighter;
+import launcher.gui.json_editor.features.CodeColorHighlight;
 import launcher.gui.json_editor.features.JsonEditorContextMenu;
-import launcher.gui.json_editor.features.JsonEditorKeyboardShortcuts;
+import launcher.gui.json_editor.features.KeyboardShortcuts;
 import launcher.gui.json_editor.util.JsonEditorFormatter;
 
 /**
@@ -24,7 +24,7 @@ public class SetupAuxiliaryFeatures {
      */
     public static void setup(CodeArea codeArea) {
         // Set up syntax highlighting
-        JsonSyntaxHighlighter.setup(codeArea);
+        CodeColorHighlight.setup(codeArea);
         
         // Create format action
         Runnable formatAction = JsonEditorFormatter.createFormatAction(codeArea);
@@ -33,7 +33,7 @@ public class SetupAuxiliaryFeatures {
         JsonEditorContextMenu.setup(codeArea, formatAction);
         
         // Set up keyboard shortcuts with format action
-        JsonEditorKeyboardShortcuts.setup(codeArea, formatAction);
+        KeyboardShortcuts.setup(codeArea, formatAction);
     }
 }
 

@@ -11,13 +11,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Handles JSON syntax highlighting for CodeArea components.
+ * Handles JSON syntax color coding for CodeArea components.
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
-public class JsonSyntaxHighlighter {
+public class CodeColorHighlight {
     
     // JSON syntax highlighting patterns
     private static final String[] KEYWORDS = new String[] {

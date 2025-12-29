@@ -2,7 +2,7 @@ package launcher.gui.json_editor.building;
 
 import javafx.beans.property.StringProperty;
 import org.fxmisc.richtext.CodeArea;
-import launcher.gui.json_editor.features.JsonEditorAutoIndent;
+import launcher.gui.json_editor.features.AutoIndent;
 
 /**
  * Configures the core CodeArea component for JSON editing with line numbers,
@@ -43,7 +43,7 @@ public class ConfigureCodeArea {
         textProperty.bind(codeArea.textProperty());
         
         // Set up auto-indent
-        JsonEditorAutoIndent.setup(codeArea);
+        AutoIndent.setup(codeArea);
     }
 }
 

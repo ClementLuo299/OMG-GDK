@@ -10,9 +10,10 @@ import org.fxmisc.richtext.model.TwoDimensional.Bias;
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
-public class JsonEditorAutoIndent {
+public class AutoIndent {
     
     /**
      * Set up auto-indentation for the given code area.

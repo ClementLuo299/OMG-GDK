@@ -1,6 +1,5 @@
 package launcher.gui.json_editor.features;
 
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import org.fxmisc.richtext.CodeArea;
 
@@ -9,7 +8,8 @@ import org.fxmisc.richtext.CodeArea;
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
 public class JsonEditorContextMenu {
     
@@ -20,7 +20,7 @@ public class JsonEditorContextMenu {
      * @param formatAction The action to perform when format is selected
      */
     public static void setup(CodeArea codeArea, Runnable formatAction) {
-        ContextMenu contextMenu = new ContextMenu();
+        javafx.scene.control.ContextMenu contextMenu = new javafx.scene.control.ContextMenu();
         
         MenuItem formatItem = new MenuItem("Format JSON");
         formatItem.setOnAction(e -> formatAction.run());

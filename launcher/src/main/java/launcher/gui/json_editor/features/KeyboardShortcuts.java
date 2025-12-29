@@ -9,9 +9,10 @@ import org.fxmisc.richtext.CodeArea;
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @since 1.0
+ * @edited December 28, 2025
+ * @since Beta 1.0
  */
-public class JsonEditorKeyboardShortcuts {
+public class KeyboardShortcuts {
     
     /**
      * Set up keyboard shortcuts for the given code area.
