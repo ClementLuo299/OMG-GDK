@@ -2,21 +2,18 @@ package launcher.gui.lobby.subcontrollers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
+import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.managers.MessageManager;
 import launcher.gui.lobby.managers.UIStateManager;
 import launcher.gui.lobby.managers.LoadingAnimationManager;
 import launcher.gui.lobby.managers.ModuleCompilationChecker;
 import launcher.gui.lobby.managers.JsonPersistenceManager;
-import launcher.utils.module.ModuleDiscovery;
-import launcher.utils.module.ModuleCompiler;
-import launcher.utils.path.PathUtil;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +37,7 @@ public class GameSelectionController {
     private final Button settingsButton;
     
     // Managers
+    private final GDKViewModel viewModel;
     private final MessageManager messageManager;
     private final UIStateManager uiStateManager;
     private final LoadingAnimationManager loadingAnimationManager;
@@ -65,6 +63,7 @@ public class GameSelectionController {
      * @param refreshButton The refresh button
      * @param settingsButton The settings button
      * @param availableGameModules The observable list of available game modules
+     * @param viewModel The ViewModel for business logic
      * @param messageManager The message manager
      * @param uiStateManager The UI state manager
      * @param loadingAnimationManager The loading animation manager
@@ -77,6 +76,7 @@ public class GameSelectionController {
             Button refreshButton,
             Button settingsButton,
             ObservableList<GameModule> availableGameModules,
+            GDKViewModel viewModel,
             MessageManager messageManager,
             UIStateManager uiStateManager,
             LoadingAnimationManager loadingAnimationManager,
@@ -88,6 +88,7 @@ public class GameSelectionController {
         this.refreshButton = refreshButton;
         this.settingsButton = settingsButton;
         this.availableGameModules = availableGameModules;
+        this.viewModel = viewModel;
         this.messageManager = messageManager;
         this.uiStateManager = uiStateManager;
         this.loadingAnimationManager = loadingAnimationManager;
@@ -138,6 +139,15 @@ public class GameSelectionController {
      */
     public void setSelectedGameModule(GameModule gameModule) {
         this.selectedGameModule = gameModule;
+    }
+    
+    /**
+     * Get the observable list of available game modules.
+     * 
+     * @return The observable list of available game modules
+     */
+    public ObservableList<GameModule> getAvailableGameModules() {
+        return availableGameModules;
     }
     
     /**
@@ -232,25 +242,16 @@ public class GameSelectionController {
                     }
                 }
 
-                // Get the path to the modules directory
-                String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-                
-                // Detect disabled/removed modules before recompilation
-                if (previousCountSnapshot == 0) {
-                    detectDisabledModulesBeforeRecompilation(modulesDirectoryPath);
+                // Delegate module discovery to ViewModel (business logic)
+                final List<GameModule> discoveredGameModules;
+                if (viewModel != null) {
+                    discoveredGameModules = viewModel.discoverAndLoadModules();
                 } else {
-                    detectNewlyRemovedModules(previousModuleNames);
+                    // Fallback if ViewModel not available (shouldn't happen)
+                    Logging.error("❌ ViewModel not available for module discovery");
+                    messageManager.addMessage("❌ Error: ViewModel not available");
+                    discoveredGameModules = new ArrayList<>();
                 }
-                
-                // Skip compilation checks on startup for faster loading
-                // Only recompile if this is not the first load
-                if (previousCountSnapshot > 0) {
-                    checkAndRecompileModules(modulesDirectoryPath);
-                }
-                
-                // Use ModuleDiscovery and ModuleCompiler to discover all available game modules
-                List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(new File(modulesDirectoryPath));
-                List<GameModule> discoveredGameModules = ModuleCompiler.loadModules(validModuleDirectories);
                 
                 // Add each discovered module to our observable list
                 for (GameModule gameModule : discoveredGameModules) {
@@ -264,10 +265,14 @@ public class GameSelectionController {
                     }
                 }
                 
-                // Check for compilation failures and broken modules in the logs and notify user
-                if (moduleCompilationChecker != null) {
-                    moduleCompilationChecker.checkForCompilationFailures(modulesDirectoryPath);
-                    moduleCompilationChecker.checkForBrokenModules(modulesDirectoryPath);
+                // Check for compilation failures using ViewModel (business logic)
+                if (viewModel != null && moduleCompilationChecker != null) {
+                    List<String> compilationFailures = viewModel.checkForCompilationFailures();
+                    if (!compilationFailures.isEmpty()) {
+                        for (String moduleName : compilationFailures) {
+                            messageManager.addMessage("⚠️ Module '" + moduleName + "' failed to compile - check source code for errors");
+                        }
+                    }
                 }
                 
                 // Update the ComboBox with the new list of games
@@ -297,7 +302,7 @@ public class GameSelectionController {
                 int currentModuleCount = discoveredGameModules.size();
                 
                 if (currentModuleCount == 0) {
-                    messageManager.addMessage("⚠️ No game modules found in " + modulesDirectoryPath);
+                    messageManager.addMessage("⚠️ No game modules found");
                 } else if (previousCountSnapshot > 0) {
                     // Check for module changes (additions/removals)
                     Set<String> currentModuleNames = new HashSet<>();
@@ -327,9 +332,6 @@ public class GameSelectionController {
                     }
                     
                     messageManager.addMessage("✅ Successfully detected " + currentModuleCount + " game(s)");
-                } else if (previousCountSnapshot == 0) {
-                    // First time loading - check for disabled modules that exist but aren't loaded
-                    checkForDisabledModulesOnFirstLoad(modulesDirectoryPath, currentModuleCount);
                 } else {
                     messageManager.addMessage("✅ Successfully detected " + currentModuleCount + " game(s)");
                 }
@@ -365,40 +367,25 @@ public class GameSelectionController {
             }
             Logging.info("📊 Previous module count: " + previousModuleNames.size());
 
-            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            Logging.info("📁 Modules directory path: " + modulesDirectoryPath);
-            
-            File modulesDir = new File(modulesDirectoryPath);
-            if (!modulesDir.exists()) {
-                Logging.error("❌ Modules directory does not exist: " + modulesDirectoryPath);
+            // Delegate module discovery to ViewModel (business logic)
+            final List<GameModule> discoveredGameModules;
+            if (viewModel != null) {
+                discoveredGameModules = viewModel.discoverAndLoadModules();
+            } else {
+                Logging.error("❌ ViewModel not available for module discovery");
                 Platform.runLater(() -> {
-                    messageManager.addMessage("❌ Modules directory not found: " + modulesDirectoryPath);
+                    messageManager.addMessage("❌ Error: ViewModel not available");
                     uiStateManager.updateGameCountStatus(availableGameModules.size());
                 });
                 return;
             }
             
-            Logging.info("🔍 Discovering modules in: " + modulesDir.getAbsolutePath());
-            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDir);
-            Logging.info("✅ Found " + validModuleDirectories.size() + " valid module directories");
-            
-            if (validModuleDirectories.isEmpty()) {
-                Logging.warning("⚠️ No valid module directories found");
-                Platform.runLater(() -> {
-                    messageManager.addMessage("⚠️ No valid modules found in: " + modulesDirectoryPath);
-                    uiStateManager.updateGameCountStatus(availableGameModules.size());
-                });
-                return;
-            }
-            
-            Logging.info("📦 Loading modules...");
-            List<GameModule> discoveredGameModules = ModuleCompiler.loadModules(validModuleDirectories);
             Logging.info("✅ Module loading completed. Loaded " + discoveredGameModules.size() + " modules");
             
-            if (discoveredGameModules == null) {
-                Logging.error("❌ ModuleCompiler.loadModules() returned null!");
+            if (discoveredGameModules == null || discoveredGameModules.isEmpty()) {
+                Logging.warning("⚠️ No modules discovered");
                 Platform.runLater(() -> {
-                    messageManager.addMessage("❌ Error: Module loading returned null");
+                    messageManager.addMessage("⚠️ No valid modules found");
                     uiStateManager.updateGameCountStatus(availableGameModules.size());
                     uiStateManager.updateLaunchButtonState(false);
                 });
@@ -514,130 +501,6 @@ public class GameSelectionController {
         } catch (Exception e) {
             messageManager.addMessage("❌ Error refreshing game modules: " + e.getMessage());
             Logging.error("❌ Error refreshing game modules: " + e.getMessage(), e);
-        }
-    }
-    
-    // Helper methods for module detection and compilation
-    private void detectDisabledModulesBeforeRecompilation(String modulesDirectoryPath) {
-        try {
-            File modulesDir = new File(modulesDirectoryPath);
-            File[] subdirs = modulesDir.listFiles(File::isDirectory);
-            
-            if (subdirs != null) {
-                for (File subdir : subdirs) {
-                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
-                        continue;
-                    }
-                    
-                    File pomFile = new File(subdir, "pom.xml");
-                    if (pomFile.exists()) {
-                        File mainJavaFile = new File(subdir, "src/main/java/Main.java");
-                        if (!mainJavaFile.exists()) {
-                            removedModuleNames.add(subdir.getName());
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Logging.error("❌ Error detecting disabled modules: " + e.getMessage(), e);
-        }
-    }
-    
-    private void detectNewlyRemovedModules(Set<String> previousModuleNames) {
-        try {
-            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            File modulesDir = new File(modulesDirectoryPath);
-            File[] subdirs = modulesDir.listFiles(File::isDirectory);
-            
-            if (subdirs != null) {
-                for (File subdir : subdirs) {
-                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
-                        continue;
-                    }
-                    
-                    if (previousModuleNames.contains(subdir.getName())) {
-                        File pomFile = new File(subdir, "pom.xml");
-                        if (pomFile.exists()) {
-                            File mainJavaFile = new File(subdir, "src/main/java/Main.java");
-                            if (!mainJavaFile.exists()) {
-                                removedModuleNames.add(subdir.getName());
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Logging.error("❌ Error detecting newly removed modules: " + e.getMessage(), e);
-        }
-    }
-    
-    private void checkForDisabledModulesOnFirstLoad(String modulesDirectoryPath, int currentModuleCount) {
-        messageManager.addMessage("✅ Loaded " + currentModuleCount + " game module(s)");
-    }
-    
-    private void checkAndRecompileModules(String modulesDirectoryPath) {
-        try {
-            File modulesDir = new File(modulesDirectoryPath);
-            File[] subdirs = modulesDir.listFiles(File::isDirectory);
-            
-            if (subdirs != null) {
-                for (File subdir : subdirs) {
-                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
-                        continue;
-                    }
-                    
-                    File pomFile = new File(subdir, "pom.xml");
-                    if (pomFile.exists()) {
-                        if (!removedModuleNames.contains(subdir.getName())) {
-                            checkAndRecompileModule(subdir);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            messageManager.addMessage("❌ Error checking modules: " + e.getMessage());
-            Logging.error("❌ Error checking modules: " + e.getMessage(), e);
-        }
-    }
-    
-    private void checkAndRecompileModule(File moduleDir) {
-        try {
-            File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
-            
-            if (!mainJavaFile.exists()) {
-                return;
-            }
-            
-            File targetClassesDir = new File(moduleDir, "target/classes");
-            File mainClassFile = new File(targetClassesDir, "Main.class");
-            
-            boolean needsRecompilation = !mainClassFile.exists() || 
-                                       mainJavaFile.lastModified() > mainClassFile.lastModified();
-            
-            if (needsRecompilation) {
-                recompileModule(moduleDir);
-            }
-        } catch (Exception e) {
-            messageManager.addMessage("❌ Error checking module " + moduleDir.getName() + ": " + e.getMessage());
-            Logging.error("❌ Error checking module " + moduleDir.getName() + ": " + e.getMessage(), e);
-        }
-    }
-    
-    private void recompileModule(File moduleDir) {
-        try {
-            ProcessBuilder pb = new ProcessBuilder("mvn", "compile", "-q");
-            pb.directory(moduleDir);
-            pb.redirectErrorStream(true);
-            
-            Process process = pb.start();
-            int exitCode = process.waitFor();
-            
-            if (exitCode != 0) {
-                messageManager.addMessage("⚠️ Module compilation failed for " + moduleDir.getName() + " (exit code: " + exitCode + ")");
-            }
-        } catch (Exception e) {
-            messageManager.addMessage("❌ Error recompiling module " + moduleDir.getName() + ": " + e.getMessage());
-            Logging.error("❌ Error recompiling module " + moduleDir.getName() + ": " + e.getMessage(), e);
         }
     }
 }

@@ -17,7 +17,7 @@ public final class StartupDelayUtil {
      * When true, adds delays between startup steps for easier debugging.
      * Set to false for normal operation.
      */
-    private static final boolean ENABLE_DEVELOPMENT_DELAYS = true;
+    private static final boolean ENABLE_DEVELOPMENT_DELAYS = false;
 
     private StartupDelayUtil() {}
 

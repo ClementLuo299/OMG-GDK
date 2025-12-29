@@ -19,7 +19,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import launcher.gui.server_simulator.ServerSimulatorController;
 
@@ -709,4 +711,131 @@ public class GDKViewModel {
         Logging.info("🔍 DEBUG: Could not determine game mode from JSON, defaulting to false");
         return false;
     }
+    
+    // ==================== MODULE DISCOVERY & LOADING ====================
+    
+    /**
+     * Discover and load all available game modules.
+     * This is business logic that should be in the ViewModel.
+     * 
+     * @return List of discovered game modules, or empty list if error
+     */
+    public List<GameModule> discoverAndLoadModules() {
+        try {
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
+            Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
+            
+            File modulesDir = new File(modulesDirectoryPath);
+            if (!modulesDir.exists()) {
+                Logging.error("❌ Modules directory does not exist: " + modulesDirectoryPath);
+                return new ArrayList<>();
+            }
+            
+            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDir);
+            List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
+            
+            // Filter out null modules
+            List<GameModule> validModules = new ArrayList<>();
+            for (GameModule module : discoveredModules) {
+                if (module != null) {
+                    validModules.add(module);
+                }
+            }
+            
+            Logging.info("✅ Found " + validModules.size() + " game module(s)");
+            return validModules;
+            
+        } catch (Exception moduleDiscoveryError) {
+            Logging.error("❌ Error discovering modules: " + moduleDiscoveryError.getMessage());
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Check for compilation failures in modules.
+     * This is business logic that should be in the ViewModel.
+     * 
+     * @return List of module names that failed to compile
+     */
+    public List<String> checkForCompilationFailures() {
+        List<String> failures = new ArrayList<>();
+        try {
+            // Get compilation failures from ModuleCompiler
+            List<String> compilerFailures = ModuleCompiler.getLastCompilationFailures();
+            failures.addAll(compilerFailures);
+            
+            // Check for additional compilation issues
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue;
+                    }
+                    
+                    File pomFile = new File(subdir, "pom.xml");
+                    if (pomFile.exists()) {
+                        File mainJava = new File(subdir, "src/main/java/Main.java");
+                        File metadataJava = new File(subdir, "src/main/java/Metadata.java");
+                        
+                        if (mainJava.exists() && metadataJava.exists()) {
+                            // Check if compiled classes exist
+                            File targetClassesDir = new File(subdir, "target/classes");
+                            if (!targetClassesDir.exists() || targetClassesDir.listFiles() == null || targetClassesDir.listFiles().length == 0) {
+                                if (!failures.contains(subdir.getName())) {
+                                    failures.add(subdir.getName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error checking compilation failures: " + e.getMessage(), e);
+        }
+        return failures;
+    }
+    
+    /**
+     * Validate game launch parameters.
+     * This is business logic that should be in the ViewModel.
+     * 
+     * @param gameModule The game module to validate
+     * @return Validation result with error message if invalid
+     */
+    public LaunchValidationResult validateGameLaunch(GameModule gameModule) {
+        if (gameModule == null) {
+            return new LaunchValidationResult(false, "No game module is selected");
+        }
+        return new LaunchValidationResult(true, null);
+    }
+    
+    /**
+     * Parse JSON configuration string.
+     * This is business logic that should be in the ViewModel.
+     * 
+     * @param jsonString The JSON string to parse
+     * @return The parsed Map, or null if parsing fails or input is empty
+     */
+    public Map<String, Object> parseJsonConfiguration(String jsonString) {
+        if (jsonString == null || jsonString.trim().isEmpty()) {
+            return null;
+        }
+        
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> configurationData = JSON_MAPPER.readValue(jsonString.trim(), Map.class);
+            return configurationData;
+        } catch (Exception e) {
+            Logging.error("❌ Failed to parse JSON: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Result of game launch validation.
+     */
+    public record LaunchValidationResult(boolean isValid, String errorMessage) {}
 } 

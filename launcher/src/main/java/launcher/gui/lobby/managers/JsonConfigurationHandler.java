@@ -3,20 +3,19 @@ package launcher.gui.lobby.managers;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.json_editor.JsonEditor;
+import launcher.gui.lobby.GDKViewModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
 /**
- * Handles JSON configuration operations in the controller context.
- * 
- * Provides methods for sending messages, formatting JSON responses,
- * and parsing JSON configuration data.
+ * Handles JSON configuration UI operations.
+ * Delegates business logic (parsing, validation) to ViewModel.
  * 
  * @authors Clement Luo
  * @date December 27, 2025
- * @edited December 27, 2025
+ * @edited January 2025
  * @since 1.0
  */
 public class JsonConfigurationHandler {
@@ -28,6 +27,7 @@ public class JsonConfigurationHandler {
         void addMessage(String message);
     }
     
+    private final GDKViewModel viewModel;
     private final ObjectMapper jsonDataMapper;
     private final JsonEditor jsonInputEditor;
     private final JsonEditor jsonOutputEditor;
@@ -36,17 +36,28 @@ public class JsonConfigurationHandler {
     /**
      * Create a new JsonConfigurationHandler.
      * 
-     * @param jsonDataMapper The ObjectMapper for JSON operations
+     * @param viewModel The ViewModel for business logic (may be null initially)
      * @param jsonInputEditor The input JSON editor
      * @param jsonOutputEditor The output JSON editor
      * @param messageReporter Callback to report messages to the UI
      */
-    public JsonConfigurationHandler(ObjectMapper jsonDataMapper, JsonEditor jsonInputEditor, 
-                                   JsonEditor jsonOutputEditor, MessageReporter messageReporter) {
-        this.jsonDataMapper = jsonDataMapper;
+    public JsonConfigurationHandler(GDKViewModel viewModel,
+                                   JsonEditor jsonInputEditor, 
+                                   JsonEditor jsonOutputEditor, 
+                                   MessageReporter messageReporter) {
+        this.viewModel = viewModel;
+        this.jsonDataMapper = new ObjectMapper();
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;
         this.messageReporter = messageReporter;
+    }
+    
+    /**
+     * Update the ViewModel reference (called when ViewModel is set).
+     */
+    public void setViewModel(GDKViewModel viewModel) {
+        // Note: ViewModel is final, so we can't update it. This method is kept for API compatibility.
+        // In practice, JsonConfigurationHandler should be recreated when ViewModel changes.
     }
     
     /**
@@ -71,11 +82,28 @@ public class JsonConfigurationHandler {
             return;
         }
         
-        // Validate JSON syntax before sending
+        // Validate JSON syntax before sending using ViewModel (business logic)
+        Map<String, Object> messageData = null;
+        if (viewModel != null) {
+            messageData = viewModel.parseJsonConfiguration(jsonContent);
+        } else {
+            // Fallback parsing if ViewModel not available
+            try {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> parsed = jsonDataMapper.readValue(jsonContent, Map.class);
+                messageData = parsed;
+            } catch (JsonProcessingException e) {
+                messageReporter.addMessage("❌ Invalid JSON syntax - message not sent");
+                return;
+            }
+        }
+        
+        if (messageData == null) {
+            messageReporter.addMessage("❌ Invalid JSON syntax - message not sent");
+            return;
+        }
+        
         try {
-            // Attempt to parse the JSON to validate its syntax
-            @SuppressWarnings("unchecked")
-            Map<String, Object> messageData = jsonDataMapper.readValue(jsonContent, Map.class);
             
             // Record message to transcript before sending
             launcher.utils.game.TranscriptRecorder.recordToGame(messageData);
@@ -99,9 +127,6 @@ public class JsonConfigurationHandler {
                 messageReporter.addMessage("📭 No response from " + gameModuleName);
             }
             
-        } catch (JsonProcessingException jsonProcessingError) {
-            // If JSON is invalid, notify the user and don't send
-            messageReporter.addMessage("❌ Invalid JSON syntax - message not sent");
         } catch (Exception e) {
             // Handle any other errors
             messageReporter.addMessage("❌ Error sending message: " + e.getMessage());
@@ -160,27 +185,31 @@ public class JsonConfigurationHandler {
     
     /**
      * Parse the JSON configuration data from the text area.
+     * Delegates to ViewModel for business logic.
      * 
      * @return The parsed JSON data as a Map, or null if parsing fails or input is empty
      */
     public Map<String, Object> parseJsonConfigurationData() {
-        // Get the JSON text from the text area and remove leading/trailing whitespace
+        // Get the JSON text from the text area
         String jsonConfigurationText = jsonInputEditor.getText().trim();
         
-        // If JSON is empty, return null (let the game decide what to do)
+        // Delegate parsing to ViewModel (business logic)
+        if (viewModel != null) {
+            return viewModel.parseJsonConfiguration(jsonConfigurationText);
+        }
+        
+        // Fallback to local parsing if ViewModel not available (shouldn't happen)
         if (jsonConfigurationText.isEmpty()) {
             return null;
         }
         
         try {
-            // Parse the JSON text into a Map<String, Object> for easy access
             @SuppressWarnings("unchecked")
             Map<String, Object> configurationData = jsonDataMapper.readValue(jsonConfigurationText, Map.class);
-            return configurationData; // Return the parsed configuration
+            return configurationData;
         } catch (JsonProcessingException jsonProcessingError) {
-            // Log the parsing error for debugging
             Logging.error("❌ Failed to parse JSON: " + jsonProcessingError.getMessage());
-            return null; // Return null to indicate parsing failure
+            return null;
         }
     }
 }
