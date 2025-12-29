@@ -20,19 +20,12 @@ import java.util.ResourceBundle;
 
 import launcher.gui.lobby.managers.MessageManager;
 import launcher.gui.lobby.managers.LoadingAnimationManager;
-import launcher.gui.lobby.managers.JsonPersistenceManager;
 import launcher.gui.lobby.managers.ModuleCompilationChecker;
-import launcher.gui.lobby.managers.JsonConfigurationHandler;
-import launcher.gui.lobby.managers.UIStateManager;
 import launcher.gui.lobby.managers.GameLaunchManager;
-import launcher.gui.lobby.managers.SettingsNavigationManager;
-import launcher.gui.lobby.managers.MessageBridgeManager;
 import launcher.gui.lobby.managers.LobbyLifecycleManager;
 import launcher.gui.lobby.managers.LobbyInitializationManager;
 import launcher.gui.lobby.subcontrollers.GameSelectionController;
 import launcher.gui.lobby.subcontrollers.JsonConfigurationController;
-import launcher.gui.lobby.subcontrollers.ApplicationControlController;
-
 
 /**
  * Controller for the GDK Game Lobby interface.
@@ -120,39 +113,14 @@ public class GDKGameLobbyController implements Initializable {
     private LoadingAnimationManager loadingAnimationManager;
     
     /**
-     * Manager for JSON persistence
-     */
-    private JsonPersistenceManager jsonPersistenceManager;
-    
-    /**
      * Manager for module compilation checking
      */
     private ModuleCompilationChecker moduleCompilationChecker;
     
     /**
-     * Handler for JSON configuration operations
-     */
-    private JsonConfigurationHandler jsonConfigurationHandler;
-    
-    /**
-     * Manager for UI state updates
-     */
-    private UIStateManager uiStateManager;
-    
-    /**
      * Manager for game launching operations
      */
     private GameLaunchManager gameLaunchManager;
-    
-    /**
-     * Manager for settings page navigation
-     */
-    private SettingsNavigationManager settingsNavigationManager;
-    
-    /**
-     * Manager for messaging bridge subscriptions
-     */
-    private MessageBridgeManager messageBridgeManager;
     
     /**
      * Manager for lobby lifecycle operations
@@ -176,11 +144,6 @@ public class GDKGameLobbyController implements Initializable {
      */
     private JsonConfigurationController jsonConfigurationController;
     
-    /**
-     * Subcontroller for application control UI area
-     */
-    private ApplicationControlController applicationControlController;
-
     // ==================== INITIALIZATION ====================
     
     /**
@@ -253,18 +216,20 @@ public class GDKGameLobbyController implements Initializable {
         // Store all initialized components
         messageManager = result.messageManager();
         loadingAnimationManager = result.loadingAnimationManager();
-        jsonPersistenceManager = result.jsonPersistenceManager();
         moduleCompilationChecker = result.moduleCompilationChecker();
-        jsonConfigurationHandler = result.jsonConfigurationHandler();
-        uiStateManager = result.uiStateManager();
         gameLaunchManager = result.gameLaunchManager();
-        messageBridgeManager = result.messageBridgeManager();
         lobbyLifecycleManager = result.lobbyLifecycleManager();
-        settingsNavigationManager = result.settingsNavigationManager();
         gameSelectionController = result.gameSelectionController();
         jsonConfigurationController = result.jsonConfigurationController();
-        applicationControlController = result.applicationControlController();
+        
+        // Store the initialization result for later ViewModel updates
+        lastInitializationResult = result;
     }
+    
+    /**
+     * Store the last initialization result for ViewModel updates.
+     */
+    private LobbyInitializationManager.InitializationResult lastInitializationResult;
 
     // ==================== DEPENDENCY INJECTION ====================
     
@@ -275,8 +240,19 @@ public class GDKGameLobbyController implements Initializable {
      */
     public void setViewModel(GDKViewModel applicationViewModel) {
         this.applicationViewModel = applicationViewModel;
-        if (initializationManager != null && gameLaunchManager != null && jsonConfigurationController != null && messageManager != null) {
-            gameLaunchManager = initializationManager.updateGameLaunchManager(applicationViewModel, jsonConfigurationController, messageManager);
+        
+        // Update ViewModel in all components that need it
+        if (initializationManager != null && lastInitializationResult != null) {
+            LobbyInitializationManager.InitializationResult updatedResult = 
+                initializationManager.updateViewModel(applicationViewModel, lastInitializationResult);
+            
+            // Update all references with the new components
+            moduleCompilationChecker = updatedResult.moduleCompilationChecker();
+            gameLaunchManager = updatedResult.gameLaunchManager();
+            gameSelectionController = updatedResult.gameSelectionController();
+            
+            // Update the stored result
+            lastInitializationResult = updatedResult;
         }
     }
     
@@ -364,15 +340,6 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     // ==================== NAVIGATION & LIFECYCLE ====================
-    
-    /**
-     * Open the settings page.
-     */
-    private void openSettingsPage() {
-        if (settingsNavigationManager != null) {
-            settingsNavigationManager.openSettingsPage();
-        }
-    }
     
     /**
      * Handle application shutdown and save settings.

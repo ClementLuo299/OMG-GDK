@@ -281,6 +281,66 @@ public class LobbyInitializationManager {
     }
     
     /**
+     * Update ViewModel references in all components that need it.
+     * Since some components have final ViewModel fields, they need to be recreated.
+     * 
+     * @param applicationViewModel The ViewModel to set
+     * @param currentResult The current initialization result
+     * @return Updated initialization result with new ViewModel references
+     */
+    public InitializationResult updateViewModel(GDKViewModel applicationViewModel, InitializationResult currentResult) {
+        // Recreate components with final ViewModel fields
+        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
+        JsonConfigurationHandler jsonConfigurationHandler = new JsonConfigurationHandler(applicationViewModel, 
+            currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
+        
+        // Recreate GameSelectionController with new ViewModel (using stored UI component references)
+        GameSelectionController gameSelectionController = new GameSelectionController(
+            gameSelector,
+            launchGameButton,
+            refreshButton,
+            settingsButton,
+            currentResult.gameSelectionController().getAvailableGameModules(),
+            applicationViewModel,
+            currentResult.messageManager(),
+            currentResult.uiStateManager(),
+            currentResult.loadingAnimationManager(),
+            moduleCompilationChecker,
+            currentResult.jsonPersistenceManager()
+        );
+        
+        // Recreate GameLaunchManager with new ViewModel
+        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, 
+            currentResult.jsonConfigurationController(), currentResult.messageManager());
+        
+        // Wire up callbacks again with new components
+        wireCallbacks(gameSelectionController, currentResult.jsonConfigurationController(), 
+            currentResult.applicationControlController(), gameLaunchManager, 
+            currentResult.lobbyLifecycleManager(), currentResult.settingsNavigationManager());
+        
+        // Initialize the recreated subcontroller
+        gameSelectionController.initialize();
+        
+        return new InitializationResult(
+            currentResult.jsonInputEditor(),
+            currentResult.jsonOutputEditor(),
+            currentResult.messageManager(),
+            currentResult.loadingAnimationManager(),
+            currentResult.jsonPersistenceManager(),
+            moduleCompilationChecker,
+            jsonConfigurationHandler,
+            currentResult.uiStateManager(),
+            gameLaunchManager,
+            currentResult.messageBridgeManager(),
+            currentResult.lobbyLifecycleManager(),
+            currentResult.settingsNavigationManager(),
+            gameSelectionController,
+            currentResult.jsonConfigurationController(),
+            currentResult.applicationControlController()
+        );
+    }
+    
+    /**
      * Result of initialization containing all created managers and subcontrollers.
      */
     public record InitializationResult(
