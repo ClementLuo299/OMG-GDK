@@ -17,7 +17,7 @@ import java.text.AttributedString;
 public class Typography {
     
     /** Path to custom font file in resources */
-    private static final String CUSTOM_FONT_PATH = "/startup-window/Inter_18pt-Regular.ttf";
+    private static final String CUSTOM_FONT_PATH = "/fonts/Inter_18pt-Regular.ttf";
     
     /** Custom font family name (will be set if custom font loads successfully) */
     private static String customFontFamily = null;
@@ -129,6 +129,8 @@ public class Typography {
                     ? CUSTOM_FONT_PATH.replace("-Regular.ttf", "-Bold.ttf")
                     : CUSTOM_FONT_PATH;
             }
+            // Ensure path uses /fonts/ directory
+            fontPath = fontPath.replace("/startup-window/", "/fonts/");
             
             java.io.InputStream fontStream = Typography.class.getResourceAsStream(fontPath);
             if (fontStream == null) {

@@ -267,7 +267,11 @@ public class LobbyInitializationManager {
      */
     private void setupUserInterface() {
         // Apply consistent styling to the message container for better readability
-        messageContainer.setStyle("-fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;");
+        // Use the same font as the startup window
+        String fontFamily = launcher.utils.FontLoader.getApplicationFontFamily();
+        gdk.internal.Logging.info("🎨 Message container font: " + fontFamily);
+        String fontStyle = String.format("-fx-font-family: '%s', 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;", fontFamily);
+        messageContainer.setStyle(fontStyle);
         Logging.info("🎨 UI components initialized");
     }
     

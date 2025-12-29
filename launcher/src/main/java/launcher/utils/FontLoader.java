@@ -17,13 +17,16 @@ import java.io.InputStream;
 public class FontLoader {
     
     /** Path to Inter Regular font in resources */
-    private static final String INTER_REGULAR_PATH = "/startup-window/Inter_18pt-Regular.ttf";
+    private static final String INTER_REGULAR_PATH = "/fonts/Inter_18pt-Regular.ttf";
     
     /** Path to Inter Bold font in resources */
-    private static final String INTER_BOLD_PATH = "/startup-window/Inter_18pt-Bold.ttf";
+    private static final String INTER_BOLD_PATH = "/fonts/Inter_18pt-Bold.ttf";
     
     /** Font family name for Inter */
     public static final String INTER_FONT_FAMILY = "Inter";
+    
+    /** Actual font family name after loading (may include size suffix like "Inter 18pt") */
+    private static String actualInterFontFamily = null;
     
     private static boolean fontsLoaded = false;
     
@@ -99,8 +102,14 @@ public class FontLoader {
                 return false;
             }
             
-            Font.loadFont(regularStream, 12); // Size doesn't matter, just needs to be > 0
+            Font loadedFont = Font.loadFont(regularStream, 12); // Size doesn't matter, just needs to be > 0
             regularStream.close();
+            
+            // Get the actual font family name from the loaded font
+            if (loadedFont != null) {
+                actualInterFontFamily = loadedFont.getFamily();
+                Logging.info("✅ JavaFX Inter font loaded with family name: " + actualInterFontFamily);
+            }
             
             // Load bold weight
             InputStream boldStream = FontLoader.class.getResourceAsStream(INTER_BOLD_PATH);
@@ -132,6 +141,82 @@ public class FontLoader {
      */
     public static boolean areFontsLoaded() {
         return fontsLoaded;
+    }
+    
+    /**
+     * Gets the font family to use for the application.
+     * Uses the same logic as the startup window - tries Inter first, then falls back to system fonts.
+     * 
+     * @return The font family name to use in CSS
+     */
+    public static String getApplicationFontFamily() {
+        // If Inter is loaded, use the actual font family name (may be "Inter 18pt" not "Inter")
+        if (fontsLoaded && actualInterFontFamily != null) {
+            // Verify the actual font family is available in JavaFX font families
+            java.util.List<String> javafxFontFamilies = javafx.scene.text.Font.getFamilies();
+            for (String family : javafxFontFamilies) {
+                if (family.equalsIgnoreCase(actualInterFontFamily)) {
+                    Logging.info("✅ Using Inter font family: " + family);
+                    return family;
+                }
+            }
+            // If the actual family name isn't found, try just "Inter"
+            for (String family : javafxFontFamilies) {
+                if (family.equalsIgnoreCase(INTER_FONT_FAMILY)) {
+                    Logging.info("✅ Using Inter font family (without size): " + family);
+                    return family;
+                }
+            }
+            // If neither is found, use the actual family name anyway (it should work)
+            Logging.info("✅ Using Inter font family (actual name): " + actualInterFontFamily);
+            return actualInterFontFamily;
+        }
+        
+        // Otherwise, use the same fallback logic as startup window
+        try {
+            // Check JavaFX available fonts first (more accurate for JavaFX)
+            java.util.List<String> javafxFontFamilies = javafx.scene.text.Font.getFamilies();
+            String[] preferredFonts = {
+                // macOS - modern system fonts
+                "SF Pro Display", "SF Pro Text", "SF Mono", "Helvetica Neue",
+                // Windows - modern system fonts
+                "Segoe UI", "Segoe UI Variable", "Segoe UI Semibold",
+                // Linux/Android - modern fonts
+                "Roboto", "Roboto Medium", "Noto Sans", "Ubuntu", "Cantarell",
+                // Cross-platform alternatives
+                "Inter", "Source Sans Pro", "Open Sans", "Lato",
+                // Classic fallbacks
+                "Arial", "Helvetica", "Verdana"
+            };
+            
+            for (String preferred : preferredFonts) {
+                for (String available : javafxFontFamilies) {
+                    if (available.equalsIgnoreCase(preferred)) {
+                        Logging.info("✅ Using system font: " + available);
+                        return available;
+                    }
+                }
+            }
+            
+            // Fallback to AWT fonts if JavaFX doesn't have them
+            java.awt.GraphicsEnvironment ge = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
+            String[] awtFonts = ge.getAvailableFontFamilyNames();
+            
+            for (String preferred : preferredFonts) {
+                for (String available : awtFonts) {
+                    if (available.equalsIgnoreCase(preferred)) {
+                        Logging.info("✅ Using AWT font: " + available);
+                        return available;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.warning("⚠️ Error getting font family: " + e.getMessage());
+        }
+        
+        // Final fallback
+        Logging.info("⚠️ Using final fallback: sans-serif");
+        return "sans-serif";
     }
 }
 

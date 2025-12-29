@@ -1,4 +1,19 @@
 
+/* ==================== GLOBAL FONT STYLING ==================== */
+/* Apply the same font as the startup window globally - use !important to override any inline styles */
+/* Note: The actual font name is "Inter 18pt" when loaded, but we include both for compatibility */
+.root {
+    -fx-font-family: 'Inter 18pt', 'Inter', 'Segoe UI', 'SF Pro Display', 'SF Pro Text', 'Roboto', 'Noto Sans', Arial, sans-serif !important;
+}
+
+/* Apply to all common UI elements */
+.label,
+.button,
+.text-field,
+.combo-box,
+.check-box {
+    -fx-font-family: 'Inter 18pt', 'Inter', 'Segoe UI', 'SF Pro Display', 'SF Pro Text', 'Roboto', 'Noto Sans', Arial, sans-serif !important;
+}
 
 /* ==================== GDK GAME LOBBY STYLES ==================== */
 
@@ -51,7 +66,7 @@
 }
 
 .single-json-editor .title-label {
-    -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    -fx-font-family: 'Inter 18pt', 'Inter', 'Segoe UI', 'SF Pro Display', 'SF Pro Text', 'Roboto', 'Noto Sans', Arial, sans-serif;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
     -fx-text-fill: #2c3e50;
@@ -158,7 +173,7 @@
 /* Main Container */
 .game-lobby-container {
     -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-    -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    -fx-font-family: 'Inter 18pt', 'Inter', 'Segoe UI', 'SF Pro Display', 'SF Pro Text', 'Roboto', 'Noto Sans', Arial, sans-serif;
 }
 
 /* Top Navigation */
@@ -843,7 +858,7 @@
 /* Game Picker Container */
 .game-picker-container {
     -fx-background-color: white;
-    -fx-font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    -fx-font-family: 'Inter 18pt', 'Inter', 'Segoe UI', 'SF Pro Display', 'SF Pro Text', 'Roboto', 'Noto Sans', Arial, sans-serif;
     -fx-pref-width: 1200px;
 }
 

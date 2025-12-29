@@ -61,11 +61,38 @@ public final class SceneLoader {
                 throw new RuntimeException("Lobby controller is null - FXML loading may have failed");
             }
             
-            // Apply CSS styling if available
+            // Apply CSS styling first (CSS has global font rules)
             URL cssResourceUrl = GDKApplication.class.getResource("/lobby/gdk-lobby.css");
             if (cssResourceUrl != null) {
                 mainLobbyScene.getStylesheets().add(cssResourceUrl.toExternalForm());
+                gdk.internal.Logging.info("✅ CSS stylesheet loaded");
+            } else {
+                gdk.internal.Logging.warning("⚠️ CSS stylesheet not found");
             }
+            
+            // Get the font family to use
+            String fontFamily = launcher.utils.FontLoader.getApplicationFontFamily();
+            gdk.internal.Logging.info("🎨 Font family to apply: " + fontFamily);
+            gdk.internal.Logging.info("🎨 Fonts loaded: " + launcher.utils.FontLoader.areFontsLoaded());
+            
+            // Build the font style string with fallbacks and !important
+            String fontStyle = String.format("-fx-font-family: '%s', 'Segoe UI', 'SF Pro Display', 'SF Pro Text', 'Roboto', 'Noto Sans', Arial, sans-serif !important;", fontFamily);
+            
+            // Apply font to root node AFTER CSS (so inline style overrides CSS)
+            javafx.scene.Parent root = mainLobbyScene.getRoot();
+            String existingStyle = root.getStyle();
+            if (existingStyle != null && !existingStyle.isEmpty()) {
+                root.setStyle(existingStyle + " " + fontStyle);
+            } else {
+                root.setStyle(fontStyle);
+            }
+            gdk.internal.Logging.info("🎨 Applied font style to root: " + root.getStyle());
+            
+            // Log available JavaFX fonts for debugging
+            java.util.List<String> availableFonts = javafx.scene.text.Font.getFamilies();
+            boolean interFound = availableFonts.stream().anyMatch(f -> f.equalsIgnoreCase("Inter"));
+            gdk.internal.Logging.info("🎨 Inter font available in JavaFX: " + interFound);
+            gdk.internal.Logging.info("🎨 Available JavaFX fonts (first 15): " + availableFonts.subList(0, Math.min(15, availableFonts.size())));
             
             // Return the SceneLoadResult containing the scene and controller
             return new SceneLoadResult(mainLobbyScene, lobbyController);
