@@ -4,21 +4,20 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.json_editor.JsonEditor;
 import launcher.gui.lobby.GDKViewModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import launcher.gui.lobby.GameMessageHandler;
+import launcher.gui.lobby.JsonFormatter;
 
 import java.util.Map;
 
 /**
- * Handles JSON configuration UI operations.
- * Delegates business logic (parsing, validation) to ViewModel.
+ * Handles JSON editor UI operations.
+ * Manages clearing, filling, and displaying JSON content in editors.
  * 
  * @authors Clement Luo
- * @date December 27, 2025
- * @edited January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @since Beta 1.0
  */
-public class JsonConfigurationHandler {
+public class JsonEditorOperations {
     
     /**
      * Interface for reporting messages to the UI.
@@ -28,25 +27,23 @@ public class JsonConfigurationHandler {
     }
     
     private final GDKViewModel viewModel;
-    private final ObjectMapper jsonDataMapper;
     private final JsonEditor jsonInputEditor;
     private final JsonEditor jsonOutputEditor;
     private final MessageReporter messageReporter;
     
     /**
-     * Create a new JsonConfigurationHandler.
+     * Create a new JsonEditorOperations.
      * 
      * @param viewModel The ViewModel for business logic (may be null initially)
      * @param jsonInputEditor The input JSON editor
      * @param jsonOutputEditor The output JSON editor
      * @param messageReporter Callback to report messages to the UI
      */
-    public JsonConfigurationHandler(GDKViewModel viewModel,
-                                   JsonEditor jsonInputEditor, 
-                                   JsonEditor jsonOutputEditor, 
-                                   MessageReporter messageReporter) {
+    public JsonEditorOperations(GDKViewModel viewModel,
+                                JsonEditor jsonInputEditor, 
+                                JsonEditor jsonOutputEditor, 
+                                MessageReporter messageReporter) {
         this.viewModel = viewModel;
-        this.jsonDataMapper = new ObjectMapper();
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;
         this.messageReporter = messageReporter;
@@ -57,7 +54,7 @@ public class JsonConfigurationHandler {
      */
     public void setViewModel(GDKViewModel viewModel) {
         // Note: ViewModel is final, so we can't update it. This method is kept for API compatibility.
-        // In practice, JsonConfigurationHandler should be recreated when ViewModel changes.
+        // In practice, JsonEditorOperations should be recreated when ViewModel changes.
     }
     
     /**
@@ -82,20 +79,10 @@ public class JsonConfigurationHandler {
             return;
         }
         
-        // Validate JSON syntax before sending using ViewModel (business logic)
+        // Parse JSON using ViewModel (business logic)
         Map<String, Object> messageData = null;
         if (viewModel != null) {
             messageData = viewModel.parseJsonConfiguration(jsonContent);
-        } else {
-            // Fallback parsing if ViewModel not available
-            try {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> parsed = jsonDataMapper.readValue(jsonContent, Map.class);
-                messageData = parsed;
-            } catch (JsonProcessingException e) {
-                messageReporter.addMessage("❌ Invalid JSON syntax - message not sent");
-                return;
-            }
         }
         
         if (messageData == null) {
@@ -103,33 +90,25 @@ public class JsonConfigurationHandler {
             return;
         }
         
-        try {
+        // Send message using business logic handler
+        GameMessageHandler.MessageResult result = GameMessageHandler.sendMessage(selectedGameModule, messageData);
+        
+        if (!result.isSuccess()) {
+            messageReporter.addMessage("❌ " + result.getErrorMessage());
+            return;
+        }
+        
+        // Handle the response if there is one
+        if (result.hasResponse()) {
+            // Format response using business logic formatter
+            String responseJson = JsonFormatter.formatJsonResponse(result.getResponse());
             
-            // Record message to transcript before sending
-            launcher.utils.game.TranscriptRecorder.recordToGame(messageData);
+            // Display in the output area (UI operation)
+            jsonOutputEditor.setText(responseJson);
             
-            // Send the message to the game module
-            Map<String, Object> response = selectedGameModule.handleMessage(messageData);
-            
-            // Handle the response if there is one
-            if (response != null) {
-                String responseJson = formatJsonResponse(response);
-                
-                // Display in the output area
-                jsonOutputEditor.setText(responseJson);
-                
-                // Record response to transcript
-                launcher.utils.game.TranscriptRecorder.recordFromGame(response);
-                
-                // Add status message to message area
-                messageReporter.addMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");
-            } else {
-                messageReporter.addMessage("📭 No response from " + gameModuleName);
-            }
-            
-        } catch (Exception e) {
-            // Handle any other errors
-            messageReporter.addMessage("❌ Error sending message: " + e.getMessage());
+            messageReporter.addMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");
+        } else {
+            messageReporter.addMessage("📭 No response from " + gameModuleName);
         }
     }
     
@@ -164,26 +143,6 @@ public class JsonConfigurationHandler {
     }
     
     /**
-     * Format a JSON response for better display.
-     * 
-     * @param response The response map to format
-     * @return A formatted JSON string with proper indentation
-     */
-    public String formatJsonResponse(Map<String, Object> response) {
-        try {
-            // Use pretty printing for better readability
-            return jsonDataMapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
-        } catch (JsonProcessingException e) {
-            // Fallback to simple formatting if pretty printing fails
-            try {
-                return jsonDataMapper.writeValueAsString(response);
-            } catch (JsonProcessingException ex) {
-                return "Error formatting response: " + ex.getMessage();
-            }
-        }
-    }
-    
-    /**
      * Parse the JSON configuration data from the text area.
      * Delegates to ViewModel for business logic.
      * 
@@ -198,19 +157,17 @@ public class JsonConfigurationHandler {
             return viewModel.parseJsonConfiguration(jsonConfigurationText);
         }
         
-        // Fallback to local parsing if ViewModel not available (shouldn't happen)
-        if (jsonConfigurationText.isEmpty()) {
-            return null;
-        }
-        
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> configurationData = jsonDataMapper.readValue(jsonConfigurationText, Map.class);
-            return configurationData;
-        } catch (JsonProcessingException jsonProcessingError) {
-            Logging.error("❌ Failed to parse JSON: " + jsonProcessingError.getMessage());
-            return null;
-        }
+        return null;
+    }
+    
+    /**
+     * Format and display a JSON response in the output editor.
+     * 
+     * @param response The response map to format and display
+     */
+    public void displayJsonResponse(Map<String, Object> response) {
+        String formattedJson = JsonFormatter.formatJsonResponse(response);
+        jsonOutputEditor.setText(formattedJson);
     }
 }
 

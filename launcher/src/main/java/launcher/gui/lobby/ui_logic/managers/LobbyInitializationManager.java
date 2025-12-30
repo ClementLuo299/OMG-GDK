@@ -9,6 +9,10 @@ import launcher.gui.lobby.persistence.JsonPersistenceManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.ApplicationControlController;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonConfigurationController;
+import launcher.gui.lobby.ui_logic.managers.JsonEditorOperations;
+import launcher.gui.lobby.ui_logic.managers.StatusLabelManager;
+import launcher.gui.lobby.ui_logic.managers.LaunchButtonManager;
+import launcher.gui.lobby.ui_logic.managers.ModuleChangeReporter;
 import launcher.utils.module.ModuleCompiler;
 
 import javafx.collections.FXCollections;
@@ -120,8 +124,12 @@ public class LobbyInitializationManager {
         LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
         JsonPersistenceManager jsonPersistenceManager = new JsonPersistenceManager(jsonInputEditor, jsonPersistenceToggle);
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
-        JsonConfigurationHandler jsonConfigurationHandler = new JsonConfigurationHandler(applicationViewModel, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
-        UIStateManager uiStateManager = new UIStateManager(statusLabel, launchGameButton, messageReporter::addMessage);
+        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
+        
+        // Split UI state managers
+        StatusLabelManager statusLabelManager = new StatusLabelManager(statusLabel);
+        LaunchButtonManager launchButtonManager = new LaunchButtonManager(launchGameButton);
+        ModuleChangeReporter moduleChangeReporter = new ModuleChangeReporter(messageReporter::addMessage);
         
         // Initialize subcontrollers
         ObservableList<GameModule> availableGameModules = FXCollections.observableArrayList();
@@ -133,7 +141,9 @@ public class LobbyInitializationManager {
             availableGameModules,
             applicationViewModel,
             messageManager,
-            uiStateManager,
+            statusLabelManager,
+            launchButtonManager,
+            moduleChangeReporter,
             loadingAnimationManager,
             moduleCompilationChecker,
             jsonPersistenceManager
@@ -149,7 +159,7 @@ public class LobbyInitializationManager {
             metadataRequestButton,
             sendMessageButton,
             jsonPersistenceToggle,
-            jsonConfigurationHandler,
+            jsonEditorOperations,
             jsonPersistenceManager,
             messageManager
         );
@@ -164,7 +174,7 @@ public class LobbyInitializationManager {
         
         // Initialize managers that depend on subcontrollers
         GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonConfigurationController, messageManager);
-        MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonConfigurationController, jsonConfigurationHandler);
+        MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonConfigurationController);
         LobbyLifecycleManager lobbyLifecycleManager = new LobbyLifecycleManager(jsonPersistenceManager, gameSelectionController);
         
         // Initialize SettingsNavigationManager with lazy stage supplier
@@ -192,8 +202,8 @@ public class LobbyInitializationManager {
         jsonPersistenceManager.loadPersistenceSettings();
         
         // Initialize the status label
-        if (uiStateManager != null && gameSelectionController != null) {
-            uiStateManager.updateGameCountStatus(gameSelectionController.getAvailableGameModules().size());
+        if (statusLabelManager != null && gameSelectionController != null) {
+            statusLabelManager.updateGameCountStatus(gameSelectionController.getAvailableGameModules().size());
         }
         
         // Initialize all subcontrollers
@@ -210,8 +220,10 @@ public class LobbyInitializationManager {
             loadingAnimationManager,
             jsonPersistenceManager,
             moduleCompilationChecker,
-            jsonConfigurationHandler,
-            uiStateManager,
+            jsonEditorOperations,
+            statusLabelManager,
+            launchButtonManager,
+            moduleChangeReporter,
             gameLaunchManager,
             messageBridgeManager,
             lobbyLifecycleManager,
@@ -296,7 +308,7 @@ public class LobbyInitializationManager {
     public InitializationResult updateViewModel(GDKViewModel applicationViewModel, InitializationResult currentResult) {
         // Recreate components with final ViewModel fields
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
-        JsonConfigurationHandler jsonConfigurationHandler = new JsonConfigurationHandler(applicationViewModel, 
+        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, 
             currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
         
         // Recreate GameSelectionController with new ViewModel (using stored UI component references)
@@ -308,7 +320,9 @@ public class LobbyInitializationManager {
             currentResult.gameSelectionController().getAvailableGameModules(),
             applicationViewModel,
             currentResult.messageManager(),
-            currentResult.uiStateManager(),
+            currentResult.statusLabelManager(),
+            currentResult.launchButtonManager(),
+            currentResult.moduleChangeReporter(),
             currentResult.loadingAnimationManager(),
             moduleCompilationChecker,
             currentResult.jsonPersistenceManager()
@@ -333,8 +347,10 @@ public class LobbyInitializationManager {
             currentResult.loadingAnimationManager(),
             currentResult.jsonPersistenceManager(),
             moduleCompilationChecker,
-            jsonConfigurationHandler,
-            currentResult.uiStateManager(),
+            jsonEditorOperations,
+            currentResult.statusLabelManager(),
+            currentResult.launchButtonManager(),
+            currentResult.moduleChangeReporter(),
             gameLaunchManager,
             currentResult.messageBridgeManager(),
             currentResult.lobbyLifecycleManager(),
@@ -355,8 +371,10 @@ public class LobbyInitializationManager {
         LoadingAnimationManager loadingAnimationManager,
         JsonPersistenceManager jsonPersistenceManager,
         ModuleCompilationChecker moduleCompilationChecker,
-        JsonConfigurationHandler jsonConfigurationHandler,
-        UIStateManager uiStateManager,
+        JsonEditorOperations jsonEditorOperations,
+        StatusLabelManager statusLabelManager,
+        LaunchButtonManager launchButtonManager,
+        ModuleChangeReporter moduleChangeReporter,
         GameLaunchManager gameLaunchManager,
         MessageBridgeManager messageBridgeManager,
         LobbyLifecycleManager lobbyLifecycleManager,

@@ -4,7 +4,9 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.ui_logic.managers.MessageManager;
-import launcher.gui.lobby.ui_logic.managers.UIStateManager;
+import launcher.gui.lobby.ui_logic.managers.StatusLabelManager;
+import launcher.gui.lobby.ui_logic.managers.LaunchButtonManager;
+import launcher.gui.lobby.ui_logic.managers.ModuleChangeReporter;
 import launcher.gui.lobby.ui_logic.managers.LoadingAnimationManager;
 import launcher.gui.lobby.ui_logic.managers.ModuleCompilationChecker;
 import launcher.gui.lobby.persistence.JsonPersistenceManager;
@@ -39,7 +41,9 @@ public class GameSelectionController {
     // Managers
     private final GDKViewModel viewModel;
     private final MessageManager messageManager;
-    private final UIStateManager uiStateManager;
+    private final StatusLabelManager statusLabelManager;
+    private final LaunchButtonManager launchButtonManager;
+    private final ModuleChangeReporter moduleChangeReporter;
     private final LoadingAnimationManager loadingAnimationManager;
     private final ModuleCompilationChecker moduleCompilationChecker;
     private final JsonPersistenceManager jsonPersistenceManager;
@@ -65,7 +69,9 @@ public class GameSelectionController {
      * @param availableGameModules The observable list of available game modules
      * @param viewModel The ViewModel for business logic
      * @param messageManager The message manager
-     * @param uiStateManager The UI state manager
+     * @param statusLabelManager The status label manager
+     * @param launchButtonManager The launch button manager
+     * @param moduleChangeReporter The module change reporter
      * @param loadingAnimationManager The loading animation manager
      * @param moduleCompilationChecker The module compilation checker
      * @param jsonPersistenceManager The JSON persistence manager
@@ -78,7 +84,9 @@ public class GameSelectionController {
             ObservableList<GameModule> availableGameModules,
             GDKViewModel viewModel,
             MessageManager messageManager,
-            UIStateManager uiStateManager,
+            StatusLabelManager statusLabelManager,
+            LaunchButtonManager launchButtonManager,
+            ModuleChangeReporter moduleChangeReporter,
             LoadingAnimationManager loadingAnimationManager,
             ModuleCompilationChecker moduleCompilationChecker,
             JsonPersistenceManager jsonPersistenceManager) {
@@ -90,7 +98,9 @@ public class GameSelectionController {
         this.availableGameModules = availableGameModules;
         this.viewModel = viewModel;
         this.messageManager = messageManager;
-        this.uiStateManager = uiStateManager;
+        this.statusLabelManager = statusLabelManager;
+        this.launchButtonManager = launchButtonManager;
+        this.moduleChangeReporter = moduleChangeReporter;
         this.loadingAnimationManager = loadingAnimationManager;
         this.moduleCompilationChecker = moduleCompilationChecker;
         this.jsonPersistenceManager = jsonPersistenceManager;
@@ -176,7 +186,7 @@ public class GameSelectionController {
             String selectedGameName = selectedGameModule != null ? selectedGameModule.getMetadata().getGameName() : "None";
             
             // Update launch button state based on selection
-            uiStateManager.updateLaunchButtonState(selectedGameModule != null);
+            launchButtonManager.updateLaunchButtonState(selectedGameModule != null);
             
             if (selectedGameModule != null) {
                 messageManager.addMessage("🎮 Selected game: " + selectedGameName);
@@ -198,7 +208,7 @@ public class GameSelectionController {
         });
         
         // Initialize launch button state (disabled until a game is selected)
-        uiStateManager.updateLaunchButtonState(false);
+        launchButtonManager.updateLaunchButtonState(false);
         
         // Refresh button: Reload the list of available games
         refreshButton.setOnAction(event -> handleRefresh());
@@ -285,8 +295,8 @@ public class GameSelectionController {
                         selectedGameModule = null;
                         gameSelector.setItems(availableGameModules);
                         gameSelector.getSelectionModel().clearSelection();
-                        uiStateManager.updateGameCountStatus(availableGameModules.size());
-                        uiStateManager.updateLaunchButtonState(false);
+                        statusLabelManager.updateGameCountStatus(availableGameModules.size());
+                        launchButtonManager.updateLaunchButtonState(false);
                         gameSelector.requestLayout();
 
                         Logging.info("📋 ComboBox items after refresh: " + gameSelector.getItems().size());
@@ -375,7 +385,7 @@ public class GameSelectionController {
                 Logging.error("❌ ViewModel not available for module discovery");
                 Platform.runLater(() -> {
                     messageManager.addMessage("❌ Error: ViewModel not available");
-                    uiStateManager.updateGameCountStatus(availableGameModules.size());
+                        statusLabelManager.updateGameCountStatus(availableGameModules.size());
                 });
                 return;
             }
@@ -386,8 +396,8 @@ public class GameSelectionController {
                 Logging.warning("⚠️ No modules discovered");
                 Platform.runLater(() -> {
                     messageManager.addMessage("⚠️ No valid modules found");
-                    uiStateManager.updateGameCountStatus(availableGameModules.size());
-                    uiStateManager.updateLaunchButtonState(false);
+                        statusLabelManager.updateGameCountStatus(availableGameModules.size());
+                        launchButtonManager.updateLaunchButtonState(false);
                 });
                 return;
             }
@@ -458,8 +468,8 @@ public class GameSelectionController {
                         Logging.error("❌ gameSelector is null!");
                     }
                     
-                    uiStateManager.updateGameCountStatus(availableGameModules.size());
-                    uiStateManager.updateLaunchButtonState(false);
+                        statusLabelManager.updateGameCountStatus(availableGameModules.size());
+                        launchButtonManager.updateLaunchButtonState(false);
                     
                     if (gameSelector != null) {
                         for (GameModule module : gameSelector.getItems()) {
@@ -478,8 +488,8 @@ public class GameSelectionController {
                     
                     uiMessages.forEach(messageManager::addMessage);
                     
-                    if (uiStateManager != null) {
-                        uiStateManager.reportModuleChanges(previousModuleNames, newlyDiscoveredModuleNames);
+                    if (moduleChangeReporter != null) {
+                        moduleChangeReporter.reportModuleChanges(previousModuleNames, newlyDiscoveredModuleNames);
                     }
                     previousModuleCount = availableGameModules.size();
                     

@@ -2,7 +2,7 @@ package launcher.gui.lobby.ui_logic.subcontrollers;
 
 import gdk.api.GameModule;
 import launcher.gui.json_editor.JsonEditor;
-import launcher.gui.lobby.ui_logic.managers.JsonConfigurationHandler;
+import launcher.gui.lobby.ui_logic.managers.JsonEditorOperations;
 import launcher.gui.lobby.persistence.JsonPersistenceManager;
 import launcher.gui.lobby.ui_logic.managers.MessageManager;
 import javafx.scene.control.Button;
@@ -33,7 +33,7 @@ public class JsonConfigurationController {
     private final JFXToggleButton jsonPersistenceToggle;
     
     // Managers
-    private final JsonConfigurationHandler jsonConfigurationHandler;
+    private final JsonEditorOperations jsonEditorOperations;
     private final JsonPersistenceManager jsonPersistenceManager;
     private final MessageManager messageManager;
     
@@ -52,7 +52,7 @@ public class JsonConfigurationController {
      * @param metadataRequestButton Button to fill metadata request
      * @param sendMessageButton Button to send message
      * @param jsonPersistenceToggle Toggle for JSON persistence
-     * @param jsonConfigurationHandler The JSON configuration handler
+     * @param jsonEditorOperations The JSON editor operations handler
      * @param jsonPersistenceManager The JSON persistence manager
      * @param messageManager The message manager
      */
@@ -66,7 +66,7 @@ public class JsonConfigurationController {
             Button metadataRequestButton,
             Button sendMessageButton,
             JFXToggleButton jsonPersistenceToggle,
-            JsonConfigurationHandler jsonConfigurationHandler,
+            JsonEditorOperations jsonEditorOperations,
             JsonPersistenceManager jsonPersistenceManager,
             MessageManager messageManager) {
         
@@ -79,7 +79,7 @@ public class JsonConfigurationController {
         this.metadataRequestButton = metadataRequestButton;
         this.sendMessageButton = sendMessageButton;
         this.jsonPersistenceToggle = jsonPersistenceToggle;
-        this.jsonConfigurationHandler = jsonConfigurationHandler;
+        this.jsonEditorOperations = jsonEditorOperations;
         this.jsonPersistenceManager = jsonPersistenceManager;
         this.messageManager = messageManager;
     }
@@ -117,8 +117,8 @@ public class JsonConfigurationController {
      * @return The parsed JSON data, or null if parsing fails or input is empty
      */
     public java.util.Map<String, Object> parseJsonConfigurationData() {
-        return jsonConfigurationHandler != null ? 
-            jsonConfigurationHandler.parseJsonConfigurationData() : null;
+        return jsonEditorOperations != null ? 
+            jsonEditorOperations.parseJsonConfigurationData() : null;
     }
     
     /**
@@ -136,16 +136,16 @@ public class JsonConfigurationController {
         javafx.scene.layout.VBox.setVgrow(jsonOutputEditor, javafx.scene.layout.Priority.ALWAYS);
         
         // Clear input button: Remove all JSON input
-        clearInputButton.setOnAction(event -> jsonConfigurationHandler.clearJsonInputData());
+        clearInputButton.setOnAction(event -> jsonEditorOperations.clearJsonInputData());
         
         // Clear output button: Remove all JSON output
-        clearOutputButton.setOnAction(event -> jsonConfigurationHandler.clearJsonOutputData());
+        clearOutputButton.setOnAction(event -> jsonEditorOperations.clearJsonOutputData());
         
         // Metadata request button: Fill JSON with metadata request
-        metadataRequestButton.setOnAction(event -> jsonConfigurationHandler.fillMetadataRequest());
+        metadataRequestButton.setOnAction(event -> jsonEditorOperations.fillMetadataRequest());
         
         // Send message button: Send a test message
-        sendMessageButton.setOnAction(event -> jsonConfigurationHandler.sendMessage(selectedGameModule));
+        sendMessageButton.setOnAction(event -> jsonEditorOperations.sendMessage(selectedGameModule));
         
         // Persistence Toggle Handler
         jsonPersistenceToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {

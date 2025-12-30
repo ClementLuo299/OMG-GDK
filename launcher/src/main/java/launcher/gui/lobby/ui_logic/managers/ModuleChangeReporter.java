@@ -1,23 +1,19 @@
 package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.internal.Logging;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Manages UI state updates for the game lobby controller.
- * 
- * Handles updating status labels, button states, and reporting module changes.
+ * Reports changes in available game modules to the UI.
+ * Handles module change analysis and message reporting.
  * 
  * @authors Clement Luo
- * @date December 27, 2025
- * @edited December 27, 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @since Beta 1.0
  */
-public class UIStateManager {
+public class ModuleChangeReporter {
     
     /**
      * Interface for reporting messages to the UI.
@@ -26,50 +22,15 @@ public class UIStateManager {
         void addMessage(String message);
     }
     
-    private final Label statusLabel;
-    private final Button launchGameButton;
     private final MessageReporter messageReporter;
     
     /**
-     * Create a new UIStateManager.
+     * Create a new ModuleChangeReporter.
      * 
-     * @param statusLabel The status label to update
-     * @param launchGameButton The launch button to update
      * @param messageReporter Callback to report messages to the UI
      */
-    public UIStateManager(Label statusLabel, Button launchGameButton, MessageReporter messageReporter) {
-        this.statusLabel = statusLabel;
-        this.launchGameButton = launchGameButton;
+    public ModuleChangeReporter(MessageReporter messageReporter) {
         this.messageReporter = messageReporter;
-    }
-    
-    /**
-     * Update the game count status label.
-     * 
-     * @param gameCount The number of available games
-     */
-    public void updateGameCountStatus(int gameCount) {
-        if (statusLabel != null) {
-            statusLabel.setText("Available Games: " + gameCount);
-            Logging.info("📊 UI Status updated: " + gameCount + " games available");
-        }
-    }
-    
-    /**
-     * Update the launch button state based on whether a game is selected.
-     * 
-     * @param hasSelectedGame Whether a game is currently selected
-     */
-    public void updateLaunchButtonState(boolean hasSelectedGame) {
-        if (launchGameButton != null) {
-            launchGameButton.setDisable(!hasSelectedGame);
-            
-            if (hasSelectedGame) {
-                launchGameButton.setStyle("-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px; -fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 10 20; -fx-min-width: 120;");
-            } else {
-                launchGameButton.setStyle("-fx-alignment: center; -fx-content-display: text-only; -fx-min-height: 45px; -fx-pref-height: 45px; -fx-max-height: 45px; -fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-border-color: transparent; -fx-cursor: default; -fx-padding: 10 20; -fx-min-width: 120; -fx-opacity: 0.6;");
-            }
-        }
     }
     
     /**
