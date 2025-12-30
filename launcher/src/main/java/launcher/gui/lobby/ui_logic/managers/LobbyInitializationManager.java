@@ -122,10 +122,12 @@ public class LobbyInitializationManager {
         
         // Initialize managers
         MessageManager messageManager = new MessageManager(messageContainer, messageScrollPane);
-        LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
+        RefreshButtonStateManager refreshButtonStateManager = new RefreshButtonStateManager(refreshButton);
+        LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButtonStateManager, loadingProgressBar, loadingStatusLabel);
         JsonPersistenceManager jsonPersistenceManager = new JsonPersistenceManager(jsonInputEditor, jsonPersistenceToggle);
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
         JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
+        GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(messageManager);
         
         // Split UI state managers
         StatusLabelManager statusLabelManager = new StatusLabelManager(statusLabel);
@@ -184,7 +186,7 @@ public class LobbyInitializationManager {
         );
         
         // Initialize managers that depend on subcontrollers
-        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonActionButtonsController, messageManager);
+        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonActionButtonsController, gameLaunchErrorHandler);
         MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonActionButtonsController);
         LobbyLifecycleManager lobbyLifecycleManager = new LobbyLifecycleManager(jsonPersistenceManager, gameSelectionController);
         
@@ -316,7 +318,8 @@ public class LobbyInitializationManager {
     public GameLaunchManager updateGameLaunchManager(GDKViewModel applicationViewModel,
                                                      JsonActionButtonsController jsonActionButtonsController,
                                                      MessageManager messageManager) {
-        return new GameLaunchManager(applicationViewModel, jsonActionButtonsController, messageManager);
+        GameLaunchErrorHandler errorHandler = new GameLaunchErrorHandler(messageManager);
+        return new GameLaunchManager(applicationViewModel, jsonActionButtonsController, errorHandler);
     }
     
     /**
@@ -356,9 +359,12 @@ public class LobbyInitializationManager {
             moduleCompilationChecker
         );
         
+        // Recreate GameLaunchErrorHandler (no ViewModel dependency)
+        GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(currentResult.messageManager());
+        
         // Recreate GameLaunchManager with new ViewModel
         GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, 
-            currentResult.jsonActionButtonsController(), currentResult.messageManager());
+            currentResult.jsonActionButtonsController(), gameLaunchErrorHandler);
         
         // Wire up callbacks again with new components
         wireCallbacks(gameSelectionController, currentResult.jsonActionButtonsController(), 
@@ -373,7 +379,7 @@ public class LobbyInitializationManager {
             currentResult.jsonInputEditor(),
             currentResult.jsonOutputEditor(),
             currentResult.messageManager(),
-            currentResult.loadingAnimationManager(),
+            loadingAnimationManager,
             currentResult.jsonPersistenceManager(),
             moduleCompilationChecker,
             jsonEditorOperations,

@@ -3,7 +3,6 @@ package launcher.gui.lobby.ui_logic.managers;
 import gdk.internal.Logging;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.util.Duration;
@@ -18,7 +17,7 @@ import javafx.util.Duration;
  */
 public class LoadingAnimationManager {
     
-    private final Button refreshButton;
+    private final RefreshButtonStateManager refreshButtonStateManager;
     private final ProgressBar loadingProgressBar;
     private final Label loadingStatusLabel;
     
@@ -38,12 +37,12 @@ public class LoadingAnimationManager {
     /**
      * Create a new LoadingAnimationManager.
      * 
-     * @param refreshButton The refresh button to disable during loading
+     * @param refreshButtonStateManager The refresh button state manager
      * @param loadingProgressBar The progress bar to show progress
      * @param loadingStatusLabel The status label to show loading messages
      */
-    public LoadingAnimationManager(Button refreshButton, ProgressBar loadingProgressBar, Label loadingStatusLabel) {
-        this.refreshButton = refreshButton;
+    public LoadingAnimationManager(RefreshButtonStateManager refreshButtonStateManager, ProgressBar loadingProgressBar, Label loadingStatusLabel) {
+        this.refreshButtonStateManager = refreshButtonStateManager;
         this.loadingProgressBar = loadingProgressBar;
         this.loadingStatusLabel = loadingStatusLabel;
     }
@@ -53,7 +52,7 @@ public class LoadingAnimationManager {
      */
     public void startAnimation() {
         isRefreshing = true;
-        refreshButton.setDisable(true);
+        refreshButtonStateManager.disable();
         loadingProgressBar.setVisible(true);
         loadingProgressBar.setProgress(0.0);
         loadingStatusLabel.setVisible(true);
@@ -125,7 +124,7 @@ public class LoadingAnimationManager {
     public void stopAnimation() {
         Logging.info("🎯 Stopping loading animation");
         isRefreshing = false;
-        refreshButton.setDisable(false);
+        refreshButtonStateManager.enable();
         loadingProgressBar.setVisible(false);
         loadingStatusLabel.setVisible(false);
         

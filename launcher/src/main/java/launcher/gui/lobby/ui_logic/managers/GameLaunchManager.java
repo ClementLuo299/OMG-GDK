@@ -5,13 +5,12 @@ import gdk.internal.Logging;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 import launcher.utils.game.GameLaunchUtil;
-import launcher.utils.gui.DialogUtil;
 
 import java.util.Map;
 
 /**
  * Manages game launching operations for the lobby controller.
- * Handles validation, configuration parsing, and coordination with the ViewModel.
+ * Handles coordination with the ViewModel and game launch execution.
  * 
  * @authors Clement Luo
  * @date January 2025
@@ -21,21 +20,21 @@ public class GameLaunchManager {
     
     private final GDKViewModel applicationViewModel;
     private final JsonActionButtonsController jsonActionButtonsController;
-    private final MessageManager messageManager;
+    private final GameLaunchErrorHandler errorHandler;
     
     /**
      * Create a new GameLaunchManager.
      * 
      * @param applicationViewModel The application ViewModel for launching games
      * @param jsonActionButtonsController The JSON action buttons controller
-     * @param messageManager The message manager for user feedback
+     * @param errorHandler The error handler for launch errors
      */
     public GameLaunchManager(GDKViewModel applicationViewModel,
                              JsonActionButtonsController jsonActionButtonsController,
-                             MessageManager messageManager) {
+                             GameLaunchErrorHandler errorHandler) {
         this.applicationViewModel = applicationViewModel;
         this.jsonActionButtonsController = jsonActionButtonsController;
-        this.messageManager = messageManager;
+        this.errorHandler = errorHandler;
     }
     
     /**
@@ -49,22 +48,14 @@ public class GameLaunchManager {
     public boolean launchGame(GameModule selectedGameModule, Map<String, Object> jsonConfigurationData, boolean isAutoLaunch) {
         // Validate ViewModel is available
         if (applicationViewModel == null) {
-            Logging.error("❌ applicationViewModel is null - cannot launch game");
-            if (!isAutoLaunch) {
-                DialogUtil.showError("Application Error", "Application ViewModel is not available. Please restart the application.");
-                messageManager.addMessage("❌ Error: ViewModel not available");
-            }
+            errorHandler.handleViewModelUnavailable(isAutoLaunch);
             return false;
         }
         
         // Validate game launch using ViewModel (business logic)
         GDKViewModel.LaunchValidationResult validation = applicationViewModel.validateGameLaunch(selectedGameModule);
         if (!validation.isValid()) {
-            Logging.error("❌ Game launch validation failed: " + validation.errorMessage());
-            if (!isAutoLaunch) {
-                DialogUtil.showError("Launch Error", validation.errorMessage());
-                messageManager.addMessage("❌ Error: " + validation.errorMessage());
-            }
+            errorHandler.handleValidationError(validation.errorMessage(), isAutoLaunch);
             return false;
         }
         
@@ -75,11 +66,7 @@ public class GameLaunchManager {
         boolean configSuccess = GameLaunchUtil.launchGameWithConfiguration(selectedGameModule, jsonConfigurationData, isAutoLaunch);
         
         if (!configSuccess) {
-            Logging.error("❌ Game configuration failed for: " + gameName);
-            if (!isAutoLaunch) {
-                DialogUtil.showError("Launch Error", "Failed to configure game: " + gameName + ". Check the logs for details.");
-                messageManager.addMessage("❌ Failed to configure game: " + gameName);
-            }
+            errorHandler.handleConfigurationFailure(gameName, isAutoLaunch);
             return false;
         }
         
@@ -91,14 +78,10 @@ public class GameLaunchManager {
         try {
             Logging.info("🎮 Calling ViewModel to launch game: " + gameName);
             applicationViewModel.handleLaunchGame(selectedGameModule, jsonText);
-            messageManager.addMessage("✅ Launching game: " + gameName);
+            errorHandler.reportSuccessfulLaunch(gameName);
             return true;
         } catch (Exception e) {
-            Logging.error("❌ Exception while launching game: " + gameName, e);
-            if (!isAutoLaunch) {
-                DialogUtil.showError("Launch Error", "Failed to launch game: " + gameName + "\n\nError: " + e.getMessage());
-                messageManager.addMessage("❌ Error launching game: " + e.getMessage());
-            }
+            errorHandler.handleLaunchException(gameName, e, isAutoLaunch);
             return false;
         }
     }
@@ -123,8 +106,8 @@ public class GameLaunchManager {
         if (applicationViewModel != null && !jsonText.isEmpty()) {
             jsonConfigurationData = applicationViewModel.parseJsonConfiguration(jsonText);
             if (jsonConfigurationData == null) {
-                // Invalid JSON syntax - show UI error
-                DialogUtil.showJsonError("Invalid JSON", "Please enter valid JSON configuration.");
+                // Invalid JSON syntax - report error
+                errorHandler.handleValidationError("Invalid JSON syntax - Please enter valid JSON configuration.", false);
                 return false;
             }
         }

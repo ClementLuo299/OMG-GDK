@@ -8,6 +8,7 @@ package launcher.gui.lobby.ui_logic;
  * 
  * @author Clement Luo
  * @date December 28, 2025
+ * @edited December 29, 2025
  * @since Beta 1.0
  */
 public enum ControllerMode {
