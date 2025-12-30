@@ -2,7 +2,7 @@ package launcher.lifecycle.start.gui;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.lifecycle.start.gui.initialization.SceneLoader;
 import launcher.lifecycle.start.gui.initialization.StageInitializer;

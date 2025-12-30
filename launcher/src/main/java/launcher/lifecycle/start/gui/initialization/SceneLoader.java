@@ -3,7 +3,7 @@ package launcher.lifecycle.start.gui.initialization;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import launcher.GDKApplication;
-import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 
 import java.net.URL;
 

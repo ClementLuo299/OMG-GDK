@@ -1,13 +1,13 @@
-package launcher.gui.lobby.subcontrollers;
+package launcher.gui.lobby.ui_logic.subcontrollers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.managers.MessageManager;
-import launcher.gui.lobby.managers.UIStateManager;
-import launcher.gui.lobby.managers.LoadingAnimationManager;
-import launcher.gui.lobby.managers.ModuleCompilationChecker;
-import launcher.gui.lobby.managers.JsonPersistenceManager;
+import launcher.gui.lobby.ui_logic.managers.MessageManager;
+import launcher.gui.lobby.ui_logic.managers.UIStateManager;
+import launcher.gui.lobby.ui_logic.managers.LoadingAnimationManager;
+import launcher.gui.lobby.ui_logic.managers.ModuleCompilationChecker;
+import launcher.gui.lobby.persistence.JsonPersistenceManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

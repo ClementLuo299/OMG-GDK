@@ -1,9 +1,9 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.subcontrollers.JsonConfigurationController;
+import launcher.gui.lobby.ui_logic.subcontrollers.JsonConfigurationController;
 import launcher.utils.game.GameLaunchUtil;
 import launcher.utils.gui.DialogUtil;
 

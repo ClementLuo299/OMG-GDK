@@ -1,11 +1,11 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.internal.Logging;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.settings_page.SettingsPageController;
 import launcher.utils.gui.DialogUtil;
 

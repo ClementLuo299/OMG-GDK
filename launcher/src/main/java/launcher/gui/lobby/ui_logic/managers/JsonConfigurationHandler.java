@@ -1,4 +1,4 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;

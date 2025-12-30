@@ -1,8 +1,8 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.internal.Logging;
-import launcher.gui.lobby.ControllerMode;
-import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.ui_logic.ControllerMode;
+import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.utils.module.ModuleCompiler;
 
 /**

@@ -15,7 +15,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 
 /**
  * Controller for the GDK Settings Page.

@@ -1,4 +1,4 @@
-package launcher.gui.lobby;
+package launcher.gui.lobby.ui_logic;
 
 /**
  * Represents the operational mode of the GDK Game Lobby Controller.

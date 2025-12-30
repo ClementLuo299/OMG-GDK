@@ -1,8 +1,8 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.internal.MessagingBridge;
 import javafx.application.Platform;
-import launcher.gui.lobby.subcontrollers.JsonConfigurationController;
+import launcher.gui.lobby.ui_logic.subcontrollers.JsonConfigurationController;
 
 import java.util.Map;
 

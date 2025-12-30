@@ -1,4 +1,4 @@
-package launcher.gui.lobby.subcontrollers;
+package launcher.gui.lobby.ui_logic.subcontrollers;
 
 import gdk.internal.Logging;
 import javafx.application.Platform;

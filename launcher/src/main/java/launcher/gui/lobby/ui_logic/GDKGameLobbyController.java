@@ -1,4 +1,4 @@
-package launcher.gui.lobby;
+package launcher.gui.lobby.ui_logic;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -17,14 +17,15 @@ import com.jfoenix.controls.JFXToggleButton;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import launcher.gui.lobby.managers.MessageManager;
-import launcher.gui.lobby.managers.LoadingAnimationManager;
-import launcher.gui.lobby.managers.ModuleCompilationChecker;
-import launcher.gui.lobby.managers.GameLaunchManager;
-import launcher.gui.lobby.managers.LobbyLifecycleManager;
-import launcher.gui.lobby.managers.LobbyInitializationManager;
-import launcher.gui.lobby.managers.ControllerModeManager;
-import launcher.gui.lobby.subcontrollers.GameSelectionController;
+import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.ui_logic.managers.MessageManager;
+import launcher.gui.lobby.ui_logic.managers.LoadingAnimationManager;
+import launcher.gui.lobby.ui_logic.managers.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.GameLaunchManager;
+import launcher.gui.lobby.ui_logic.managers.LobbyLifecycleManager;
+import launcher.gui.lobby.ui_logic.managers.LobbyInitializationManager;
+import launcher.gui.lobby.ui_logic.managers.ControllerModeManager;
+import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 
 /**
  * Controller for the GDK Game Lobby interface.

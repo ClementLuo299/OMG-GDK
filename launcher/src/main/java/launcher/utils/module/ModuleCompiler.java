@@ -2,7 +2,7 @@ package launcher.utils.module;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
-import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 
 import java.io.File;
 import java.net.URL;

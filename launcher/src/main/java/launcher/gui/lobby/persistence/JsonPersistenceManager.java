@@ -1,4 +1,4 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.persistence;
 
 import gdk.internal.Logging;
 import launcher.gui.json_editor.JsonEditor;

@@ -1,13 +1,14 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.json_editor.JsonEditor;
-import launcher.gui.lobby.GDKGameLobbyController;
+import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.subcontrollers.ApplicationControlController;
-import launcher.gui.lobby.subcontrollers.GameSelectionController;
-import launcher.gui.lobby.subcontrollers.JsonConfigurationController;
+import launcher.gui.lobby.persistence.JsonPersistenceManager;
+import launcher.gui.lobby.ui_logic.subcontrollers.ApplicationControlController;
+import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
+import launcher.gui.lobby.ui_logic.subcontrollers.JsonConfigurationController;
 import launcher.utils.module.ModuleCompiler;
 
 import javafx.collections.FXCollections;

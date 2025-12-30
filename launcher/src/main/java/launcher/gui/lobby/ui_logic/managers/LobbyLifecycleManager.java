@@ -1,8 +1,9 @@
-package launcher.gui.lobby.managers;
+package launcher.gui.lobby.ui_logic.managers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.gui.lobby.subcontrollers.GameSelectionController;
+import launcher.gui.lobby.persistence.JsonPersistenceManager;
+import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 
 /**
  * Manages lifecycle operations for the lobby controller.

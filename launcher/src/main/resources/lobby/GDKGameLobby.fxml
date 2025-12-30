@@ -8,7 +8,7 @@
     - View game messages and output
     - Access settings
     
-    Controller: launcher.gui.lobby.GDKGameLobbyController
+    Controller: launcher.gui.lobby.ui_logic.GDKGameLobbyController
     Layout: Vertical box (VBox) with header, content area, and status bar
 -->
 
@@ -27,7 +27,7 @@
 <!-- Main container for the entire lobby interface -->
 <VBox fx:id="mainContainer" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="launcher.gui.lobby.GDKGameLobbyController"
+      fx:controller="launcher.gui.lobby.ui_logic.GDKGameLobbyController"
       styleClass="game-picker-container" spacing="0" alignment="TOP_LEFT">
     
     <padding>
