@@ -25,6 +25,7 @@ import launcher.gui.lobby.ui_logic.managers.GameLaunchManager;
 import launcher.gui.lobby.ui_logic.managers.LobbyLifecycleManager;
 import launcher.gui.lobby.ui_logic.managers.LobbyInitializationManager;
 import launcher.gui.lobby.ui_logic.managers.ControllerModeManager;
+import launcher.gui.lobby.ui_logic.managers.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 
 /**
@@ -201,6 +202,7 @@ public class GDKGameLobbyController implements Initializable {
         gameLaunchManager = result.gameLaunchManager();
         lobbyLifecycleManager = result.lobbyLifecycleManager();
         gameSelectionController = result.gameSelectionController();
+        gameModuleRefreshManager = result.gameModuleRefreshManager();
         
         // Store the initialization result for later ViewModel updates
         lastInitializationResult = result;
@@ -230,6 +232,7 @@ public class GDKGameLobbyController implements Initializable {
             moduleCompilationChecker = updatedResult.moduleCompilationChecker();
             gameLaunchManager = updatedResult.gameLaunchManager();
             gameSelectionController = updatedResult.gameSelectionController();
+            gameModuleRefreshManager = updatedResult.gameModuleRefreshManager();
             
             // Update the stored result
             lastInitializationResult = updatedResult;
@@ -283,11 +286,16 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== MODULE DISCOVERY & REFRESH ====================
     
     /**
+     * Manager for refreshing game modules
+     */
+    private GameModuleRefreshManager gameModuleRefreshManager;
+    
+    /**
      * Fast refresh that skips compilation checks for faster startup.
      */
     public void refreshAvailableGameModulesFast() {
-        if (gameSelectionController != null) {
-            gameSelectionController.refreshAvailableGameModulesFast();
+        if (gameModuleRefreshManager != null) {
+            gameModuleRefreshManager.refreshAvailableGameModulesFast();
         }
     }
     

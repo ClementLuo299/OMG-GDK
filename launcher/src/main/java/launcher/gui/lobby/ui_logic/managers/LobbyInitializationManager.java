@@ -6,13 +6,14 @@ import launcher.gui.json_editor.JsonEditor;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.persistence.JsonPersistenceManager;
-import launcher.gui.lobby.ui_logic.subcontrollers.ApplicationControlController;
+import launcher.gui.lobby.ui_logic.subcontrollers.TopBarController;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
-import launcher.gui.lobby.ui_logic.subcontrollers.JsonConfigurationController;
+import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 import launcher.gui.lobby.ui_logic.managers.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.StatusLabelManager;
 import launcher.gui.lobby.ui_logic.managers.LaunchButtonManager;
 import launcher.gui.lobby.ui_logic.managers.ModuleChangeReporter;
+import launcher.gui.lobby.ui_logic.managers.GameModuleRefreshManager;
 import launcher.utils.module.ModuleCompiler;
 
 import javafx.collections.FXCollections;
@@ -136,22 +137,34 @@ public class LobbyInitializationManager {
         GameSelectionController gameSelectionController = new GameSelectionController(
             gameSelector,
             launchGameButton,
-            refreshButton,
-            settingsButton,
             availableGameModules,
+            messageManager,
+            launchButtonManager,
+            jsonPersistenceManager
+        );
+        
+        // Create refresh manager
+        GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
             applicationViewModel,
+            availableGameModules,
+            gameSelector,
             messageManager,
             statusLabelManager,
             launchButtonManager,
             moduleChangeReporter,
             loadingAnimationManager,
-            moduleCompilationChecker,
-            jsonPersistenceManager
+            moduleCompilationChecker
         );
         
-        JsonConfigurationController jsonConfigurationController = new JsonConfigurationController(
-            jsonInputEditorContainer,
-            jsonOutputEditorContainer,
+        // Set up JSON editor containers
+        jsonInputEditorContainer.getChildren().add(jsonInputEditor);
+        jsonOutputEditorContainer.getChildren().add(jsonOutputEditor);
+        javafx.scene.layout.VBox.setVgrow(jsonInputEditorContainer, javafx.scene.layout.Priority.ALWAYS);
+        javafx.scene.layout.VBox.setVgrow(jsonOutputEditorContainer, javafx.scene.layout.Priority.ALWAYS);
+        javafx.scene.layout.VBox.setVgrow(jsonInputEditor, javafx.scene.layout.Priority.ALWAYS);
+        javafx.scene.layout.VBox.setVgrow(jsonOutputEditor, javafx.scene.layout.Priority.ALWAYS);
+        
+        JsonActionButtonsController jsonActionButtonsController = new JsonActionButtonsController(
             jsonInputEditor,
             jsonOutputEditor,
             clearInputButton,
@@ -164,17 +177,15 @@ public class LobbyInitializationManager {
             messageManager
         );
         
-        ApplicationControlController applicationControlController = new ApplicationControlController(
+        TopBarController topBarController = new TopBarController(
             exitButton,
-            settingsButton,
-            statusLabel,
-            loadingProgressBar,
-            loadingStatusLabel
+            refreshButton,
+            settingsButton
         );
         
         // Initialize managers that depend on subcontrollers
-        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonConfigurationController, messageManager);
-        MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonConfigurationController);
+        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonActionButtonsController, messageManager);
+        MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonActionButtonsController);
         LobbyLifecycleManager lobbyLifecycleManager = new LobbyLifecycleManager(jsonPersistenceManager, gameSelectionController);
         
         // Initialize SettingsNavigationManager with lazy stage supplier
@@ -186,8 +197,8 @@ public class LobbyInitializationManager {
         });
         
         // Wire up callbacks
-        wireCallbacks(gameSelectionController, jsonConfigurationController, applicationControlController,
-                     gameLaunchManager, lobbyLifecycleManager, settingsNavigationManager);
+        wireCallbacks(gameSelectionController, jsonActionButtonsController, topBarController,
+                     gameLaunchManager, lobbyLifecycleManager, settingsNavigationManager, gameModuleRefreshManager);
         
         // Set up the UI components
         setupUserInterface();
@@ -197,6 +208,15 @@ public class LobbyInitializationManager {
         
         // Register controller with ModuleCompiler for progress updates
         ModuleCompiler.setUIController(controller);
+        
+        // Set up JSON persistence text change listener (auto-save)
+        javafx.application.Platform.runLater(() -> {
+            jsonInputEditor.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (jsonPersistenceToggle.isSelected()) {
+                    jsonPersistenceManager.saveJsonContent();
+                }
+            });
+        });
         
         // Load saved JSON content and toggle state
         jsonPersistenceManager.loadPersistenceSettings();
@@ -208,8 +228,8 @@ public class LobbyInitializationManager {
         
         // Initialize all subcontrollers
         gameSelectionController.initialize();
-        jsonConfigurationController.initialize();
-        applicationControlController.initialize();
+        jsonActionButtonsController.initialize();
+        topBarController.initialize();
         
         Logging.info("✅ GDK Game Picker Controller initialized successfully");
         
@@ -229,8 +249,9 @@ public class LobbyInitializationManager {
             lobbyLifecycleManager,
             settingsNavigationManager,
             gameSelectionController,
-            jsonConfigurationController,
-            applicationControlController
+            jsonActionButtonsController,
+            topBarController,
+            gameModuleRefreshManager
         );
     }
     
@@ -239,11 +260,12 @@ public class LobbyInitializationManager {
      */
     private void wireCallbacks(
             GameSelectionController gameSelectionController,
-            JsonConfigurationController jsonConfigurationController,
-            ApplicationControlController applicationControlController,
+            JsonActionButtonsController jsonActionButtonsController,
+            TopBarController topBarController,
             GameLaunchManager gameLaunchManager,
             LobbyLifecycleManager lobbyLifecycleManager,
-            SettingsNavigationManager settingsNavigationManager) {
+            SettingsNavigationManager settingsNavigationManager,
+            GameModuleRefreshManager gameModuleRefreshManager) {
         
         // Set callbacks for game selection controller
         gameSelectionController.setOnLaunchGame(() -> {
@@ -252,23 +274,23 @@ public class LobbyInitializationManager {
                 gameLaunchManager.launchGameFromUI(selectedGame);
             }
         });
-        gameSelectionController.setOnOpenSettings(() -> {
-            if (settingsNavigationManager != null) {
-                settingsNavigationManager.openSettingsPage();
-            }
-        });
         gameSelectionController.setOnGameSelected(() -> {
             // Update JSON configuration controller with selected game
-            jsonConfigurationController.setSelectedGameModule(gameSelectionController.getSelectedGameModule());
+            jsonActionButtonsController.setSelectedGameModule(gameSelectionController.getSelectedGameModule());
         });
         
         // Set callbacks for application control controller
-        applicationControlController.setOnExit(() -> {
+        topBarController.setOnExit(() -> {
             if (lobbyLifecycleManager != null) {
                 lobbyLifecycleManager.handleShutdown();
             }
         });
-        applicationControlController.setOnOpenSettings(() -> {
+        topBarController.setOnRefresh(() -> {
+            if (gameModuleRefreshManager != null) {
+                gameModuleRefreshManager.handleRefresh();
+            }
+        });
+        topBarController.setOnOpenSettings(() -> {
             if (settingsNavigationManager != null) {
                 settingsNavigationManager.openSettingsPage();
             }
@@ -292,9 +314,9 @@ public class LobbyInitializationManager {
      * Update the game launch manager with a new ViewModel.
      */
     public GameLaunchManager updateGameLaunchManager(GDKViewModel applicationViewModel,
-                                                     JsonConfigurationController jsonConfigurationController,
+                                                     JsonActionButtonsController jsonActionButtonsController,
                                                      MessageManager messageManager) {
-        return new GameLaunchManager(applicationViewModel, jsonConfigurationController, messageManager);
+        return new GameLaunchManager(applicationViewModel, jsonActionButtonsController, messageManager);
     }
     
     /**
@@ -311,31 +333,38 @@ public class LobbyInitializationManager {
         JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, 
             currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
         
-        // Recreate GameSelectionController with new ViewModel (using stored UI component references)
+        // Recreate GameSelectionController (no ViewModel dependency)
         GameSelectionController gameSelectionController = new GameSelectionController(
             gameSelector,
             launchGameButton,
-            refreshButton,
-            settingsButton,
             currentResult.gameSelectionController().getAvailableGameModules(),
+            currentResult.messageManager(),
+            currentResult.launchButtonManager(),
+            currentResult.jsonPersistenceManager()
+        );
+        
+        // Recreate GameModuleRefreshManager with new ViewModel
+        GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
             applicationViewModel,
+            currentResult.gameSelectionController().getAvailableGameModules(),
+            gameSelector,
             currentResult.messageManager(),
             currentResult.statusLabelManager(),
             currentResult.launchButtonManager(),
             currentResult.moduleChangeReporter(),
             currentResult.loadingAnimationManager(),
-            moduleCompilationChecker,
-            currentResult.jsonPersistenceManager()
+            moduleCompilationChecker
         );
         
         // Recreate GameLaunchManager with new ViewModel
         GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, 
-            currentResult.jsonConfigurationController(), currentResult.messageManager());
+            currentResult.jsonActionButtonsController(), currentResult.messageManager());
         
         // Wire up callbacks again with new components
-        wireCallbacks(gameSelectionController, currentResult.jsonConfigurationController(), 
-            currentResult.applicationControlController(), gameLaunchManager, 
-            currentResult.lobbyLifecycleManager(), currentResult.settingsNavigationManager());
+        wireCallbacks(gameSelectionController, currentResult.jsonActionButtonsController(), 
+            currentResult.topBarController(), gameLaunchManager, 
+            currentResult.lobbyLifecycleManager(), currentResult.settingsNavigationManager(),
+            gameModuleRefreshManager);
         
         // Initialize the recreated subcontroller
         gameSelectionController.initialize();
@@ -356,8 +385,9 @@ public class LobbyInitializationManager {
             currentResult.lobbyLifecycleManager(),
             currentResult.settingsNavigationManager(),
             gameSelectionController,
-            currentResult.jsonConfigurationController(),
-            currentResult.applicationControlController()
+            currentResult.jsonActionButtonsController(),
+            currentResult.topBarController(),
+            gameModuleRefreshManager
         );
     }
     
@@ -380,8 +410,9 @@ public class LobbyInitializationManager {
         LobbyLifecycleManager lobbyLifecycleManager,
         SettingsNavigationManager settingsNavigationManager,
         GameSelectionController gameSelectionController,
-        JsonConfigurationController jsonConfigurationController,
-        ApplicationControlController applicationControlController
+        JsonActionButtonsController jsonActionButtonsController,
+        TopBarController topBarController,
+        GameModuleRefreshManager gameModuleRefreshManager
     ) {}
 }
 

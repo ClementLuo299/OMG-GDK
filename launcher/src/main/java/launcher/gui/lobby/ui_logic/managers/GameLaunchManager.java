@@ -3,7 +3,7 @@ package launcher.gui.lobby.ui_logic.managers;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.ui_logic.subcontrollers.JsonConfigurationController;
+import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 import launcher.utils.game.GameLaunchUtil;
 import launcher.utils.gui.DialogUtil;
 
@@ -20,21 +20,21 @@ import java.util.Map;
 public class GameLaunchManager {
     
     private final GDKViewModel applicationViewModel;
-    private final JsonConfigurationController jsonConfigurationController;
+    private final JsonActionButtonsController jsonActionButtonsController;
     private final MessageManager messageManager;
     
     /**
      * Create a new GameLaunchManager.
      * 
      * @param applicationViewModel The application ViewModel for launching games
-     * @param jsonConfigurationController The JSON configuration controller
+     * @param jsonActionButtonsController The JSON action buttons controller
      * @param messageManager The message manager for user feedback
      */
     public GameLaunchManager(GDKViewModel applicationViewModel,
-                             JsonConfigurationController jsonConfigurationController,
+                             JsonActionButtonsController jsonActionButtonsController,
                              MessageManager messageManager) {
         this.applicationViewModel = applicationViewModel;
-        this.jsonConfigurationController = jsonConfigurationController;
+        this.jsonActionButtonsController = jsonActionButtonsController;
         this.messageManager = messageManager;
     }
     
@@ -84,8 +84,8 @@ public class GameLaunchManager {
         }
         
         // Get the JSON text for the ViewModel to check game mode
-        String jsonText = jsonConfigurationController != null ? 
-            jsonConfigurationController.getJsonInputEditor().getText().trim() : "";
+        String jsonText = jsonActionButtonsController != null ? 
+            jsonActionButtonsController.getJsonInputEditor().getText().trim() : "";
         
         // Launch the game using the ViewModel
         try {
@@ -115,8 +115,8 @@ public class GameLaunchManager {
             (selectedGameModule != null ? selectedGameModule.getMetadata().getGameName() : "null"));
         
         // Get JSON text from UI
-        String jsonText = jsonConfigurationController != null ? 
-            jsonConfigurationController.getJsonInputEditor().getText().trim() : "";
+        String jsonText = jsonActionButtonsController != null ? 
+            jsonActionButtonsController.getJsonInputEditor().getText().trim() : "";
         
         // Parse JSON using ViewModel (business logic)
         Map<String, Object> jsonConfigurationData = null;

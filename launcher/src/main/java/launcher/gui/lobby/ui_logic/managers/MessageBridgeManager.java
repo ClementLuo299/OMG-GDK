@@ -4,7 +4,7 @@ import gdk.internal.MessagingBridge;
 import javafx.application.Platform;
 import launcher.gui.lobby.JsonFormatter;
 import launcher.gui.lobby.TranscriptManager;
-import launcher.gui.lobby.ui_logic.subcontrollers.JsonConfigurationController;
+import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 
 import java.util.Map;
 
@@ -18,15 +18,15 @@ import java.util.Map;
  */
 public class MessageBridgeManager {
     
-    private final JsonConfigurationController jsonConfigurationController;
+    private final JsonActionButtonsController jsonActionButtonsController;
     
     /**
      * Create a new MessageBridgeManager.
      * 
-     * @param jsonConfigurationController The JSON configuration controller
+     * @param jsonActionButtonsController The JSON action buttons controller
      */
-    public MessageBridgeManager(JsonConfigurationController jsonConfigurationController) {
-        this.jsonConfigurationController = jsonConfigurationController;
+    public MessageBridgeManager(JsonActionButtonsController jsonActionButtonsController) {
+        this.jsonActionButtonsController = jsonActionButtonsController;
     }
     
     /**
@@ -40,10 +40,10 @@ public class MessageBridgeManager {
                     TranscriptManager.recordFromGame((Map<String, Object>) msg);
                     
                     Object fn = (msg != null) ? msg.get("function") : null;
-                    if (fn != null && "end".equals(String.valueOf(fn)) && jsonConfigurationController != null) {
+                    if (fn != null && "end".equals(String.valueOf(fn)) && jsonActionButtonsController != null) {
                         // Format using business logic formatter
                         String pretty = JsonFormatter.formatJsonResponse((Map<String, Object>) msg);
-                        Platform.runLater(() -> jsonConfigurationController.getJsonOutputEditor().setText(pretty));
+                        Platform.runLater(() -> jsonActionButtonsController.getJsonOutputEditor().setText(pretty));
                     }
                 } catch (Exception ignored) {
                     // Silently ignore errors in message processing
