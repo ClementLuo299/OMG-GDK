@@ -6,7 +6,6 @@ import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
-import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.SettingsNavigationManager;
 import launcher.gui.lobby.ui_logic.managers.game.GameLaunchErrorHandler;
@@ -14,7 +13,6 @@ import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
 import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.managers.game.ModuleChangeReporter;
 import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
-import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageBridgeManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LaunchButtonManager;
@@ -25,28 +23,22 @@ import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 
 /**
- * Factory for creating all manager instances used in the lobby.
- * Encapsulates manager creation logic to reduce complexity in LobbyInitializationManager.
+ * Factory for creating managers that depend on subcontrollers.
+ * These managers must be created after subcontrollers are available.
+ * Basic managers (that don't depend on subcontrollers) are created by BasicManagerFactory.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
-public class ManagerFactory {
+public class DependentManagerFactory {
     
     /**
-     * Result containing all created dependent managers.
+     * Result containing only the managers created by this factory.
+     * These are the managers that depend on subcontrollers.
      */
-    public record ManagerCreationResult(
-        MessageManager messageManager,
-        LoadingAnimationManager loadingAnimationManager,
-        JsonPersistenceManager jsonPersistenceManager,
-        ModuleCompilationChecker moduleCompilationChecker,
-        JsonEditorOperations jsonEditorOperations, // May be null if not created here
-        GameLaunchErrorHandler gameLaunchErrorHandler,
-        StatusLabelManager statusLabelManager,
-        LaunchButtonManager launchButtonManager,
-        ModuleChangeReporter moduleChangeReporter,
+    public record DependentManagerCreationResult(
         GameModuleRefreshManager gameModuleRefreshManager,
         GameLaunchManager gameLaunchManager,
         MessageBridgeManager messageBridgeManager,
@@ -56,29 +48,27 @@ public class ManagerFactory {
     
     /**
      * Create managers that depend on subcontrollers.
-     * Basic managers should be created separately before calling this method.
+     * Basic managers should be created by BasicManagerFactory before calling this method.
      * 
      * @param applicationViewModel The application ViewModel (may be null)
-     * @param messageReporter Callback for reporting messages
      * @param controller The main lobby controller
      * @param exitButton The exit button
      * @param gameSelector The game selection ComboBox
      * @param availableGameModules The available game modules list
      * @param gameSelectionController The game selection controller
      * @param jsonActionButtonsController The JSON action buttons controller
-     * @param messageManager The message manager (already created)
-     * @param statusLabelManager The status label manager (already created)
-     * @param launchButtonManager The launch button manager (already created)
-     * @param moduleChangeReporter The module change reporter (already created)
-     * @param loadingAnimationManager The loading animation manager (already created)
-     * @param moduleCompilationChecker The module compilation checker (already created)
-     * @param gameLaunchErrorHandler The game launch error handler (already created)
-     * @param jsonPersistenceManager The JSON persistence manager (already created)
-     * @return Result containing all created dependent managers
+     * @param messageManager The message manager (already created by BasicManagerFactory)
+     * @param statusLabelManager The status label manager (already created by BasicManagerFactory)
+     * @param launchButtonManager The launch button manager (already created by BasicManagerFactory)
+     * @param moduleChangeReporter The module change reporter (already created by BasicManagerFactory)
+     * @param loadingAnimationManager The loading animation manager (already created by BasicManagerFactory)
+     * @param moduleCompilationChecker The module compilation checker (already created by BasicManagerFactory)
+     * @param gameLaunchErrorHandler The game launch error handler (already created by BasicManagerFactory)
+     * @param jsonPersistenceManager The JSON persistence manager (already created by BasicManagerFactory)
+     * @return Result containing only the dependent managers created by this factory
      */
-    public static ManagerCreationResult createDependentManagers(
+    public static DependentManagerCreationResult createDependentManagers(
             GDKViewModel applicationViewModel,
-            LobbyInitializationManager.MessageReporter messageReporter,
             GDKGameLobbyController controller,
             Button exitButton,
             ComboBox<?> gameSelector,
@@ -94,7 +84,8 @@ public class ManagerFactory {
             GameLaunchErrorHandler gameLaunchErrorHandler,
             JsonPersistenceManager jsonPersistenceManager) {
         
-        // Create refresh manager
+        // ==================== CREATE DEPENDENT MANAGERS ====================
+        
         GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
             applicationViewModel,
             (ObservableList) availableGameModules,
@@ -107,12 +98,10 @@ public class ManagerFactory {
             moduleCompilationChecker
         );
         
-        // Create managers that depend on subcontrollers
         GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonActionButtonsController, gameLaunchErrorHandler);
         MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonActionButtonsController);
         LobbyShutdownManager lobbyShutdownManager = new LobbyShutdownManager(jsonPersistenceManager, gameSelectionController);
         
-        // Create SettingsNavigationManager with lazy stage supplier
         SettingsNavigationManager settingsNavigationManager = new SettingsNavigationManager(controller, () -> {
             if (exitButton != null && exitButton.getScene() != null) {
                 return (Stage) exitButton.getScene().getWindow();
@@ -120,16 +109,7 @@ public class ManagerFactory {
             return null;
         });
         
-        return new ManagerCreationResult(
-            messageManager,
-            loadingAnimationManager,
-            jsonPersistenceManager,
-            moduleCompilationChecker,
-            null, // jsonEditorOperations - not created here
-            gameLaunchErrorHandler,
-            statusLabelManager,
-            launchButtonManager,
-            moduleChangeReporter,
+        return new DependentManagerCreationResult(
             gameModuleRefreshManager,
             gameLaunchManager,
             messageBridgeManager,

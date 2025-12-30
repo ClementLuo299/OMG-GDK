@@ -12,8 +12,9 @@ import launcher.gui.lobby.persistence.JsonPersistenceManager;
  * Encapsulates JSON editor UI setup logic to reduce complexity in LobbyInitializationManager.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
 public class JsonEditorSetup {
     

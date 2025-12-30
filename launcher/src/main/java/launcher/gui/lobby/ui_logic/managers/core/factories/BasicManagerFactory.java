@@ -1,7 +1,6 @@
 package launcher.gui.lobby.ui_logic.managers.core.factories;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
@@ -25,8 +24,9 @@ import launcher.gui.lobby.ui_logic.managers.ui.StatusLabelManager;
  * Encapsulates basic manager creation logic to reduce complexity in LobbyInitializationManager.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
 public class BasicManagerFactory {
     

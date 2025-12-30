@@ -14,8 +14,9 @@ import launcher.gui.lobby.ui_logic.subcontrollers.TopBarController;
  * Encapsulates callback wiring logic to reduce complexity in LobbyInitializationManager.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
 public class CallbackWiring {
     
@@ -40,29 +41,38 @@ public class CallbackWiring {
             SettingsNavigationManager settingsNavigationManager,
             GameModuleRefreshManager gameModuleRefreshManager) {
         
-        // Set callbacks for game selection controller
+        // ==================== GAME SELECTION CALLBACKS ====================
+        
+        // Launch game callback
         gameSelectionController.setOnLaunchGame(() -> {
             GameModule selectedGame = gameSelectionController.getSelectedGameModule();
             if (gameLaunchManager != null) {
                 gameLaunchManager.launchGameFromUI(selectedGame);
             }
         });
+        
+        // Game selection change callback - update JSON editor with selected game
         gameSelectionController.setOnGameSelected(() -> {
-            // Update JSON configuration controller with selected game
             jsonActionButtonsController.setSelectedGameModule(gameSelectionController.getSelectedGameModule());
         });
         
-        // Set callbacks for top bar controller
+        // ==================== TOP BAR CALLBACKS ====================
+        
+        // Exit callback
         topBarController.setOnExit(() -> {
             if (lobbyShutdownManager != null) {
                 lobbyShutdownManager.handleShutdown();
             }
         });
+        
+        // Refresh callback
         topBarController.setOnRefresh(() -> {
             if (gameModuleRefreshManager != null) {
                 gameModuleRefreshManager.handleRefresh();
             }
         });
+        
+        // Settings callback
         topBarController.setOnOpenSettings(() -> {
             if (settingsNavigationManager != null) {
                 settingsNavigationManager.openSettingsPage();

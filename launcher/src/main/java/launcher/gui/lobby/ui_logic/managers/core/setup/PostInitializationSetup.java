@@ -3,7 +3,6 @@ package launcher.gui.lobby.ui_logic.managers.core.setup;
 import gdk.internal.Logging;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.lobby.persistence.JsonPersistenceManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageBridgeManager;
 import launcher.gui.lobby.ui_logic.managers.ui.StatusLabelManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
@@ -16,8 +15,9 @@ import launcher.utils.module.ModuleCompiler;
  * Encapsulates setup logic that occurs after all components are created.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
 public class PostInitializationSetup {
     
@@ -41,19 +41,29 @@ public class PostInitializationSetup {
             JsonActionButtonsController jsonActionButtonsController,
             TopBarController topBarController) {
         
+        // ==================== MESSAGE BRIDGE SETUP ====================
+        
         // Mirror game 'end' messages into JSON output
         messageBridgeManager.subscribeToEndMessageMirror();
+        
+        // ==================== MODULE COMPILER SETUP ====================
         
         // Register controller with ModuleCompiler for progress updates
         ModuleCompiler.setUIController(controller);
         
+        // ==================== PERSISTENCE SETUP ====================
+        
         // Load saved JSON content and toggle state
         jsonPersistenceManager.loadPersistenceSettings();
         
-        // Initialize the status label
+        // ==================== UI STATE INITIALIZATION ====================
+        
+        // Initialize the status label with current game count
         if (statusLabelManager != null && gameSelectionController != null) {
             statusLabelManager.updateGameCountStatus(gameSelectionController.getAvailableGameModules().size());
         }
+        
+        // ==================== SUBCONTROLLER INITIALIZATION ====================
         
         // Initialize all subcontrollers
         gameSelectionController.initialize();

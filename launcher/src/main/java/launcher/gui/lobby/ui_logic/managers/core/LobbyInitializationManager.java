@@ -13,7 +13,6 @@ import launcher.gui.lobby.ui_logic.managers.ui.LaunchButtonManager;
 import launcher.gui.lobby.ui_logic.managers.ui.StatusLabelManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
 import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchErrorHandler;
 import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.managers.game.ModuleChangeReporter;
 import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
@@ -21,18 +20,16 @@ import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageBridgeManager;
 import launcher.gui.lobby.ui_logic.managers.core.factories.BasicManagerFactory;
-import launcher.gui.lobby.ui_logic.managers.core.factories.ManagerFactory;
+import launcher.gui.lobby.ui_logic.managers.core.factories.DependentManagerFactory;
 import launcher.gui.lobby.ui_logic.managers.core.factories.SubcontrollerFactory;
-import launcher.gui.lobby.ui_logic.managers.core.factories.ViewModelUpdateFactory;
+import launcher.gui.lobby.ui_logic.managers.core.factories.ViewModelDependentsFactory;
 import launcher.gui.lobby.ui_logic.managers.core.setup.CallbackWiring;
 import launcher.gui.lobby.ui_logic.managers.core.setup.JsonEditorSetup;
 import launcher.gui.lobby.ui_logic.managers.core.setup.PostInitializationSetup;
 import launcher.gui.lobby.ui_logic.managers.core.setup.UiSetup;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.SettingsNavigationManager;
-import launcher.utils.module.ModuleCompiler;
 
-import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -62,7 +59,8 @@ public class LobbyInitializationManager {
         void addMessage(String message);
     }
     
-    // FXML Components
+    // ==================== FXML COMPONENTS ====================
+    
     private final ComboBox<GameModule> gameSelector;
     private final Button launchGameButton;
     private final Button refreshButton;
@@ -159,11 +157,14 @@ public class LobbyInitializationManager {
     public InitializationResult initialize(GDKViewModel applicationViewModel) {
         Logging.info("Initializing GDK Game Picker Controller");
         
-        // Create JSON editors first (needed for managers)
+        // ==================== CREATE JSON EDITORS ====================
+        
         JsonEditor jsonInputEditor = new JsonEditor("JSON Input");
         JsonEditor jsonOutputEditor = new JsonEditor("JSON Output");
         
-        // Create basic managers first (needed by subcontrollers)
+        // ==================== CREATE BASIC MANAGERS ====================
+        // Basic managers don't depend on subcontrollers and are needed by them
+        
         BasicManagerFactory.BasicManagerCreationResult basicManagers = BasicManagerFactory.createBasicManagers(
             applicationViewModel,
             messageReporter,
@@ -179,7 +180,9 @@ public class LobbyInitializationManager {
             launchGameButton
         );
         
-        // Create subcontrollers (they need basic managers)
+        // ==================== CREATE SUBCONTROLLERS ====================
+        // Subcontrollers depend on basic managers
+        
         SubcontrollerFactory.SubcontrollerCreationResult subcontrollerResult = SubcontrollerFactory.createSubcontrollers(
             gameSelector,
             launchGameButton,
@@ -199,10 +202,11 @@ public class LobbyInitializationManager {
             basicManagers.jsonEditorOperations()
         );
         
-        // Create managers that depend on subcontrollers
-        ManagerFactory.ManagerCreationResult managerResult = ManagerFactory.createDependentManagers(
+        // ==================== CREATE DEPENDENT MANAGERS ====================
+        // These managers depend on subcontrollers
+        
+        DependentManagerFactory.DependentManagerCreationResult dependentManagers = DependentManagerFactory.createDependentManagers(
             applicationViewModel,
-            messageReporter,
             controller,
             exitButton,
             gameSelector,
@@ -219,7 +223,8 @@ public class LobbyInitializationManager {
             basicManagers.jsonPersistenceManager()
         );
         
-        // Set up JSON editor containers
+        // ==================== SETUP JSON EDITORS ====================
+        
         JsonEditorSetup.setupEditorContainers(
             jsonInputEditor,
             jsonOutputEditor,
@@ -227,33 +232,36 @@ public class LobbyInitializationManager {
             jsonOutputEditorContainer
         );
         
-        // Wire up callbacks
+        // ==================== WIRE CALLBACKS ====================
+        
         CallbackWiring.wireCallbacks(
             subcontrollerResult.gameSelectionController(),
             subcontrollerResult.jsonActionButtonsController(),
             subcontrollerResult.topBarController(),
-            managerResult.gameLaunchManager(),
-            managerResult.lobbyShutdownManager(),
-            managerResult.settingsNavigationManager(),
-            managerResult.gameModuleRefreshManager()
+            dependentManagers.gameLaunchManager(),
+            dependentManagers.lobbyShutdownManager(),
+            dependentManagers.settingsNavigationManager(),
+            dependentManagers.gameModuleRefreshManager()
         );
         
-        // Set up the UI components
-        UiSetup.setupUserInterface(messageContainer);
+        // ==================== UI SETUP ====================
         
-        // Set up JSON persistence auto-save listener
+        UiSetup.setupUserInterface(messageContainer);
         JsonEditorSetup.setupPersistenceListener(jsonInputEditor, jsonPersistenceToggle, basicManagers.jsonPersistenceManager());
         
-        // Perform post-initialization setup
+        // ==================== POST-INITIALIZATION SETUP ====================
+        
         PostInitializationSetup.performSetup(
             controller,
-            managerResult.messageBridgeManager(),
+            dependentManagers.messageBridgeManager(),
             basicManagers.jsonPersistenceManager(),
             basicManagers.statusLabelManager(),
             subcontrollerResult.gameSelectionController(),
             subcontrollerResult.jsonActionButtonsController(),
             subcontrollerResult.topBarController()
         );
+        
+        // ==================== BUILD RESULT ====================
         
         return new InitializationResult(
             jsonInputEditor,
@@ -266,14 +274,14 @@ public class LobbyInitializationManager {
             basicManagers.statusLabelManager(),
             basicManagers.launchButtonManager(),
             basicManagers.moduleChangeReporter(),
-            managerResult.gameLaunchManager(),
-            managerResult.messageBridgeManager(),
-            managerResult.lobbyShutdownManager(),
-            managerResult.settingsNavigationManager(),
+            dependentManagers.gameLaunchManager(),
+            dependentManagers.messageBridgeManager(),
+            dependentManagers.lobbyShutdownManager(),
+            dependentManagers.settingsNavigationManager(),
             subcontrollerResult.gameSelectionController(),
             subcontrollerResult.jsonActionButtonsController(),
             subcontrollerResult.topBarController(),
-            managerResult.gameModuleRefreshManager()
+            dependentManagers.gameModuleRefreshManager()
         );
     }
     
@@ -289,8 +297,9 @@ public class LobbyInitializationManager {
      * @return Updated initialization result with new ViewModel references
      */
     public InitializationResult updateViewModel(GDKViewModel applicationViewModel, InitializationResult currentResult) {
-        // Update components with new ViewModel
-        ViewModelUpdateFactory.ViewModelUpdateResult updateResult = ViewModelUpdateFactory.updateComponents(
+        // ==================== RECREATE VIEWMODEL-DEPENDENT COMPONENTS ====================
+        
+        ViewModelDependentsFactory.ViewModelDependentsResult updateResult = ViewModelDependentsFactory.recreateComponents(
             applicationViewModel,
             messageReporter,
             gameSelector,
@@ -301,7 +310,8 @@ public class LobbyInitializationManager {
             currentResult
         );
         
-        // Wire up callbacks again with new components
+        // ==================== RE-WIRE CALLBACKS ====================
+        
         CallbackWiring.wireCallbacks(
             updateResult.gameSelectionController(),
             currentResult.jsonActionButtonsController(),
@@ -311,6 +321,8 @@ public class LobbyInitializationManager {
             currentResult.settingsNavigationManager(),
             updateResult.gameModuleRefreshManager()
         );
+        
+        // ==================== BUILD UPDATED RESULT ====================
         
         return new InitializationResult(
             currentResult.jsonInputEditor(),

@@ -8,8 +8,9 @@ import javafx.scene.layout.VBox;
  * Encapsulates UI setup logic to reduce complexity in LobbyInitializationManager.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
 public class UiSetup {
     

@@ -13,21 +13,20 @@ import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
 import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
-import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
-import launcher.gui.lobby.ui_logic.subcontrollers.TopBarController;
 
 /**
- * Factory for updating ViewModel references in components.
- * Encapsulates ViewModel update logic to reduce complexity in LobbyInitializationManager.
+ * Factory for recreating components that depend on ViewModel.
+ * Encapsulates ViewModel-dependent component recreation logic to reduce complexity in LobbyInitializationManager.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
-public class ViewModelUpdateFactory {
+public class ViewModelDependentsFactory {
     
     /**
-     * Update ViewModel references in all components that need it.
+     * Recreate components that depend on ViewModel with new ViewModel references.
      * Since some components have final ViewModel fields, they need to be recreated.
      * 
      * @param applicationViewModel The ViewModel to set
@@ -38,9 +37,9 @@ public class ViewModelUpdateFactory {
      * @param loadingProgressBar The loading progress bar
      * @param loadingStatusLabel The loading status label
      * @param currentResult The current initialization result
-     * @return Updated components that need ViewModel references
+     * @return Recreated components with new ViewModel references
      */
-    public static ViewModelUpdateResult updateComponents(
+    public static ViewModelDependentsResult recreateComponents(
             GDKViewModel applicationViewModel,
             LobbyInitializationManager.MessageReporter messageReporter,
             ComboBox<?> gameSelector,
@@ -50,12 +49,14 @@ public class ViewModelUpdateFactory {
             Label loadingStatusLabel,
             LobbyInitializationManager.InitializationResult currentResult) {
         
-        // Recreate components with final ViewModel fields
+        // ==================== RECREATE VIEWMODEL-DEPENDENT COMPONENTS ====================
+        
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
         JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, 
             currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
         
-        // Recreate GameSelectionController (no ViewModel dependency)
+        // ==================== RECREATE COMPONENTS (NO VIEWMODEL DEPENDENCY) ====================
+        
         GameSelectionController gameSelectionController = new GameSelectionController(
             (ComboBox) gameSelector,
             launchGameButton,
@@ -65,14 +66,16 @@ public class ViewModelUpdateFactory {
             currentResult.jsonPersistenceManager()
         );
         
-        // Recreate LoadingAnimationManager (no ViewModel dependency)
         LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(
             refreshButton,
             loadingProgressBar,
             loadingStatusLabel
         );
         
-        // Recreate GameModuleRefreshManager with new ViewModel
+        GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(currentResult.messageManager());
+        
+        // ==================== RECREATE VIEWMODEL-DEPENDENT MANAGERS ====================
+        
         GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
             applicationViewModel,
             currentResult.gameSelectionController().getAvailableGameModules(),
@@ -85,17 +88,14 @@ public class ViewModelUpdateFactory {
             moduleCompilationChecker
         );
         
-        // Recreate GameLaunchErrorHandler (no ViewModel dependency)
-        GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(currentResult.messageManager());
-        
-        // Recreate GameLaunchManager with new ViewModel
         GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, 
             currentResult.jsonActionButtonsController(), gameLaunchErrorHandler);
         
-        // Initialize the recreated subcontroller
+        // ==================== INITIALIZE RECREATED COMPONENTS ====================
+        
         gameSelectionController.initialize();
         
-        return new ViewModelUpdateResult(
+        return new ViewModelDependentsResult(
             moduleCompilationChecker,
             jsonEditorOperations,
             gameSelectionController,
@@ -106,9 +106,9 @@ public class ViewModelUpdateFactory {
     }
     
     /**
-     * Result containing updated components with new ViewModel references.
+     * Result containing recreated components with new ViewModel references.
      */
-    public record ViewModelUpdateResult(
+    public record ViewModelDependentsResult(
         ModuleCompilationChecker moduleCompilationChecker,
         JsonEditorOperations jsonEditorOperations,
         GameSelectionController gameSelectionController,
