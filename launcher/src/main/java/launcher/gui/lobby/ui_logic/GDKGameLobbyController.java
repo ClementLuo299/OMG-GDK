@@ -22,9 +22,9 @@ import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
 import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
 import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
-import launcher.gui.lobby.ui_logic.managers.core.LobbyLifecycleManager;
 import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
-import launcher.gui.lobby.ui_logic.managers.core.ControllerModeManager;
+import launcher.gui.lobby.ui_logic.managers.core.lifecycle.LobbyShutdownManager;
+import launcher.gui.lobby.ui_logic.managers.core.lifecycle.ControllerModeManager;
 import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 
@@ -113,9 +113,9 @@ public class GDKGameLobbyController implements Initializable {
     private GameLaunchManager gameLaunchManager;
     
     /**
-     * Manager for lobby lifecycle operations
+     * Manager for lobby shutdown operations
      */
-    private LobbyLifecycleManager lobbyLifecycleManager;
+    private LobbyShutdownManager lobbyShutdownManager;
     
     /**
      * Manager for lobby initialization
@@ -200,7 +200,7 @@ public class GDKGameLobbyController implements Initializable {
         loadingAnimationManager = result.loadingAnimationManager();
         moduleCompilationChecker = result.moduleCompilationChecker();
         gameLaunchManager = result.gameLaunchManager();
-        lobbyLifecycleManager = result.lobbyLifecycleManager();
+        lobbyShutdownManager = result.lobbyShutdownManager();
         gameSelectionController = result.gameSelectionController();
         gameModuleRefreshManager = result.gameModuleRefreshManager();
         
@@ -333,8 +333,8 @@ public class GDKGameLobbyController implements Initializable {
      * Handle application shutdown and save settings.
      */
     public void onApplicationShutdown() {
-        if (lobbyLifecycleManager != null) {
-            lobbyLifecycleManager.handleShutdown();
+        if (lobbyShutdownManager != null) {
+            lobbyShutdownManager.handleShutdown();
         }
     }
 }  

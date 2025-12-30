@@ -20,11 +20,18 @@ import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
 import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageBridgeManager;
-import launcher.gui.lobby.ui_logic.managers.core.LobbyLifecycleManager;
-import launcher.gui.lobby.ui_logic.managers.core.SettingsNavigationManager;
+import launcher.gui.lobby.ui_logic.managers.core.factories.BasicManagerFactory;
+import launcher.gui.lobby.ui_logic.managers.core.factories.ManagerFactory;
+import launcher.gui.lobby.ui_logic.managers.core.factories.SubcontrollerFactory;
+import launcher.gui.lobby.ui_logic.managers.core.factories.ViewModelUpdateFactory;
+import launcher.gui.lobby.ui_logic.managers.core.setup.CallbackWiring;
+import launcher.gui.lobby.ui_logic.managers.core.setup.JsonEditorSetup;
+import launcher.gui.lobby.ui_logic.managers.core.setup.PostInitializationSetup;
+import launcher.gui.lobby.ui_logic.managers.core.setup.UiSetup;
+import launcher.gui.lobby.ui_logic.managers.core.lifecycle.LobbyShutdownManager;
+import launcher.gui.lobby.ui_logic.managers.core.lifecycle.SettingsNavigationManager;
 import launcher.utils.module.ModuleCompiler;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -33,14 +40,14 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import com.jfoenix.controls.JFXToggleButton;
-import javafx.stage.Stage;
 
 /**
  * Manages initialization of the lobby controller and all its components.
  * 
  * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @date December 29, 2025  
+ * @edited December 29, 2025
+ * @since Beta 1.0
  */
 public class LobbyInitializationManager {
     
@@ -74,6 +81,31 @@ public class LobbyInitializationManager {
     private final ProgressBar loadingProgressBar;
     private final Label loadingStatusLabel;
     
+    // ==================== CONSTRUCTOR ====================
+    
+    /**
+     * Create a new LobbyInitializationManager.
+     * 
+     * @param controller The main lobby controller
+     * @param messageReporter Callback for reporting messages
+     * @param gameSelector The game selection ComboBox
+     * @param launchGameButton The launch game button
+     * @param refreshButton The refresh button
+     * @param settingsButton The settings button
+     * @param messageScrollPane The message scroll pane
+     * @param messageContainer The message container VBox
+     * @param jsonInputEditorContainer The JSON input editor container
+     * @param jsonOutputEditorContainer The JSON output editor container
+     * @param clearInputButton The clear input button
+     * @param clearOutputButton2 The clear output button
+     * @param metadataRequestButton The metadata request button
+     * @param sendMessageButton The send message button
+     * @param jsonPersistenceToggle The JSON persistence toggle
+     * @param exitButton The exit button
+     * @param statusLabel The status label
+     * @param loadingProgressBar The loading progress bar
+     * @param loadingStatusLabel The loading status label
+     */
     public LobbyInitializationManager(
             GDKGameLobbyController controller,
             MessageReporter messageReporter,
@@ -115,65 +147,42 @@ public class LobbyInitializationManager {
         this.loadingStatusLabel = loadingStatusLabel;
     }
     
+    // ==================== INITIALIZATION ====================
+    
     /**
      * Initialize all lobby components.
+     * Creates all managers, subcontrollers, wires callbacks, and sets up the UI.
      * 
      * @param applicationViewModel The application ViewModel (may be null initially)
      * @return Initialization result containing all managers and subcontrollers
      */
     public InitializationResult initialize(GDKViewModel applicationViewModel) {
-        Logging.info("🎮 Initializing GDK Game Picker Controller");
+        Logging.info("Initializing GDK Game Picker Controller");
         
         // Create JSON editors first (needed for managers)
         JsonEditor jsonInputEditor = new JsonEditor("JSON Input");
         JsonEditor jsonOutputEditor = new JsonEditor("JSON Output");
         
-        // Initialize managers
-        MessageManager messageManager = new MessageManager(messageContainer, messageScrollPane);
-        LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
-        JsonPersistenceManager jsonPersistenceManager = new JsonPersistenceManager(jsonInputEditor, jsonPersistenceToggle);
-        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
-        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
-        GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(messageManager);
+        // Create basic managers first (needed by subcontrollers)
+        BasicManagerFactory.BasicManagerCreationResult basicManagers = BasicManagerFactory.createBasicManagers(
+            applicationViewModel,
+            messageReporter,
+            messageContainer,
+            messageScrollPane,
+            refreshButton,
+            loadingProgressBar,
+            loadingStatusLabel,
+            jsonInputEditor,
+            jsonOutputEditor,
+            jsonPersistenceToggle,
+            statusLabel,
+            launchGameButton
+        );
         
-        // Split UI state managers
-        StatusLabelManager statusLabelManager = new StatusLabelManager(statusLabel);
-        LaunchButtonManager launchButtonManager = new LaunchButtonManager(launchGameButton);
-        ModuleChangeReporter moduleChangeReporter = new ModuleChangeReporter(messageReporter::addMessage);
-        
-        // Initialize subcontrollers
-        ObservableList<GameModule> availableGameModules = FXCollections.observableArrayList();
-        GameSelectionController gameSelectionController = new GameSelectionController(
+        // Create subcontrollers (they need basic managers)
+        SubcontrollerFactory.SubcontrollerCreationResult subcontrollerResult = SubcontrollerFactory.createSubcontrollers(
             gameSelector,
             launchGameButton,
-            availableGameModules,
-            messageManager,
-            launchButtonManager,
-            jsonPersistenceManager
-        );
-        
-        // Create refresh manager
-        GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
-            applicationViewModel,
-            availableGameModules,
-            gameSelector,
-            messageManager,
-            statusLabelManager,
-            launchButtonManager,
-            moduleChangeReporter,
-            loadingAnimationManager,
-            moduleCompilationChecker
-        );
-        
-        // Set up JSON editor containers
-        jsonInputEditorContainer.getChildren().add(jsonInputEditor);
-        jsonOutputEditorContainer.getChildren().add(jsonOutputEditor);
-        javafx.scene.layout.VBox.setVgrow(jsonInputEditorContainer, javafx.scene.layout.Priority.ALWAYS);
-        javafx.scene.layout.VBox.setVgrow(jsonOutputEditorContainer, javafx.scene.layout.Priority.ALWAYS);
-        javafx.scene.layout.VBox.setVgrow(jsonInputEditor, javafx.scene.layout.Priority.ALWAYS);
-        javafx.scene.layout.VBox.setVgrow(jsonOutputEditor, javafx.scene.layout.Priority.ALWAYS);
-        
-        JsonActionButtonsController jsonActionButtonsController = new JsonActionButtonsController(
             jsonInputEditor,
             jsonOutputEditor,
             clearInputButton,
@@ -181,228 +190,155 @@ public class LobbyInitializationManager {
             metadataRequestButton,
             sendMessageButton,
             jsonPersistenceToggle,
-            jsonEditorOperations,
-            jsonPersistenceManager,
-            messageManager
-        );
-        
-        TopBarController topBarController = new TopBarController(
             exitButton,
             refreshButton,
-            settingsButton
+            settingsButton,
+            basicManagers.messageManager(),
+            basicManagers.launchButtonManager(),
+            basicManagers.jsonPersistenceManager(),
+            basicManagers.jsonEditorOperations()
         );
         
-        // Initialize managers that depend on subcontrollers
-        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonActionButtonsController, gameLaunchErrorHandler);
-        MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonActionButtonsController);
-        LobbyLifecycleManager lobbyLifecycleManager = new LobbyLifecycleManager(jsonPersistenceManager, gameSelectionController);
+        // Create managers that depend on subcontrollers
+        ManagerFactory.ManagerCreationResult managerResult = ManagerFactory.createDependentManagers(
+            applicationViewModel,
+            messageReporter,
+            controller,
+            exitButton,
+            gameSelector,
+            subcontrollerResult.availableGameModules(),
+            subcontrollerResult.gameSelectionController(),
+            subcontrollerResult.jsonActionButtonsController(),
+            basicManagers.messageManager(),
+            basicManagers.statusLabelManager(),
+            basicManagers.launchButtonManager(),
+            basicManagers.moduleChangeReporter(),
+            basicManagers.loadingAnimationManager(),
+            basicManagers.moduleCompilationChecker(),
+            basicManagers.gameLaunchErrorHandler(),
+            basicManagers.jsonPersistenceManager()
+        );
         
-        // Initialize SettingsNavigationManager with lazy stage supplier
-        SettingsNavigationManager settingsNavigationManager = new SettingsNavigationManager(controller, () -> {
-            if (exitButton != null && exitButton.getScene() != null) {
-                return (Stage) exitButton.getScene().getWindow();
-            }
-            return null;
-        });
+        // Set up JSON editor containers
+        JsonEditorSetup.setupEditorContainers(
+            jsonInputEditor,
+            jsonOutputEditor,
+            jsonInputEditorContainer,
+            jsonOutputEditorContainer
+        );
         
         // Wire up callbacks
-        wireCallbacks(gameSelectionController, jsonActionButtonsController, topBarController,
-                     gameLaunchManager, lobbyLifecycleManager, settingsNavigationManager, gameModuleRefreshManager);
+        CallbackWiring.wireCallbacks(
+            subcontrollerResult.gameSelectionController(),
+            subcontrollerResult.jsonActionButtonsController(),
+            subcontrollerResult.topBarController(),
+            managerResult.gameLaunchManager(),
+            managerResult.lobbyShutdownManager(),
+            managerResult.settingsNavigationManager(),
+            managerResult.gameModuleRefreshManager()
+        );
         
         // Set up the UI components
-        setupUserInterface();
+        UiSetup.setupUserInterface(messageContainer);
         
-        // Mirror game 'end' messages into JSON output
-        messageBridgeManager.subscribeToEndMessageMirror();
+        // Set up JSON persistence auto-save listener
+        JsonEditorSetup.setupPersistenceListener(jsonInputEditor, jsonPersistenceToggle, basicManagers.jsonPersistenceManager());
         
-        // Register controller with ModuleCompiler for progress updates
-        ModuleCompiler.setUIController(controller);
-        
-        // Set up JSON persistence text change listener (auto-save)
-        javafx.application.Platform.runLater(() -> {
-            jsonInputEditor.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (jsonPersistenceToggle.isSelected()) {
-                    jsonPersistenceManager.saveJsonContent();
-                }
-            });
-        });
-        
-        // Load saved JSON content and toggle state
-        jsonPersistenceManager.loadPersistenceSettings();
-        
-        // Initialize the status label
-        if (statusLabelManager != null && gameSelectionController != null) {
-            statusLabelManager.updateGameCountStatus(gameSelectionController.getAvailableGameModules().size());
-        }
-        
-        // Initialize all subcontrollers
-        gameSelectionController.initialize();
-        jsonActionButtonsController.initialize();
-        topBarController.initialize();
-        
-        Logging.info("✅ GDK Game Picker Controller initialized successfully");
+        // Perform post-initialization setup
+        PostInitializationSetup.performSetup(
+            controller,
+            managerResult.messageBridgeManager(),
+            basicManagers.jsonPersistenceManager(),
+            basicManagers.statusLabelManager(),
+            subcontrollerResult.gameSelectionController(),
+            subcontrollerResult.jsonActionButtonsController(),
+            subcontrollerResult.topBarController()
+        );
         
         return new InitializationResult(
             jsonInputEditor,
             jsonOutputEditor,
-            messageManager,
-            loadingAnimationManager,
-            jsonPersistenceManager,
-            moduleCompilationChecker,
-            jsonEditorOperations,
-            statusLabelManager,
-            launchButtonManager,
-            moduleChangeReporter,
-            gameLaunchManager,
-            messageBridgeManager,
-            lobbyLifecycleManager,
-            settingsNavigationManager,
-            gameSelectionController,
-            jsonActionButtonsController,
-            topBarController,
-            gameModuleRefreshManager
+            basicManagers.messageManager(),
+            basicManagers.loadingAnimationManager(),
+            basicManagers.jsonPersistenceManager(),
+            basicManagers.moduleCompilationChecker(),
+            basicManagers.jsonEditorOperations(),
+            basicManagers.statusLabelManager(),
+            basicManagers.launchButtonManager(),
+            basicManagers.moduleChangeReporter(),
+            managerResult.gameLaunchManager(),
+            managerResult.messageBridgeManager(),
+            managerResult.lobbyShutdownManager(),
+            managerResult.settingsNavigationManager(),
+            subcontrollerResult.gameSelectionController(),
+            subcontrollerResult.jsonActionButtonsController(),
+            subcontrollerResult.topBarController(),
+            managerResult.gameModuleRefreshManager()
         );
     }
     
-    /**
-     * Wire up callbacks between subcontrollers and managers.
-     */
-    private void wireCallbacks(
-            GameSelectionController gameSelectionController,
-            JsonActionButtonsController jsonActionButtonsController,
-            TopBarController topBarController,
-            GameLaunchManager gameLaunchManager,
-            LobbyLifecycleManager lobbyLifecycleManager,
-            SettingsNavigationManager settingsNavigationManager,
-            GameModuleRefreshManager gameModuleRefreshManager) {
-        
-        // Set callbacks for game selection controller
-        gameSelectionController.setOnLaunchGame(() -> {
-            GameModule selectedGame = gameSelectionController.getSelectedGameModule();
-            if (gameLaunchManager != null) {
-                gameLaunchManager.launchGameFromUI(selectedGame);
-            }
-        });
-        gameSelectionController.setOnGameSelected(() -> {
-            // Update JSON configuration controller with selected game
-            jsonActionButtonsController.setSelectedGameModule(gameSelectionController.getSelectedGameModule());
-        });
-        
-        // Set callbacks for application control controller
-        topBarController.setOnExit(() -> {
-            if (lobbyLifecycleManager != null) {
-                lobbyLifecycleManager.handleShutdown();
-            }
-        });
-        topBarController.setOnRefresh(() -> {
-            if (gameModuleRefreshManager != null) {
-                gameModuleRefreshManager.handleRefresh();
-            }
-        });
-        topBarController.setOnOpenSettings(() -> {
-            if (settingsNavigationManager != null) {
-                settingsNavigationManager.openSettingsPage();
-            }
-        });
-    }
-    
-    /**
-     * Set up all user interface components.
-     */
-    private void setupUserInterface() {
-        // Apply consistent styling to the message container for better readability
-        // Use the same font as the startup window
-        String fontFamily = launcher.utils.FontLoader.getApplicationFontFamily();
-        gdk.internal.Logging.info("🎨 Message container font: " + fontFamily);
-        String fontStyle = String.format("-fx-font-family: '%s', 'Segoe UI', Arial, sans-serif; -fx-font-size: 12px;", fontFamily);
-        messageContainer.setStyle(fontStyle);
-        Logging.info("🎨 UI components initialized");
-    }
+    // ==================== VIEWMODEL UPDATES ====================
     
     /**
      * Update ViewModel references in all components that need it.
      * Since some components have final ViewModel fields, they need to be recreated.
+     * Called when the ViewModel becomes available after initial initialization.
      * 
      * @param applicationViewModel The ViewModel to set
      * @param currentResult The current initialization result
      * @return Updated initialization result with new ViewModel references
      */
     public InitializationResult updateViewModel(GDKViewModel applicationViewModel, InitializationResult currentResult) {
-        // Recreate components with final ViewModel fields
-        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
-        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, 
-            currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
-        
-        // Recreate GameSelectionController (no ViewModel dependency)
-        GameSelectionController gameSelectionController = new GameSelectionController(
+        // Update components with new ViewModel
+        ViewModelUpdateFactory.ViewModelUpdateResult updateResult = ViewModelUpdateFactory.updateComponents(
+            applicationViewModel,
+            messageReporter,
             gameSelector,
             launchGameButton,
-            currentResult.gameSelectionController().getAvailableGameModules(),
-            currentResult.messageManager(),
-            currentResult.launchButtonManager(),
-            currentResult.jsonPersistenceManager()
-        );
-        
-        // Recreate LoadingAnimationManager (no ViewModel dependency)
-        LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(
             refreshButton,
             loadingProgressBar,
-            loadingStatusLabel
+            loadingStatusLabel,
+            currentResult
         );
-        
-        // Recreate GameModuleRefreshManager with new ViewModel
-        GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
-            applicationViewModel,
-            currentResult.gameSelectionController().getAvailableGameModules(),
-            gameSelector,
-            currentResult.messageManager(),
-            currentResult.statusLabelManager(),
-            currentResult.launchButtonManager(),
-            currentResult.moduleChangeReporter(),
-            loadingAnimationManager,
-            moduleCompilationChecker
-        );
-        
-        // Recreate GameLaunchErrorHandler (no ViewModel dependency)
-        GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(currentResult.messageManager());
-        
-        // Recreate GameLaunchManager with new ViewModel
-        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, 
-            currentResult.jsonActionButtonsController(), gameLaunchErrorHandler);
         
         // Wire up callbacks again with new components
-        wireCallbacks(gameSelectionController, currentResult.jsonActionButtonsController(), 
-            currentResult.topBarController(), gameLaunchManager, 
-            currentResult.lobbyLifecycleManager(), currentResult.settingsNavigationManager(),
-            gameModuleRefreshManager);
-        
-        // Initialize the recreated subcontroller
-        gameSelectionController.initialize();
+        CallbackWiring.wireCallbacks(
+            updateResult.gameSelectionController(),
+            currentResult.jsonActionButtonsController(),
+            currentResult.topBarController(),
+            updateResult.gameLaunchManager(),
+            currentResult.lobbyShutdownManager(),
+            currentResult.settingsNavigationManager(),
+            updateResult.gameModuleRefreshManager()
+        );
         
         return new InitializationResult(
             currentResult.jsonInputEditor(),
             currentResult.jsonOutputEditor(),
             currentResult.messageManager(),
-            loadingAnimationManager,
+            updateResult.loadingAnimationManager(),
             currentResult.jsonPersistenceManager(),
-            moduleCompilationChecker,
-            jsonEditorOperations,
+            updateResult.moduleCompilationChecker(),
+            updateResult.jsonEditorOperations(),
             currentResult.statusLabelManager(),
             currentResult.launchButtonManager(),
             currentResult.moduleChangeReporter(),
-            gameLaunchManager,
+            updateResult.gameLaunchManager(),
             currentResult.messageBridgeManager(),
-            currentResult.lobbyLifecycleManager(),
+            currentResult.lobbyShutdownManager(),
             currentResult.settingsNavigationManager(),
-            gameSelectionController,
+            updateResult.gameSelectionController(),
             currentResult.jsonActionButtonsController(),
             currentResult.topBarController(),
-            gameModuleRefreshManager
+            updateResult.gameModuleRefreshManager()
         );
     }
     
+    // ==================== DATA STRUCTURES ====================
+    
     /**
      * Result of initialization containing all created managers and subcontrollers.
+     * Used to pass initialization results between methods and to the main controller.
      */
     public record InitializationResult(
         JsonEditor jsonInputEditor,
@@ -417,7 +353,7 @@ public class LobbyInitializationManager {
         ModuleChangeReporter moduleChangeReporter,
         GameLaunchManager gameLaunchManager,
         MessageBridgeManager messageBridgeManager,
-        LobbyLifecycleManager lobbyLifecycleManager,
+        LobbyShutdownManager lobbyShutdownManager,
         SettingsNavigationManager settingsNavigationManager,
         GameSelectionController gameSelectionController,
         JsonActionButtonsController jsonActionButtonsController,
