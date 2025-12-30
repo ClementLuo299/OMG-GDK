@@ -2,7 +2,6 @@ package launcher.gui.lobby;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.utils.module.ModuleCompiler;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,8 +23,8 @@ import launcher.gui.lobby.managers.ModuleCompilationChecker;
 import launcher.gui.lobby.managers.GameLaunchManager;
 import launcher.gui.lobby.managers.LobbyLifecycleManager;
 import launcher.gui.lobby.managers.LobbyInitializationManager;
+import launcher.gui.lobby.managers.ControllerModeManager;
 import launcher.gui.lobby.subcontrollers.GameSelectionController;
-import launcher.gui.lobby.subcontrollers.JsonConfigurationController;
 
 /**
  * Controller for the GDK Game Lobby interface.
@@ -43,7 +42,7 @@ import launcher.gui.lobby.subcontrollers.JsonConfigurationController;
  *
  * @authors Clement Luo
  * @date July 25, 2025
- * @edited December 28, 2025       
+ * @edited December 29, 2025       
  * @since Beta 1.0
  */
 public class GDKGameLobbyController implements Initializable {
@@ -84,13 +83,12 @@ public class GDKGameLobbyController implements Initializable {
      */
     private GDKViewModel applicationViewModel;
     
-    /**
-     * Current mode of operation for this controller
-     */
-    private ControllerMode controllerMode = ControllerMode.NORMAL;
-    
-    
     // ==================== MANAGERS ====================
+    
+    /**
+     * Manager for controller mode logic
+     */
+    private final ControllerModeManager controllerModeManager = new ControllerModeManager();
     
     /**
      * Manager for handling message display queue
@@ -129,11 +127,6 @@ public class GDKGameLobbyController implements Initializable {
      */
     private GameSelectionController gameSelectionController;
     
-    /**
-     * Subcontroller for JSON configuration UI area
-     */
-    private JsonConfigurationController jsonConfigurationController;
-    
     // ==================== INITIALIZATION ====================
     
     /**
@@ -143,8 +136,7 @@ public class GDKGameLobbyController implements Initializable {
      * @param mode The mode to set
      */
     public void setControllerMode(ControllerMode mode) {
-        this.controllerMode = mode;
-        Logging.info("Controller mode set to: " + mode);
+        controllerModeManager.setMode(mode);
     }
     
     /**
@@ -153,7 +145,7 @@ public class GDKGameLobbyController implements Initializable {
      * @return The current mode
      */
     public ControllerMode getControllerMode() {
-        return controllerMode;
+        return controllerModeManager.getMode();
     }
     
     /**
@@ -168,13 +160,11 @@ public class GDKGameLobbyController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Logging.info("Initializing GDK Game Picker Controller (mode: " + controllerMode + ")");
+        Logging.info("Initializing GDK Game Picker Controller (mode: " + controllerModeManager.getModeString() + ")");
         
         // Skip GUI setup in AUTO_LAUNCH mode
-        if (controllerMode == ControllerMode.AUTO_LAUNCH) {
-            Logging.info("⏭Skipping GUI setup for AUTO_LAUNCH mode");
-            ModuleCompiler.setUIController(this);
-            Logging.info("GDK Game Picker Controller initialized (AUTO_LAUNCH mode)");
+        if (controllerModeManager.shouldSkipGuiSetup()) {
+            controllerModeManager.handleAutoLaunchInitialization(this);
             return;
         }
         
@@ -210,7 +200,6 @@ public class GDKGameLobbyController implements Initializable {
         gameLaunchManager = result.gameLaunchManager();
         lobbyLifecycleManager = result.lobbyLifecycleManager();
         gameSelectionController = result.gameSelectionController();
-        jsonConfigurationController = result.jsonConfigurationController();
         
         // Store the initialization result for later ViewModel updates
         lastInitializationResult = result;
