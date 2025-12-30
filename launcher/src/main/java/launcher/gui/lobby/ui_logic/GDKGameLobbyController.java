@@ -18,14 +18,14 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.ui_logic.managers.MessageManager;
-import launcher.gui.lobby.ui_logic.managers.LoadingAnimationManager;
-import launcher.gui.lobby.ui_logic.managers.ModuleCompilationChecker;
-import launcher.gui.lobby.ui_logic.managers.GameLaunchManager;
-import launcher.gui.lobby.ui_logic.managers.LobbyLifecycleManager;
-import launcher.gui.lobby.ui_logic.managers.LobbyInitializationManager;
-import launcher.gui.lobby.ui_logic.managers.ControllerModeManager;
-import launcher.gui.lobby.ui_logic.managers.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
+import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
+import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
+import launcher.gui.lobby.ui_logic.managers.core.LobbyLifecycleManager;
+import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
+import launcher.gui.lobby.ui_logic.managers.core.ControllerModeManager;
+import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 
 /**

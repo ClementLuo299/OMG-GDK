@@ -1,4 +1,4 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.messaging;
 
 import gdk.internal.MessagingBridge;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;

@@ -1,23 +1,25 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.ui;
 
 import gdk.internal.Logging;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.util.Duration;
 
 /**
  * Manages loading animation with progress bar and animated text.
+ * Also manages the refresh button state during loading.
  * 
  * @authors Clement Luo
  * @date December 27, 2025
- * @edited December 27, 2025
+ * @edited December 29, 2025
  * @since 1.0
  */
 public class LoadingAnimationManager {
     
-    private final RefreshButtonStateManager refreshButtonStateManager;
+    private final Button refreshButton;
     private final ProgressBar loadingProgressBar;
     private final Label loadingStatusLabel;
     
@@ -37,12 +39,12 @@ public class LoadingAnimationManager {
     /**
      * Create a new LoadingAnimationManager.
      * 
-     * @param refreshButtonStateManager The refresh button state manager
+     * @param refreshButton The refresh button to disable during loading
      * @param loadingProgressBar The progress bar to show progress
      * @param loadingStatusLabel The status label to show loading messages
      */
-    public LoadingAnimationManager(RefreshButtonStateManager refreshButtonStateManager, ProgressBar loadingProgressBar, Label loadingStatusLabel) {
-        this.refreshButtonStateManager = refreshButtonStateManager;
+    public LoadingAnimationManager(Button refreshButton, ProgressBar loadingProgressBar, Label loadingStatusLabel) {
+        this.refreshButton = refreshButton;
         this.loadingProgressBar = loadingProgressBar;
         this.loadingStatusLabel = loadingStatusLabel;
     }
@@ -52,7 +54,9 @@ public class LoadingAnimationManager {
      */
     public void startAnimation() {
         isRefreshing = true;
-        refreshButtonStateManager.disable();
+        if (refreshButton != null) {
+            refreshButton.setDisable(true);
+        }
         loadingProgressBar.setVisible(true);
         loadingProgressBar.setProgress(0.0);
         loadingStatusLabel.setVisible(true);
@@ -124,7 +128,9 @@ public class LoadingAnimationManager {
     public void stopAnimation() {
         Logging.info("🎯 Stopping loading animation");
         isRefreshing = false;
-        refreshButtonStateManager.enable();
+        if (refreshButton != null) {
+            refreshButton.setDisable(false);
+        }
         loadingProgressBar.setVisible(false);
         loadingStatusLabel.setVisible(false);
         

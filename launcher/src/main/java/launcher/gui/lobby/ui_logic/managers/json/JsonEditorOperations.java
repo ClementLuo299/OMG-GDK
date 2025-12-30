@@ -1,11 +1,9 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.json;
 
-import gdk.api.GameModule;
-import gdk.internal.Logging;
 import launcher.gui.json_editor.JsonEditor;
 import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.GameMessageHandler;
 import launcher.gui.lobby.JsonFormatter;
+import launcher.gui.lobby.ui_logic.managers.json.JsonMessageSender;
 
 import java.util.Map;
 
@@ -59,14 +57,6 @@ public class JsonEditorOperations {
      */
     public void sendMessage(gdk.api.GameModule selectedGameModule) {
         messageSender.sendMessage(selectedGameModule);
-    }
-    
-    /**
-     * Update the ViewModel reference (called when ViewModel is set).
-     */
-    public void setViewModel(GDKViewModel viewModel) {
-        // Note: ViewModel is final, so we can't update it. This method is kept for API compatibility.
-        // In practice, JsonEditorOperations should be recreated when ViewModel changes.
     }
     
     

@@ -1,4 +1,4 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.messaging;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;

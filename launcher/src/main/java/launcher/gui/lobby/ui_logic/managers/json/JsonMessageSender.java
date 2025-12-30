@@ -1,4 +1,4 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.json;
 
 import gdk.api.GameModule;
 import launcher.gui.json_editor.JsonEditor;

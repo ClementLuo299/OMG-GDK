@@ -1,4 +1,4 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.core;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -9,11 +9,19 @@ import launcher.gui.lobby.persistence.JsonPersistenceManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.TopBarController;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
-import launcher.gui.lobby.ui_logic.managers.JsonEditorOperations;
-import launcher.gui.lobby.ui_logic.managers.StatusLabelManager;
-import launcher.gui.lobby.ui_logic.managers.LaunchButtonManager;
-import launcher.gui.lobby.ui_logic.managers.ModuleChangeReporter;
-import launcher.gui.lobby.ui_logic.managers.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.ui.LaunchButtonManager;
+import launcher.gui.lobby.ui_logic.managers.ui.StatusLabelManager;
+import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
+import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
+import launcher.gui.lobby.ui_logic.managers.game.GameLaunchErrorHandler;
+import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.game.ModuleChangeReporter;
+import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
+import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
+import launcher.gui.lobby.ui_logic.managers.messaging.MessageBridgeManager;
+import launcher.gui.lobby.ui_logic.managers.core.LobbyLifecycleManager;
+import launcher.gui.lobby.ui_logic.managers.core.SettingsNavigationManager;
 import launcher.utils.module.ModuleCompiler;
 
 import javafx.collections.FXCollections;
@@ -122,8 +130,7 @@ public class LobbyInitializationManager {
         
         // Initialize managers
         MessageManager messageManager = new MessageManager(messageContainer, messageScrollPane);
-        RefreshButtonStateManager refreshButtonStateManager = new RefreshButtonStateManager(refreshButton);
-        LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButtonStateManager, loadingProgressBar, loadingStatusLabel);
+        LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
         JsonPersistenceManager jsonPersistenceManager = new JsonPersistenceManager(jsonInputEditor, jsonPersistenceToggle);
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
         JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
@@ -313,16 +320,6 @@ public class LobbyInitializationManager {
     }
     
     /**
-     * Update the game launch manager with a new ViewModel.
-     */
-    public GameLaunchManager updateGameLaunchManager(GDKViewModel applicationViewModel,
-                                                     JsonActionButtonsController jsonActionButtonsController,
-                                                     MessageManager messageManager) {
-        GameLaunchErrorHandler errorHandler = new GameLaunchErrorHandler(messageManager);
-        return new GameLaunchManager(applicationViewModel, jsonActionButtonsController, errorHandler);
-    }
-    
-    /**
      * Update ViewModel references in all components that need it.
      * Since some components have final ViewModel fields, they need to be recreated.
      * 
@@ -346,6 +343,13 @@ public class LobbyInitializationManager {
             currentResult.jsonPersistenceManager()
         );
         
+        // Recreate LoadingAnimationManager (no ViewModel dependency)
+        LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(
+            refreshButton,
+            loadingProgressBar,
+            loadingStatusLabel
+        );
+        
         // Recreate GameModuleRefreshManager with new ViewModel
         GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
             applicationViewModel,
@@ -355,7 +359,7 @@ public class LobbyInitializationManager {
             currentResult.statusLabelManager(),
             currentResult.launchButtonManager(),
             currentResult.moduleChangeReporter(),
-            currentResult.loadingAnimationManager(),
+            loadingAnimationManager,
             moduleCompilationChecker
         );
         

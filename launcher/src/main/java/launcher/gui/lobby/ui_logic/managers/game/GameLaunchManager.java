@@ -1,9 +1,10 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.game;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
+import launcher.gui.lobby.ui_logic.managers.game.GameLaunchErrorHandler;
 import launcher.utils.game.GameLaunchUtil;
 
 import java.util.Map;

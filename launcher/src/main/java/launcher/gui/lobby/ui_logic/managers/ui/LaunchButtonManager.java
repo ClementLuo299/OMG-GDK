@@ -1,4 +1,4 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.ui;
 
 import javafx.scene.control.Button;
 

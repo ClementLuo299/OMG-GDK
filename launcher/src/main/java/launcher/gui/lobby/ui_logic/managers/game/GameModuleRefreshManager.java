@@ -1,8 +1,12 @@
-package launcher.gui.lobby.ui_logic.managers;
+package launcher.gui.lobby.ui_logic.managers.game;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
+import launcher.gui.lobby.ui_logic.managers.ui.StatusLabelManager;
+import launcher.gui.lobby.ui_logic.managers.ui.LaunchButtonManager;
+import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
