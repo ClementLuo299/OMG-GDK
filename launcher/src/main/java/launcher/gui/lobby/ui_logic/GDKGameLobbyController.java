@@ -20,12 +20,12 @@ import java.util.ResourceBundle;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchingManager;
 import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.ControllerModeManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 
 /**
@@ -110,7 +110,7 @@ public class GDKGameLobbyController implements Initializable {
     /**
      * Manager for game launching operations
      */
-    private GameLaunchManager gameLaunchManager;
+    private GameLaunchingManager gameLaunchManager;
     
     /**
      * Manager for lobby shutdown operations

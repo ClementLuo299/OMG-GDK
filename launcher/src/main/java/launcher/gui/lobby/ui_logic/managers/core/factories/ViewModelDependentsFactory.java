@@ -6,10 +6,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchErrorHandler;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchErrorHandler;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchingManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleCompilationChecker;
 import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
@@ -88,7 +88,7 @@ public class ViewModelDependentsFactory {
             moduleCompilationChecker
         );
         
-        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, 
+        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(applicationViewModel, 
             currentResult.jsonActionButtonsController(), gameLaunchErrorHandler);
         
         // ==================== INITIALIZE RECREATED COMPONENTS ====================
@@ -114,7 +114,7 @@ public class ViewModelDependentsFactory {
         GameSelectionController gameSelectionController,
         LoadingAnimationManager loadingAnimationManager,
         GameModuleRefreshManager gameModuleRefreshManager,
-        GameLaunchManager gameLaunchManager
+        GameLaunchingManager gameLaunchManager
     ) {}
 }
 

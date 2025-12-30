@@ -123,7 +123,7 @@ public class GameSelectionController {
     
     /**
      * Set callback for when launch game is requested.
-     * Typically delegates to GameLaunchManager.launchGameFromUI().
+     * Typically delegates to GameLaunchingManager.launchGameFromUI().
      * 
      * @param onLaunchGame The callback to execute (e.g., launch game with validation)
      */

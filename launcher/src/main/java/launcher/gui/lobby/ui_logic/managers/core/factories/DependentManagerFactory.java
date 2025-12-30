@@ -8,11 +8,11 @@ import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.SettingsNavigationManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchErrorHandler;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleChangeReporter;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchErrorHandler;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchingManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleChangesReporter;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleCompilationChecker;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageBridgeManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LaunchButtonManager;
@@ -40,7 +40,7 @@ public class DependentManagerFactory {
      */
     public record DependentManagerCreationResult(
         GameModuleRefreshManager gameModuleRefreshManager,
-        GameLaunchManager gameLaunchManager,
+        GameLaunchingManager gameLaunchManager,
         MessageBridgeManager messageBridgeManager,
         LobbyShutdownManager lobbyShutdownManager,
         SettingsNavigationManager settingsNavigationManager
@@ -78,7 +78,7 @@ public class DependentManagerFactory {
             MessageManager messageManager,
             StatusLabelManager statusLabelManager,
             LaunchButtonManager launchButtonManager,
-            ModuleChangeReporter moduleChangeReporter,
+            ModuleChangesReporter moduleChangeReporter,
             LoadingAnimationManager loadingAnimationManager,
             ModuleCompilationChecker moduleCompilationChecker,
             GameLaunchErrorHandler gameLaunchErrorHandler,
@@ -98,7 +98,7 @@ public class DependentManagerFactory {
             moduleCompilationChecker
         );
         
-        GameLaunchManager gameLaunchManager = new GameLaunchManager(applicationViewModel, jsonActionButtonsController, gameLaunchErrorHandler);
+        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(applicationViewModel, jsonActionButtonsController, gameLaunchErrorHandler);
         MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonActionButtonsController);
         LobbyShutdownManager lobbyShutdownManager = new LobbyShutdownManager(jsonPersistenceManager, gameSelectionController);
         

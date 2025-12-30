@@ -12,10 +12,10 @@ import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 import launcher.gui.lobby.ui_logic.managers.ui.LaunchButtonManager;
 import launcher.gui.lobby.ui_logic.managers.ui.StatusLabelManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleChangeReporter;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchingManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleChangesReporter;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleCompilationChecker;
 import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageBridgeManager;
@@ -362,8 +362,8 @@ public class LobbyInitializationManager {
         JsonEditorOperations jsonEditorOperations,
         StatusLabelManager statusLabelManager,
         LaunchButtonManager launchButtonManager,
-        ModuleChangeReporter moduleChangeReporter,
-        GameLaunchManager gameLaunchManager,
+        ModuleChangesReporter moduleChangeReporter,
+        GameLaunchingManager gameLaunchManager,
         MessageBridgeManager messageBridgeManager,
         LobbyShutdownManager lobbyShutdownManager,
         SettingsNavigationManager settingsNavigationManager,

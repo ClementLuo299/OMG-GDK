@@ -3,8 +3,8 @@ package launcher.gui.lobby.ui_logic.managers.core.setup;
 import gdk.api.GameModule;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.gui.lobby.ui_logic.managers.core.lifecycle.SettingsNavigationManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameModuleRefreshManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchingManager;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameModuleRefreshManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 import launcher.gui.lobby.ui_logic.subcontrollers.TopBarController;
@@ -36,7 +36,7 @@ public class CallbackWiring {
             GameSelectionController gameSelectionController,
             JsonActionButtonsController jsonActionButtonsController,
             TopBarController topBarController,
-            GameLaunchManager gameLaunchManager,
+            GameLaunchingManager gameLaunchManager,
             LobbyShutdownManager lobbyShutdownManager,
             SettingsNavigationManager settingsNavigationManager,
             GameModuleRefreshManager gameModuleRefreshManager) {

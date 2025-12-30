@@ -10,9 +10,9 @@ import launcher.gui.json_editor.JsonEditor;
 import launcher.gui.lobby.GDKViewModel;
 import launcher.gui.lobby.persistence.JsonPersistenceManager;
 import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
-import launcher.gui.lobby.ui_logic.managers.game.GameLaunchErrorHandler;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleChangeReporter;
-import launcher.gui.lobby.ui_logic.managers.game.ModuleCompilationChecker;
+import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchErrorHandler;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleChangesReporter;
+import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleCompilationChecker;
 import launcher.gui.lobby.ui_logic.managers.json.JsonEditorOperations;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LaunchButtonManager;
@@ -42,7 +42,7 @@ public class BasicManagerFactory {
         GameLaunchErrorHandler gameLaunchErrorHandler,
         StatusLabelManager statusLabelManager,
         LaunchButtonManager launchButtonManager,
-        ModuleChangeReporter moduleChangeReporter
+        ModuleChangesReporter moduleChangeReporter
     ) {}
     
     /**
@@ -84,7 +84,7 @@ public class BasicManagerFactory {
         GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(messageManager);
         StatusLabelManager statusLabelManager = new StatusLabelManager(statusLabel);
         LaunchButtonManager launchButtonManager = new LaunchButtonManager(launchGameButton);
-        ModuleChangeReporter moduleChangeReporter = new ModuleChangeReporter(messageReporter::addMessage);
+        ModuleChangesReporter moduleChangeReporter = new ModuleChangesReporter(messageReporter::addMessage);
         
         return new BasicManagerCreationResult(
             messageManager,
