@@ -335,7 +335,7 @@ public class GDKViewModel {
                 Logging.info("Auto-launched game window closing - shutting down application");
                 Platform.runLater(() -> {
                     try {
-                        launcher.lifecycle.stop.Shutdown.shutdown();
+                        launcher.core.lifecycle.stop.Shutdown.shutdown();
                     } catch (Exception e) {
                         Logging.error("Error during shutdown: " + e.getMessage(), e);
                         System.exit(0);

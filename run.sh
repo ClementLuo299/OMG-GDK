@@ -46,4 +46,4 @@ echo "🔧 Development mode enabled - caching disabled for faster UI updates"
 echo "💡 UI changes will now be visible immediately!"
 
 # Use exec:java but with minimal Maven output for faster startup
-mvn exec:java -Dexec.mainClass="launcher.GDKApplication" -q 
+mvn exec:java -Dexec.mainClass="launcher.core.GDKApplication" -q 
