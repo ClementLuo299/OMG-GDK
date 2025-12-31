@@ -18,7 +18,7 @@ import com.jfoenix.controls.JFXToggleButton;
  * - Save JSON toggle (persistence toggle)
  * - Clear output button
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

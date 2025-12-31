@@ -14,7 +14,7 @@ import launcher.features.module_handling.loading.ModuleCompiler;
  * Handles post-initialization setup tasks.
  * Encapsulates setup logic that occurs after all components are created.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

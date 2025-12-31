@@ -8,18 +8,18 @@ import java.nio.file.Paths;
 /**
  * Utility class for resolving application paths.
  * 
- * This class handles file_paths resolution for the GDK application, particularly
+ * This class handles path resolution for the GDK application, particularly
  * for finding the modules directory regardless of how the application is launched
  * (IDE vs command line).
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 19, 2025
  * @since Beta 1.0
  */
 public final class PathUtil {
     
     /**
-     * Cached resolved file_paths to the modules directory.
+     * Cached resolved path to the modules directory.
      * This is resolved once at class initialization time.
      */
     private static final String MODULES_DIRECTORY_PATH = resolveModulesDirectoryPath();
@@ -33,19 +33,19 @@ public final class PathUtil {
     }
     
     /**
-     * Get the resolved file_paths to the modules directory.
+     * Get the resolved path to the modules directory.
      * 
-     * This method returns the file_paths to the modules directory, which is resolved
-     * at application startup. The file_paths is cached for performance.
+     * This method returns the path to the modules directory, which is resolved
+     * at application startup. The path is cached for performance.
      * 
-     * @return The absolute file_paths to the modules directory
+     * @return The absolute path to the modules directory
      */
     public static String getModulesDirectoryPath() {
         return MODULES_DIRECTORY_PATH;
     }
     
     /**
-     * Resolve the modules directory file_paths for both CLI and IDE runs.
+     * Resolve the modules directory path for both CLI and IDE runs.
      * 
      * This method tries multiple candidate paths to find the modules directory,
      * ensuring the application works regardless of the working directory when launched.
@@ -55,7 +55,7 @@ public final class PathUtil {
      * 2. "modules" - Works when project root is the working directory
      * 3. "../../modules" - Fallback for IDEs launching from submodules
      * 
-     * @return The resolved absolute file_paths to the modules directory
+     * @return The resolved absolute path to the modules directory
      */
     private static String resolveModulesDirectoryPath() {
         String userDir = System.getProperty("user.dir");

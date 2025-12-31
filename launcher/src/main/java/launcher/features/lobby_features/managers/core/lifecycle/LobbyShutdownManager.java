@@ -9,7 +9,7 @@ import launcher.ui.lobby.subcontrollers.GameSelectionController;
  * Manages shutdown operations for the lobby controller.
  * Handles saving settings, persistence, and cleanup on application exit.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

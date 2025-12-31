@@ -28,7 +28,7 @@ import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
  * These managers must be created after subcontrollers are available.
  * Basic managers (that don't depend on subcontrollers) are created by BasicManagerFactory.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

@@ -9,7 +9,7 @@ import javafx.scene.control.Button;
  * 
  * Handles exit button, refresh button, and settings button in the header.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

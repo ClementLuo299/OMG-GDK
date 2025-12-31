@@ -9,7 +9,7 @@ import launcher.core.AutoLaunchUtil;
 import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 /**
- * Handles the auto-launch file_paths for the GDK application.
+ * Handles the auto-launch flow for the GDK application.
  * 
  * Auto-launch attempts to restore and launch a previously selected game
  * using saved configuration data. If successful, the application skips

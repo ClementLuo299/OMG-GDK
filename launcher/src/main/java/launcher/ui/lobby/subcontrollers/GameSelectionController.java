@@ -13,7 +13,7 @@ import javafx.scene.control.ComboBox;
  * 
  * Handles game selection dropdown and launch button only.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

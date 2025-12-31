@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  * Manages navigation to and from the settings page.
  * Handles FXML loading, scene switching, and CSS application.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

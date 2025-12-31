@@ -12,7 +12,7 @@ import javafx.util.Duration;
  * Manages loading animation with progress bar and animated text.
  * Also manages the refresh button state during loading.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 27, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

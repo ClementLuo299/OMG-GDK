@@ -18,7 +18,7 @@ import java.util.Map;
  *   <li>Providing access to the shared ObjectMapper instance</li>
  * </ul>
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 20, 2025
  * @edited December 20, 2025
  * @since Beta 1.0

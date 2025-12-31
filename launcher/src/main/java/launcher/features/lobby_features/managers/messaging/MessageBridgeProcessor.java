@@ -7,7 +7,7 @@ import launcher.ui.lobby.json_editor.JsonEditor;
 import java.util.Map;
 
 /**
- * Handles UI updates for messages from the game_messaging bridge.
+ * Handles UI updates for messages from the messaging bridge.
  * 
  * <p>This processor handles UI-related operations:
  * <ul>

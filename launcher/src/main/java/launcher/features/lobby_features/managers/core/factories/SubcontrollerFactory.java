@@ -19,7 +19,7 @@ import launcher.ui.lobby.subcontrollers.TopBarController;
  * Factory for creating all subcontroller instances used in the lobby.
  * Encapsulates subcontroller creation logic to reduce complexity in LobbyInitializationManager.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

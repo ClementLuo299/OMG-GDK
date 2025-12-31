@@ -9,7 +9,7 @@ import launcher.ui.startup_window.StartupWindowManager;
 import launcher.core.StartupDelayUtil;
 
 /**
- * Handles the standard launch file_paths for the GDK application.
+ * Handles the standard launch flow for the GDK application.
  * 
  * Standard launch initializes the full GDK interface with game selection:
  * 1. Creates and displays the startup progress window

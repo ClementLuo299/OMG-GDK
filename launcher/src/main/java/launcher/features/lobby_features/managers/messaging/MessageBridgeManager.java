@@ -7,7 +7,7 @@ import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
 import java.util.Map;
 
 /**
- * Manages game_messaging bridge subscriptions for the lobby.
+ * Manages messaging bridge subscriptions for the lobby.
  * Handles subscription to game messages and delegates processing.
  * 
  * @author Clement Luo

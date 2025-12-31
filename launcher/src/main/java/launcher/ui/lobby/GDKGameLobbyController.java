@@ -42,7 +42,7 @@ import launcher.ui.lobby.subcontrollers.GameSelectionController;
  * - Provide user feedback through messages and error dialogs
  * - Manage the refresh of available game modules
  *
- * @authors Clement Luo
+ * @author Clement Luo
  * @date July 25, 2025
  * @edited December 29, 2025       
  * @since Beta 1.0

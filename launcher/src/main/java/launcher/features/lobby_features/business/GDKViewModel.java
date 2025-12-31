@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  * - Manage server simulator lifecycle
  * - Handle application cleanup and shutdown
  *
- * @authors Clement Luo
+ * @author Clement Luo
  * @date July 25, 2025
  * @edited December 27, 2025  
  * @since Beta 1.0

@@ -24,7 +24,7 @@ import launcher.features.lobby_features.managers.ui.StatusLabelManager;
  * Factory for creating basic managers that don't depend on subcontrollers.
  * Encapsulates basic manager creation logic to reduce complexity in LobbyInitializationManager.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

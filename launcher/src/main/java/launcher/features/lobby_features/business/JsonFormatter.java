@@ -18,7 +18,7 @@ import java.util.Map;
  *   <li>Formatting JSON maps to compact strings</li>
  * </ul>
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @since Beta 1.0
  */

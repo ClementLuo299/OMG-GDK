@@ -22,7 +22,7 @@ import java.nio.file.Paths;
  *   <li>Persisting selected game name</li>
  * </ul>
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 27, 2025
  * @edited December 27, 2025
  * @since 1.0

@@ -32,7 +32,7 @@ import java.nio.file.Paths;
  *   <li>Handling return to normal GDK mode</li>
  * </ul>
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 20, 2025
  * @edited December 20, 2025
  * @since Beta 1.0

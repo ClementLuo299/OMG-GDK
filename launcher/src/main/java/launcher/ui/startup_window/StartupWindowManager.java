@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
  * This class acts as a facade/coordinator that delegates to specialized components
  * for window lifecycle, progress updates, UI handling, and step calculation.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date August 12, 2025
  * @edited December 26, 2025
  * @since Beta 1.0

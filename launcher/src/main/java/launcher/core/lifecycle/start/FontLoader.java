@@ -1,10 +1,11 @@
 package launcher.core.lifecycle.start;
 
 /**
- * Initializes application-wide resources before the UI is created.
+ * Initializes application fonts before the UI is created.
  * 
- * This class handles initialization tasks that must be completed before
- * any UI components (Swing or JavaFX) are created.
+ * This class is a thin wrapper that delegates to launcher.core.FontLoader
+ * to load and register the Inter font for both Swing (AWT) and JavaFX components.
+ * Font initialization must be completed before any UI components are created.
  * 
  * @author Clement Luo
  * @date December 24, 2025

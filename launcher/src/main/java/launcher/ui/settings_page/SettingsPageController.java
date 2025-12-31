@@ -29,7 +29,7 @@ import launcher.ui.lobby.GDKGameLobbyController;
  * - Provide real-time settings updates
  * - Integrate with the main GDK lobby controller
  *
- * @authors Clement Luo
+ * @author Clement Luo
  * @date August 22, 2025
  * @edited August 22, 2025
  * @since 1.0

@@ -11,7 +11,7 @@ import launcher.features.module_handling.loading.ModuleCompiler;
  * Manages the operational mode of the controller (AUTO_LAUNCH or NORMAL)
  * and handles mode-specific initialization logic.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

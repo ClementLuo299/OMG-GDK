@@ -41,7 +41,7 @@ import com.jfoenix.controls.JFXToggleButton;
 /**
  * Manages initialization of the lobby controller and all its components.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025  
  * @edited December 29, 2025
  * @since Beta 1.0

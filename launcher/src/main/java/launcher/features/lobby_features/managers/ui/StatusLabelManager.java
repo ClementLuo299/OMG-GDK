@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
  * Manages the status label UI component.
  * Handles updating the game count status display.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 30, 2025
  * @since Beta 1.0

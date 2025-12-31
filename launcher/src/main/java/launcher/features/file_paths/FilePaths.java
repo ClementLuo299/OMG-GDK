@@ -1,13 +1,13 @@
 package launcher.features.file_paths;
 
 /**
- * Utility class for centralized file file_paths constants.
+ * Utility class for centralized file path constants.
  * 
  * This class contains all file paths used throughout the GDK application
  * for persistence, configuration, and saved data. Centralizing these paths
  * makes it easier to maintain and update file locations.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 19, 2025
  * @since 1.0
  */

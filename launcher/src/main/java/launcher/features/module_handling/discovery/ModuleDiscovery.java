@@ -29,7 +29,7 @@ import java.util.List;
  *   <li>Finding modules by name</li>
  * </ul>
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date August 12, 2025
  * @edited December 20, 2025
  * @since Beta 1.0
@@ -55,7 +55,7 @@ public class ModuleDiscovery {
      * Actual loading is delegated to ModuleCompiler (kept intentionally
      * side-effect free here).
      * 
-     * @param modulesDirectoryPath The file_paths to the modules directory
+     * @param modulesDirectoryPath The path to the modules directory
      * @return List of discovered game modules (currently empty, loading is done elsewhere)
      */
     public static List<GameModule> discoverModules(String modulesDirectoryPath) {
@@ -337,7 +337,7 @@ public class ModuleDiscovery {
     /**
      * Checks if a module directory exists and is accessible.
      * 
-     * @param modulePath The file_paths to the module directory
+     * @param modulePath The path to the module directory
      * @return true if the directory exists, is a directory, and is readable
      */
     public static boolean moduleDirectoryExists(String modulePath) {
@@ -439,7 +439,7 @@ public class ModuleDiscovery {
      * directory type, readability, and listing capability. This can help identify
      * if the issue is with file system access.
      * 
-     * @param modulesDirectoryPath The file_paths to the modules directory
+     * @param modulesDirectoryPath The path to the modules directory
      * @return true if the directory is accessible, false otherwise
      */
     public static boolean testModulesDirectoryAccess(String modulesDirectoryPath) {
@@ -503,9 +503,9 @@ public class ModuleDiscovery {
      *   <li>Checking compilation status</li>
      * </ul>
      * 
-     * <p>This will help identify file system, file_paths, or validation issues.
+     * <p>This will help identify file system, path, or validation issues.
      * 
-     * @param modulesDirectoryPath The file_paths to the modules directory
+     * @param modulesDirectoryPath The path to the modules directory
      */
     public static void diagnoseModuleDetectionIssues(String modulesDirectoryPath) {
         Logging.info("🔍 === MODULE DETECTION DIAGNOSTICS ===");
@@ -515,10 +515,10 @@ public class ModuleDiscovery {
             String currentWorkingDir = System.getProperty("user.dir");
             Logging.info("📁 Current working directory: " + currentWorkingDir);
             
-            // Check the modules directory file_paths
-            Logging.info("🔍 Modules directory file_paths: " + modulesDirectoryPath);
+            // Check the modules directory path
+            Logging.info("🔍 Modules directory path: " + modulesDirectoryPath);
             
-            // Try to resolve the file_paths
+            // Try to resolve the path
             File modulesDirectory = new File(modulesDirectoryPath);
             Logging.info("📁 Resolved modules directory: " + modulesDirectory.getAbsolutePath());
             

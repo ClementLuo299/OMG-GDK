@@ -19,7 +19,7 @@ import java.util.Map;
  *   <li>Handling responses and errors</li>
  * </ul>
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @since Beta 1.0
  */

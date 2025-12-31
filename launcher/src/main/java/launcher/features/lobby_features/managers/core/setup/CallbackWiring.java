@@ -13,7 +13,7 @@ import launcher.ui.lobby.subcontrollers.TopBarController;
  * Handles wiring of callbacks between subcontrollers and managers.
  * Encapsulates callback wiring logic to reduce complexity in LobbyInitializationManager.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

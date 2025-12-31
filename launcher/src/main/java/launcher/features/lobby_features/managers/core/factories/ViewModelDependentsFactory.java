@@ -20,7 +20,7 @@ import launcher.ui.lobby.subcontrollers.GameSelectionController;
  * Factory for recreating components that depend on ViewModel.
  * Encapsulates ViewModel-dependent component recreation logic to reduce complexity in LobbyInitializationManager.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

@@ -8,7 +8,7 @@ import launcher.core.FontLoader;
  * Handles UI component setup and styling.
  * Encapsulates UI setup logic to reduce complexity in LobbyInitializationManager.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @edited December 29, 2025
  * @since Beta 1.0

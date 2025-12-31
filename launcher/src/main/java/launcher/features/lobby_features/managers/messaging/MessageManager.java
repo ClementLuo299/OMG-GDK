@@ -16,7 +16,7 @@ import java.util.Queue;
  * Messages are queued and displayed one by one every 250ms to ensure
  * all messages are shown while preventing UI spam.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 27, 2025
  * @edited December 27, 2025
  * @since Beta 1.0

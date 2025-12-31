@@ -13,7 +13,7 @@ import java.util.Map;
  * <p>This is a thin wrapper around TranscriptRecorder that provides a business
  * logic layer interface for the lobby package.
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date December 29, 2025
  * @since Beta 1.0
  */

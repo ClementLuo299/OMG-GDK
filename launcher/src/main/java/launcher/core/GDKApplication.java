@@ -12,7 +12,7 @@ import javafx.stage.Stage;
  * Main JavaFX Application class for the OMG Game Development Kit (GDK).
  * This class serves as the entry point for the GDK launcher application.
  *
- * @authors Clement Luo
+ * @author Clement Luo
  * @date July 20, 2025
  * @edited December 24, 2025
  * @since Beta 1.0

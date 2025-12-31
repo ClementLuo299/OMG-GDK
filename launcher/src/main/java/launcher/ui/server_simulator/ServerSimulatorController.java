@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * 
  * This class manages the server simulator interface that allows users to
  * send and receive JSON messages to simulate server communication with
- * running games. It provides a simple game_messaging interface for testing
+ * running games. It provides a simple messaging interface for testing
  * game-server communication protocols.
  * 
  * Key responsibilities:
@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * - Coordinate with the main GDK application
  * - Handle window lifecycle and cleanup
  *
- * @authors Clement Luo
+ * @author Clement Luo
  * @date July 25, 2025
  * @edited August 10, 2025   
  * @since 1.0
@@ -88,7 +88,7 @@ public class ServerSimulatorController {
     // ==================== CONSTANTS ====================
     
     /**
-     * File file_paths for persisting input content
+     * File path for persisting input content
      */
     private static final String INPUT_PERSISTENCE_FILE = "saved/server-simulator-input.txt";
 

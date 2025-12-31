@@ -24,7 +24,7 @@ import java.util.Map;
  *   <li>Parsing JSON configuration strings</li>
  * </ul>
  * 
- * @authors Clement Luo
+ * @author Clement Luo
  * @date August 11, 2025
  * @edited August 11, 2025
  * @since 1.0
