@@ -4,7 +4,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.business.game_launching.GameLaunchService;
+import launcher.gui.lobby.business.json.JsonProcessingService;
+import launcher.gui.lobby.business.GDKViewModel;
 import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
 import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchErrorHandler;
 import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchingManager;
@@ -52,7 +54,10 @@ public class ViewModelDependentsFactory {
         // ==================== RECREATE VIEWMODEL-DEPENDENT COMPONENTS ====================
         
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
-        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, 
+        
+        // Create business service for JSON processing
+        JsonProcessingService jsonProcessingService = new JsonProcessingService(applicationViewModel);
+        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(jsonProcessingService, 
             currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
         
         // ==================== RECREATE COMPONENTS (NO VIEWMODEL DEPENDENCY) ====================
@@ -76,6 +81,7 @@ public class ViewModelDependentsFactory {
         
         // ==================== RECREATE VIEWMODEL-DEPENDENT MANAGERS ====================
         
+        // Note: GameModuleRefreshManager creates ModuleDiscoveryService internally
         GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
             applicationViewModel,
             currentResult.gameSelectionController().getAvailableGameModules(),
@@ -88,7 +94,9 @@ public class ViewModelDependentsFactory {
             moduleCompilationChecker
         );
         
-        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(applicationViewModel, 
+        // Create business service for game launching
+        GameLaunchService gameLaunchService = new GameLaunchService(applicationViewModel);
+        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(gameLaunchService, 
             currentResult.jsonActionButtonsController(), gameLaunchErrorHandler);
         
         // ==================== INITIALIZE RECREATED COMPONENTS ====================

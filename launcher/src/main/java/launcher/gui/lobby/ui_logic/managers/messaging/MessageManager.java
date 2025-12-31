@@ -19,7 +19,7 @@ import java.util.Queue;
  * @authors Clement Luo
  * @date December 27, 2025
  * @edited December 27, 2025
- * @since 1.0
+ * @since Beta 1.0
  */
 public class MessageManager {
     
@@ -60,11 +60,11 @@ public class MessageManager {
     public void addMessage(String userMessage) {
         // If this is a loading animation message and we're already refreshing,
         // replace the last message instead of adding a new one
-        if (isRefreshing && userMessage.startsWith("🔄 Reload in progress")) {
+        if (isRefreshing && userMessage.startsWith("Reload in progress")) {
             // Remove the last message if it's also a loading message
             if (!messageQueue.isEmpty()) {
                 String lastMessage = ((LinkedList<String>) messageQueue).peekLast();
-                if (lastMessage != null && lastMessage.startsWith("🔄 Reload in progress")) {
+                if (lastMessage != null && lastMessage.startsWith("Reload in progress")) {
                     ((LinkedList<String>) messageQueue).removeLast();
                 }
             }

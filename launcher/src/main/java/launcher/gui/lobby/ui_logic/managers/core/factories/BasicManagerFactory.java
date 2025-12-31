@@ -7,8 +7,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import com.jfoenix.controls.JFXToggleButton;
 import launcher.gui.json_editor.JsonEditor;
-import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.persistence.JsonPersistenceManager;
+import launcher.gui.lobby.business.json.JsonProcessingService;
+import launcher.gui.lobby.business.GDKViewModel;
+import launcher.gui.lobby.business.JsonPersistenceManager;
 import launcher.gui.lobby.ui_logic.managers.core.LobbyInitializationManager;
 import launcher.gui.lobby.ui_logic.managers.game_launching.GameLaunchErrorHandler;
 import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleChangesReporter;
@@ -80,7 +81,10 @@ public class BasicManagerFactory {
         LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
         JsonPersistenceManager jsonPersistenceManager = new JsonPersistenceManager(jsonInputEditor, jsonPersistenceToggle);
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
-        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(applicationViewModel, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
+        
+        // Create business service for JSON processing
+        JsonProcessingService jsonProcessingService = new JsonProcessingService(applicationViewModel);
+        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(jsonProcessingService, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
         GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(messageManager);
         StatusLabelManager statusLabelManager = new StatusLabelManager(statusLabel);
         LaunchButtonManager launchButtonManager = new LaunchButtonManager(launchGameButton);

@@ -1,6 +1,7 @@
 package launcher.gui.lobby.ui_logic.managers.messaging;
 
 import gdk.internal.MessagingBridge;
+import launcher.gui.lobby.business.messaging.MessageProcessingService;
 import launcher.gui.lobby.ui_logic.subcontrollers.JsonActionButtonsController;
 
 import java.util.Map;
@@ -9,21 +10,25 @@ import java.util.Map;
  * Manages messaging bridge subscriptions for the lobby.
  * Handles subscription to game messages and delegates processing.
  * 
- * @authors Clement Luo
- * @date January 2025
- * @since 1.0
+ * @author Clement Luo
+ * @date December 30, 2025
+ * @edited December 30, 2025
+ * @since Beta 1.0
  */
 public class MessageBridgeManager {
     
     private final MessageBridgeProcessor messageProcessor;
     
     /**
-     * Create a new MessageBridgeManager.
+     * Creates a new MessageBridgeManager.
      * 
      * @param jsonActionButtonsController The JSON action buttons controller
      */
     public MessageBridgeManager(JsonActionButtonsController jsonActionButtonsController) {
+        // Create business service for message processing
+        MessageProcessingService messageProcessingService = new MessageProcessingService();
         this.messageProcessor = new MessageBridgeProcessor(
+            messageProcessingService,
             jsonActionButtonsController != null ? jsonActionButtonsController.getJsonOutputEditor() : null
         );
     }

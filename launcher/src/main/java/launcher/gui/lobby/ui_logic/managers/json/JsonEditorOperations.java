@@ -1,18 +1,26 @@
 package launcher.gui.lobby.ui_logic.managers.json;
 
+import launcher.gui.lobby.business.json.JsonProcessingService;
 import launcher.gui.json_editor.JsonEditor;
-import launcher.gui.lobby.GDKViewModel;
-import launcher.gui.lobby.JsonFormatter;
-import launcher.gui.lobby.ui_logic.managers.json.JsonMessageSender;
 
 import java.util.Map;
 
 /**
  * Handles JSON editor UI operations.
- * Manages clearing, filling, and displaying JSON content in editors.
  * 
- * @authors Clement Luo
+ * <p>This class handles UI-related operations:
+ * <ul>
+ *   <li>Clearing JSON editor content</li>
+ *   <li>Filling JSON editor with template content</li>
+ *   <li>Displaying formatted JSON in editors</li>
+ *   <li>Reporting user actions via messages</li>
+ * </ul>
+ * 
+ * <p>Business logic (JSON parsing, formatting) is delegated to {@link JsonProcessingService}.
+ * 
+ * @author Clement Luo
  * @date December 29, 2025
+ * @edited December 30, 2025
  * @since Beta 1.0
  */
 public class JsonEditorOperations {
@@ -24,29 +32,42 @@ public class JsonEditorOperations {
         void addMessage(String message);
     }
     
-    private final GDKViewModel viewModel;
+    // ==================== DEPENDENCIES ====================
+    
+    /** Business logic service for JSON processing. */
+    private final JsonProcessingService jsonProcessingService;
+    
+    /** Input JSON editor UI component. */
     private final JsonEditor jsonInputEditor;
+    
+    /** Output JSON editor UI component. */
     private final JsonEditor jsonOutputEditor;
+    
+    /** Callback for reporting messages to the UI. */
     private final MessageReporter messageReporter;
+    
+    /** Message sender for sending JSON messages. */
     private final JsonMessageSender messageSender;
     
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Create a new JsonEditorOperations.
+     * Creates a new JsonEditorOperations.
      * 
-     * @param viewModel The ViewModel for business logic (may be null initially)
+     * @param jsonProcessingService The business logic service for JSON processing
      * @param jsonInputEditor The input JSON editor
      * @param jsonOutputEditor The output JSON editor
      * @param messageReporter Callback to report messages to the UI
      */
-    public JsonEditorOperations(GDKViewModel viewModel,
+    public JsonEditorOperations(JsonProcessingService jsonProcessingService,
                                 JsonEditor jsonInputEditor, 
                                 JsonEditor jsonOutputEditor, 
                                 MessageReporter messageReporter) {
-        this.viewModel = viewModel;
+        this.jsonProcessingService = jsonProcessingService;
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;
         this.messageReporter = messageReporter;
-        this.messageSender = new JsonMessageSender(viewModel, jsonInputEditor, jsonOutputEditor, messageReporter);
+        this.messageSender = new JsonMessageSender(jsonProcessingService, jsonInputEditor, jsonOutputEditor, messageReporter);
     }
     
     /**
@@ -65,7 +86,7 @@ public class JsonEditorOperations {
      */
     public void clearJsonInputData() {
         jsonInputEditor.clear();
-        messageReporter.addMessage("🗑️ Cleared JSON input data");
+        messageReporter.addMessage("Cleared JSON input data");
     }
     
     /**
@@ -73,7 +94,7 @@ public class JsonEditorOperations {
      */
     public void clearJsonOutputData() {
         jsonOutputEditor.clear();
-        messageReporter.addMessage("🗑️ Cleared JSON output data");
+        messageReporter.addMessage("Cleared JSON output data");
     }
     
     /**
@@ -87,34 +108,32 @@ public class JsonEditorOperations {
         jsonInputEditor.setText(metadataRequest);
         
         // Provide user feedback about the action
-        messageReporter.addMessage("📋 Filled JSON input with metadata request");
+        messageReporter.addMessage("Filled JSON input with metadata request");
     }
     
     /**
-     * Parse the JSON configuration data from the text area.
-     * Delegates to ViewModel for business logic.
+     * Parses the JSON configuration data from the text area.
+     * Delegates to business service for parsing.
      * 
      * @return The parsed JSON data as a Map, or null if parsing fails or input is empty
      */
     public Map<String, Object> parseJsonConfigurationData() {
-        // Get the JSON text from the text area
+        // Get the JSON text from the UI text area
         String jsonConfigurationText = jsonInputEditor.getText().trim();
         
-        // Delegate parsing to ViewModel (business logic)
-        if (viewModel != null) {
-            return viewModel.parseJsonConfiguration(jsonConfigurationText);
-        }
-        
-        return null;
+        // Delegate parsing to business service
+        return jsonProcessingService.parseJsonConfiguration(jsonConfigurationText);
     }
     
     /**
-     * Format and display a JSON response in the output editor.
+     * Formats and displays a JSON response in the output editor.
      * 
      * @param response The response map to format and display
      */
     public void displayJsonResponse(Map<String, Object> response) {
-        String formattedJson = JsonFormatter.formatJsonResponse(response);
+        // Format using business service
+        String formattedJson = jsonProcessingService.formatJsonResponse(response);
+        // Update UI
         jsonOutputEditor.setText(formattedJson);
     }
 }

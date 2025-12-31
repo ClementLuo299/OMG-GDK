@@ -2,26 +2,27 @@ package launcher.gui.lobby.ui_logic.managers.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.business.module_discovery.ModuleDiscoveryService;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.ui.StatusLabelManager;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Handles discovery and processing of game modules.
+ * Handles UI coordination for module discovery operations.
  * 
- * <p>This handler is responsible for:
+ * <p>This handler is responsible for UI-related operations:
  * <ul>
- *   <li>Discovering modules via ViewModel</li>
- *   <li>Processing discovered modules (extracting names, logging, creating messages)</li>
- *   <li>Filtering out invalid (null) modules</li>
- *   <li>Reporting discovery results</li>
+ *   <li>Reporting discovered modules to users via messages</li>
+ *   <li>Updating status labels</li>
+ *   <li>Creating UI-friendly messages from discovery results</li>
  * </ul>
+ * 
+ * <p>Business logic (discovery, processing, filtering) is delegated to
+ * {@link ModuleDiscoveryService}.
  * 
  * @author Clement Luo
  * @date December 30, 2025
@@ -32,8 +33,8 @@ public class ModuleDiscoveryHandler {
     
     // ==================== DEPENDENCIES ====================
     
-    /** ViewModel for business logic operations (module discovery). */
-    private final GDKViewModel viewModel;
+    /** Business logic service for module discovery. */
+    private final ModuleDiscoveryService discoveryService;
     
     /** Message manager for user feedback. */
     private final MessageManager messageManager;
@@ -46,14 +47,14 @@ public class ModuleDiscoveryHandler {
     /**
      * Creates a new ModuleDiscoveryHandler.
      * 
-     * @param viewModel The ViewModel for business logic operations
+     * @param discoveryService The business logic service for module discovery
      * @param messageManager The message manager for user feedback
      * @param statusLabelManager The status label manager for status updates
      */
-    public ModuleDiscoveryHandler(GDKViewModel viewModel,
+    public ModuleDiscoveryHandler(ModuleDiscoveryService discoveryService,
                                   MessageManager messageManager,
                                   StatusLabelManager statusLabelManager) {
-        this.viewModel = viewModel;
+        this.discoveryService = discoveryService;
         this.messageManager = messageManager;
         this.statusLabelManager = statusLabelManager;
     }
@@ -61,32 +62,29 @@ public class ModuleDiscoveryHandler {
     // ==================== PUBLIC METHODS ====================
     
     /**
-     * Discovers and loads game modules using the ViewModel.
+     * Discovers and loads game modules using the business service.
      * 
      * @param availableGameModulesSize Current size of available modules (for status updates)
-     * @return List of discovered game modules, or null if ViewModel is unavailable
+     * @return List of discovered game modules, or null if service is unavailable
      */
     public List<GameModule> discoverModules(int availableGameModulesSize) {
-        if (viewModel != null) {
-            return viewModel.discoverAndLoadModules();
-        } else {
-            Logging.error("ViewModel not available for module discovery");
+        List<GameModule> discovered = discoveryService.discoverModules();
+        if (discovered == null) {
             Platform.runLater(() -> {
                 messageManager.addMessage("Error: ViewModel not available");
                 statusLabelManager.updateGameCountStatus(availableGameModulesSize);
             });
-            return null;
         }
+        return discovered;
     }
     
     /**
-     * Processes discovered modules and prepares discovery result.
+     * Processes discovered modules and prepares UI-friendly discovery result.
      * 
      * <p>This method:
      * <ul>
-     *   <li>Extracts module names and metadata</li>
-     *   <li>Logs discovered modules</li>
-     *   <li>Creates UI messages for each discovered module</li>
+     *   <li>Delegates processing to business service</li>
+     *   <li>Creates UI messages from business results</li>
      *   <li>Handles errors gracefully</li>
      * </ul>
      * 
@@ -94,52 +92,36 @@ public class ModuleDiscoveryHandler {
      * @return Result containing module names and UI messages
      */
     public ModuleDiscoveryResult processDiscoveredModules(List<GameModule> discoveredGameModules) {
-        Set<String> newlyDiscoveredModuleNames = new HashSet<>();
-        List<String> uiMessages = new ArrayList<>();
+        // Process using business service
+        ModuleDiscoveryService.ModuleDiscoveryResult businessResult = 
+            discoveryService.processDiscoveredModules(discoveredGameModules);
         
-        for (GameModule gameModule : discoveredGameModules) {
-            if (gameModule == null) {
-                Logging.warning("Null game module in discovered list - skipping");
-                continue;
-            }
-            
-            try {
-                String gameName = gameModule.getMetadata().getGameName();
-                String className = gameModule.getClass().getSimpleName();
-                newlyDiscoveredModuleNames.add(gameName);
-                Logging.info("Loaded game module: " + gameName + " (" + className + ")");
-                uiMessages.add("Detected game: " + gameName);
-            } catch (Exception e) {
-                Logging.error("Error getting metadata from game module: " + e.getMessage(), e);
-            }
+        // Create UI messages from business results
+        List<String> uiMessages = new ArrayList<>();
+        for (ModuleDiscoveryService.ModuleInfo info : businessResult.moduleInfos) {
+            uiMessages.add("Detected game: " + info.gameName);
         }
         
-        if (!discoveredGameModules.isEmpty()) {
-            uiMessages.add("Successfully detected " + discoveredGameModules.size() + " game(s)");
-            Logging.info("Ready to update UI with " + discoveredGameModules.size() + " modules");
+        if (businessResult.totalCount > 0) {
+            uiMessages.add("Successfully detected " + businessResult.totalCount + " game(s)");
+            Logging.info("Ready to update UI with " + businessResult.totalCount + " modules");
         } else {
             uiMessages.add("No games detected - check modules directory");
             Logging.warning("No modules were loaded. Check logs above for loading errors.");
         }
         
-        return new ModuleDiscoveryResult(newlyDiscoveredModuleNames, uiMessages);
+        return new ModuleDiscoveryResult(businessResult.moduleNames, uiMessages);
     }
     
     /**
      * Filters out null modules from the discovered list.
+     * Delegates to business service.
      * 
      * @param discoveredGameModules List of discovered modules (may contain nulls)
      * @return List containing only valid (non-null) modules
      */
     public List<GameModule> filterValidModules(List<GameModule> discoveredGameModules) {
-        List<GameModule> validModules = new ArrayList<>();
-        for (GameModule module : discoveredGameModules) {
-            if (module != null) {
-                validModules.add(module);
-            }
-        }
-        Logging.info("Valid modules to add to UI: " + validModules.size());
-        return validModules;
+        return discoveryService.filterValidModules(discoveredGameModules);
     }
     
     /**
@@ -163,35 +145,25 @@ public class ModuleDiscoveryHandler {
     
     /**
      * Collects module names from a collection of game modules.
+     * Delegates to business service.
      * 
      * @param modules Collection of game modules (list or observable list)
      * @return Set of module names
      */
     public Set<String> collectModuleNames(Iterable<GameModule> modules) {
-        Set<String> moduleNames = new HashSet<>();
-        for (GameModule module : modules) {
-            if (module != null) {
-                moduleNames.add(module.getMetadata().getGameName());
-            }
-        }
-        return moduleNames;
+        return discoveryService.collectModuleNames(modules);
     }
     
     /**
      * Extracts module names from a list of modules.
+     * Delegates to business service.
      * 
      * @param modules List of game modules
      * @param previousCount Previous module count (used to determine if this is first load)
      * @return Set of module names
      */
     public Set<String> extractModuleNames(List<GameModule> modules, int previousCount) {
-        Set<String> moduleNames = new HashSet<>();
-        if (previousCount > 0) {
-            for (GameModule module : modules) {
-                moduleNames.add(module.getMetadata().getGameName());
-            }
-        }
-        return moduleNames;
+        return discoveryService.extractModuleNames(modules, previousCount);
     }
     
     // ==================== INNER CLASSES ====================

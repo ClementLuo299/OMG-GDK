@@ -2,7 +2,7 @@ package launcher.gui.lobby.ui_logic.managers.core.lifecycle;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.gui.lobby.persistence.JsonPersistenceManager;
+import launcher.gui.lobby.business.JsonPersistenceManager;
 import launcher.gui.lobby.ui_logic.subcontrollers.GameSelectionController;
 
 /**

@@ -1,7 +1,7 @@
 package launcher.gui.lobby.ui_logic.managers.game_launching;
 
 import gdk.internal.Logging;
-import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.business.GDKViewModel;
 import launcher.utils.module.ModuleCompiler;
 import javafx.application.Platform;
 
@@ -23,7 +23,7 @@ import java.util.List;
  * @author Clement Luo
  * @date December 27, 2025
  * @edited December 30, 2025
- * @since 1.0
+ * @since Beta 1.0
  */
 public class ModuleCompilationChecker {
     

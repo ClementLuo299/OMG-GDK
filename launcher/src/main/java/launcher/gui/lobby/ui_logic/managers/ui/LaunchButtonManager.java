@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
  * 
  * @authors Clement Luo
  * @date December 29, 2025
+ * @edited December 30, 2025
  * @since Beta 1.0
  */
 public class LaunchButtonManager {

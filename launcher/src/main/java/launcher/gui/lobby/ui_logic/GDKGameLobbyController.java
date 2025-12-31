@@ -17,7 +17,7 @@ import com.jfoenix.controls.JFXToggleButton;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.business.GDKViewModel;
 import launcher.gui.lobby.ui_logic.managers.messaging.MessageManager;
 import launcher.gui.lobby.ui_logic.managers.ui.LoadingAnimationManager;
 import launcher.gui.lobby.ui_logic.managers.game_launching.ModuleCompilationChecker;

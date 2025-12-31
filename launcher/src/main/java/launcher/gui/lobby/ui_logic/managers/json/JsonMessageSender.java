@@ -1,42 +1,61 @@
 package launcher.gui.lobby.ui_logic.managers.json;
 
 import gdk.api.GameModule;
+import launcher.gui.lobby.business.json.JsonProcessingService;
 import launcher.gui.json_editor.JsonEditor;
-import launcher.gui.lobby.GameMessageHandler;
-import launcher.gui.lobby.JsonFormatter;
-import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.business.GameMessageHandler;
 
 import java.util.Map;
 
 /**
- * Handles sending messages to game modules from JSON editor.
- * Manages message parsing, sending, and response handling.
+ * Handles UI coordination for sending messages to game modules from JSON editor.
  * 
- * @authors Clement Luo
+ * <p>This class handles UI-related operations:
+ * <ul>
+ *   <li>Retrieving JSON content from UI editor</li>
+ *   <li>Displaying formatted responses in UI editor</li>
+ *   <li>Reporting success/failure messages to users</li>
+ * </ul>
+ * 
+ * <p>Business logic (JSON parsing, formatting) is delegated to {@link JsonProcessingService}.
+ * Message sending is delegated to {@link GameMessageHandler}.
+ * 
+ * @author Clement Luo
  * @date December 29, 2025
+ * @edited December 30, 2025
  * @since Beta 1.0
  */
 public class JsonMessageSender {
     
+    // ==================== DEPENDENCIES ====================
     
-    private final GDKViewModel viewModel;
+    /** Business logic service for JSON processing. */
+    private final JsonProcessingService jsonProcessingService;
+    
+    /** Input JSON editor UI component. */
     private final JsonEditor jsonInputEditor;
+    
+    /** Output JSON editor UI component. */
     private final JsonEditor jsonOutputEditor;
+    
+    /** Callback for reporting messages to the UI. */
     private final JsonEditorOperations.MessageReporter messageReporter;
     
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Create a new JsonMessageSender.
+     * Creates a new JsonMessageSender.
      * 
-     * @param viewModel The ViewModel for business logic (may be null initially)
+     * @param jsonProcessingService The business logic service for JSON processing
      * @param jsonInputEditor The input JSON editor
      * @param jsonOutputEditor The output JSON editor
      * @param messageReporter Callback to report messages to the UI
      */
-    public JsonMessageSender(GDKViewModel viewModel,
+    public JsonMessageSender(JsonProcessingService jsonProcessingService,
                             JsonEditor jsonInputEditor,
                             JsonEditor jsonOutputEditor,
                             JsonEditorOperations.MessageReporter messageReporter) {
-        this.viewModel = viewModel;
+        this.jsonProcessingService = jsonProcessingService;
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;
         this.messageReporter = messageReporter;
@@ -50,7 +69,7 @@ public class JsonMessageSender {
     public void sendMessage(GameModule selectedGameModule) {
         // Check if a game module is selected
         if (selectedGameModule == null) {
-            messageReporter.addMessage("⚠️ Please select a game module first before sending a message");
+            messageReporter.addMessage("Please select a game module first before sending a message");
             return;
         }
         
@@ -60,18 +79,15 @@ public class JsonMessageSender {
         
         if (jsonContent.isEmpty()) {
             // If the JSON field is empty, send a placeholder message
-            messageReporter.addMessage("💬 No content to send to " + gameModuleName + " (JSON field is empty)");
+            messageReporter.addMessage("No content to send to " + gameModuleName + " (JSON field is empty)");
             return;
         }
         
-        // Parse JSON using ViewModel (business logic)
-        Map<String, Object> messageData = null;
-        if (viewModel != null) {
-            messageData = viewModel.parseJsonConfiguration(jsonContent);
-        }
+        // Parse JSON using business service
+        Map<String, Object> messageData = jsonProcessingService.parseJsonConfiguration(jsonContent);
         
         if (messageData == null) {
-            messageReporter.addMessage("❌ Invalid JSON syntax - message not sent");
+            messageReporter.addMessage("Invalid JSON syntax - message not sent");
             return;
         }
         
@@ -79,21 +95,21 @@ public class JsonMessageSender {
         GameMessageHandler.MessageResult result = GameMessageHandler.sendMessage(selectedGameModule, messageData);
         
         if (!result.isSuccess()) {
-            messageReporter.addMessage("❌ " + result.getErrorMessage());
+            messageReporter.addMessage("Error: " + result.getErrorMessage());
             return;
         }
         
         // Handle the response if there is one
         if (result.hasResponse()) {
-            // Format response using business logic formatter
-            String responseJson = JsonFormatter.formatJsonResponse(result.getResponse());
+            // Format response using business service
+            String responseJson = jsonProcessingService.formatJsonResponse(result.getResponse());
             
             // Display in the output area (UI operation)
             jsonOutputEditor.setText(responseJson);
             
-            messageReporter.addMessage("✅ Message sent successfully to " + gameModuleName + " - Response received");
+            messageReporter.addMessage("Message sent successfully to " + gameModuleName + " - Response received");
         } else {
-            messageReporter.addMessage("📭 No response from " + gameModuleName);
+            messageReporter.addMessage("No response from " + gameModuleName);
         }
     }
 }

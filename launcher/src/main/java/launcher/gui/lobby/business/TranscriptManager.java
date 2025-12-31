@@ -1,4 +1,4 @@
-package launcher.gui.lobby;
+package launcher.gui.lobby.business;
 
 import launcher.utils.game.TranscriptRecorder;
 

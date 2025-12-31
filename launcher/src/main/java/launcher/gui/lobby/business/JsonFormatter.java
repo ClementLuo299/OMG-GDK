@@ -1,4 +1,4 @@
-package launcher.gui.lobby;
+package launcher.gui.lobby.business;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

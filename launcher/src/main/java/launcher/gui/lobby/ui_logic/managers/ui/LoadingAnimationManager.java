@@ -15,7 +15,7 @@ import javafx.util.Duration;
  * @authors Clement Luo
  * @date December 27, 2025
  * @edited December 29, 2025
- * @since 1.0
+ * @since Beta 1.0
  */
 public class LoadingAnimationManager {
     
@@ -62,7 +62,7 @@ public class LoadingAnimationManager {
         loadingStatusLabel.setVisible(true);
         loadingStatusLabel.setText("Starting module discovery...");
         
-        Logging.info("🎯 Progress bar made visible and set to 0%");
+        Logging.info("Progress bar made visible and set to 0%");
         
         // Create animated text with dots
         loadingDots = 0;
@@ -81,7 +81,7 @@ public class LoadingAnimationManager {
                 if (newProgress > 0.9) newProgress = 0.9; // Don't complete until actually done
                 loadingProgressBar.setProgress(newProgress);
                 
-                Logging.info("🎯 Progress bar updated: " + (int)(newProgress * 100) + "%");
+                Logging.info("Progress bar updated: " + (int)(newProgress * 100) + "%");
             })
         );
         loadingAnimation.setCycleCount(Timeline.INDEFINITE);
@@ -95,7 +95,7 @@ public class LoadingAnimationManager {
      */
     public void setCurrentProcessingModule(String moduleName) {
         this.currentProcessingModule = moduleName;
-        Logging.info("🎯 Now processing module: " + moduleName);
+        Logging.info("Now processing module: " + moduleName);
     }
     
     /**
@@ -103,7 +103,7 @@ public class LoadingAnimationManager {
      */
     public void clearCurrentProcessingModule() {
         this.currentProcessingModule = "";
-        Logging.info("✅ Finished processing all modules");
+        Logging.info("Finished processing all modules");
     }
     
     /**
@@ -126,7 +126,7 @@ public class LoadingAnimationManager {
      * Stop the loading animation.
      */
     public void stopAnimation() {
-        Logging.info("🎯 Stopping loading animation");
+        Logging.info("Stopping loading animation");
         isRefreshing = false;
         if (refreshButton != null) {
             refreshButton.setDisable(false);
@@ -141,7 +141,7 @@ public class LoadingAnimationManager {
         // Complete the progress bar
         loadingProgressBar.setProgress(1.0);
         loadingStatusLabel.setText("Reload completed!");
-        Logging.info("🎯 Progress bar completed to 100%");
+        Logging.info("Progress bar completed to 100%");
     }
     
     /**

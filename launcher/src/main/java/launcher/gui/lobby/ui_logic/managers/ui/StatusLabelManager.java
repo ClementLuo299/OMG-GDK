@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
  * 
  * @authors Clement Luo
  * @date December 29, 2025
+ * @edited December 30, 2025
  * @since Beta 1.0
  */
 public class StatusLabelManager {
@@ -32,7 +33,7 @@ public class StatusLabelManager {
     public void updateGameCountStatus(int gameCount) {
         if (statusLabel != null) {
             statusLabel.setText("Available Games: " + gameCount);
-            Logging.info("📊 UI Status updated: " + gameCount + " games available");
+            Logging.info("UI Status updated: " + gameCount + " games available");
         }
     }
 }

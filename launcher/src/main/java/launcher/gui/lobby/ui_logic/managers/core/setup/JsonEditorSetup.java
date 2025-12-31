@@ -5,7 +5,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import com.jfoenix.controls.JFXToggleButton;
 import launcher.gui.json_editor.JsonEditor;
-import launcher.gui.lobby.persistence.JsonPersistenceManager;
+import launcher.gui.lobby.business.JsonPersistenceManager;
 
 /**
  * Handles setup of JSON editor containers and persistence listeners.

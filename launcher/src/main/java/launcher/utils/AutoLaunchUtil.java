@@ -3,7 +3,7 @@ package launcher.utils;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
-import launcher.gui.lobby.GDKViewModel;
+import launcher.gui.lobby.business.GDKViewModel;
 import launcher.utils.path.FilePaths;
 
 import javafx.stage.Stage;
