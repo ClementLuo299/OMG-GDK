@@ -1,12 +1,10 @@
-package launcher.core.lifecycle.start.gui;
+package launcher.lobby;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.lobby.business.GDKViewModel;
-import launcher.core.lifecycle.start.gui.initialization.SceneLoader;
-import launcher.core.lifecycle.start.gui.initialization.StageInitializer;
-import launcher.core.lifecycle.start.gui.optimization.PerformanceOptimizer;
+import launcher.core.lifecycle.start.gui.MainStageInitializer;
 import launcher.core.lifecycle.start.startup_window.StartupWindowManager;
 
 /**
@@ -19,9 +17,9 @@ import launcher.core.lifecycle.start.startup_window.StartupWindowManager;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public final class UIInitializer {
+public final class LobbyUIInitializer {
 
-    private UIInitializer() {}
+    private LobbyUIInitializer() {}
 
     /**
      * Initializes the main user interface components for the GDK application.
@@ -35,12 +33,12 @@ public final class UIInitializer {
      */
     public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindowManager windowManager) {
         // Initialize application resources before UI creation
-        ResourceInitializer.initialize();
+        launcher.core.lifecycle.start.gui.FontLoader.initialize();
         
         windowManager.updateProgress(1, "Loading user interface");
         
         // Load the main scene from FXML
-        SceneLoader.SceneLoadResult loadResult = SceneLoader.loadMainScene();
+        LobbySceneLoader.SceneLoadResult loadResult = LobbySceneLoader.loadMainScene();
         Scene mainLobbyScene = loadResult.scene;
         GDKGameLobbyController lobbyController = loadResult.controller;
         
@@ -49,10 +47,10 @@ public final class UIInitializer {
         applicationViewModel.setMainLobbyScene(mainLobbyScene);
         
         // Initialize the primary stage
-        StageInitializer.initialize(primaryApplicationStage, mainLobbyScene);
+        MainStageInitializer.initialize(primaryApplicationStage, mainLobbyScene);
         
         // Apply performance optimizations
-        PerformanceOptimizer.optimize(primaryApplicationStage, mainLobbyScene);
+        LobbyOptimizer.optimize(primaryApplicationStage, mainLobbyScene);
         
         // Wire up the controller with the ViewModel
         wireUpControllerWithViewModel(applicationViewModel, lobbyController);
@@ -94,3 +92,4 @@ public final class UIInitializer {
         }
     }
 } 
+

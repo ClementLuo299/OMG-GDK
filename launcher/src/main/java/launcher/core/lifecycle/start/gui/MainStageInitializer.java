@@ -1,4 +1,4 @@
-package launcher.core.lifecycle.start.gui.initialization;
+package launcher.core.lifecycle.start.gui;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,9 +13,9 @@ import gdk.internal.Logging;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public final class StageInitializer {
+public final class MainStageInitializer {
     
-    private StageInitializer() {
+    private MainStageInitializer() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -25,10 +25,10 @@ public final class StageInitializer {
      * The stage is initially set to transparent (opacity 0.0) to allow smooth transition from startup window.
      * 
      * @param primaryApplicationStage The primary JavaFX stage to initialize
-     * @param mainLobbyScene The main lobby scene to set on the stage
+     * @param mainScene The main scene to set on the stage
      */
-    public static void initialize(Stage primaryApplicationStage, Scene mainLobbyScene) {
-        configureBasicProperties(primaryApplicationStage, mainLobbyScene);
+    public static void initialize(Stage primaryApplicationStage, Scene mainScene) {
+        configureBasicProperties(primaryApplicationStage, mainScene);
         configureCloseHandler(primaryApplicationStage);
     }
     
@@ -36,10 +36,10 @@ public final class StageInitializer {
      * Configures basic stage properties including scene, title, size, and initial opacity.
      * 
      * @param primaryApplicationStage The stage to configure
-     * @param mainLobbyScene The scene to set on the stage
+     * @param mainScene The scene to set on the stage
      */
-    private static void configureBasicProperties(Stage primaryApplicationStage, Scene mainLobbyScene) {
-        primaryApplicationStage.setScene(mainLobbyScene);
+    private static void configureBasicProperties(Stage primaryApplicationStage, Scene mainScene) {
+        primaryApplicationStage.setScene(mainScene);
         primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
         primaryApplicationStage.setMinWidth(800);
         primaryApplicationStage.setMinHeight(600);

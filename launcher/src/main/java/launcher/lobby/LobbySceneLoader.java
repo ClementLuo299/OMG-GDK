@@ -1,4 +1,4 @@
-package launcher.core.lifecycle.start.gui.initialization;
+package launcher.lobby;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,9 +16,9 @@ import java.net.URL;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public final class SceneLoader {
+public final class LobbySceneLoader {
     
-    private SceneLoader() {
+    private LobbySceneLoader() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

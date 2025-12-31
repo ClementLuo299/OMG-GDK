@@ -1,4 +1,4 @@
-package launcher.core.lifecycle.start.gui.optimization;
+package launcher.lobby;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,9 +13,9 @@ import javafx.application.Platform;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public final class PerformanceOptimizer {
+public final class LobbyOptimizer {
     
-    private PerformanceOptimizer() {
+    private LobbyOptimizer() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

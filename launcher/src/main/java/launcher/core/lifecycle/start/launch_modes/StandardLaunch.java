@@ -3,7 +3,7 @@ package launcher.core.lifecycle.start.launch_modes;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
-import launcher.core.lifecycle.start.gui.UIInitializer;
+import launcher.lobby.LobbyUIInitializer;
 import launcher.core.lifecycle.start.module_loading.LoadModules;
 import launcher.core.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.utils.StartupDelayUtil;
@@ -45,7 +45,7 @@ public final class StandardLaunch {
 
             // Step 2: Initialize the user interface
             GDKGameLobbyController lobbyController = 
-                UIInitializer.initialize(primaryApplicationStage, windowManager);
+                LobbyUIInitializer.initialize(primaryApplicationStage, windowManager);
             StartupDelayUtil.addDevelopmentDelay("After 'Loading user interface' message");
 
             // Step 3: Start loading modules in the background
