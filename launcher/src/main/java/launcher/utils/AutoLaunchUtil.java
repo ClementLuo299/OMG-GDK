@@ -2,8 +2,9 @@ package launcher.utils;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
-import launcher.gui.lobby.business.GDKViewModel;
+import launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController;
+import launcher.ui.lobby.gui.lobby.business.GDKViewModel;
+import launcher.ui.lobby.gui.lobby.ui_logic.ControllerMode;
 import launcher.utils.path.FilePaths;
 
 import javafx.stage.Stage;
@@ -215,7 +216,7 @@ public final class AutoLaunchUtil {
      */
     public static AutoLaunchComponents createAutoLaunchComponents(Stage primaryApplicationStage) {
         GDKGameLobbyController controller = new GDKGameLobbyController();
-        controller.setControllerMode(launcher.gui.lobby.ui_logic.ControllerMode.AUTO_LAUNCH);
+        controller.setControllerMode(ControllerMode.AUTO_LAUNCH);
         GDKViewModel viewModel = new GDKViewModel();
         viewModel.setPrimaryStage(primaryApplicationStage);
         controller.setViewModel(viewModel);

@@ -1,0 +1,93 @@
+package launcher.ui.startup_window.component_construction;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import launcher.ui.startup_window.component_construction.arrangement.ComponentAssembler;
+import launcher.ui.startup_window.component_construction.arrangement.WindowPositioner;
+import launcher.ui.startup_window.component_construction.components.MainWindowCreator;
+import launcher.ui.startup_window.component_construction.components.LabelCreator;
+import launcher.ui.startup_window.component_construction.components.MainPanelCreator;
+import launcher.ui.startup_window.component_construction.components.ProgressBarCreator;
+import launcher.ui.startup_window.styling.components.ProgressBarStyling;
+import launcher.ui.startup_window.styling.theme.Typography;
+
+/**
+ * Builds and assembles all components for the startup window.
+ * Handles the complete setup process from component creation to final assembly.
+ * 
+ * @author Clement Luo
+ * @date December 23, 2025
+ * @edited December 26, 2025
+ * @since Beta 1.0
+ */
+public class StartupWindowBuilder {
+    
+    /**
+     * Result class containing all initialized components.
+     */
+    public static class InitializationResult {
+        public final JFrame frame;
+        public final JProgressBar progressBar;
+        public final JLabel percentageLabel;
+        public final JLabel statusLabel;
+        public final ProgressBarStyling progressBarStyling;
+        
+        public InitializationResult(
+                JFrame frame,
+                JProgressBar progressBar,
+                JLabel percentageLabel,
+                JLabel statusLabel,
+                ProgressBarStyling progressBarStyling) {
+            this.frame = frame;
+            this.progressBar = progressBar;
+            this.percentageLabel = percentageLabel;
+            this.statusLabel = statusLabel;
+            this.progressBarStyling = progressBarStyling;
+        }
+    }
+    
+    /**
+     * Builds the complete startup window with all components.
+     * 
+     * @param totalSteps The total number of steps for the progress bar
+     * @return An InitializationResult containing all initialized components
+     */
+    public static InitializationResult build(int totalSteps) {
+        System.out.println("Creating startup progress window");
+        System.out.println("Using font: " + Typography.getCurrentFontFamily());
+        
+        // Create and configure the main JFrame with transparency
+        JFrame frame = MainWindowCreator.create();
+        
+        // Create UI components using creators
+        JLabel titleLabel = LabelCreator.create(LabelCreator.LabelType.TITLE);
+        JLabel subtitleLabel = LabelCreator.create(LabelCreator.LabelType.SUBTITLE);
+        JProgressBar progressBar = ProgressBarCreator.create(totalSteps);
+        JLabel percentageLabel = LabelCreator.create(LabelCreator.LabelType.PERCENTAGE);
+        JLabel statusLabel = LabelCreator.create(LabelCreator.LabelType.STATUS);
+        
+        // Apply custom ultra-modern progress bar styling
+        ProgressBarStyling styling = new ProgressBarStyling();
+        progressBar.setUI(styling);
+        
+        // Create and configure the main panel layout
+        JPanel mainPanel = MainPanelCreator.create();
+        
+        // Add all components to the panel with proper spacing
+        ComponentAssembler.assemble(
+            mainPanel, titleLabel, subtitleLabel, progressBar, percentageLabel, statusLabel);
+        
+        // Set the main panel as the frame's content pane
+        frame.setContentPane(mainPanel);
+        
+        // Pack and center the window on screen
+        WindowPositioner.position(frame);
+        
+        System.out.println("Startup progress window created");
+        
+        return new InitializationResult(frame, progressBar, percentageLabel, statusLabel, styling);
+    }
+}
+

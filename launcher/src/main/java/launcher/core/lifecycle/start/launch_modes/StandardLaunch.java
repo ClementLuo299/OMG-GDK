@@ -2,10 +2,10 @@ package launcher.core.lifecycle.start.launch_modes;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
-import launcher.lobby.LobbyUIInitializer;
-import launcher.module_handling.LoadModules;
-import launcher.startup_window.StartupWindowManager;
+import launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController;
+import launcher.ui.lobby.LobbyUIInitializer;
+import launcher.features.module_handling.LoadModules;
+import launcher.ui.startup_window.StartupWindowManager;
 import launcher.utils.StartupDelayUtil;
 
 /**

@@ -8,7 +8,7 @@
     - Game-related settings (auto-refresh, compilation checks)
     - Advanced options (debug mode, performance mode)
     
-    Controller: launcher.gui.settings_page.SettingsPageController
+    Controller: launcher.ui.settings_page.SettingsPageController
     Layout: Vertical box (VBox) with header, scrollable content, and status bar
 -->
 
@@ -19,7 +19,7 @@
 
 <!-- Main container for the settings page -->
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="launcher.gui.settings_page.SettingsPageController"
+      fx:controller="launcher.ui.settings_page.SettingsPageController"
       styleClass="settings-page-container" spacing="0" alignment="TOP_CENTER">
     
     <!-- 
