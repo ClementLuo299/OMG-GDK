@@ -4,7 +4,7 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.core.lifecycle.start.launch_modes.AutoLaunch;
 import launcher.core.lifecycle.start.launch_modes.StandardLaunch;
-import launcher.core.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.startup_window.StartupWindowManager;
 import launcher.utils.AutoLaunchUtil;
 
 /**

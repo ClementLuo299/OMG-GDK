@@ -2,7 +2,7 @@ package launcher.core.lifecycle.start;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import launcher.core.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.startup_window.StartupWindowManager;
 
 /**
  * Utility class for transitioning from startup window to main application stage.

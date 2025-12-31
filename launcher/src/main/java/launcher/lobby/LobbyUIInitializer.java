@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.gui.lobby.business.GDKViewModel;
 import launcher.core.lifecycle.start.gui.MainStageInitializer;
-import launcher.core.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.startup_window.StartupWindowManager;
 
 /**
  * Initializes the main user interface components.

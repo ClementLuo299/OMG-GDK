@@ -4,8 +4,8 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.lobby.LobbyUIInitializer;
-import launcher.core.lifecycle.start.module_loading.LoadModules;
-import launcher.core.lifecycle.start.startup_window.StartupWindowManager;
+import launcher.module_handling.LoadModules;
+import launcher.startup_window.StartupWindowManager;
 import launcher.utils.StartupDelayUtil;
 
 /**
