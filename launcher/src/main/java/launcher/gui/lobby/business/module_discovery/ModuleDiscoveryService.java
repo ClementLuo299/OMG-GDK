@@ -133,9 +133,12 @@ public class ModuleDiscoveryService {
     /**
      * Extracts module names from a list of modules.
      * 
+     * <p>This method only extracts names if previousCount > 0, indicating this is not
+     * the first load. This is used to determine which modules are new vs existing.
+     * 
      * @param modules List of game modules
      * @param previousCount Previous module count (used to determine if this is first load)
-     * @return Set of module names
+     * @return Set of module names (empty if previousCount is 0)
      */
     public Set<String> extractModuleNames(List<GameModule> modules, int previousCount) {
         Set<String> moduleNames = new HashSet<>();

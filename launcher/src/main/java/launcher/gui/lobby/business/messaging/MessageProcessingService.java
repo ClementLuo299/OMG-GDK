@@ -48,6 +48,9 @@ public class MessageProcessingService {
     /**
      * Checks if a message is an "end" message.
      * 
+     * <p>An "end" message indicates that the game session should be terminated.
+     * This is determined by checking if the "function" field equals "end".
+     * 
      * @param msg The message map to check
      * @return true if the message is an "end" message, false otherwise
      */

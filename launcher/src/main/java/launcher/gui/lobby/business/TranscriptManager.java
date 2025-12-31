@@ -6,7 +6,12 @@ import java.util.Map;
 
 /**
  * Manages transcript recording operations.
- * Business logic wrapper for transcript recording functionality.
+ * 
+ * <p>This class has a single responsibility: providing a business logic interface
+ * for recording messages to and from games in transcripts.
+ * 
+ * <p>This is a thin wrapper around TranscriptRecorder that provides a business
+ * logic layer interface for the lobby package.
  * 
  * @authors Clement Luo
  * @date December 29, 2025
@@ -14,8 +19,10 @@ import java.util.Map;
  */
 public class TranscriptManager {
     
+    // ==================== PUBLIC METHODS ====================
+    
     /**
-     * Record a message sent to the game.
+     * Records a message sent to the game in the transcript.
      * 
      * @param messageData The message data being sent to the game
      */
@@ -24,7 +31,7 @@ public class TranscriptManager {
     }
     
     /**
-     * Record a message received from the game.
+     * Records a message received from the game in the transcript.
      * 
      * @param messageData The message data received from the game
      */

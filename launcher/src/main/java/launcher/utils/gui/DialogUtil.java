@@ -3,16 +3,12 @@ package launcher.utils.gui;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Stage;
-import javafx.stage.Modality;
-import javafx.stage.StageStyle;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.geometry.Insets;
 import javafx.application.Platform;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,8 +17,19 @@ import java.util.Optional;
 /**
  * Utility class for displaying various types of dialogs throughout the application.
  * 
- * This class provides a centralized way to show error, warning, information,
- * confirmation, and exception dialogs with consistent styling and behavior.
+ * <p>This class has a single responsibility: providing a centralized way to show
+ * error, warning, information, confirmation, and exception dialogs with consistent
+ * styling and behavior.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Displaying error dialogs (with optional exception details)</li>
+ *   <li>Displaying warning dialogs</li>
+ *   <li>Displaying information dialogs</li>
+ *   <li>Displaying confirmation dialogs (with custom button text support)</li>
+ *   <li>Displaying custom and expandable dialogs</li>
+ *   <li>Application-specific dialog helpers</li>
+ * </ul>
  * 
  * @author Clement Luo
  * @date August 6, 2025
@@ -31,10 +38,23 @@ import java.util.Optional;
  */
 public class DialogUtil {
     
+    // ==================== CONSTRUCTOR ====================
+    
+    /**
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private DialogUtil() {
+        throw new AssertionError("DialogUtil should not be instantiated");
+    }
+    
     // ==================== ERROR DIALOGS ====================
     
     /**
-     * Display an error dialog with title and message.
+     * Displays an error dialog with title and message.
+     * 
+     * <p>This method shows a simple error dialog with just a title and message.
+     * The dialog is displayed on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param message The error message
@@ -44,7 +64,10 @@ public class DialogUtil {
     }
     
     /**
-     * Display an error dialog with title, header, and message.
+     * Displays an error dialog with title, header, and message.
+     * 
+     * <p>This method shows an error dialog with optional header text.
+     * The dialog is displayed on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param header The header text (can be null)
@@ -61,12 +84,16 @@ public class DialogUtil {
     }
     
     /**
-     * Display an error dialog for exceptions with stack trace.
+     * Displays an error dialog for exceptions with stack trace.
+     * 
+     * <p>This method shows an error dialog with expandable exception details.
+     * The stack trace is displayed in an expandable content area for debugging.
+     * The dialog is displayed on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param header The header text (can be null)
      * @param message The error message
-     * @param exception The exception to display
+     * @param exception The exception to display (stack trace will be shown)
      */
     public static void showError(String title, String header, String message, Exception exception) {
         Platform.runLater(() -> {
@@ -103,7 +130,10 @@ public class DialogUtil {
     // ==================== WARNING DIALOGS ====================
     
     /**
-     * Display a warning dialog with title and message.
+     * Displays a warning dialog with title and message.
+     * 
+     * <p>This method shows a simple warning dialog with just a title and message.
+     * The dialog is displayed on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param message The warning message
@@ -113,7 +143,10 @@ public class DialogUtil {
     }
     
     /**
-     * Display a warning dialog with title, header, and message.
+     * Displays a warning dialog with title, header, and message.
+     * 
+     * <p>This method shows a warning dialog with optional header text.
+     * The dialog is displayed on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param header The header text (can be null)
@@ -132,7 +165,10 @@ public class DialogUtil {
     // ==================== INFORMATION DIALOGS ====================
     
     /**
-     * Display an information dialog with title and message.
+     * Displays an information dialog with title and message.
+     * 
+     * <p>This method shows a simple information dialog with just a title and message.
+     * The dialog is displayed on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param message The information message
@@ -142,7 +178,10 @@ public class DialogUtil {
     }
     
     /**
-     * Display an information dialog with title, header, and message.
+     * Displays an information dialog with title, header, and message.
+     * 
+     * <p>This method shows an information dialog with optional header text.
+     * The dialog is displayed on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param header The header text (can be null)
@@ -161,7 +200,9 @@ public class DialogUtil {
     // ==================== CONFIRMATION DIALOGS ====================
     
     /**
-     * Display a confirmation dialog with title and message.
+     * Displays a confirmation dialog with title and message.
+     * 
+     * <p>This method shows a simple confirmation dialog with standard OK/Cancel buttons.
      * 
      * @param title The dialog title
      * @param message The confirmation message
@@ -172,7 +213,10 @@ public class DialogUtil {
     }
     
     /**
-     * Display a confirmation dialog with title, header, and message.
+     * Displays a confirmation dialog with title, header, and message.
+     * 
+     * <p>This method shows a confirmation dialog with optional header text
+     * and standard OK/Cancel buttons.
      * 
      * @param title The dialog title
      * @param header The header text (can be null)
@@ -190,7 +234,10 @@ public class DialogUtil {
     }
     
     /**
-     * Display a confirmation dialog with custom button text.
+     * Displays a confirmation dialog with custom button text.
+     * 
+     * <p>This method shows a confirmation dialog with custom button labels
+     * instead of the standard OK/Cancel buttons.
      * 
      * @param title The dialog title
      * @param header The header text (can be null)
@@ -217,10 +264,14 @@ public class DialogUtil {
     // ==================== CUSTOM DIALOGS ====================
     
     /**
-     * Display a custom dialog with the specified content.
+     * Displays a custom dialog with the specified content.
+     * 
+     * <p>This method creates and shows a custom dialog with user-provided content.
+     * The dialog includes a standard OK button and can be further customized
+     * using the returned Dialog instance.
      * 
      * @param title The dialog title
-     * @param content The dialog content
+     * @param content The dialog content (JavaFX Node)
      * @return The dialog instance for further customization
      */
     public static Dialog<Void> showCustomDialog(String title, javafx.scene.Node content) {
@@ -234,13 +285,17 @@ public class DialogUtil {
     }
     
     /**
-     * Display a dialog with expandable content.
+     * Displays a dialog with expandable content.
+     * 
+     * <p>This method creates a dialog with both main content and expandable
+     * content that can be shown/hidden by the user. The dialog is displayed
+     * on the JavaFX Application Thread.
      * 
      * @param title The dialog title
      * @param header The header text (can be null)
-     * @param content The main content
-     * @param expandableContent The expandable content
-     * @param alertType The type of alert
+     * @param content The main content text
+     * @param expandableContent The expandable content (JavaFX Node)
+     * @param alertType The type of alert (ERROR, WARNING, INFORMATION, etc.)
      */
     public static void showExpandableDialog(String title, String header, String content, 
                                           javafx.scene.Node expandableContent, AlertType alertType) {
@@ -257,7 +312,9 @@ public class DialogUtil {
     // ==================== APPLICATION-SPECIFIC DIALOGS ====================
     
     /**
-     * Display a startup error dialog (used by GDKApplication).
+     * Displays a startup error dialog (used by GDKApplication).
+     * 
+     * <p>This is a convenience method for showing errors during application startup.
      * 
      * @param dialogTitle The dialog title
      * @param headerText The header text (can be null)
@@ -268,7 +325,10 @@ public class DialogUtil {
     }
     
     /**
-     * Display a fatal application error dialog.
+     * Displays a fatal application error dialog.
+     * 
+     * <p>This is a convenience method for showing fatal errors that require
+     * application termination.
      * 
      * @param title The dialog title
      * @param header The header text
@@ -279,7 +339,9 @@ public class DialogUtil {
     }
     
     /**
-     * Display a game-related error dialog.
+     * Displays a game-related error dialog.
+     * 
+     * <p>This is a convenience method for showing errors related to game operations.
      * 
      * @param title The dialog title
      * @param message The error message
@@ -289,7 +351,9 @@ public class DialogUtil {
     }
     
     /**
-     * Display a JSON validation error dialog.
+     * Displays a JSON validation error dialog.
+     * 
+     * <p>This is a convenience method for showing errors related to JSON validation.
      * 
      * @param title The dialog title
      * @param message The error message
@@ -299,7 +363,9 @@ public class DialogUtil {
     }
     
     /**
-     * Display a module compilation error dialog.
+     * Displays a module compilation error dialog.
+     * 
+     * <p>This is a convenience method for showing errors related to module compilation.
      * 
      * @param title The dialog title
      * @param message The error message
@@ -311,9 +377,12 @@ public class DialogUtil {
     // ==================== UTILITY METHODS ====================
     
     /**
-     * Ensure dialog is shown on the JavaFX Application Thread.
+     * Ensures dialog is shown on the JavaFX Application Thread.
      * 
-     * @param runnable The dialog display code
+     * <p>This method checks if the current thread is the JavaFX Application Thread.
+     * If not, it schedules the runnable to run on that thread using Platform.runLater().
+     * 
+     * @param runnable The dialog display code to execute
      */
     public static void runOnFXThread(Runnable runnable) {
         if (Platform.isFxApplicationThread()) {
@@ -324,7 +393,10 @@ public class DialogUtil {
     }
     
     /**
-     * Create a styled dialog pane with consistent appearance.
+     * Creates a styled dialog pane with consistent appearance.
+     * 
+     * <p>This method applies the application's CSS stylesheet to the dialog pane
+     * to ensure consistent appearance across all dialogs.
      * 
      * @param alert The alert to style
      */

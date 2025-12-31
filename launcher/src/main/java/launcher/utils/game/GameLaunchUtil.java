@@ -7,8 +7,19 @@ import java.util.Map;
 
 /**
  * Utility class for launching games with JSON configuration.
- * This class contains the core launch logic that can be used by both
- * the GDK controller and auto-launch functionality.
+ * 
+ * <p>This class has a single responsibility: providing the core launch logic
+ * for games with JSON configuration that can be used by both the GDK controller
+ * and auto-launch functionality.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Validating game module selection</li>
+ *   <li>Applying JSON configuration to game modules</li>
+ *   <li>Sending start messages to games</li>
+ *   <li>Recording configuration and messages to transcripts</li>
+ *   <li>Parsing JSON configuration strings</li>
+ * </ul>
  * 
  * @authors Clement Luo
  * @date August 11, 2025
@@ -17,16 +28,42 @@ import java.util.Map;
  */
 public class GameLaunchUtil {
     
+    // ==================== CONSTANTS ====================
+    
+    /** Shared ObjectMapper instance for JSON parsing. */
     private static final ObjectMapper jsonMapper = new ObjectMapper();
     
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Launch a game module with JSON configuration data.
-     * This method replicates the exact behavior of pressing "Launch Game" in the GDK.
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private GameLaunchUtil() {
+        throw new AssertionError("GameLaunchUtil should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS - GAME LAUNCHING ====================
+    
+    /**
+     * Launches a game module with JSON configuration data.
+     * 
+     * <p>This method replicates the exact behavior of pressing "Launch Game" in the GDK.
+     * It performs the following steps:
+     * <ol>
+     *   <li>Validates that a game module is selected</li>
+     *   <li>Applies JSON configuration to the game module (if provided)</li>
+     *   <li>Loads and sends the default start message</li>
+     *   <li>Records all messages to the transcript</li>
+     * </ol>
+     * 
+     * <p>Note: The actual scene creation and stage management is handled by the ViewModel.
+     * This method just prepares the game with configuration and start messages.
      * 
      * @param gameModule The game module to launch
      * @param jsonConfigurationData The JSON configuration data, or null for defaults
-     * @param isAutoLaunch Whether this is an auto-launch (affects logging)
-     * @return true if the launch process was initiated successfully
+     * @param isAutoLaunch Whether this is an auto-launch (affects logging verbosity)
+     * @return true if the launch process was initiated successfully, false otherwise
      */
     public static boolean launchGameWithConfiguration(GameModule gameModule, Map<String, Object> jsonConfigurationData, boolean isAutoLaunch) {
         try {
@@ -106,11 +143,17 @@ public class GameLaunchUtil {
         }
     }
     
+    // ==================== PUBLIC METHODS - JSON PARSING ====================
+    
     /**
-     * Parse JSON string into a Map for configuration.
+     * Parses a JSON string into a Map for configuration.
+     * 
+     * <p>This method parses a JSON configuration string into a Map structure
+     * that can be used to configure game modules. Returns null if the input
+     * is null, empty, or parsing fails.
      * 
      * @param jsonString The JSON string to parse
-     * @return The parsed Map, or null if parsing fails
+     * @return The parsed Map, or null if parsing fails or input is empty
      */
     public static Map<String, Object> parseJsonString(String jsonString) {
         if (jsonString == null || jsonString.trim().isEmpty()) {

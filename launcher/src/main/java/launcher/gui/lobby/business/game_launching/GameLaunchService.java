@@ -45,8 +45,12 @@ public class GameLaunchService {
     
     // ==================== PUBLIC METHODS ====================
     
+    // ==================== PUBLIC METHODS - VALIDATION ====================
+    
     /**
      * Validates that the ViewModel is available.
+     * 
+     * <p>This method checks if the ViewModel dependency has been set.
      * 
      * @return true if ViewModel is available, false otherwise
      */
@@ -56,6 +60,8 @@ public class GameLaunchService {
     
     /**
      * Validates that a game launch is allowed.
+     * 
+     * <p>This method checks if the game module is valid and ready to launch.
      * 
      * @param selectedGameModule The game module to validate
      * @return Validation result containing whether launch is valid and error message if not
@@ -67,8 +73,13 @@ public class GameLaunchService {
         return applicationViewModel.validateGameLaunch(selectedGameModule);
     }
     
+    // ==================== PUBLIC METHODS - CONFIGURATION ====================
+    
     /**
      * Parses JSON configuration text into a map.
+     * 
+     * <p>This method delegates to the ViewModel to parse the JSON configuration.
+     * Returns null if the ViewModel is unavailable or the text is empty.
      * 
      * @param jsonText The JSON text to parse (may be null or empty)
      * @return Parsed configuration map, or null if parsing failed or text was empty
@@ -83,9 +94,12 @@ public class GameLaunchService {
     /**
      * Applies JSON configuration to a game module.
      * 
+     * <p>This method uses GameLaunchUtil to apply the configuration to the game module.
+     * The configuration is applied before the game is launched.
+     * 
      * @param selectedGameModule The game module to configure
      * @param jsonConfigurationData The parsed JSON configuration data
-     * @param isAutoLaunch Whether this is an auto-launch
+     * @param isAutoLaunch Whether this is an auto-launch operation
      * @return true if configuration was successful, false otherwise
      */
     public boolean applyGameConfiguration(GameModule selectedGameModule,
@@ -95,11 +109,18 @@ public class GameLaunchService {
             selectedGameModule, jsonConfigurationData, isAutoLaunch);
     }
     
+    // ==================== PUBLIC METHODS - LAUNCHING ====================
+    
     /**
      * Executes the actual game launch via ViewModel.
      * 
+     * <p>This method delegates to the ViewModel to handle the game launch.
+     * The ViewModel will create the game scene, set up the server simulator,
+     * and manage the game lifecycle.
+     * 
      * @param selectedGameModule The game module to launch
      * @param jsonText The JSON text for the ViewModel to check game mode
+     * @throws IllegalStateException If the ViewModel is not available
      * @throws Exception If the launch fails
      */
     public void executeLaunch(GameModule selectedGameModule, String jsonText) throws Exception {

@@ -5,6 +5,12 @@ import gdk.internal.Logging;
 /**
  * Utility class for adding delays during startup for debugging purposes.
  * 
+ * <p>This class has a single responsibility: providing controlled delays
+ * during application startup to aid in debugging and development.
+ * 
+ * <p>Delays are controlled by the ENABLE_DEVELOPMENT_DELAYS flag and are
+ * disabled by default for normal operation.
+ * 
  * @author Clement Luo
  * @date December 21, 2025
  * @edited December 21, 2025
@@ -12,21 +18,38 @@ import gdk.internal.Logging;
  */
 public final class StartupDelayUtil {
 
+    // ==================== CONSTANTS ====================
+    
     /**
      * Flag to enable/disable development delays.
-     * When true, adds delays between startup steps for easier debugging.
+     * 
+     * <p>When true, adds delays between startup steps for easier debugging.
      * Set to false for normal operation.
      */
     private static final boolean ENABLE_DEVELOPMENT_DELAYS = false;
-
-    private StartupDelayUtil() {}
-
+    
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Add a development delay to slow down the startup process so users can read each message.
-     * This method adds a delay with logging to make it clear what's happening.
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private StartupDelayUtil() {
+        throw new AssertionError("StartupDelayUtil should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS ====================
+    
+    /**
+     * Adds a development delay to slow down the startup process.
+     * 
+     * <p>This method adds a delay with logging to make it clear what's happening.
      * The delay is only executed if ENABLE_DEVELOPMENT_DELAYS is set to true.
      * 
-     * @param reason The reason for the delay (for logging)
+     * <p>The delay duration is fixed at 1.5 seconds. If the thread is interrupted,
+     * the interruption status is preserved.
+     * 
+     * @param reason The reason for the delay (for logging purposes)
      */
     public static void addDevelopmentDelay(String reason) {
         if (!ENABLE_DEVELOPMENT_DELAYS) {

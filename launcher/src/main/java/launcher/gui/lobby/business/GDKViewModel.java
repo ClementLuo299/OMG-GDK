@@ -661,8 +661,13 @@ public class GDKViewModel {
     }
 
     /**
-     * Check if the current game is single player mode by examining the JSON configuration.
-     * This is a much simpler and more reliable approach than the MessagingBridge system.
+     * Checks if the current game is single player mode by examining the JSON configuration.
+     * 
+     * <p>This method parses the JSON configuration and checks the "gameMode" field.
+     * This is a simpler and more reliable approach than using the MessagingBridge system.
+     * 
+     * @param jsonConfiguration The JSON configuration string to examine
+     * @return true if the game mode is "single_player", false otherwise
      */
     private boolean isSinglePlayerModeFromJson(String jsonConfiguration) {
         try {
@@ -687,8 +692,13 @@ public class GDKViewModel {
     }
 
     /**
-     * Check if the current game is local multiplayer mode by examining the JSON configuration.
-     * This is a much simpler and more reliable approach than the MessagingBridge system.
+     * Checks if the current game is local multiplayer mode by examining the JSON configuration.
+     * 
+     * <p>This method parses the JSON configuration and checks the "gameMode" field.
+     * This is a simpler and more reliable approach than using the MessagingBridge system.
+     * 
+     * @param jsonConfiguration The JSON configuration string to examine
+     * @return true if the game mode is "local_multiplayer", false otherwise
      */
     private boolean isLocalMultiplayerModeFromJson(String jsonConfiguration) {
         try {
@@ -715,10 +725,12 @@ public class GDKViewModel {
     // ==================== MODULE DISCOVERY & LOADING ====================
     
     /**
-     * Discover and load all available game modules.
-     * This is business logic that should be in the ViewModel.
+     * Discovers and loads all available game modules from the modules directory.
      * 
-     * @return List of discovered game modules, or empty list if error
+     * <p>This method scans the modules directory, validates module directories,
+     * and compiles/loads them into GameModule instances.
+     * 
+     * @return List of discovered game modules, or empty list if error occurs
      */
     public List<GameModule> discoverAndLoadModules() {
         try {
@@ -752,8 +764,11 @@ public class GDKViewModel {
     }
     
     /**
-     * Check for compilation failures in modules.
-     * This is business logic that should be in the ViewModel.
+     * Checks for compilation failures in modules.
+     * 
+     * <p>This method checks both the ModuleCompiler's failure list and
+     * scans the modules directory for modules that have source files but
+     * no compiled classes.
      * 
      * @return List of module names that failed to compile
      */
@@ -799,11 +814,12 @@ public class GDKViewModel {
     }
     
     /**
-     * Validate game launch parameters.
-     * This is business logic that should be in the ViewModel.
+     * Validates game launch parameters.
+     * 
+     * <p>This method checks if a game module is selected and ready to launch.
      * 
      * @param gameModule The game module to validate
-     * @return Validation result with error message if invalid
+     * @return Validation result with error message if invalid, or success result if valid
      */
     public LaunchValidationResult validateGameLaunch(GameModule gameModule) {
         if (gameModule == null) {
@@ -813,8 +829,10 @@ public class GDKViewModel {
     }
     
     /**
-     * Parse JSON configuration string.
-     * This is business logic that should be in the ViewModel.
+     * Parses JSON configuration string into a Map.
+     * 
+     * <p>This method parses a JSON string into a Map structure for use in game configuration.
+     * Returns null if the input is empty or parsing fails.
      * 
      * @param jsonString The JSON string to parse
      * @return The parsed Map, or null if parsing fails or input is empty
@@ -834,8 +852,13 @@ public class GDKViewModel {
         }
     }
     
+    // ==================== INNER CLASSES ====================
+    
     /**
      * Result of game launch validation.
+     * 
+     * @param isValid Whether the launch is valid
+     * @param errorMessage Error message if validation failed, null if valid
      */
     public record LaunchValidationResult(boolean isValid, String errorMessage) {}
 } 

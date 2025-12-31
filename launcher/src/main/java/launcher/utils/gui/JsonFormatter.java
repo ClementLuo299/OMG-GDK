@@ -1,7 +1,14 @@
 package launcher.utils.gui;
 
+
 /**
  * Utility class for formatting JSON content.
+ * 
+ * <p>This class has a single responsibility: formatting JSON text strings
+ * with proper indentation for display in the GUI.
+ * 
+ * <p>This is a GUI-specific utility that shows error dialogs when formatting fails,
+ * distinguishing it from the business logic JsonFormatter in the lobby package.
  * 
  * @author Clement Luo
  * @date December 27, 2025
@@ -10,11 +17,26 @@ package launcher.utils.gui;
  */
 public class JsonFormatter {
     
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Format JSON text with proper indentation.
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private JsonFormatter() {
+        throw new AssertionError("JsonFormatter should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS ====================
+    
+    /**
+     * Formats JSON text with proper indentation.
      * 
-     * @param jsonText The JSON text to format
-     * @return Formatted JSON text, or null if formatting fails
+     * <p>This method parses the JSON text and reformats it with pretty printing.
+     * If the input is not valid JSON, an error dialog is shown to the user.
+     * 
+     * @param jsonText The JSON text to format (may be null or empty)
+     * @return Formatted JSON text with proper indentation, or null if formatting fails
      */
     public static String format(String jsonText) {
         if (jsonText == null || jsonText.trim().isEmpty()) {

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +13,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Utility class for recording game session transcripts.
+ * 
+ * <p>This class has a single responsibility: recording and managing transcripts
+ * of game sessions, including messages sent to and received from games.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Starting and ending transcript sessions</li>
+ *   <li>Recording messages to and from games</li>
+ *   <li>Detecting end messages and automatically saving transcripts</li>
+ *   <li>Saving transcripts in both JSON and text formats</li>
+ *   <li>Providing session status and summary information</li>
+ * </ul>
  * 
  * @author Clement Luo
  * @date August 9, 2025
@@ -21,11 +33,33 @@ import java.util.Map;
  * @since 1.0
  */
 public final class TranscriptRecorder {
+    
+    // ==================== STATE ====================
+    
+    /** Flag indicating whether a transcript session is currently active. */
     private static volatile boolean inSession = false;
+    
+    /** Thread-safe list of transcript entries. */
     private static final List<Map<String, Object>> transcriptEntries = Collections.synchronizedList(new ArrayList<>());
-
-    private TranscriptRecorder() {}
-
+    
+    // ==================== CONSTRUCTOR ====================
+    
+    /**
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private TranscriptRecorder() {
+        throw new AssertionError("TranscriptRecorder should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS - SESSION MANAGEMENT ====================
+    
+    /**
+     * Starts a basic transcript session without game metadata.
+     * 
+     * <p>This method initializes a new transcript session and clears any
+     * previous entries. A session start meta entry is added to the transcript.
+     */
     public static void startSession() {
         inSession = true;
         transcriptEntries.clear();
@@ -40,7 +74,12 @@ public final class TranscriptRecorder {
     }
     
     /**
-     * Start a session with game metadata.
+     * Starts a transcript session with game metadata.
+     * 
+     * <p>This method initializes a new transcript session with game information
+     * and clears any previous entries. A session start meta entry is added
+     * to the transcript with the game name and version.
+     * 
      * @param gameName The name of the game being played
      * @param gameVersion The version of the game
      */
@@ -59,6 +98,17 @@ public final class TranscriptRecorder {
         System.out.println("📝 Session ID: " + System.identityHashCode(transcriptEntries));
     }
 
+    // ==================== PUBLIC METHODS - MESSAGE RECORDING ====================
+    
+    /**
+     * Ends the session if an "end" message is detected.
+     * 
+     * <p>This method checks if the provided message is an "end" message.
+     * If so, it records the end message, adds a session end meta entry,
+     * and automatically saves the transcript in both formats.
+     * 
+     * @param message The message to check for end detection
+     */
     public static void endSessionIfEndDetected(Map<String, Object> message) {
         if (message == null) return;
         Object fn = message.get("function");
@@ -98,6 +148,15 @@ public final class TranscriptRecorder {
         }
     }
 
+    /**
+     * Records a message sent to the game.
+     * 
+     * <p>This method records a message with direction "out" (to game).
+     * The message is only recorded if a session is active and the message is not null.
+     * After recording, it checks if the message is an end message.
+     * 
+     * @param message The message map to record
+     */
     public static void recordToGame(Map<String, Object> message) {
         if (!inSession || message == null) return;
         Map<String, Object> entry = new HashMap<>();
@@ -114,6 +173,15 @@ public final class TranscriptRecorder {
         endSessionIfEndDetected(message);
     }
 
+    /**
+     * Records a message received from the game.
+     * 
+     * <p>This method records a message with direction "in" (from game).
+     * The message is only recorded if a session is active and the message is not null.
+     * It first checks if the message is an end message before recording.
+     * 
+     * @param message The message map to record
+     */
     public static void recordFromGame(Map<String, Object> message) {
         if (!inSession || message == null) return;
         
@@ -135,6 +203,18 @@ public final class TranscriptRecorder {
         }
     }
 
+    // ==================== PUBLIC METHODS - TRANSCRIPT SAVING ====================
+    
+    /**
+     * Saves the transcript to a JSON file.
+     * 
+     * <p>This method saves the transcript in JSON format with a structured format
+     * including header and messages. If no target file is provided, it generates
+     * a filename based on the game name and timestamp.
+     * 
+     * @param targetFile The target file path, or null for auto-generation
+     * @return The path to the saved transcript file, or null if saving failed
+     */
     public static Path saveTranscript(Path targetFile) {
         try {
             System.out.println("📝 saveTranscript called with targetFile: " + targetFile);
@@ -240,9 +320,14 @@ public final class TranscriptRecorder {
     }
 
     /**
-     * Save the transcript in a human-readable text format with clear line breaks.
+     * Saves the transcript in a human-readable text format.
+     * 
+     * <p>This method saves the transcript in a plain text format with clear
+     * formatting, headers, and message details. If no target file is provided,
+     * it generates a filename based on the game name and timestamp.
+     * 
      * @param targetFile The target file path, or null for auto-generation
-     * @return The path to the saved transcript file, or null if failed
+     * @return The path to the saved transcript file, or null if saving failed
      */
     public static Path saveTranscriptAsText(Path targetFile) {
         try {
@@ -395,9 +480,14 @@ public final class TranscriptRecorder {
     }
 
     /**
-     * Save the transcript in both JSON and text formats for maximum readability.
+     * Saves the transcript in both JSON and text formats.
+     * 
+     * <p>This method saves the transcript in both JSON and text formats for
+     * maximum readability and programmatic access. If no base filename is provided,
+     * it generates one based on the game name and timestamp.
+     * 
      * @param baseFileName Base filename without extension, or null for auto-generation
-     * @return Array containing paths to both saved files, or null if failed
+     * @return Array containing paths to both saved files [JSON, Text], or null if failed
      */
     public static Path[] saveTranscriptBothFormats(String baseFileName) {
         try {
@@ -441,8 +531,12 @@ public final class TranscriptRecorder {
     }
 
     /**
-     * Manually save the current transcript to files in both formats.
-     * @return Array containing paths to both saved files, or null if failed
+     * Manually saves the current transcript to files in both formats.
+     * 
+     * <p>This method saves the current transcript if there is an active session
+     * and entries exist. This is useful for manual saving before session end.
+     * 
+     * @return Array containing paths to both saved files [JSON, Text], or null if failed
      */
     public static Path[] saveCurrentTranscript() {
         if (!inSession || transcriptEntries.isEmpty()) {
@@ -459,15 +553,30 @@ public final class TranscriptRecorder {
         return savedFiles;
     }
 
+    // ==================== PUBLIC METHODS - SESSION QUERY ====================
+    
+    /**
+     * Clears the transcript and ends the session.
+     * 
+     * <p>This method clears all transcript entries and sets the session flag to false.
+     */
     public static void clear() {
         transcriptEntries.clear();
         inSession = false;
     }
 
-    public static boolean isInSession() { return inSession; }
+    /**
+     * Checks if a transcript session is currently active.
+     * 
+     * @return true if a session is active, false otherwise
+     */
+    public static boolean isInSession() { 
+        return inSession; 
+    }
     
     /**
-     * Get the current number of transcript entries.
+     * Gets the current number of transcript entries.
+     * 
      * @return The number of entries in the current transcript
      */
     public static int getTranscriptEntryCount() { 
@@ -475,7 +584,10 @@ public final class TranscriptRecorder {
     }
     
     /**
-     * Print current transcript status for debugging.
+     * Prints current transcript status for debugging.
+     * 
+     * <p>This method prints detailed information about the current transcript
+     * session, including session state, entry count, and first/last entries.
      */
     public static void printStatus() {
         System.out.println("📝 === TRANSCRIPT STATUS ===");
@@ -492,6 +604,9 @@ public final class TranscriptRecorder {
     
     /**
      * Test method to manually trigger transcript saving for debugging.
+     * 
+     * <p>This method is used for testing and debugging transcript saving functionality.
+     * It prints status information and attempts to save the transcript.
      */
     public static void testSave() {
         System.out.println("📝 === TESTING TRANSCRIPT SAVE ===");
@@ -514,7 +629,11 @@ public final class TranscriptRecorder {
     }
     
     /**
-     * Get a summary of the current transcript session.
+     * Gets a summary of the current transcript session.
+     * 
+     * <p>This method returns a map containing session summary information including
+     * session state, total entries, and start/end timestamps.
+     * 
      * @return A map containing session summary information
      */
     public static Map<String, Object> getSessionSummary() {
@@ -544,11 +663,17 @@ public final class TranscriptRecorder {
         return summary;
     }
     
+    // ==================== PRIVATE METHODS - UTILITY ====================
+    
     /**
-     * Calculate the duration between two timestamps.
+     * Calculates the duration between two timestamps.
+     * 
+     * <p>This method calculates and formats the duration between two timestamps
+     * in a human-readable format (seconds, minutes, or hours).
+     * 
      * @param startTime Start timestamp string
      * @param endTime End timestamp string
-     * @return Duration string in human-readable format
+     * @return Duration string in human-readable format, or "unknown" if calculation fails
      */
     private static String calculateSessionDuration(Object startTime, Object endTime) {
         if (startTime == null || endTime == null) {
@@ -578,9 +703,13 @@ public final class TranscriptRecorder {
     }
     
     /**
-     * Generate a summary of message flow patterns.
-     * @param messages List of message entries
-     * @return Map containing flow analysis
+     * Generates a summary of message flow patterns.
+     * 
+     * <p>This method analyzes message flow patterns including direction counts,
+     * function breakdown, and communication patterns.
+     * 
+     * @param messages List of message entries to analyze
+     * @return Map containing flow analysis information
      */
     private static Map<String, Object> generateMessageFlowSummary(List<Map<String, Object>> messages) {
         Map<String, Object> flowSummary = new HashMap<>();
@@ -629,10 +758,13 @@ public final class TranscriptRecorder {
     }
     
     /**
-     * Get the message type based on the function.
+     * Gets the message type based on the function.
+     * 
+     * <p>This method categorizes messages by their function into types such as
+     * game_initialization, game_termination, acknowledgment, etc.
      * 
      * @param function The message function
-     * @return The message type string
+     * @return The message type string, or "unknown" if function is null
      */
     private static String getMessageType(String function) {
         if (function == null) return "unknown";
@@ -649,10 +781,13 @@ public final class TranscriptRecorder {
     }
     
     /**
-     * Generate a human-readable summary for a message based on its function and details.
+     * Generates a human-readable summary for a message based on its function and details.
+     * 
+     * <p>This method creates a summary string for different message types to make
+     * transcripts more readable. Returns null for message types that don't need summaries.
      * 
      * @param function The message function
-     * @param details The message details
+     * @param details The message details map
      * @return A human-readable summary string, or null if no summary is needed
      */
     private static String generateMessageSummary(String function, Map<String, Object> details) {
@@ -709,8 +844,13 @@ public final class TranscriptRecorder {
 
     /**
      * Formats an Instant object into a human-readable string.
-     * @param instant The Instant object to format.
-     * @return A string in the format "YYYY-MM-DD HH:MM:SS.SSS".
+     * 
+     * <p>This method formats timestamps in the format "YYYY-MM-DD HH:MM:SS.SSS"
+     * by removing the 'T' separator and 'Z' timezone indicator, and truncating
+     * to millisecond precision.
+     * 
+     * @param instant The Instant object to format
+     * @return A string in the format "YYYY-MM-DD HH:MM:SS.SSS"
      */
     private static String formatTimestamp(Instant instant) {
         String timestamp = instant.toString();
@@ -726,11 +866,5 @@ public final class TranscriptRecorder {
         return timestamp;
     }
     
-    /**
-     * Calculate the duration between two timestamps.
-     * @param startTime Start timestamp string
-     * @param endTime End timestamp string
-     * @return Duration string in human-readable format
-     */
 }
 

@@ -12,8 +12,21 @@ import java.util.List;
 
 /**
  * Handles module discovery and validation.
- * This class is responsible for finding modules in the modules directory
- * and validating their structure and required components.
+ * 
+ * <p>This class has a single responsibility: finding and validating game modules
+ * in the modules directory. It checks module structure and required components
+ * but does not handle compilation or loading (delegated to ModuleCompiler).
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Discovering modules in the modules directory</li>
+ *   <li>Validating module structure and required files</li>
+ *   <li>Counting valid modules</li>
+ *   <li>Getting lists of valid module directories</li>
+ *   <li>Checking compilation status</li>
+ *   <li>Diagnosing module detection issues</li>
+ *   <li>Finding modules by name</li>
+ * </ul>
  * 
  * @authors Clement Luo
  * @date August 12, 2025
@@ -22,10 +35,27 @@ import java.util.List;
  */
 public class ModuleDiscovery {
     
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Discover all valid modules in the modules directory.
-     * Currently only identifies candidates and logs validation; actual loading
-     * is delegated elsewhere (kept intentionally side-effect free here).
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private ModuleDiscovery() {
+        throw new AssertionError("ModuleDiscovery should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS - MODULE DISCOVERY ====================
+    
+    /**
+     * Discovers all valid modules in the modules directory.
+     * 
+     * <p>This method identifies module candidates and logs validation results.
+     * Actual loading is delegated to ModuleCompiler (kept intentionally
+     * side-effect free here).
+     * 
+     * @param modulesDirectoryPath The path to the modules directory
+     * @return List of discovered game modules (currently empty, loading is done elsewhere)
      */
     public static List<GameModule> discoverModules(String modulesDirectoryPath) {
         Logging.info("Starting module discovery in: " + modulesDirectoryPath);
@@ -63,7 +93,14 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Count the number of valid modules in the modules directory.
+     * Counts the number of valid modules in the modules directory.
+     * 
+     * <p>This method scans the modules directory and counts only those directories
+     * that pass structural validation checks. It skips infrastructure directories
+     * like "target" and ".git".
+     * 
+     * @param modulesDirectory The modules directory to scan
+     * @return The number of valid modules found
      */
     public static int countValidModules(File modulesDirectory) {
         int validCount = 0;
@@ -98,7 +135,14 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Get list of valid module directories for processing.
+     * Gets a list of valid module directories for processing.
+     * 
+     * <p>This method scans the modules directory and returns a list of directories
+     * that pass structural validation. It includes timeout protection for file
+     * operations and filters out infrastructure directories.
+     * 
+     * @param modulesDirectory The modules directory to scan
+     * @return List of valid module directories
      */
     public static List<File> getValidModuleDirectories(File modulesDirectory) {
         List<File> validModules = new ArrayList<>();
@@ -166,9 +210,19 @@ public class ModuleDiscovery {
         return validModules;
     }
     
+    // ==================== PUBLIC METHODS - VALIDATION ====================
+    
     /**
-     * Check if a directory has a valid module structure.
-     * Validity = presence of required files + minimal API signatures.
+     * Checks if a directory has a valid module structure.
+     * 
+     * <p>Validity is determined by:
+     * <ul>
+     *   <li>Presence of required source files (Main.java, Metadata.java)</li>
+     *   <li>Minimal API signatures in those files</li>
+     * </ul>
+     * 
+     * @param moduleDir The module directory to validate
+     * @return true if the directory has a valid module structure, false otherwise
      */
     public static boolean isValidModuleStructure(File moduleDir) {
         try {
@@ -199,9 +253,21 @@ public class ModuleDiscovery {
         }
     }
     
+    // ==================== PRIVATE METHODS - VALIDATION ====================
+    
     /**
-     * Validate that Main.java contains required methods.
-     * Currently ensures a runnable entrypoint via a main method signature.
+     * Validates that Main.java contains required methods.
+     * 
+     * <p>This method checks that Main.java:
+     * <ul>
+     *   <li>Implements the GameModule interface</li>
+     *   <li>Contains a class named "Main"</li>
+     * </ul>
+     * 
+     * <p>Includes timeout protection for file reading operations.
+     * 
+     * @param mainJavaFile The Main.java file to validate
+     * @return true if the file contains required methods, false otherwise
      */
     private static boolean validateMainJavaFile(File mainJavaFile) {
         try {
@@ -227,8 +293,20 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Validate that Metadata.java exposes minimal game metadata contract.
-     * Accepts instance or static getters for name, version, description.
+     * Validates that Metadata.java exposes minimal game metadata contract.
+     * 
+     * <p>This method checks that Metadata.java:
+     * <ul>
+     *   <li>Extends GameMetadata</li>
+     *   <li>Contains getGameName() method</li>
+     *   <li>Contains getGameVersion() method</li>
+     *   <li>Contains getGameDescription() method</li>
+     * </ul>
+     * 
+     * <p>Includes timeout protection for file reading operations.
+     * 
+     * @param metadataJavaFile The Metadata.java file to validate
+     * @return true if the file contains required methods, false otherwise
      */
     private static boolean validateMetadataJavaFile(File metadataJavaFile) {
         try {
@@ -256,7 +334,10 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Check if a module directory exists and is accessible.
+     * Checks if a module directory exists and is accessible.
+     * 
+     * @param modulePath The path to the module directory
+     * @return true if the directory exists, is a directory, and is readable
      */
     public static boolean moduleDirectoryExists(String modulePath) {
         File moduleDir = new File(modulePath);
@@ -264,8 +345,12 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Calculate the total number of steps needed for startup progress tracking.
-     * Base steps + one per valid module; clamped for UX.
+     * Calculates the total number of steps needed for startup progress tracking.
+     * 
+     * <p>This method calculates progress steps based on fixed startup steps plus
+     * one step per valid module. The total is clamped to a reasonable range for UX.
+     * 
+     * @return The total number of progress steps
      */
     public static int calculateTotalSteps() {
         Logging.info("Calculating total steps based on actual message count...");
@@ -310,8 +395,13 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Get the list of all module directories (valid or invalid).
-     * Useful for diagnostics or bulk operations before validation.
+     * Gets the list of all module directories (valid or invalid).
+     * 
+     * <p>This method returns all directories in the modules directory, regardless
+     * of validation status. Useful for diagnostics or bulk operations before validation.
+     * 
+     * @param modulesDirectory The modules directory to scan
+     * @return List of all module directories (excluding infrastructure directories)
      */
     public static List<File> getAllModuleDirectories(File modulesDirectory) {
         List<File> allModules = new ArrayList<>();
@@ -339,9 +429,17 @@ public class ModuleDiscovery {
         return allModules;
     }
 
+    // ==================== PUBLIC METHODS - DIAGNOSTICS ====================
+    
     /**
      * Quick test to check if modules directory is accessible.
-     * This can help identify if the issue is with file system access.
+     * 
+     * <p>This method performs basic accessibility checks including existence,
+     * directory type, readability, and listing capability. This can help identify
+     * if the issue is with file system access.
+     * 
+     * @param modulesDirectoryPath The path to the modules directory
+     * @return true if the directory is accessible, false otherwise
      */
     public static boolean testModulesDirectoryAccess(String modulesDirectoryPath) {
         try {
@@ -394,7 +492,19 @@ public class ModuleDiscovery {
 
     /**
      * Comprehensive diagnostic method to check why no modules are being detected.
-     * This will help identify file system, path, or validation issues.
+     * 
+     * <p>This method performs extensive diagnostics including:
+     * <ul>
+     *   <li>Checking current working directory</li>
+     *   <li>Verifying modules directory existence and accessibility</li>
+     *   <li>Listing all contents</li>
+     *   <li>Validating each potential module's structure</li>
+     *   <li>Checking compilation status</li>
+     * </ul>
+     * 
+     * <p>This will help identify file system, path, or validation issues.
+     * 
+     * @param modulesDirectoryPath The path to the modules directory
      */
     public static void diagnoseModuleDetectionIssues(String modulesDirectoryPath) {
         Logging.info("🔍 === MODULE DETECTION DIAGNOSTICS ===");
@@ -533,8 +643,20 @@ public class ModuleDiscovery {
         Logging.info("🔍 === END DIAGNOSTICS ===");
     }
 
+    // ==================== PUBLIC METHODS - COMPILATION STATUS ====================
+    
     /**
-     * Check if a module needs to be compiled by checking for compiled classes.
+     * Checks if a module needs to be compiled by checking for compiled classes.
+     * 
+     * <p>This method checks if:
+     * <ul>
+     *   <li>Compiled classes directory exists</li>
+     *   <li>Main.class file exists</li>
+     *   <li>Source files are newer than compiled classes</li>
+     * </ul>
+     * 
+     * @param moduleDir The module directory to check
+     * @return true if the module needs compilation, false otherwise
      */
     public static boolean moduleNeedsCompilation(File moduleDir) {
         try {
@@ -562,6 +684,9 @@ public class ModuleDiscovery {
                 }
             }
             
+            // Note: metadataJavaFile is checked but not used in the comparison above
+            // This is intentional - we only need to check if Main.java is newer
+            
             Logging.info("✅ Module " + moduleDir.getName() + " is compiled and up to date");
             return false;
             
@@ -572,7 +697,12 @@ public class ModuleDiscovery {
     }
     
     /**
-     * Get compilation status for all modules in the directory.
+     * Reports compilation status for all modules in the directory.
+     * 
+     * <p>This method scans all modules and reports which ones need compilation.
+     * Useful for debugging and user feedback.
+     * 
+     * @param modulesDirectory The modules directory to check
      */
     public static void reportModuleCompilationStatus(File modulesDirectory) {
         try {
@@ -608,9 +738,13 @@ public class ModuleDiscovery {
         }
     }
     
+    // ==================== PUBLIC METHODS - MODULE LOOKUP ====================
+    
     /**
-     * Find and load a game module by its game name.
-     * Loads modules one by one until finding a match, stopping early for efficiency.
+     * Finds and loads a game module by its game name.
+     * 
+     * <p>This method loads modules one by one until finding a match, stopping
+     * early for efficiency. It uses ModuleCompiler to load each module.
      * 
      * @param gameName The name of the game to find (as returned by getGameName())
      * @return The loaded GameModule instance, or null if not found

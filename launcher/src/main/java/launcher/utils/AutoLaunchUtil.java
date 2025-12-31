@@ -15,7 +15,20 @@ import java.nio.file.Paths;
 
 /**
  * Utility class for auto-launch functionality.
- * Handles reading and writing auto-launch configuration settings.
+ * 
+ * <p>This class has a single responsibility: handling auto-launch functionality
+ * for the GDK application, including reading configuration, creating components,
+ * and launching games automatically.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Checking if auto-launch is enabled</li>
+ *   <li>Loading saved auto-launch data (JSON and game selection)</li>
+ *   <li>Creating controller and ViewModel components for auto-launch</li>
+ *   <li>Configuring the stage for game display</li>
+ *   <li>Launching games with saved configuration</li>
+ *   <li>Handling return to normal GDK mode</li>
+ * </ul>
  * 
  * @authors Clement Luo
  * @date December 20, 2025
@@ -23,6 +36,8 @@ import java.nio.file.Paths;
  * @since Beta 1.0
  */
 public final class AutoLaunchUtil {
+    
+    // ==================== CONSTRUCTOR ====================
     
     /**
      * Private constructor to prevent instantiation.
@@ -32,9 +47,13 @@ public final class AutoLaunchUtil {
         throw new AssertionError("AutoLaunchUtil should not be instantiated");
     }
     
+    // ==================== INNER CLASSES ====================
+    
     /**
      * Data class for auto-launch saved data.
-     * Contains the saved JSON configuration and selected game name.
+     * 
+     * <p>Contains the saved JSON configuration and selected game name
+     * that are used to automatically launch a game on startup.
      */
     public static class AutoLaunchData {
         private final String savedJson;
@@ -54,12 +73,17 @@ public final class AutoLaunchUtil {
         }
     }
     
+    // ==================== PUBLIC METHODS - AUTO-LAUNCH CHECK ====================
+    
     /**
-     * Check if auto-launch functionality is enabled and all required data is available.
-     * Auto-launch is only considered enabled if:
-     * 1. The auto-launch flag is set to true
-     * 2. The JSON persistence file exists and is not empty
-     * 3. The selected game file exists and is not empty
+     * Checks if auto-launch functionality is enabled and all required data is available.
+     * 
+     * <p>Auto-launch is only considered enabled if:
+     * <ol>
+     *   <li>The auto-launch flag is set to true</li>
+     *   <li>The JSON persistence file exists and is not empty</li>
+     *   <li>The selected game file exists and is not empty</li>
+     * </ol>
      * 
      * @return true if auto-launch is enabled and all required data is available, false otherwise
      */
@@ -107,8 +131,13 @@ public final class AutoLaunchUtil {
         }
     }
     
+    // ==================== PUBLIC METHODS - DATA LOADING ====================
+    
     /**
-     * Load the saved auto-launch data (JSON and selected game name).
+     * Loads the saved auto-launch data (JSON and selected game name).
+     * 
+     * <p>This method reads the saved JSON configuration and selected game name
+     * from persistence files. It also validates that the JSON syntax is correct.
      * 
      * @return AutoLaunchData containing the saved JSON and game name, or null if loading fails
      */
@@ -149,7 +178,10 @@ public final class AutoLaunchUtil {
     }
     
     /**
-     * Components needed for auto-launch (controller and viewmodel).
+     * Components needed for auto-launch.
+     * 
+     * <p>Contains the controller and ViewModel instances that are configured
+     * for auto-launch mode, allowing games to run without the normal lobby interface.
      */
     public static class AutoLaunchComponents {
         private final GDKGameLobbyController controller;
@@ -169,12 +201,17 @@ public final class AutoLaunchUtil {
         }
     }
     
+    // ==================== PUBLIC METHODS - COMPONENT CREATION ====================
+    
     /**
-     * Create and configure controller and viewmodel for auto-launch.
-     * Sets the primary stage on the viewmodel for consistency with normal launch.
+     * Creates and configures controller and ViewModel for auto-launch.
      * 
-     * @param primaryApplicationStage The primary stage to set on the viewmodel
-     * @return AutoLaunchComponents containing the configured controller and viewmodel
+     * <p>This method creates a new GDKGameLobbyController and GDKViewModel,
+     * sets the controller mode to AUTO_LAUNCH, and configures the ViewModel
+     * with the primary stage for consistency with normal launch.
+     * 
+     * @param primaryApplicationStage The primary stage to set on the ViewModel
+     * @return AutoLaunchComponents containing the configured controller and ViewModel
      */
     public static AutoLaunchComponents createAutoLaunchComponents(Stage primaryApplicationStage) {
         GDKGameLobbyController controller = new GDKGameLobbyController();
@@ -185,11 +222,16 @@ public final class AutoLaunchUtil {
         return new AutoLaunchComponents(controller, viewModel);
     }
     
+    // ==================== PUBLIC METHODS - STAGE CONFIGURATION ====================
+    
     /**
-     * Configure the primary stage for auto-launch game display.
+     * Configures the primary stage for auto-launch game display.
+     * 
+     * <p>This method sets the stage title, size, and opacity for displaying
+     * the game in auto-launch mode.
      * 
      * @param primaryApplicationStage The primary stage to configure
-     * @param gameModule The game module (for title)
+     * @param gameModule The game module (used for setting the window title)
      */
     public static void configureStageForGame(Stage primaryApplicationStage, GameModule gameModule) {
         primaryApplicationStage.setTitle(gameModule.getMetadata().getGameName());
@@ -201,9 +243,17 @@ public final class AutoLaunchUtil {
         primaryApplicationStage.show();
     }
     
+    // ==================== PUBLIC METHODS - GAME LAUNCHING ====================
+    
     /**
-     * Launch the game with configuration.
-     * This method handles the configuration and launch sequence.
+     * Launches the game with configuration.
+     * 
+     * <p>This method handles the complete configuration and launch sequence:
+     * <ol>
+     *   <li>Parses the JSON configuration string</li>
+     *   <li>Applies configuration to the game module</li>
+     *   <li>Launches the game via the ViewModel</li>
+     * </ol>
      * 
      * @param gameModule The game module to launch
      * @param savedJson The saved JSON configuration string
@@ -231,9 +281,13 @@ public final class AutoLaunchUtil {
         return true;
     }
     
+    // ==================== PUBLIC METHODS - MODE TRANSITION ====================
+    
     /**
-     * Handle returning to normal GDK from auto-launch mode.
-     * Cleans up the game and starts the normal GDK interface.
+     * Handles returning to normal GDK from auto-launch mode.
+     * 
+     * <p>This method cleans up the current game and starts the normal GDK interface.
+     * It uses the same cleanup logic as normal mode to ensure consistency.
      * 
      * @param controller The controller instance managing the game
      * @param startNormalGDKCallback Callback to start the normal GDK interface

@@ -44,6 +44,9 @@ public class JsonProcessingService {
     /**
      * Parses JSON configuration text into a map.
      * 
+     * <p>This method delegates to the ViewModel to parse the JSON configuration.
+     * Returns null if the ViewModel is unavailable or the text is empty/null.
+     * 
      * @param jsonText The JSON text to parse
      * @return Parsed configuration map, or null if parsing fails or ViewModel is unavailable
      */
@@ -57,8 +60,11 @@ public class JsonProcessingService {
     /**
      * Formats a JSON response for display.
      * 
+     * <p>This method uses JsonFormatter to format the response with pretty printing
+     * for better readability in the UI.
+     * 
      * @param response The response map to format
-     * @return Formatted JSON string
+     * @return Formatted JSON string with proper indentation
      */
     public String formatJsonResponse(Map<String, Object> response) {
         return JsonFormatter.formatJsonResponse(response);

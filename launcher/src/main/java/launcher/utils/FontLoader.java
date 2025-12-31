@@ -8,7 +8,17 @@ import java.io.InputStream;
 
 /**
  * Global font loader for the application.
- * Loads the Inter font for both Swing (AWT) and JavaFX.
+ * 
+ * <p>This class has a single responsibility: loading and managing the Inter font
+ * for both Swing (AWT) and JavaFX components throughout the application.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Loading Inter font files from resources</li>
+ *   <li>Registering fonts with both AWT and JavaFX</li>
+ *   <li>Providing font family names for use in CSS and code</li>
+ *   <li>Fallback to system fonts if Inter cannot be loaded</li>
+ * </ul>
  * 
  * @author Clement Luo
  * @date December 24, 2025
@@ -16,25 +26,46 @@ import java.io.InputStream;
  */
 public class FontLoader {
     
-    /** Path to Inter Regular font in resources */
+    // ==================== CONSTANTS ====================
+    
+    /** Path to Inter Regular font in resources. */
     private static final String INTER_REGULAR_PATH = "/fonts/Inter_18pt-Regular.ttf";
     
-    /** Path to Inter Bold font in resources */
+    /** Path to Inter Bold font in resources. */
     private static final String INTER_BOLD_PATH = "/fonts/Inter_18pt-Bold.ttf";
     
-    /** Font family name for Inter */
+    /** Font family name for Inter. */
     public static final String INTER_FONT_FAMILY = "Inter";
     
-    /** Actual font family name after loading (may include size suffix like "Inter 18pt") */
+    // ==================== STATE ====================
+    
+    /** Actual font family name after loading (may include size suffix like "Inter 18pt"). */
     private static String actualInterFontFamily = null;
     
+    /** Flag indicating whether fonts have been loaded. */
     private static boolean fontsLoaded = false;
+    
+    // ==================== CONSTRUCTOR ====================
+    
+    /**
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private FontLoader() {
+        throw new AssertionError("FontLoader should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS - FONT LOADING ====================
     
     /**
      * Loads the Inter font for both Swing (AWT) and JavaFX.
-     * This should be called early in the application lifecycle.
      * 
-     * @return true if fonts were loaded successfully, false otherwise
+     * <p>This method should be called early in the application lifecycle,
+     * ideally during application initialization. It attempts to load fonts
+     * for both AWT and JavaFX, and considers the operation successful if
+     * at least one succeeds.
+     * 
+     * @return true if fonts were loaded successfully (at least one platform), false otherwise
      */
     public static boolean loadFonts() {
         if (fontsLoaded) {
@@ -55,10 +86,15 @@ public class FontLoader {
         return fontsLoaded;
     }
     
+    // ==================== PRIVATE METHODS - FONT LOADING ====================
+    
     /**
      * Loads the Inter font for Swing (AWT) components.
      * 
-     * @return true if loaded successfully
+     * <p>This method loads both regular and bold weights of the Inter font
+     * and registers them with the AWT GraphicsEnvironment.
+     * 
+     * @return true if loaded successfully, false otherwise
      */
     private static boolean loadSwingFont() {
         try {
@@ -92,7 +128,10 @@ public class FontLoader {
     /**
      * Loads the Inter font for JavaFX components.
      * 
-     * @return true if loaded successfully
+     * <p>This method loads both regular and bold weights of the Inter font
+     * and stores the actual font family name for later use.
+     * 
+     * @return true if loaded successfully, false otherwise
      */
     private static boolean loadJavaFXFont() {
         try {
@@ -125,8 +164,13 @@ public class FontLoader {
         }
     }
     
+    // ==================== PUBLIC METHODS - FONT QUERY ====================
+    
     /**
      * Gets the Inter font family name for use in CSS and code.
+     * 
+     * <p>This method returns the standard Inter font family name if fonts
+     * have been successfully loaded.
      * 
      * @return "Inter" if fonts are loaded, null otherwise
      */
@@ -137,7 +181,7 @@ public class FontLoader {
     /**
      * Checks if fonts have been loaded.
      * 
-     * @return true if fonts are loaded
+     * @return true if fonts are loaded, false otherwise
      */
     public static boolean areFontsLoaded() {
         return fontsLoaded;
@@ -145,9 +189,15 @@ public class FontLoader {
     
     /**
      * Gets the font family to use for the application.
-     * Uses the same logic as the startup window - tries Inter first, then falls back to system fonts.
      * 
-     * @return The font family name to use in CSS
+     * <p>This method uses the same logic as the startup window - tries Inter first,
+     * then falls back to system fonts. It checks both JavaFX and AWT font lists
+     * to find the best available font.
+     * 
+     * <p>The method prioritizes modern system fonts (SF Pro, Segoe UI, Roboto, etc.)
+     * and falls back to classic fonts (Arial, Helvetica) if needed.
+     * 
+     * @return The font family name to use in CSS, or "sans-serif" as final fallback
      */
     public static String getApplicationFontFamily() {
         // If Inter is loaded, use the actual font family name (may be "Inter 18pt" not "Inter")

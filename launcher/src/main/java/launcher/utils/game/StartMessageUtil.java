@@ -14,19 +14,59 @@ import java.util.ArrayList;
 /**
  * Utility class for managing start messages for different game modes.
  * 
+ * <p>This class has a single responsibility: loading and managing start messages
+ * for different game modes (single player, local multiplayer, all modes).
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Loading start messages from JSON files</li>
+ *   <li>Creating default start messages if files don't exist</li>
+ *   <li>Ensuring required fields (like localPlayerId) are present</li>
+ *   <li>Managing the saved directory for start message files</li>
+ * </ul>
+ * 
  * @author Clement Luo
  * @date August 8, 2025
  * @edited August 12, 2025
  * @since 1.0
  */
 public final class StartMessageUtil {
+    
+    // ==================== CONSTANTS ====================
+    
+    /** Path to the default start message file. */
     private static final String DEFAULT_FILE_NAME = "saved/start-message.example.json";
+    
+    /** Path to the local multiplayer start message file. */
     private static final String LOCAL_MULTIPLAYER_FILE = "saved/start-message-local-multiplayer.json";
+    
+    /** Path to the single player start message file. */
     private static final String SINGLE_PLAYER_FILE = "saved/start-message-single-player.json";
+    
+    /** Path to the all modes start message file. */
     private static final String ALL_MODES_FILE = "saved/start-message-all-modes.json";
-
-    private StartMessageUtil() {}
-
+    
+    // ==================== CONSTRUCTOR ====================
+    
+    /**
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private StartMessageUtil() {
+        throw new AssertionError("StartMessageUtil should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS - LOADING ====================
+    
+    /**
+     * Loads the default start message.
+     * 
+     * <p>This method loads the default start message from file. If the file doesn't exist,
+     * it creates a default start message and saves it for future use. The method also
+     * ensures that the localPlayerId field is present in the message.
+     * 
+     * @return The start message map, or null if loading fails
+     */
     public static Map<String, Object> loadDefaultStartMessage() {
         Map<String, Object> msg = loadStartMessage(Path.of(DEFAULT_FILE_NAME));
         if (msg != null) {
@@ -61,26 +101,79 @@ public final class StartMessageUtil {
     }
     
     /**
-     * Load a start message for local multiplayer mode
+     * Loads a start message for local multiplayer mode.
+     * 
+     * @return The start message map for local multiplayer, or null if loading fails
      */
     public static Map<String, Object> loadLocalMultiplayerStartMessage() {
         return loadStartMessage(Path.of(LOCAL_MULTIPLAYER_FILE));
     }
     
     /**
-     * Load a start message for single player mode
+     * Loads a start message for single player mode.
+     * 
+     * @return The start message map for single player, or null if loading fails
      */
     public static Map<String, Object> loadSinglePlayerStartMessage() {
         return loadStartMessage(Path.of(SINGLE_PLAYER_FILE));
     }
     
     /**
-     * Load a start message for all modes (multi player)
+     * Loads a start message for all modes (multi player).
+     * 
+     * @return The start message map for all modes, or null if loading fails
      */
     public static Map<String, Object> loadAllModesStartMessage() {
         return loadStartMessage(Path.of(ALL_MODES_FILE));
     }
+    
+    // ==================== PRIVATE METHODS - LOADING ====================
+    
+    /**
+     * Loads a start message from a file path.
+     * 
+     * <p>This method reads a JSON file and parses it into a Map structure.
+     * Returns null if the file doesn't exist, is not readable, or parsing fails.
+     * 
+     * @param filePath The path to the start message file
+     * @return The parsed start message map, or null if loading fails
+     */
+    public static Map<String, Object> loadStartMessage(Path filePath) {
+        try {
+            if (filePath == null) {
+                return null;
+            }
+            File file = filePath.toFile();
+            if (!file.exists() || !file.isFile() || !file.canRead()) {
+                Logging.info("Start message file not found: " + file.getAbsolutePath());
+                return null;
+            }
+            String json = Files.readString(file.toPath());
+            ObjectMapper mapper = new ObjectMapper();
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = mapper.readValue(json, Map.class);
+            return data;
+        } catch (Exception e) {
+            Logging.error("Failed to load start message: " + e.getMessage(), e);
+            return null;
+        }
+    }
 
+    // ==================== PRIVATE METHODS - CREATION ====================
+    
+    /**
+     * Creates a default start message with standard game configuration.
+     * 
+     * <p>This method creates a default start message with:
+     * <ul>
+     *   <li>Function: "start"</li>
+     *   <li>Game mode: "multi_player"</li>
+     *   <li>Local player ID: "p1"</li>
+     *   <li>Two players (p1 as host, p2 as guest)</li>
+     * </ul>
+     * 
+     * @return A default start message map
+     */
     private static Map<String, Object> createDefaultStartMessage() {
         Map<String, Object> defaultMsg = new HashMap<>();
         defaultMsg.put("function", "start");
@@ -103,28 +196,15 @@ public final class StartMessageUtil {
         defaultMsg.put("players", players);
         return defaultMsg;
     }
-
-    public static Map<String, Object> loadStartMessage(Path filePath) {
-        try {
-            if (filePath == null) {
-                return null;
-            }
-            File file = filePath.toFile();
-            if (!file.exists() || !file.isFile() || !file.canRead()) {
-                Logging.info("Start message file not found: " + file.getAbsolutePath());
-                return null;
-            }
-            String json = Files.readString(file.toPath());
-            ObjectMapper mapper = new ObjectMapper();
-            @SuppressWarnings("unchecked")
-            Map<String, Object> data = mapper.readValue(json, Map.class);
-            return data;
-        } catch (Exception e) {
-            Logging.error("Failed to load start message: " + e.getMessage(), e);
-            return null;
-        }
-    }
-
+    
+    // ==================== PRIVATE METHODS - UTILITY ====================
+    
+    /**
+     * Ensures the saved directory exists, creating it if necessary.
+     * 
+     * <p>This method creates the "saved" directory if it doesn't exist.
+     * Errors are logged but do not throw exceptions.
+     */
     public static void ensureSavedDirectoryExists() {
         try {
             Path savedDir = Path.of("saved");

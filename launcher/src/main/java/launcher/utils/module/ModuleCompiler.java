@@ -13,8 +13,20 @@ import javafx.application.Platform;
 
 /**
  * Handles module compilation and loading.
- * This class is responsible for compiling modules and creating GameModule instances
- * from the compiled classes. Also tracks compilation failures and UI controller.
+ * 
+ * <p>This class has a single responsibility: compiling modules and creating
+ * GameModule instances from compiled classes. It also tracks compilation failures
+ * and manages UI controller references for progress updates.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Compiling modules using Maven</li>
+ *   <li>Loading modules from compiled classes</li>
+ *   <li>Creating class loaders with proper dependencies</li>
+ *   <li>Validating loaded classes</li>
+ *   <li>Tracking compilation failures</li>
+ *   <li>Managing UI controller for progress updates</li>
+ * </ul>
  *
  * @author Clement Luo
  * @date August 8, 2025
@@ -25,14 +37,29 @@ public class ModuleCompiler {
     
     // ==================== STATIC STATE ====================
     
-    /** UI controller for progress updates */
+    /** UI controller for progress updates. */
     private static GDKGameLobbyController uiController = null;
     
-    /** Track compilation failures for UI notification */
+    /** Tracks compilation failures for UI notification. */
     private static List<String> lastCompilationFailures = new ArrayList<>();
     
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Compile a specific module.
+     * Private constructor to prevent instantiation.
+     * This is a utility class with only static methods.
+     */
+    private ModuleCompiler() {
+        throw new AssertionError("ModuleCompiler should not be instantiated");
+    }
+    
+    // ==================== PUBLIC METHODS - COMPILATION ====================
+    
+    /**
+     * Compiles a specific module.
+     * 
+     * <p>This method uses Maven to compile a module by running "mvn clean compile".
+     * It finds the Maven command automatically and executes it in the module directory.
      * 
      * @param modulePath The path to the module to compile
      * @return true if compilation was successful, false otherwise
@@ -64,8 +91,22 @@ public class ModuleCompiler {
         }
     }
     
+    // ==================== PUBLIC METHODS - MODULE LOADING ====================
+    
     /**
-     * Load a module from its compiled classes.
+     * Loads a module from its compiled classes.
+     * 
+     * <p>This method performs the complete module loading process:
+     * <ol>
+     *   <li>Validates module structure</li>
+     *   <li>Checks for compiled classes</li>
+     *   <li>Creates a class loader with dependencies</li>
+     *   <li>Loads and validates the Main class</li>
+     *   <li>Instantiates the GameModule</li>
+     * </ol>
+     * 
+     * <p>Includes timeout protection and extensive error handling for JavaFX
+     * initialization issues.
      * 
      * @param moduleDir The module directory
      * @return The loaded GameModule instance, or null if loading failed
@@ -227,7 +268,11 @@ public class ModuleCompiler {
     }
     
     /**
-     * Load multiple modules from their compiled classes.
+     * Loads multiple modules from their compiled classes.
+     * 
+     * <p>This method loads multiple modules sequentially with timeout protection.
+     * It continues loading other modules even if one fails, ensuring maximum
+     * module availability.
      * 
      * @param moduleDirectories List of module directories to load
      * @return List of successfully loaded GameModule instances
@@ -265,12 +310,24 @@ public class ModuleCompiler {
         return loadedModules;
     }
     
+    // ==================== PRIVATE METHODS - CLASS LOADER ====================
+    
     /**
-     * Create a class loader for a module with necessary dependencies.
+     * Creates a class loader for a module with necessary dependencies.
+     * 
+     * <p>This method creates a URLClassLoader that includes:
+     * <ul>
+     *   <li>The module's compiled classes (target/classes)</li>
+     *   <li>GDK classes (gdk/target/classes)</li>
+     *   <li>Launcher classes (launcher/target/classes)</li>
+     * </ul>
+     * 
+     * <p>It tries multiple possible locations for dependencies to handle
+     * different project structures and launch scenarios.
      * 
      * @param moduleDir The module directory
      * @return URLClassLoader configured for the module
-     * @throws Exception if class loader creation fails
+     * @throws Exception if class loader creation fails (e.g., no valid classpath URLs found)
      */
     private static URLClassLoader createModuleClassLoader(File moduleDir) throws Exception {
         List<URL> classpathUrls = new ArrayList<>();
@@ -369,11 +426,13 @@ public class ModuleCompiler {
         return new URLClassLoader(classpathUrls.toArray(new URL[0]), ModuleCompiler.class.getClassLoader());
     }
     
+    // ==================== PRIVATE METHODS - VALIDATION ====================
+    
     /**
-     * Validate that a Main class has the required main method.
+     * Validates that a Main class implements the GameModule interface.
      * 
      * @param mainClass The Main class to validate
-     * @return true if the class has a valid main method, false otherwise
+     * @return true if the class implements GameModule, false otherwise
      */
     private static boolean validateMainClass(Class<?> mainClass) {
         try {
@@ -388,8 +447,17 @@ public class ModuleCompiler {
         }
     }
     
+    // ==================== PUBLIC METHODS - COMPILATION STATUS ====================
+    
     /**
-     * Check if a module needs to be compiled.
+     * Checks if a module needs to be compiled.
+     * 
+     * <p>This method checks if:
+     * <ul>
+     *   <li>Compiled classes directory doesn't exist</li>
+     *   <li>Main.class file doesn't exist</li>
+     *   <li>Source files are newer than compiled classes</li>
+     * </ul>
      * 
      * @param moduleDir The module directory to check
      * @return true if the module needs compilation, false otherwise
@@ -419,7 +487,10 @@ public class ModuleCompiler {
     }
     
     /**
-     * Compile all modules that need compilation.
+     * Compiles all modules that need compilation.
+     * 
+     * <p>This method checks each module and compiles only those that need it.
+     * It returns a list of successfully compiled module names.
      * 
      * @param moduleDirectories List of module directories to check and compile
      * @return List of successfully compiled module names
@@ -443,8 +514,14 @@ public class ModuleCompiler {
         return compiledModules;
     }
     
+    // ==================== PRIVATE METHODS - MAVEN ====================
+    
     /**
-     * Find the Maven command to use.
+     * Finds the Maven command to use.
+     * 
+     * <p>This method tries common Maven command names (mvn, mvn.cmd, mvn.bat)
+     * and tests if they work by running "mvn --version". Returns the first
+     * working command, or "mvn" as a default.
      * 
      * @return The Maven command path
      */
@@ -471,9 +548,12 @@ public class ModuleCompiler {
     }
     
     /**
-     * Check if modules need to be built (legacy method for compatibility).
+     * Checks if modules need to be built (legacy method for compatibility).
      * 
-     * @return true if modules need to be built, false otherwise
+     * <p>This method currently always returns false to avoid Maven execution issues.
+     * It can be enhanced later with proper build detection logic.
+     * 
+     * @return true if modules need to be built, false otherwise (currently always false)
      */
     public static boolean needToBuildModules() {
         // For now, always return false to avoid Maven execution issues
@@ -483,8 +563,13 @@ public class ModuleCompiler {
     
     // ==================== UI CONTROLLER MANAGEMENT ====================
     
+    // ==================== PUBLIC METHODS - UI CONTROLLER MANAGEMENT ====================
+    
     /**
-     * Set the UI controller for progress updates.
+     * Sets the UI controller for progress updates.
+     * 
+     * <p>This method allows the UI controller to be set for displaying
+     * compilation and loading progress to the user.
      * 
      * @param controller The UI controller
      */
@@ -493,7 +578,7 @@ public class ModuleCompiler {
     }
     
     /**
-     * Get the current UI controller.
+     * Gets the current UI controller.
      * 
      * @return The current UI controller, or null if not set
      */
@@ -504,7 +589,10 @@ public class ModuleCompiler {
     // ==================== COMPILATION FAILURE TRACKING ====================
     
     /**
-     * Store compilation failures for UI notification.
+     * Stores compilation failures for UI notification.
+     * 
+     * <p>This method replaces the current list of compilation failures with
+     * the provided list. Used to track which modules failed to compile.
      * 
      * @param failures List of module names that failed compilation
      */
@@ -515,7 +603,9 @@ public class ModuleCompiler {
     }
     
     /**
-     * Get the last compilation failures for UI notification.
+     * Gets the last compilation failures for UI notification.
+     * 
+     * <p>This method returns a copy of the stored compilation failures list.
      * 
      * @return List of module names that failed compilation
      */
@@ -525,14 +615,19 @@ public class ModuleCompiler {
     }
     
     /**
-     * Clear the stored compilation failures.
+     * Clears the stored compilation failures.
+     * 
+     * <p>This method clears all stored compilation failure information.
      */
     public static void clearCompilationFailures() {
         lastCompilationFailures.clear();
     }
     
     /**
-     * Add a compilation failure for a specific module.
+     * Adds a compilation failure for a specific module.
+     * 
+     * <p>This method adds a module name to the compilation failures list
+     * if it's not already present.
      * 
      * @param moduleName The name of the module that failed compilation
      */

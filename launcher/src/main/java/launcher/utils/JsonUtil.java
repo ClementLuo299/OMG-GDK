@@ -7,7 +7,16 @@ import java.util.Map;
 
 /**
  * Utility class for JSON operations.
- * Provides centralized JSON parsing, validation, and formatting functionality.
+ * 
+ * <p>This class has a single responsibility: providing centralized JSON parsing,
+ * validation, and formatting functionality using Jackson ObjectMapper.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Validating JSON string syntax</li>
+ *   <li>Parsing JSON strings into Map structures</li>
+ *   <li>Providing access to the shared ObjectMapper instance</li>
+ * </ul>
  * 
  * @authors Clement Luo
  * @date December 20, 2025
@@ -16,11 +25,17 @@ import java.util.Map;
  */
 public final class JsonUtil {
     
+    // ==================== CONSTANTS ====================
+    
     /**
      * Shared ObjectMapper instance for JSON operations.
-     * ObjectMapper is thread-safe after configuration, so we can reuse it.
+     * 
+     * <p>ObjectMapper is thread-safe after configuration, so we can reuse it
+     * across all JSON operations for better performance.
      */
     private static final ObjectMapper jsonMapper = new ObjectMapper();
+    
+    // ==================== CONSTRUCTOR ====================
     
     /**
      * Private constructor to prevent instantiation.
@@ -30,8 +45,13 @@ public final class JsonUtil {
         throw new AssertionError("JsonUtil should not be instantiated");
     }
     
+    // ==================== PUBLIC METHODS - VALIDATION ====================
+    
     /**
-     * Validate that a JSON string has valid syntax.
+     * Validates that a JSON string has valid syntax.
+     * 
+     * <p>This method attempts to parse the JSON string to verify its syntax.
+     * Returns false if the string is null, empty, or contains invalid JSON.
      * 
      * @param jsonString The JSON string to validate
      * @return true if the JSON is valid, false otherwise
@@ -49,8 +69,13 @@ public final class JsonUtil {
         }
     }
     
+    // ==================== PUBLIC METHODS - PARSING ====================
+    
     /**
-     * Parse a JSON string into a Map.
+     * Parses a JSON string into a Map structure.
+     * 
+     * <p>This method parses the JSON string and returns a Map representation.
+     * Returns null if the input is null, empty, or parsing fails.
      * 
      * @param jsonString The JSON string to parse
      * @return The parsed Map, or null if parsing fails or input is empty
@@ -70,9 +95,14 @@ public final class JsonUtil {
         }
     }
     
+    // ==================== PUBLIC METHODS - ACCESS ====================
+    
     /**
-     * Get the shared ObjectMapper instance.
-     * Useful for classes that need to perform custom JSON operations.
+     * Gets the shared ObjectMapper instance.
+     * 
+     * <p>This method provides access to the shared ObjectMapper for classes
+     * that need to perform custom JSON operations beyond the standard parsing
+     * and validation methods.
      * 
      * @return The shared ObjectMapper instance
      */

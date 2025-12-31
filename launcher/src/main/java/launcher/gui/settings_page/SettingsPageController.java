@@ -103,7 +103,11 @@ public class SettingsPageController implements Initializable {
     // ==================== DEPENDENCY INJECTION ====================
     
     /**
-     * Set the main GDK lobby controller reference.
+     * Sets the main GDK lobby controller reference.
+     * 
+     * <p>This method is called by the parent component to provide a reference
+     * to the main GDK lobby controller. This allows the settings controller
+     * to synchronize settings with the main controller.
      * 
      * @param mainController The main GDK lobby controller
      */
@@ -114,7 +118,11 @@ public class SettingsPageController implements Initializable {
     }
     
     /**
-     * Set the main scene reference for navigation back to lobby.
+     * Sets the main scene reference for navigation back to lobby.
+     * 
+     * <p>This method is called by the parent component to provide a reference
+     * to the main lobby scene. This allows the settings controller to navigate
+     * back to the lobby when the back button is clicked.
      * 
      * @param mainScene The main lobby scene
      */
@@ -125,8 +133,13 @@ public class SettingsPageController implements Initializable {
     
     // ==================== USER INTERFACE SETUP ====================
     
+    // ==================== USER INTERFACE SETUP ====================
+    
     /**
-     * Set up all user interface components.
+     * Sets up all user interface components.
+     * 
+     * <p>This method initializes UI components such as the theme selector
+     * and font size slider with their default values and configurations.
      */
     private void setupUserInterface() {
         // Theme selector setup (with null check)
@@ -146,20 +159,22 @@ public class SettingsPageController implements Initializable {
         }
     }
     
-    // ==================== EVENT HANDLER SETUP ====================
-    
     /**
-     * Set up all event handlers for user interactions.
+     * Sets up all event handlers for user interactions.
+     * 
+     * <p>This method configures event handlers for buttons and other
+     * interactive UI components that trigger actions.
      */
     private void setupEventHandlers() {
         // Back button: Return to main lobby
         backButton.setOnAction(event -> returnToMainLobby());
     }
     
-    // ==================== SETTINGS LISTENERS ====================
-    
     /**
-     * Set up listeners for all settings changes.
+     * Sets up listeners for all settings changes.
+     * 
+     * <p>This method configures change listeners for all settings controls.
+     * When a setting changes, it is automatically saved to preferences.
      */
     private void setupSettingsListeners() {
         // General settings listeners (with null checks)
@@ -198,9 +213,13 @@ public class SettingsPageController implements Initializable {
     }
     
     /**
-     * Create a settings change listener for a specific setting.
+     * Creates a settings change listener for a specific setting.
      * 
-     * @param settingName The name of the setting
+     * <p>This method creates a generic change listener that automatically
+     * saves the setting value to preferences when it changes. The listener
+     * only saves if initialization is complete and the new value is not null.
+     * 
+     * @param settingName The name of the setting to save
      * @return A ChangeListener that saves the setting when it changes
      */
     private <T> ChangeListener<T> createSettingsListener(String settingName) {
@@ -212,10 +231,12 @@ public class SettingsPageController implements Initializable {
         };
     }
     
-    // ==================== SETTINGS MANAGEMENT ====================
-    
     /**
-     * Load all saved settings from preferences.
+     * Loads all saved settings from preferences.
+     * 
+     * <p>This method loads all settings from Java Preferences and applies
+     * them to the UI components. The initialization flag is set to prevent
+     * triggering save operations during loading.
      */
     private void loadSettings() {
         isInitializing = true;
@@ -271,10 +292,13 @@ public class SettingsPageController implements Initializable {
     }
     
     /**
-     * Save a single setting to preferences.
+     * Saves a single setting to preferences.
+     * 
+     * <p>This method saves a single setting key-value pair to Java Preferences.
+     * Errors are logged but do not throw exceptions.
      * 
      * @param key The setting key
-     * @param value The setting value
+     * @param value The setting value (as a string)
      */
     private void saveSetting(String key, String value) {
         try {
@@ -286,7 +310,11 @@ public class SettingsPageController implements Initializable {
     }
     
     /**
-     * Save all current settings to preferences.
+     * Saves all current settings to preferences.
+     * 
+     * <p>This method saves all current UI component values to Java Preferences.
+     * This is typically called when navigating away from the settings page
+     * to ensure all changes are persisted.
      */
     private void saveAllSettings() {
         try {
@@ -332,10 +360,12 @@ public class SettingsPageController implements Initializable {
         }
     }
     
-    // ==================== MAIN CONTROLLER INTEGRATION ====================
-    
     /**
-     * Synchronize settings with the main GDK lobby controller.
+     * Synchronizes settings with the main GDK lobby controller.
+     * 
+     * <p>This method synchronizes settings between the settings page controller
+     * and the main GDK lobby controller. Currently, this is a placeholder for
+     * future synchronization logic.
      */
     private void synchronizeWithMainController() {
         if (mainController != null) {
@@ -345,10 +375,11 @@ public class SettingsPageController implements Initializable {
         }
     }
     
-    // ==================== UTILITY METHODS ====================
-    
     /**
-     * Update the status label with a message.
+     * Updates the status label with a message.
+     * 
+     * <p>This method updates the status label to display feedback messages
+     * to the user about settings operations.
      * 
      * @param message The status message to display
      */
@@ -359,7 +390,11 @@ public class SettingsPageController implements Initializable {
     }
     
     /**
-     * Return to the main lobby.
+     * Returns to the main lobby.
+     * 
+     * <p>This method saves all current settings, then navigates back to the
+     * main lobby scene by changing the stage's scene. This ensures all settings
+     * are persisted before leaving the settings page.
      */
     private void returnToMainLobby() {
         try {
@@ -384,34 +419,46 @@ public class SettingsPageController implements Initializable {
     // ==================== PUBLIC API ====================
     
     /**
-     * Get the current auto-launch setting.
+     * Gets the current auto-launch setting.
      * 
-     * @return true if auto-launch is enabled
+     * <p>This method returns whether auto-launch is currently enabled.
+     * Returns false if the toggle button is not available.
+     * 
+     * @return true if auto-launch is enabled, false otherwise
      */
     public boolean isAutoLaunchEnabled() {
         return settingsAutoLaunchToggle != null ? settingsAutoLaunchToggle.isSelected() : false;
     }
     
     /**
-     * Get the current auto-select game setting.
+     * Gets the current auto-select game setting.
      * 
-     * @return true if auto-select game is enabled
+     * <p>This method returns whether auto-select game is currently enabled.
+     * Returns false if the toggle button is not available.
+     * 
+     * @return true if auto-select game is enabled, false otherwise
      */
     public boolean isAutoSelectGameEnabled() {
         return settingsAutoSelectGameToggle != null ? settingsAutoSelectGameToggle.isSelected() : false;
     }
     
     /**
-     * Get the current JSON persistence setting.
+     * Gets the current JSON persistence setting.
      * 
-     * @return true if JSON persistence is enabled
+     * <p>This method returns whether JSON persistence is currently enabled.
+     * Returns true (default) if the toggle button is not available.
+     * 
+     * @return true if JSON persistence is enabled, false otherwise
      */
     public boolean isJsonPersistenceEnabled() {
         return settingsJsonPersistenceToggle != null ? settingsJsonPersistenceToggle.isSelected() : true;
     }
     
     /**
-     * Get the current theme setting.
+     * Gets the current theme setting.
+     * 
+     * <p>This method returns the currently selected theme name.
+     * Returns "System Default" if the theme selector is not available.
      * 
      * @return The selected theme name
      */
@@ -420,9 +467,12 @@ public class SettingsPageController implements Initializable {
     }
     
     /**
-     * Get the current font size setting.
+     * Gets the current font size setting.
      * 
-     * @return The selected font size
+     * <p>This method returns the currently selected font size in pixels.
+     * Returns 12 (default) if the font size slider is not available.
+     * 
+     * @return The selected font size in pixels
      */
     public int getFontSize() {
         return settingsFontSizeSlider != null ? (int) settingsFontSizeSlider.getValue() : 12;

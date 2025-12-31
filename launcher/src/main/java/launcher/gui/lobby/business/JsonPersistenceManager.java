@@ -11,7 +11,16 @@ import java.nio.file.Paths;
 /**
  * Manages JSON persistence to/from file system.
  * 
- * Handles saving and loading JSON content, toggle state, and selected game.
+ * <p>This class has a single responsibility: managing persistence of JSON content,
+ * persistence toggle state, and selected game name to/from the file system.
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Loading saved JSON content and persistence settings on startup</li>
+ *   <li>Saving JSON content when persistence is enabled</li>
+ *   <li>Managing persistence toggle state</li>
+ *   <li>Persisting selected game name</li>
+ * </ul>
  * 
  * @authors Clement Luo
  * @date December 27, 2025
@@ -20,19 +29,36 @@ import java.nio.file.Paths;
  */
 public class JsonPersistenceManager {
     
+    // ==================== CONSTANTS ====================
+    
+    /** File path for persisted JSON content. */
     private static final String JSON_PERSISTENCE_FILE = "saved/gdk-json-persistence.txt";
+    
+    /** File path for persistence toggle state. */
     private static final String PERSISTENCE_TOGGLE_FILE = "saved/gdk-persistence-toggle.txt";
+    
+    /** File path for selected game name. */
     private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
     
+    // ==================== DEPENDENCIES ====================
+    
+    /** The JSON input editor to save/load content from. */
     private final JsonEditor jsonInputEditor;
+    
+    /** The toggle button that controls persistence state. */
     private final JFXToggleButton jsonPersistenceToggle;
     
+    // ==================== STATE ====================
+    
+    /** Flag to prevent message spam during persistence settings loading. */
     private boolean isLoadingPersistenceSettings = false;
     
+    // ==================== CONSTRUCTOR ====================
+    
     /**
-     * Create a new JsonPersistenceManager.
+     * Creates a new JsonPersistenceManager.
      * 
-     * @param jsonInputEditor The JSON input editor to save/load
+     * @param jsonInputEditor The JSON input editor to save/load content from
      * @param jsonPersistenceToggle The toggle button for persistence state
      */
     public JsonPersistenceManager(JsonEditor jsonInputEditor, JFXToggleButton jsonPersistenceToggle) {
@@ -40,17 +66,17 @@ public class JsonPersistenceManager {
         this.jsonPersistenceToggle = jsonPersistenceToggle;
     }
     
-    /**
-     * Check if currently loading persistence settings (prevents message spam during load).
-     * 
-     * @return true if loading, false otherwise
-     */
-    public boolean isLoadingPersistenceSettings() {
-        return isLoadingPersistenceSettings;
-    }
+    // ==================== PUBLIC METHODS - LOADING ====================
     
     /**
-     * Load saved JSON content and persistence toggle state on startup.
+     * Loads saved JSON content and persistence toggle state on startup.
+     * 
+     * <p>This method:
+     * <ul>
+     *   <li>Loads the persistence toggle state from file</li>
+     *   <li>If persistence is enabled, loads the saved JSON content</li>
+     *   <li>Sets a flag to prevent persistence messages during loading</li>
+     * </ul>
      */
     public void loadPersistenceSettings() {
         try {
@@ -75,8 +101,101 @@ public class JsonPersistenceManager {
         }
     }
     
+    // ==================== PUBLIC METHODS - SAVING ====================
+    
     /**
-     * Load the persistence toggle state from file.
+     * Saves JSON content to file if persistence is enabled.
+     * 
+     * <p>This method only saves if the persistence toggle is selected.
+     * If persistence is disabled, this method returns without saving.
+     */
+    public void saveJsonContent() {
+        if (!jsonPersistenceToggle.isSelected()) {
+            return; // Don't save if persistence is disabled
+        }
+        
+        try {
+            ensureSavedDirectoryExists();
+            String jsonContent = jsonInputEditor.getText();
+            Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
+            Files.writeString(jsonFile, jsonContent);
+            Logging.info("📋 Saved JSON input content to file");
+        } catch (Exception e) {
+            Logging.error("❌ Error saving JSON content: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Saves persistence toggle state to file.
+     * 
+     * <p>The toggle state is saved as a boolean string representation.
+     */
+    public void savePersistenceToggleState() {
+        try {
+            ensureSavedDirectoryExists();
+            boolean isEnabled = jsonPersistenceToggle.isSelected();
+            Path toggleFile = Paths.get(PERSISTENCE_TOGGLE_FILE);
+            Files.writeString(toggleFile, String.valueOf(isEnabled));
+            Logging.info("📋 Saved persistence toggle state: " + (isEnabled ? "enabled" : "disabled"));
+        } catch (Exception e) {
+            Logging.error("❌ Error saving persistence toggle state: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Persists the selected game module's name to file.
+     * 
+     * <p>This method silently ignores null or "None" game names.
+     * Failures are silently ignored as this is not a critical operation.
+     * 
+     * @param gameName The name of the selected game module
+     */
+    public void persistSelectedGame(String gameName) {
+        try {
+            if (gameName == null || gameName.equals("None")) return;
+            ensureSavedDirectoryExists();
+            Files.writeString(Paths.get(SELECTED_GAME_FILE), gameName);
+        } catch (Exception ignored) {
+            // Silently fail - not critical
+        }
+    }
+    
+    // ==================== PUBLIC METHODS - UTILITY ====================
+    
+    /**
+     * Checks if currently loading persistence settings.
+     * 
+     * <p>This flag prevents message spam during the initial load operation.
+     * 
+     * @return true if loading, false otherwise
+     */
+    public boolean isLoadingPersistenceSettings() {
+        return isLoadingPersistenceSettings;
+    }
+    
+    /**
+     * Clears the JSON persistence file.
+     * 
+     * <p>This method deletes the persisted JSON content file if it exists.
+     */
+    public void clearJsonPersistenceFile() {
+        try {
+            Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
+            if (Files.exists(jsonFile)) {
+                Files.delete(jsonFile);
+                Logging.info("🗑️ Cleared JSON persistence file");
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error clearing JSON persistence file: " + e.getMessage(), e);
+        }
+    }
+    
+    // ==================== PRIVATE METHODS - LOADING ====================
+    
+    /**
+     * Loads the persistence toggle state from file.
+     * 
+     * <p>If the file doesn't exist or an error occurs, defaults to enabled (true).
      */
     private void loadPersistenceToggleState() {
         try {
@@ -97,7 +216,10 @@ public class JsonPersistenceManager {
     }
     
     /**
-     * Load saved JSON content from file.
+     * Loads saved JSON content from file.
+     * 
+     * <p>If the file doesn't exist, this method does nothing.
+     * Errors are logged but do not throw exceptions.
      */
     private void loadSavedJsonContent() {
         try {
@@ -111,72 +233,13 @@ public class JsonPersistenceManager {
         }
     }
     
-    /**
-     * Save JSON content to file if persistence is enabled.
-     */
-    public void saveJsonContent() {
-        if (!jsonPersistenceToggle.isSelected()) {
-            return; // Don't save if persistence is disabled
-        }
-        
-        try {
-            ensureSavedDirectoryExists();
-            String jsonContent = jsonInputEditor.getText();
-            Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
-            Files.writeString(jsonFile, jsonContent);
-            Logging.info("📋 Saved JSON input content to file");
-        } catch (Exception e) {
-            Logging.error("❌ Error saving JSON content: " + e.getMessage(), e);
-        }
-    }
+    // ==================== PRIVATE METHODS - UTILITY ====================
     
     /**
-     * Save persistence toggle state to file.
-     */
-    public void savePersistenceToggleState() {
-        try {
-            ensureSavedDirectoryExists();
-            boolean isEnabled = jsonPersistenceToggle.isSelected();
-            Path toggleFile = Paths.get(PERSISTENCE_TOGGLE_FILE);
-            Files.writeString(toggleFile, String.valueOf(isEnabled));
-            Logging.info("📋 Saved persistence toggle state: " + (isEnabled ? "enabled" : "disabled"));
-        } catch (Exception e) {
-            Logging.error("❌ Error saving persistence toggle state: " + e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * Clear the JSON persistence file.
-     */
-    public void clearJsonPersistenceFile() {
-        try {
-            Path jsonFile = Paths.get(JSON_PERSISTENCE_FILE);
-            if (Files.exists(jsonFile)) {
-                Files.delete(jsonFile);
-                Logging.info("🗑️ Cleared JSON persistence file");
-            }
-        } catch (Exception e) {
-            Logging.error("❌ Error clearing JSON persistence file: " + e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * Persist the selected game module's name.
+     * Ensures the saved directory exists, creating it if necessary.
      * 
-     * @param gameName The name of the selected game module
-     */
-    public void persistSelectedGame(String gameName) {
-        try {
-            if (gameName == null || gameName.equals("None")) return;
-            ensureSavedDirectoryExists();
-            Files.writeString(Paths.get(SELECTED_GAME_FILE), gameName);
-        } catch (Exception ignored) {
-            // Silently fail - not critical
-        }
-    }
-    
-    /**
-     * Ensure the saved directory exists.
+     * <p>This method creates the "saved" directory if it doesn't exist.
+     * Errors are logged but do not throw exceptions.
      */
     private void ensureSavedDirectoryExists() {
         try {

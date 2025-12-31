@@ -8,7 +8,15 @@ import java.util.Map;
 
 /**
  * Handles JSON formatting operations.
- * Business logic for formatting JSON data structures.
+ * 
+ * <p>This class has a single responsibility: converting Map objects to JSON strings
+ * with various formatting options (pretty-printed or compact).
+ * 
+ * <p>Key responsibilities:
+ * <ul>
+ *   <li>Formatting JSON responses with pretty printing for display</li>
+ *   <li>Formatting JSON maps to compact strings</li>
+ * </ul>
  * 
  * @authors Clement Luo
  * @date December 29, 2025
@@ -16,10 +24,19 @@ import java.util.Map;
  */
 public class JsonFormatter {
     
+    // ==================== CONSTANTS ====================
+    
+    /** Shared ObjectMapper instance for JSON operations. */
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
     
+    // ==================== PUBLIC METHODS ====================
+    
     /**
-     * Format a JSON response for display with pretty printing.
+     * Formats a JSON response for display with pretty printing.
+     * 
+     * <p>This method attempts to format with pretty printing first.
+     * If that fails, it falls back to compact formatting.
+     * If both fail, it returns an error message string.
      * 
      * @param response The response map to format
      * @return A formatted JSON string with proper indentation, or error message if formatting fails
@@ -40,7 +57,9 @@ public class JsonFormatter {
     }
     
     /**
-     * Format a JSON map to a simple string (no pretty printing).
+     * Formats a JSON map to a compact string (no pretty printing).
+     * 
+     * <p>This method produces a single-line JSON string without indentation.
      * 
      * @param data The data map to format
      * @return A JSON string representation

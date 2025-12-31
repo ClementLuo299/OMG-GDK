@@ -138,6 +138,12 @@ public class ServerSimulatorController {
         });
     }
 
+    /**
+     * Sets up save and load message handlers.
+     * 
+     * <p>This method configures the save and load buttons to allow users
+     * to persist and restore server simulator input content.
+     */
     private void setupSaveLoadHandlers() {
         if (saveMessagesButton != null) {
             saveMessagesButton.setOnAction(e -> handleSaveMessages());
@@ -146,7 +152,16 @@ public class ServerSimulatorController {
             loadMessagesButton.setOnAction(e -> handleLoadMessages());
         }
     }
-
+    
+    // ==================== FILE OPERATIONS ====================
+    
+    /**
+     * Handles saving the current input content to a file.
+     * 
+     * <p>This method opens a file chooser dialog allowing the user to save
+     * the current input field content to a text file. The file chooser
+     * defaults to the "saved" directory if it exists.
+     */
     private void handleSaveMessages() {
         try {
             // Create file chooser for save
@@ -194,6 +209,13 @@ public class ServerSimulatorController {
         }
     }
 
+    /**
+     * Handles loading input content from a file.
+     * 
+     * <p>This method opens a file chooser dialog allowing the user to load
+     * input content from a text file into the input field. The file chooser
+     * defaults to the "saved" directory if it exists.
+     */
     private void handleLoadMessages() {
         try {
             // Create file chooser for load
@@ -247,7 +269,11 @@ public class ServerSimulatorController {
     // ==================== INPUT PERSISTENCE METHODS ====================
     
     /**
-     * Save the current input content to the persistence file.
+     * Saves the current input content to the persistence file.
+     * 
+     * <p>This method automatically saves the input field content to a
+     * persistence file in the "saved" directory. This allows the input
+     * to be restored when the server simulator is reopened.
      */
     private void saveInputContent() {
         try {
@@ -269,7 +295,11 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Load the previously saved input content from the persistence file.
+     * Loads the previously saved input content from the persistence file.
+     * 
+     * <p>This method automatically loads the input field content from the
+     * persistence file when the server simulator is initialized. If no
+     * saved content exists, this method does nothing.
      */
     private void loadInputContent() {
         try {
@@ -287,7 +317,11 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Clear the saved input content from the persistence file.
+     * Clears the saved input content from the persistence file.
+     * 
+     * <p>This method deletes the persistence file if it exists. This is
+     * typically called when the window is closed or when the user explicitly
+     * clears the input.
      */
     private void clearSavedInputContent() {
         try {
@@ -301,6 +335,12 @@ public class ServerSimulatorController {
         }
     }
 
+    /**
+     * Sets up the clear messages button handler.
+     * 
+     * <p>This method configures the clear button to clear both the message
+     * display area and the input field when clicked.
+     */
     private void setupClearHandler() {
         if (clearMessagesButton != null) {
             clearMessagesButton.setOnAction(e -> {
@@ -315,10 +355,14 @@ public class ServerSimulatorController {
         }
     }
 
-    // ==================== SETUP METHODS ====================
+    // ==================== DEPENDENCY INJECTION ====================
     
     /**
-     * Set the stage reference for window management.
+     * Sets the stage reference for window management.
+     * 
+     * <p>This method is called by the parent component to provide the stage
+     * hosting the server simulator window. This allows the controller to
+     * manage window lifecycle operations.
      * 
      * @param serverSimulatorStage The stage hosting the server simulator window
      */
@@ -327,7 +371,11 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Set the GDK application reference for coordination.
+     * Sets the GDK application reference for coordination.
+     * 
+     * <p>This method is called by the parent component to provide a reference
+     * to the main GDK application. This allows the controller to coordinate
+     * with the main application if needed.
      * 
      * @param gdkApplication The main GDK application instance
      */
@@ -336,7 +384,11 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Set the message handler for sending messages to games.
+     * Sets the message handler for sending messages to games.
+     * 
+     * <p>This method is called by the parent component to provide a handler
+     * function that processes messages sent to games. The handler receives
+     * the message text and forwards it to the currently running game.
      * 
      * @param gameMessageHandler The handler for processing messages sent to games
      */
@@ -347,11 +399,15 @@ public class ServerSimulatorController {
 
     // ==================== MESSAGE HANDLING ====================
     
+    // ==================== MESSAGE HANDLING ====================
+    
     /**
-     * Handle the send message action initiated by the user.
+     * Handles the send message action initiated by the user.
      * 
-     * This method processes the message from the input field, sends it
-     * to the game via the message handler, and updates the display.
+     * <p>This method processes the message from the input field, sends it
+     * to the game via the message handler, updates the display with the
+     * sent message, clears the input field, and saves the input content
+     * for persistence.
      */
     @FXML
     private void handleSendMessageAction() {
@@ -371,7 +427,11 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Send a message to the game via the message handler.
+     * Sends a message to the game via the message handler.
+     * 
+     * <p>This method invokes the game message handler with the provided
+     * message text. The handler is responsible for forwarding the message
+     * to the currently running game module.
      * 
      * @param messageText The message text to send to the game
      */
@@ -381,7 +441,11 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Add a sent message to the display area with timestamp.
+     * Adds a sent message to the display area with timestamp.
+     * 
+     * <p>This method formats the message with a timestamp and appends it
+     * to the display area. The display automatically scrolls to show the
+     * latest message.
      * 
      * @param messageText The message text that was sent
      */
@@ -393,20 +457,22 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Clear the message input field after sending.
+     * Clears the message input field after sending.
      * 
-     * This method clears the input field to prepare for the next message.
+     * <p>This method clears the input field to prepare for the next message.
+     * It is called automatically after a message is successfully sent.
      */
     private void clearMessageInputField() {
         messageInputField.clear();
     }
     
     /**
-     * Add a received message to the display area with timestamp.
+     * Adds a received message to the display area with timestamp.
      * 
-     * This method adds a message to the display area with proper
+     * <p>This method adds a message to the display area with proper
      * timestamp formatting and ensures the display scrolls to show
-     * the latest message.
+     * the latest message. This method is thread-safe and can be called
+     * from any thread, as it uses Platform.runLater to update the UI.
      * 
      * @param messageText The message text to display
      */
@@ -424,11 +490,14 @@ public class ServerSimulatorController {
 
     // ==================== USER INTERFACE ACTIONS ====================
     
+    // ==================== USER INTERFACE ACTIONS ====================
+    
     /**
-     * Handle the clear messages action initiated by the user.
+     * Handles the clear messages action initiated by the user.
      * 
-     * This method clears only the message input field to prepare
-     * for new input, preserving the message history in the display.
+     * <p>This method clears the message input field and clears the saved
+     * input content from the persistence file. The message history in the
+     * display area is preserved.
      */
     @FXML
     private void handleClearMessagesAction() {
@@ -438,10 +507,11 @@ public class ServerSimulatorController {
     }
     
     /**
-     * Handle the close window action initiated by the user.
+     * Handles the close window action initiated by the user.
      * 
-     * This method closes the server simulator window and
-     * logs the action for debugging purposes.
+     * <p>This method closes the server simulator window and clears the
+     * saved input content from the persistence file. This ensures a clean
+     * state when the window is reopened.
      */
     @FXML
     private void handleCloseWindowAction() {
@@ -455,10 +525,11 @@ public class ServerSimulatorController {
     // ==================== UTILITY METHODS ====================
     
     /**
-     * Get the root VBox container for scene creation.
+     * Gets the root VBox container for scene creation.
      * 
-     * This method provides access to the root container for
-     * creating the server simulator scene.
+     * <p>This method provides access to the root container for
+     * creating the server simulator scene. This is typically used
+     * by the parent component to create the scene.
      * 
      * @return The root VBox container
      */
@@ -469,9 +540,9 @@ public class ServerSimulatorController {
     /**
      * Called when the server simulator window is about to close.
      * 
-     * This method performs cleanup operations when the server
-     * simulator window is closing, including notifying the
-     * main GDK application if necessary.
+     * <p>This method performs cleanup operations when the server
+     * simulator window is closing, including clearing saved input
+     * content and notifying the main GDK application if necessary.
      */
     public void onClose() {
         Logging.info("🔒 Server Simulator cleanup");
