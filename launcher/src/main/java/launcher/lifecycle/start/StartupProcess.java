@@ -4,7 +4,6 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.lifecycle.start.launch_modes.AutoLaunch;
 import launcher.lifecycle.start.launch_modes.StandardLaunch;
-import launcher.lifecycle.start.resources.ResourceInitializer;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.utils.AutoLaunchUtil;
 
@@ -33,9 +32,6 @@ public final class StartupProcess {
     public static void start(Stage primaryApplicationStage) {
 
         Logging.info("Beginning GDK application startup process");
-        
-        // Initialize application resources before UI creation
-        ResourceInitializer.initialize();
         
         // Show startup window
         StartupWindowManager windowManager = StartupWindowManager.createAndShow();

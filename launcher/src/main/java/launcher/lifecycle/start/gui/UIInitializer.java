@@ -25,14 +25,18 @@ public final class UIInitializer {
 
     /**
      * Initializes the main user interface components for the GDK application.
-     * Orchestrates the complete UI setup process including loading the FXML scene,
-     * creating the ViewModel, configuring the primary stage, and wiring up the controller.
+     * Orchestrates the complete UI setup process including resource initialization,
+     * loading the FXML scene, creating the ViewModel, configuring the primary stage,
+     * and wiring up the controller.
      * 
      * @param primaryApplicationStage The primary JavaFX stage for the application
      * @param windowManager The startup window manager for progress updates
      * @return The initialized GDKGameLobbyController
      */
     public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindowManager windowManager) {
+        // Initialize application resources before UI creation
+        ResourceInitializer.initialize();
+        
         windowManager.updateProgress(1, "Loading user interface");
         
         // Load the main scene from FXML

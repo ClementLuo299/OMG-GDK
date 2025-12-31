@@ -1,4 +1,4 @@
-package launcher.lifecycle.start.resources;
+package launcher.lifecycle.start.gui;
 
 import launcher.utils.FontLoader;
 
@@ -10,17 +10,20 @@ import launcher.utils.FontLoader;
  * 
  * @author Clement Luo
  * @date December 24, 2025
+ * @edited December 30, 2025
  * @since Beta 1.0
  */
-public final class ResourceInitializer {
+final class ResourceInitializer {
     
-    private ResourceInitializer() {}
+    private ResourceInitializer() {
+        throw new AssertionError("Utility class should not be instantiated");
+    }
     
     /**
      * Initializes all application-wide resources.
      * This should be called early in the application lifecycle, before any UI is created.
      */
-    public static void initialize() {
+    static void initialize() {
         FontLoader.loadFonts();
     }
 }
