@@ -14,7 +14,7 @@ import java.text.AttributedString;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class Typography {
+class Typography {
     
     /** Path to custom font file in resources */
     private static final String CUSTOM_FONT_PATH = "/fonts/Inter_18pt-Regular.ttf";

@@ -13,7 +13,7 @@ import gdk.internal.Logging;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public final class StageInitializer {
+final class StageInitializer {
     
     private StageInitializer() {
         throw new AssertionError("Utility class should not be instantiated");

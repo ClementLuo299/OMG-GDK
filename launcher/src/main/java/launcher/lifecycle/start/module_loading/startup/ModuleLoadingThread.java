@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import launcher.gui.lobby.ui_logic.GDKGameLobbyController;
 import launcher.lifecycle.start.startup_window.StartupWindowManager;
 import launcher.utils.StartupDelayUtil;
-import launcher.utils.StartupTransitionUtil;
+import launcher.lifecycle.start.StartupTransitionUtil;
 
 /**
  * Creates and manages the background thread that loads game modules during startup.

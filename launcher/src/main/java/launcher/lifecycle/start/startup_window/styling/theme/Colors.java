@@ -11,7 +11,7 @@ import java.awt.Color;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class Colors {
+class Colors {
     
     /** Primary text color (softer dark gray) */
     public static final Color PRIMARY_TEXT = new Color(30, 30, 35);

@@ -13,7 +13,7 @@ import javafx.application.Platform;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public final class PerformanceOptimizer {
+final class PerformanceOptimizer {
     
     private PerformanceOptimizer() {
         throw new AssertionError("Utility class should not be instantiated");

@@ -14,7 +14,7 @@ import java.io.File;
  * @edited December 27, 2025
  * @since Beta 1.0
  */
-public final class ModuleDirectoryValidator {
+final class ModuleDirectoryValidator {
     
     private ModuleDirectoryValidator() {}
     

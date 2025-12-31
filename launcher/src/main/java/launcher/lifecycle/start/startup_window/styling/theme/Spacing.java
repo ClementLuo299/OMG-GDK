@@ -9,7 +9,7 @@ package launcher.lifecycle.start.startup_window.styling.theme;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public class Spacing {
+class Spacing {
     
     /** Extra small vertical spacing (8px) */
     public static final int SPACING_XS = 8;

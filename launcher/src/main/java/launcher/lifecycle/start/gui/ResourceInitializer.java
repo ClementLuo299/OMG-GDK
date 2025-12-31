@@ -13,7 +13,7 @@ import launcher.utils.FontLoader;
  * @edited December 30, 2025
  * @since Beta 1.0
  */
-final class ResourceInitializer {
+public final class ResourceInitializer {
     
     private ResourceInitializer() {
         throw new AssertionError("Utility class should not be instantiated");

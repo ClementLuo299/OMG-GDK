@@ -1,4 +1,4 @@
-package launcher.utils;
+package launcher.lifecycle.start;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -9,12 +9,14 @@ import launcher.lifecycle.start.startup_window.StartupWindowManager;
  * 
  * @author Clement Luo
  * @date December 21, 2025
- * @edited December 21, 2025
+ * @edited December 30, 2025
  * @since Beta 1.0
  */
 public final class StartupTransitionUtil {
 
-    private StartupTransitionUtil() {}
+    private StartupTransitionUtil() {
+        throw new AssertionError("Utility class should not be instantiated");
+    }
 
     /**
      * Shows the main application stage and hides the startup window.

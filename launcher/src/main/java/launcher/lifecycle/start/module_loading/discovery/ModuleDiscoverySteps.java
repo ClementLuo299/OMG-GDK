@@ -16,7 +16,7 @@ import java.util.List;
  * @edited December 27, 2025
  * @since Beta 1.0
  */
-public final class ModuleDiscoverySteps {
+final class ModuleDiscoverySteps {
     
     private ModuleDiscoverySteps() {}
     
