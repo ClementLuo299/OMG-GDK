@@ -22,7 +22,7 @@ public final class FontLoader {
      * This should be called early in the application lifecycle, before any UI is created.
      */
     public static void initialize() {
-        launcher.utils.FontLoader.loadFonts();
+        launcher.core.FontLoader.loadFonts();
     }
 }
 

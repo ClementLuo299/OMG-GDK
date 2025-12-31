@@ -1,7 +1,7 @@
 package launcher.features.module_handling.discovery;
 
 import gdk.internal.Logging;
-import launcher.utils.path.PathUtil;
+import launcher.features.file_paths.PathUtil;
 
 import java.io.File;
 
@@ -59,16 +59,16 @@ final class ModuleDirectoryValidator {
      * @return Validation result containing the directory if valid, or error information
      */
     public static ValidationResult validate() {
-        // Get the configured modules directory path
+        // Get the configured modules directory file_paths
         String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-        Logging.info("Modules directory path: " + modulesDirectoryPath);
+        Logging.info("Modules directory file_paths: " + modulesDirectoryPath);
         File modulesDirectory = new File(modulesDirectoryPath);
         
         // First check: verify the directory actually exists on the filesystem
         if (!modulesDirectory.exists()) {
             Logging.warning("Modules directory does not exist: " + modulesDirectoryPath);
             // Run diagnostics to help identify where the directory should be
-            launcher.utils.module.ModuleDiscovery.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            ModuleDiscovery.diagnoseModuleDetectionIssues(modulesDirectoryPath);
             return ValidationResult.invalid("Modules directory not found: " + modulesDirectoryPath);
         }
         
@@ -76,10 +76,10 @@ final class ModuleDirectoryValidator {
         
         // Second check: verify we can actually read and list contents of the directory
         Logging.info("Testing modules directory access...");
-        if (!launcher.utils.module.ModuleDiscovery.testModulesDirectoryAccess(modulesDirectoryPath)) {
+        if (!ModuleDiscovery.testModulesDirectoryAccess(modulesDirectoryPath)) {
             // Directory exists but we can't access it (permissions issue)
             Logging.error("Modules directory access test failed - skipping module discovery");
-            launcher.utils.module.ModuleDiscovery.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            ModuleDiscovery.diagnoseModuleDetectionIssues(modulesDirectoryPath);
             return ValidationResult.invalid("Modules directory access failed");
         }
         

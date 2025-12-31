@@ -2,11 +2,11 @@ package launcher.features.module_handling;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController;
+import launcher.ui.lobby.GDKGameLobbyController;
 import launcher.features.module_handling.startup.ModuleLoadingThread;
 import launcher.ui.startup_window.StartupWindowManager;
 import launcher.core.lifecycle.stop.Shutdown;
-import launcher.utils.StartupDelayUtil;
+import launcher.core.StartupDelayUtil;
 
 import javax.swing.SwingUtilities;
 

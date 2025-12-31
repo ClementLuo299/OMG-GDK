@@ -129,7 +129,7 @@ public class Typography {
                     ? CUSTOM_FONT_PATH.replace("-Regular.ttf", "-Bold.ttf")
                     : CUSTOM_FONT_PATH;
             }
-            // Ensure path uses /fonts/ directory
+            // Ensure file_paths uses /fonts/ directory
             fontPath = fontPath.replace("/startup-window/", "/fonts/");
             
             java.io.InputStream fontStream = Typography.class.getResourceAsStream(fontPath);

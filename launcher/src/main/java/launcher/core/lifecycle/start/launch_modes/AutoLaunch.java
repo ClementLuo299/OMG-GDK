@@ -3,13 +3,13 @@ package launcher.core.lifecycle.start.launch_modes;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController;
-import launcher.ui.lobby.gui.lobby.business.GDKViewModel;
-import launcher.utils.AutoLaunchUtil;
-import launcher.utils.module.ModuleDiscovery;
+import launcher.ui.lobby.GDKGameLobbyController;
+import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.core.AutoLaunchUtil;
+import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 /**
- * Handles the auto-launch path for the GDK application.
+ * Handles the auto-launch file_paths for the GDK application.
  * 
  * Auto-launch attempts to restore and launch a previously selected game
  * using saved configuration data. If successful, the application skips

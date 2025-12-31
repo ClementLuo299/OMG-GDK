@@ -482,7 +482,7 @@ public class Main implements GameModule {
             endMessage.put("timestamp", java.time.Instant.now().toString());
             MessagingBridge.publish(endMessage);
             stopGame();
-            // Use the messaging bridge to return to lobby instead of firing close event
+            // Use the game_messaging bridge to return to lobby instead of firing close event
             MessagingBridge.returnToLobby();
         });
         

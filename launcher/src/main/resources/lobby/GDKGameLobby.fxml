@@ -27,7 +27,7 @@
 <!-- Main container for the entire lobby interface -->
 <VBox fx:id="mainContainer" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController"
+      fx:controller="launcher.ui.lobby.GDKGameLobbyController"
       styleClass="game-picker-container" spacing="0" alignment="TOP_LEFT">
     
     <padding>

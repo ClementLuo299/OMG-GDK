@@ -2,14 +2,14 @@ package launcher.core.lifecycle.start.launch_modes;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController;
+import launcher.ui.lobby.GDKGameLobbyController;
 import launcher.ui.lobby.LobbyUIInitializer;
 import launcher.features.module_handling.LoadModules;
 import launcher.ui.startup_window.StartupWindowManager;
-import launcher.utils.StartupDelayUtil;
+import launcher.core.StartupDelayUtil;
 
 /**
- * Handles the standard launch path for the GDK application.
+ * Handles the standard launch file_paths for the GDK application.
  * 
  * Standard launch initializes the full GDK interface with game selection:
  * 1. Creates and displays the startup progress window

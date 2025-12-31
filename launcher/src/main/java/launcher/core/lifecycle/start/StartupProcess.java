@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import launcher.core.lifecycle.start.launch_modes.AutoLaunch;
 import launcher.core.lifecycle.start.launch_modes.StandardLaunch;
 import launcher.ui.startup_window.StartupWindowManager;
-import launcher.utils.AutoLaunchUtil;
+import launcher.core.AutoLaunchUtil;
 
 /**
  * Orchestrates the startup process of the GDK application.

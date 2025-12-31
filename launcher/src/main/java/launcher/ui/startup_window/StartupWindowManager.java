@@ -7,7 +7,7 @@ import launcher.ui.startup_window.progress.DurationEstimator;
 import launcher.ui.startup_window.window_control.StartupWindowUIController;
 import launcher.ui.startup_window.window_control.WindowController;
 import launcher.ui.startup_window.progress.ProgressUpdateController;
-import launcher.utils.module.ModuleDiscovery;
+import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 import javax.swing.SwingUtilities;
 

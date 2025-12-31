@@ -9,7 +9,7 @@ import java.util.Set;
  * Metadata for the Chatroom module.
  * <p>
  * The Chatroom application is a simple multiplayer communication environment
- * built to test networking, player connectivity, and real-time messaging
+ * built to test networking, player connectivity, and real-time game_messaging
  * within the GDK framework.
  * </p>
  *

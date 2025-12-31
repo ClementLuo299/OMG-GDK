@@ -3,8 +3,7 @@ package launcher.features.module_handling.loading;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
-import launcher.utils.module.ModuleCompiler;
-import launcher.utils.StartupDelayUtil;
+import launcher.core.StartupDelayUtil;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -3,8 +3,7 @@ package launcher.ui.lobby;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import launcher.core.lifecycle.start.FontLoader;
-import launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController;
-import launcher.ui.lobby.gui.lobby.business.GDKViewModel;
+import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.core.lifecycle.start.MainStageInitializer;
 import launcher.ui.startup_window.StartupWindowManager;
 

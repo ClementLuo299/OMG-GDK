@@ -25,7 +25,7 @@ public class BuildLayout {
     public static void build(VBox container, String title, CodeArea codeArea) {
         // Container styling
         container.setSpacing(0);
-        container.getStyleClass().add("single-json-editor");
+        container.getStyleClass().add("single-json_processing-editor");
         
         // Title label
         Label titleLabel = new Label(title);

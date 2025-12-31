@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * 
  * This class manages the server simulator interface that allows users to
  * send and receive JSON messages to simulate server communication with
- * running games. It provides a simple messaging interface for testing
+ * running games. It provides a simple game_messaging interface for testing
  * game-server communication protocols.
  * 
  * Key responsibilities:
@@ -88,7 +88,7 @@ public class ServerSimulatorController {
     // ==================== CONSTANTS ====================
     
     /**
-     * File path for persisting input content
+     * File file_paths for persisting input content
      */
     private static final String INPUT_PERSISTENCE_FILE = "saved/server-simulator-input.txt";
 

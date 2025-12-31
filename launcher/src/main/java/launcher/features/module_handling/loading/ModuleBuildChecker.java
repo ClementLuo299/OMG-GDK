@@ -2,8 +2,7 @@ package launcher.features.module_handling.loading;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
-import launcher.utils.module.ModuleCompiler;
-import launcher.utils.StartupDelayUtil;
+import launcher.core.StartupDelayUtil;
 
 /**
  * Checks if modules need to be built before loading.

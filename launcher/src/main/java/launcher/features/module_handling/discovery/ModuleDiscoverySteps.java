@@ -1,7 +1,7 @@
 package launcher.features.module_handling.discovery;
 
 import gdk.internal.Logging;
-import launcher.utils.path.PathUtil;
+import launcher.features.file_paths.PathUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public final class ModuleDiscoverySteps {
             return DiscoveryResult.failure(validationResult.getErrorMessage());
         }
         
-        // Extract the validated directory and path for discovery
+        // Extract the validated directory and file_paths for discovery
         File modulesDirectory = validationResult.getModulesDirectory();
         String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
         

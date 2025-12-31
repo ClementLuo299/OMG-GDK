@@ -1,7 +1,6 @@
 package launcher.features.module_handling.discovery;
 
 import gdk.internal.Logging;
-import launcher.utils.module.ModuleDiscovery;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ final class ModuleDiscoveryProcess {
      * Performs module discovery on the validated modules directory.
      * 
      * @param modulesDirectory The validated modules directory
-     * @param modulesDirectoryPath The path to the modules directory
+     * @param modulesDirectoryPath The file_paths to the modules directory
      * @return List of valid module directories
      */
     public static List<File> findModules(File modulesDirectory, String modulesDirectoryPath) {
@@ -51,7 +50,7 @@ final class ModuleDiscoveryProcess {
      * Runs diagnostics when no modules are found.
      * 
      * @param modulesDirectory The modules directory
-     * @param modulesDirectoryPath The path to the modules directory
+     * @param modulesDirectoryPath The file_paths to the modules directory
      */
     public static void runEmptyDiscoveryDiagnostics(File modulesDirectory, String modulesDirectoryPath) {
         // Run comprehensive diagnostics to help identify why no modules were found

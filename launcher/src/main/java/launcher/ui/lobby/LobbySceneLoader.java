@@ -2,8 +2,8 @@ package launcher.ui.lobby;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import launcher.core.FontLoader;
 import launcher.core.GDKApplication;
-import launcher.ui.lobby.gui.lobby.ui_logic.GDKGameLobbyController;
 
 import java.net.URL;
 
@@ -71,9 +71,9 @@ public final class LobbySceneLoader {
             }
             
             // Get the font family to use
-            String fontFamily = launcher.utils.FontLoader.getApplicationFontFamily();
+            String fontFamily = FontLoader.getApplicationFontFamily();
             gdk.internal.Logging.info("🎨 Font family to apply: " + fontFamily);
-            gdk.internal.Logging.info("🎨 Fonts loaded: " + launcher.utils.FontLoader.areFontsLoaded());
+            gdk.internal.Logging.info("🎨 Fonts loaded: " + FontLoader.areFontsLoaded());
             
             // Build the font style string with fallbacks and !important
             String fontStyle = String.format("-fx-font-family: '%s', 'Segoe UI', 'SF Pro Display', 'SF Pro Text', 'Roboto', 'Noto Sans', Arial, sans-serif !important;", fontFamily);

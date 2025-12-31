@@ -2,8 +2,7 @@ package launcher.features.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.ui.lobby.gui.lobby.business.GDKViewModel;
-import launcher.utils.game.GameLaunchUtil;
+import launcher.features.lobby_features.business.GDKViewModel;
 
 import java.util.Map;
 
