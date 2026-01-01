@@ -21,9 +21,9 @@ import launcher.core.StartupDelayUtil;
  * @edited December 22, 2025
  * @since Beta 1.0
  */
-public final class StandardLaunch {
+public final class StandardLaunchProcess {
 
-    private StandardLaunch() {}
+    private StandardLaunchProcess() {}
 
     /**
      * Starts the standard GDK interface with game selection.

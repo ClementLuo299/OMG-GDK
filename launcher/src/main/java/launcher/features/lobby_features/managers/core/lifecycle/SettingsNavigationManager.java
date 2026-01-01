@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import launcher.ui.lobby.GDKGameLobbyController;
 import launcher.ui.settings_page.SettingsPageController;
-import launcher.core.gui.DialogUtil;
+import launcher.core.core_ui.DialogUtil;
 
 import java.net.URL;
 import java.util.function.Supplier;

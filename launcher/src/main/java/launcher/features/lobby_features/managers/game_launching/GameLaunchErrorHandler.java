@@ -2,7 +2,7 @@ package launcher.features.lobby_features.managers.game_launching;
 
 import gdk.internal.Logging;
 import launcher.ui.lobby.managers.messaging.MessageManager;
-import launcher.core.gui.DialogUtil;
+import launcher.core.core_ui.DialogUtil;
 
 /**
  * Handles error reporting and user feedback for game launch operations.

@@ -5,7 +5,6 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui.lobby.GDKGameLobbyController;
 import launcher.features.lobby_features.business.GDKViewModel;
-import launcher.core.AutoLaunchUtil;
 import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 /**
@@ -20,9 +19,9 @@ import launcher.features.module_handling.discovery.ModuleDiscovery;
  * @edited December 26, 2025
  * @since Beta 1.0
  */
-public final class AutoLaunch {
+public final class AutoLaunchProcess {
 
-    private AutoLaunch() {
+    private AutoLaunchProcess() {
         // Utility class - prevent instantiation
     }
 

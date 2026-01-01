@@ -8,7 +8,7 @@
     - View game messages and output
     - Access settings
     
-    Controller: launcher.lobby.gui.ui_logic.lobby.GDKGameLobbyController
+    Controller: launcher.lobby.core_ui.ui_logic.lobby.GDKGameLobbyController
     Layout: Vertical box (VBox) with header, content area, and status bar
 -->
 

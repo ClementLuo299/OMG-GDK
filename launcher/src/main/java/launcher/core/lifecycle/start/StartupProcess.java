@@ -2,10 +2,10 @@ package launcher.core.lifecycle.start;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.core.lifecycle.start.launch_modes.AutoLaunch;
-import launcher.core.lifecycle.start.launch_modes.StandardLaunch;
+import launcher.core.lifecycle.start.launch_modes.AutoLaunchProcess;
+import launcher.core.lifecycle.start.launch_modes.StandardLaunchProcess;
 import launcher.ui.startup_window.StartupWindowManager;
-import launcher.core.AutoLaunchUtil;
+import launcher.core.lifecycle.start.launch_modes.AutoLaunchUtil;
 
 /**
  * Orchestrates the startup process of the GDK application.
@@ -41,14 +41,14 @@ public final class StartupProcess {
 
             // Attempt auto-launch
             if (AutoLaunchUtil.isAutoLaunchEnabled() && 
-                AutoLaunch.launch(primaryApplicationStage, () -> StandardLaunch.launch(primaryApplicationStage, windowManager))) {
+                AutoLaunchProcess.launch(primaryApplicationStage, () -> StandardLaunchProcess.launch(primaryApplicationStage, windowManager))) {
                 Logging.info("Auto-launch successful");
                 return;
             }
             
             // Fall back to standard launch
             Logging.info("Proceeding with standard launch");
-            StandardLaunch.launch(primaryApplicationStage, windowManager);
+            StandardLaunchProcess.launch(primaryApplicationStage, windowManager);
 
         } catch (Exception startupError) {
             Logging.error("GDK application startup failed: " + startupError.getMessage(), startupError);
