@@ -3,18 +3,13 @@ package launcher.core.lifecycle.start.launch;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.LobbyUIInitializer;
+import launcher.ui_areas.lobby.lifecycle.LobbyUIInitializer;
 import launcher.features.module_handling.LoadModules;
 import launcher.ui_areas.startup_window.StartupWindowManager;
 import launcher.features.development_features.StartupDelayUtil;
 
 /**
  * Handles the standard launch flow for the GDK application.
- * 
- * Standard launch initializes the full GDK interface with game selection:
- * 1. Creates and displays the startup progress window
- * 2. Initializes the user interface
- * 3. Loads game modules in the background
  * 
  * @author Clement Luo
  * @date December 22, 2025
@@ -38,17 +33,17 @@ public final class StandardLaunchProcess {
      */
     public static void launch(Stage primaryApplicationStage, StartupWindowManager windowManager) {
         try {
-            // Startup window is already shown by StartupProcess
-            // Step 1: Update progress
+
+            // Step 1: Update progress to step 0, the first step
             windowManager.updateProgress(0, "Starting GDK application");
             StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application' message");
 
-            // Step 2: Initialize the user interface
+            // Step 2: Initialize the user interface by initializing the controller
             GDKGameLobbyController lobbyController = 
                 LobbyUIInitializer.initialize(primaryApplicationStage, windowManager);
             StartupDelayUtil.addDevelopmentDelay("After 'Loading user interface' message");
 
-            // Step 3: Start ui_loading modules in the background
+            // Step 3: Start loading modules in a background thread
             LoadModules.load(primaryApplicationStage, lobbyController, windowManager);
 
             Logging.info("GDK application startup completed successfully");

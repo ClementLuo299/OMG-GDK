@@ -1,10 +1,13 @@
-package launcher.ui_areas.lobby;
+package launcher.ui_areas.lobby.lifecycle;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import launcher.core.ui.ui_loading.fonts.FontLoaderWrapper;
 import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.core.ui.ui_loading.stage.MainStageInitializer;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
+import launcher.ui_areas.lobby.LobbyOptimizer;
+import launcher.ui_areas.lobby.LobbySceneLoader;
 import launcher.ui_areas.startup_window.StartupWindowManager;
 
 /**
