@@ -18,10 +18,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import launcher.features.lobby_features.business.GDKViewModel;
-import launcher.features.lobby_features.managers.messaging.MessageManager;
-import launcher.features.lobby_features.managers.ui.LoadingAnimationManager;
+import launcher.ui.lobby.managers.messaging.MessageManager;
+import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
 import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
-import launcher.features.lobby_features.managers.game_launching.GameLaunchingManager;
+import launcher.ui.lobby.managers.game_launching.GameLaunchingManager;
 import launcher.features.lobby_features.managers.core.LobbyInitializationManager;
 import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.features.lobby_features.managers.core.lifecycle.ControllerModeManager;

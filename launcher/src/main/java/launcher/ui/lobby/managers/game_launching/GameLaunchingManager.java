@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.game_launching;
+package launcher.ui.lobby.managers.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -42,7 +42,7 @@ public class GameLaunchingManager {
     private final JsonActionButtonsController jsonActionButtonsController;
     
     /** Error handler for reporting launch failures to UI. */
-    private final GameLaunchErrorHandler errorHandler;
+    private final launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler errorHandler;
     
     // ==================== CONSTRUCTOR ====================
     
@@ -55,7 +55,7 @@ public class GameLaunchingManager {
      */
     public GameLaunchingManager(GameLaunchService launchService,
                              JsonActionButtonsController jsonActionButtonsController,
-                             GameLaunchErrorHandler errorHandler) {
+                             launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler errorHandler) {
         this.launchService = launchService;
         this.jsonActionButtonsController = jsonActionButtonsController;
         this.errorHandler = errorHandler;

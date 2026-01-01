@@ -1,5 +1,6 @@
-package launcher.core.gui;
+package launcher.ui.lobby.json_editor.building;
 
+import launcher.core.gui.DialogUtil;
 
 /**
  * Utility class for formatting JSON content.

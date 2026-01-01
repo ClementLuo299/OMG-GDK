@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.json;
+package launcher.ui.lobby.managers.json;
 
 import gdk.api.GameModule;
 import launcher.features.json_processing.JsonProcessingService;

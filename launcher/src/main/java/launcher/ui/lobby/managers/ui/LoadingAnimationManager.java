@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.ui;
+package launcher.ui.lobby.managers.ui;
 
 import gdk.internal.Logging;
 import javafx.animation.KeyFrame;

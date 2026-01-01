@@ -1,10 +1,10 @@
-package launcher.features.lobby_features.managers.game_launching;
+package launcher.ui.lobby.managers.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.lobby_features.managers.messaging.MessageManager;
-import launcher.features.lobby_features.managers.ui.LaunchButtonManager;
-import launcher.features.lobby_features.managers.ui.StatusLabelManager;
+import launcher.ui.lobby.managers.messaging.MessageManager;
+import launcher.ui.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui.lobby.managers.ui.StatusLabelManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -114,9 +114,9 @@ public class ModuleRefreshUIUpdater {
      * @return The new module count after update
      */
     public int updateUIForFastRefresh(List<GameModule> validModules,
-                                      ModuleDiscoveryHandler.ModuleDiscoveryResult discoveryResult,
+                                      launcher.features.lobby_features.managers.game_launching.ModuleDiscoveryHandler.ModuleDiscoveryResult discoveryResult,
                                       MessageManager messageManager,
-                                      ModuleChangesReporter moduleChangeReporter,
+                                      launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter moduleChangeReporter,
                                       Set<String> previousModuleNames) {
         Runnable uiUpdate = () -> {
             try {
@@ -141,10 +141,10 @@ public class ModuleRefreshUIUpdater {
                 logUIState();
                 
                 // Display messages and report changes
-                discoveryResult.uiMessages.forEach(messageManager::addMessage);
+                discoveryResult.getUiMessages().forEach(messageManager::addMessage);
                 
                 if (moduleChangeReporter != null) {
-                    moduleChangeReporter.reportModuleChanges(previousModuleNames, discoveryResult.moduleNames);
+                    moduleChangeReporter.reportModuleChanges(previousModuleNames, discoveryResult.getModuleNames());
                 }
                 
                 Logging.info("UI update completed successfully");

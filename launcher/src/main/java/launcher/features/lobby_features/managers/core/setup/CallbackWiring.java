@@ -3,7 +3,7 @@ package launcher.features.lobby_features.managers.core.setup;
 import gdk.api.GameModule;
 import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
-import launcher.features.lobby_features.managers.game_launching.GameLaunchingManager;
+import launcher.ui.lobby.managers.game_launching.GameLaunchingManager;
 import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
 import launcher.ui.lobby.subcontrollers.GameSelectionController;
 import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;

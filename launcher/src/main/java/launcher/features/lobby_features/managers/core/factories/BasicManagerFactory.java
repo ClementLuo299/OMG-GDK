@@ -14,11 +14,11 @@ import launcher.features.lobby_features.managers.core.LobbyInitializationManager
 import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
 import launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter;
 import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
-import launcher.features.lobby_features.managers.json.JsonEditorOperations;
-import launcher.features.lobby_features.managers.messaging.MessageManager;
-import launcher.features.lobby_features.managers.ui.LaunchButtonManager;
-import launcher.features.lobby_features.managers.ui.LoadingAnimationManager;
-import launcher.features.lobby_features.managers.ui.StatusLabelManager;
+import launcher.ui.lobby.managers.json.JsonEditorOperations;
+import launcher.ui.lobby.managers.messaging.MessageManager;
+import launcher.ui.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
+import launcher.ui.lobby.managers.ui.StatusLabelManager;
 
 /**
  * Factory for creating basic managers that don't depend on subcontrollers.

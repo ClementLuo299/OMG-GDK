@@ -1,8 +1,8 @@
 package launcher.ui.lobby.subcontrollers;
 
 import gdk.api.GameModule;
-import launcher.features.lobby_features.managers.messaging.MessageManager;
-import launcher.features.lobby_features.managers.ui.LaunchButtonManager;
+import launcher.ui.lobby.managers.messaging.MessageManager;
+import launcher.ui.lobby.managers.ui.LaunchButtonManager;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;

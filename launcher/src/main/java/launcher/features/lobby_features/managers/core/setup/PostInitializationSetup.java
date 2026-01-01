@@ -4,7 +4,7 @@ import gdk.internal.Logging;
 import launcher.ui.lobby.GDKGameLobbyController;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
 import launcher.features.lobby_features.managers.messaging.MessageBridgeManager;
-import launcher.features.lobby_features.managers.ui.StatusLabelManager;
+import launcher.ui.lobby.managers.ui.StatusLabelManager;
 import launcher.ui.lobby.subcontrollers.GameSelectionController;
 import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
 import launcher.ui.lobby.subcontrollers.TopBarController;

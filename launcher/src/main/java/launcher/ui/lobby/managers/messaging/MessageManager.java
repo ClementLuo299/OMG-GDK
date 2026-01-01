@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.messaging;
+package launcher.ui.lobby.managers.messaging;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;

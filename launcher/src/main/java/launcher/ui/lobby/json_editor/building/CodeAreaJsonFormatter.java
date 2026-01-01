@@ -1,7 +1,6 @@
 package launcher.ui.lobby.json_editor.building;
 
 import org.fxmisc.richtext.CodeArea;
-import launcher.core.gui.JsonFormatter;
 
 /**
  * Handles JSON formatting for CodeArea components.

@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.core.setup;
+package launcher.ui.lobby.managers.setup;
 
 import gdk.internal.Logging;
 import javafx.scene.layout.VBox;

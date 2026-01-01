@@ -2,9 +2,9 @@ package launcher.ui.lobby.subcontrollers;
 
 import gdk.api.GameModule;
 import launcher.ui.lobby.json_editor.JsonEditor;
-import launcher.features.lobby_features.managers.json.JsonEditorOperations;
+import launcher.ui.lobby.managers.json.JsonEditorOperations;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
-import launcher.features.lobby_features.managers.messaging.MessageManager;
+import launcher.ui.lobby.managers.messaging.MessageManager;
 import javafx.scene.control.Button;
 import com.jfoenix.controls.JFXToggleButton;
 

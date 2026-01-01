@@ -1,7 +1,7 @@
 package launcher.features.lobby_features.managers.game_launching;
 
 import gdk.internal.Logging;
-import launcher.features.lobby_features.managers.messaging.MessageManager;
+import launcher.ui.lobby.managers.messaging.MessageManager;
 import launcher.core.gui.DialogUtil;
 
 /**

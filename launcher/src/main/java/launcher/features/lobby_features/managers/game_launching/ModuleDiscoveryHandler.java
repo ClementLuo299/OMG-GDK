@@ -3,8 +3,8 @@ package launcher.features.lobby_features.managers.game_launching;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.ModuleDiscoveryService;
-import launcher.features.lobby_features.managers.messaging.MessageManager;
-import launcher.features.lobby_features.managers.ui.StatusLabelManager;
+import launcher.ui.lobby.managers.messaging.MessageManager;
+import launcher.ui.lobby.managers.ui.StatusLabelManager;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
@@ -187,6 +187,24 @@ public class ModuleDiscoveryHandler {
         public ModuleDiscoveryResult(Set<String> moduleNames, List<String> uiMessages) {
             this.moduleNames = moduleNames;
             this.uiMessages = uiMessages;
+        }
+        
+        /**
+         * Gets the set of discovered module names.
+         * 
+         * @return Set of module names
+         */
+        public Set<String> getModuleNames() {
+            return moduleNames;
+        }
+        
+        /**
+         * Gets the list of UI messages to display.
+         * 
+         * @return List of UI messages
+         */
+        public List<String> getUiMessages() {
+            return uiMessages;
         }
     }
 }

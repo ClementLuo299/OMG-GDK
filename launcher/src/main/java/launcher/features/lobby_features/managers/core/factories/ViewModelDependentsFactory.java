@@ -9,11 +9,11 @@ import launcher.features.json_processing.JsonProcessingService;
 import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.features.lobby_features.managers.core.LobbyInitializationManager;
 import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
-import launcher.features.lobby_features.managers.game_launching.GameLaunchingManager;
+import launcher.ui.lobby.managers.game_launching.GameLaunchingManager;
 import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
 import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
-import launcher.features.lobby_features.managers.json.JsonEditorOperations;
-import launcher.features.lobby_features.managers.ui.LoadingAnimationManager;
+import launcher.ui.lobby.managers.json.JsonEditorOperations;
+import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
 import launcher.ui.lobby.subcontrollers.GameSelectionController;
 
 /**
