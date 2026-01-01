@@ -1,8 +1,8 @@
 package launcher.features.lobby_features.managers.core.lifecycle;
 
 import gdk.internal.Logging;
-import launcher.ui.lobby.ControllerMode;
-import launcher.ui.lobby.GDKGameLobbyController;
+import launcher.ui_areas.lobby.ControllerMode;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.module_handling.loading.ModuleCompiler;
 
 /**

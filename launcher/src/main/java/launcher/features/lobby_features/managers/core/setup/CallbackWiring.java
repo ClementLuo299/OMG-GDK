@@ -3,11 +3,11 @@ package launcher.features.lobby_features.managers.core.setup;
 import gdk.api.GameModule;
 import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
-import launcher.ui.lobby.managers.game_launching.GameLaunchingManager;
+import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
 import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
-import launcher.ui.lobby.subcontrollers.GameSelectionController;
-import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
-import launcher.ui.lobby.subcontrollers.TopBarController;
+import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
+import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
+import launcher.ui_areas.lobby.subcontrollers.TopBarController;
 
 /**
  * Handles wiring of callbacks between subcontrollers and managers.

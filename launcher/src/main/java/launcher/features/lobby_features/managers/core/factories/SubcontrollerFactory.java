@@ -6,14 +6,14 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import com.jfoenix.controls.JFXToggleButton;
-import launcher.ui.lobby.json_editor.JsonEditor;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
-import launcher.ui.lobby.managers.json.JsonEditorOperations;
-import launcher.ui.lobby.managers.messaging.MessageManager;
-import launcher.ui.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui.lobby.subcontrollers.GameSelectionController;
-import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
-import launcher.ui.lobby.subcontrollers.TopBarController;
+import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
+import launcher.ui_areas.lobby.managers.messaging.MessageManager;
+import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
+import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
+import launcher.ui_areas.lobby.subcontrollers.TopBarController;
 
 /**
  * Factory for creating all subcontroller instances used in the lobby.

@@ -4,11 +4,11 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.features.module_handling.discovery.ModuleDiscoveryService;
-import launcher.ui.lobby.managers.messaging.MessageManager;
-import launcher.ui.lobby.managers.ui.StatusLabelManager;
-import launcher.ui.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
-import launcher.ui.lobby.managers.game_launching.ModuleRefreshUIUpdater;
+import launcher.ui_areas.lobby.managers.messaging.MessageManager;
+import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
+import launcher.ui_areas.lobby.managers.game_launching.ModuleRefreshUIUpdater;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
@@ -53,7 +53,7 @@ public class GameModuleRefreshManager {
     /** Reporter for module change notifications (additions/removals). */
     private final ModuleChangesReporter moduleChangeReporter;
     
-    /** Manager for loading animation display. */
+    /** Manager for ui_loading animation display. */
     private final LoadingAnimationManager loadingAnimationManager;
     
     /** Checker for module compilation failures. */
@@ -82,7 +82,7 @@ public class GameModuleRefreshManager {
      * @param statusLabelManager The status label manager for status updates
      * @param launchButtonManager The launch button manager for button state
      * @param moduleChangeReporter The module change reporter for change notifications
-     * @param loadingAnimationManager The loading animation manager
+     * @param loadingAnimationManager The ui_loading animation manager
      * @param moduleCompilationChecker The module compilation checker
      */
     public GameModuleRefreshManager(
@@ -117,7 +117,7 @@ public class GameModuleRefreshManager {
      * 
      * <p>Performs a full refresh operation that includes:
      * <ul>
-     *   <li>Module discovery and loading</li>
+     *   <li>Module discovery and ui_loading</li>
      *   <li>Compilation failure checks</li>
      *   <li>UI updates (ComboBox, status labels, messages)</li>
      *   <li>Change detection and reporting</li>
@@ -178,7 +178,7 @@ public class GameModuleRefreshManager {
                 return;
             }
             
-            Logging.info("Module loading completed. Loaded " + discoveredGameModules.size() + " modules");
+            Logging.info("Module ui_loading completed. Loaded " + discoveredGameModules.size() + " modules");
             
             // Process discovered modules and prepare UI messages
             ModuleDiscoveryHandler.ModuleDiscoveryResult discoveryResult = 

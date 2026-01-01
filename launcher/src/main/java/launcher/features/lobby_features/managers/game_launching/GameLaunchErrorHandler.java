@@ -1,23 +1,23 @@
 package launcher.features.lobby_features.managers.game_launching;
 
 import gdk.internal.Logging;
-import launcher.ui.lobby.managers.messaging.MessageManager;
-import launcher.core.core_ui.DialogUtil;
+import launcher.ui_areas.lobby.managers.messaging.MessageManager;
+import launcher.core.ui.pop_up_dialogs.DialogUtil;
 
 /**
  * Handles error reporting and user feedback for game launch operations.
  * 
  * <p>This handler is responsible for:
  * <ul>
- *   <li>Reporting launch errors to the user via dialogs and messages</li>
+ *   <li>Reporting launch errors to the user via pop_up_dialogs and messages</li>
  *   <li>Logging errors for debugging</li>
  *   <li>Reporting successful launches</li>
  * </ul>
  * 
  * <p>Error handling behavior differs based on launch mode:
  * <ul>
- *   <li><b>UI launch</b>: Shows error dialogs and messages to the user</li>
- *   <li><b>Auto-launch</b>: Only logs errors (no user-visible dialogs)</li>
+ *   <li><b>UI launch</b>: Shows error pop_up_dialogs and messages to the user</li>
+ *   <li><b>Auto-launch</b>: Only logs errors (no user-visible pop_up_dialogs)</li>
  * </ul>
  * 
  * @author Clement Luo

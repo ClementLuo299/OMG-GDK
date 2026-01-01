@@ -2,9 +2,9 @@ package launcher.features.module_handling.startup;
 
 import gdk.internal.Logging;
 import javafx.application.Platform;
-import launcher.ui.lobby.GDKGameLobbyController;
-import launcher.ui.startup_window.StartupWindowManager;
-import launcher.core.StartupDelayUtil;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
+import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.features.development_features.StartupDelayUtil;
 
 import javax.swing.SwingUtilities;
 

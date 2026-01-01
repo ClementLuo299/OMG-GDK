@@ -9,12 +9,12 @@ import launcher.features.json_processing.JsonProcessingService;
 import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.features.lobby_features.managers.core.LobbyInitializationManager;
 import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
-import launcher.ui.lobby.managers.game_launching.GameLaunchingManager;
+import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
 import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
 import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
-import launcher.ui.lobby.managers.json.JsonEditorOperations;
-import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
-import launcher.ui.lobby.subcontrollers.GameSelectionController;
+import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
+import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
+import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 
 /**
  * Factory for recreating components that depend on ViewModel.
@@ -36,8 +36,8 @@ public class ViewModelDependentsFactory {
      * @param gameSelector The game selection ComboBox
      * @param launchGameButton The launch game button
      * @param refreshButton The refresh button
-     * @param loadingProgressBar The loading progress bar
-     * @param loadingStatusLabel The loading status label
+     * @param loadingProgressBar The ui_loading progress bar
+     * @param loadingStatusLabel The ui_loading status label
      * @param currentResult The current initialization result
      * @return Recreated components with new ViewModel references
      */

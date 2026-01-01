@@ -1,7 +1,7 @@
 package launcher.core.lifecycle;
 
-import launcher.ui.startup_window.StartupWindowManager;
-import launcher.core.StartupDelayUtil;
+import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.features.development_features.StartupDelayUtil;
 
 import javax.swing.SwingUtilities;
 

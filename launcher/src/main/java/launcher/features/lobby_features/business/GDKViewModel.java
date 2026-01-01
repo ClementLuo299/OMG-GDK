@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import launcher.ui.server_simulator.ServerSimulatorController;
+import launcher.ui_areas.server_simulator.ServerSimulatorController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -33,11 +33,11 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  * ViewModel for the GDK application that manages application state and business logic.
  * 
  * This class serves as the central data and logic layer for the GDK application.
- * It manages the application state, handles game module discovery and loading,
+ * It manages the application state, handles game module discovery and ui_loading,
  * coordinates between the UI and game modules, and manages the server simulator.
  * 
  * Key responsibilities:
- * - Handle game module discovery and loading
+ * - Handle game module discovery and ui_loading
  * - Coordinate game launching and management
  * - Manage server simulator lifecycle
  * - Handle application cleanup and shutdown
@@ -103,7 +103,7 @@ public class GDKViewModel {
     
     /**
      * Create a new GDK ViewModel.
-     * Module discovery and loading is now handled by static methods.
+     * Module discovery and ui_loading is now handled by static methods.
      */
     public GDKViewModel() {
         // No module loader instance needed - using static methods now
@@ -451,7 +451,7 @@ public class GDKViewModel {
      * Load the server simulator scene from FXML resources.
      * 
      * @return The loaded server simulator scene
-     * @throws Exception if FXML loading fails
+     * @throws Exception if FXML ui_loading fails
      */
     private Scene loadServerSimulatorScene() throws Exception {
         URL fxmlResourceUrl = getClass().getResource("/server-simulator/ServerSimulator.fxml");

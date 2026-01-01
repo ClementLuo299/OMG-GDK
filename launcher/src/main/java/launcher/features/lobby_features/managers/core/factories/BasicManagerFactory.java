@@ -6,7 +6,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import com.jfoenix.controls.JFXToggleButton;
-import launcher.ui.lobby.json_editor.JsonEditor;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.features.json_processing.JsonProcessingService;
 import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
@@ -14,11 +14,11 @@ import launcher.features.lobby_features.managers.core.LobbyInitializationManager
 import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
 import launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter;
 import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
-import launcher.ui.lobby.managers.json.JsonEditorOperations;
-import launcher.ui.lobby.managers.messaging.MessageManager;
-import launcher.ui.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
-import launcher.ui.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
+import launcher.ui_areas.lobby.managers.messaging.MessageManager;
+import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
+import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
 
 /**
  * Factory for creating basic managers that don't depend on subcontrollers.
@@ -54,8 +54,8 @@ public class BasicManagerFactory {
      * @param messageContainer The message container VBox
      * @param messageScrollPane The message scroll pane
      * @param refreshButton The refresh button
-     * @param loadingProgressBar The loading progress bar
-     * @param loadingStatusLabel The loading status label
+     * @param loadingProgressBar The ui_loading progress bar
+     * @param loadingStatusLabel The ui_loading status label
      * @param jsonInputEditor The JSON input editor
      * @param jsonOutputEditor The JSON output editor
      * @param jsonPersistenceToggle The JSON persistence toggle

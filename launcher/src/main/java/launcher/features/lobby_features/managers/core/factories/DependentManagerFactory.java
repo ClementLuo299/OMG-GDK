@@ -6,22 +6,22 @@ import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import launcher.features.game_launching.GameLaunchService;
 import launcher.features.lobby_features.business.GDKViewModel;
-import launcher.ui.lobby.GDKGameLobbyController;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
 import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
-import launcher.ui.lobby.managers.game_launching.GameLaunchingManager;
+import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
 import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
 import launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter;
 import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
-import launcher.ui.lobby.managers.messaging.MessageManager;
+import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import launcher.features.lobby_features.managers.messaging.MessageBridgeManager;
-import launcher.ui.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
-import launcher.ui.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
+import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
-import launcher.ui.lobby.subcontrollers.GameSelectionController;
-import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
+import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
+import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
 /**
  * Factory for creating managers that depend on subcontrollers.
@@ -62,7 +62,7 @@ public class DependentManagerFactory {
      * @param statusLabelManager The status label manager (already created by BasicManagerFactory)
      * @param launchButtonManager The launch button manager (already created by BasicManagerFactory)
      * @param moduleChangeReporter The module change reporter (already created by BasicManagerFactory)
-     * @param loadingAnimationManager The loading animation manager (already created by BasicManagerFactory)
+     * @param loadingAnimationManager The ui_loading animation manager (already created by BasicManagerFactory)
      * @param moduleCompilationChecker The module compilation checker (already created by BasicManagerFactory)
      * @param gameLaunchErrorHandler The game launch error handler (already created by BasicManagerFactory)
      * @param jsonPersistenceManager The JSON persistence manager (already created by BasicManagerFactory)

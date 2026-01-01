@@ -2,7 +2,7 @@ package launcher.core;
 
 import gdk.internal.Logging;
 
-import launcher.core.lifecycle.start.StartupProcess;
+import launcher.core.lifecycle.start.Startup;
 import launcher.core.lifecycle.stop.Shutdown;
 
 import javafx.application.Application;
@@ -28,7 +28,7 @@ public class GDKApplication extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        StartupProcess.start(primaryStage);
+        Startup.start(primaryStage);
     }
 
     /**

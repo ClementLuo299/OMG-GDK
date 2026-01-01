@@ -1,7 +1,7 @@
 package launcher.features.lobby_features.business;
 
 import gdk.internal.Logging;
-import launcher.ui.lobby.json_editor.JsonEditor;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import com.jfoenix.controls.JFXToggleButton;
 
 import java.nio.file.Files;
@@ -50,7 +50,7 @@ public class JsonPersistenceManager {
     
     // ==================== STATE ====================
     
-    /** Flag to prevent message spam during persistence settings loading. */
+    /** Flag to prevent message spam during persistence settings ui_loading. */
     private boolean isLoadingPersistenceSettings = false;
     
     // ==================== CONSTRUCTOR ====================
@@ -75,12 +75,12 @@ public class JsonPersistenceManager {
      * <ul>
      *   <li>Loads the persistence toggle state from file</li>
      *   <li>If persistence is enabled, loads the saved JSON content</li>
-     *   <li>Sets a flag to prevent persistence messages during loading</li>
+     *   <li>Sets a flag to prevent persistence messages during ui_loading</li>
      * </ul>
      */
     public void loadPersistenceSettings() {
         try {
-            // Set flag to prevent persistence messages during loading
+            // Set flag to prevent persistence messages during ui_loading
             isLoadingPersistenceSettings = true;
             
             // Load persistence toggle state
@@ -91,11 +91,11 @@ public class JsonPersistenceManager {
                 loadSavedJsonContent();
             }
             
-            // Clear flag after loading is complete
+            // Clear flag after ui_loading is complete
             isLoadingPersistenceSettings = false;
             
         } catch (Exception e) {
-            Logging.error("❌ Error loading persistence settings: " + e.getMessage(), e);
+            Logging.error("❌ Error ui_loading persistence settings: " + e.getMessage(), e);
             // Clear flag even on error
             isLoadingPersistenceSettings = false;
         }
@@ -163,11 +163,11 @@ public class JsonPersistenceManager {
     // ==================== PUBLIC METHODS - UTILITY ====================
     
     /**
-     * Checks if currently loading persistence settings.
+     * Checks if currently ui_loading persistence settings.
      * 
      * <p>This flag prevents message spam during the initial load operation.
      * 
-     * @return true if loading, false otherwise
+     * @return true if ui_loading, false otherwise
      */
     public boolean isLoadingPersistenceSettings() {
         return isLoadingPersistenceSettings;
@@ -209,7 +209,7 @@ public class JsonPersistenceManager {
                 jsonPersistenceToggle.setSelected(true);
             }
         } catch (Exception e) {
-            Logging.error("❌ Error loading persistence toggle state: " + e.getMessage(), e);
+            Logging.error("❌ Error ui_loading persistence toggle state: " + e.getMessage(), e);
             // Default to enabled on error
             jsonPersistenceToggle.setSelected(true);
         }
@@ -229,7 +229,7 @@ public class JsonPersistenceManager {
                 jsonInputEditor.setText(savedJson);
             }
         } catch (Exception e) {
-            Logging.error("❌ Error loading saved JSON content: " + e.getMessage(), e);
+            Logging.error("❌ Error ui_loading saved JSON content: " + e.getMessage(), e);
         }
     }
     

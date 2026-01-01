@@ -8,7 +8,7 @@
     - View game messages and output
     - Access settings
     
-    Controller: launcher.lobby.core_ui.ui_logic.lobby.GDKGameLobbyController
+    Controller: launcher.lobby.ui_areas.ui_logic.lobby.GDKGameLobbyController
     Layout: Vertical box (VBox) with header, content area, and status bar
 -->
 
@@ -27,7 +27,7 @@
 <!-- Main container for the entire lobby interface -->
 <VBox fx:id="mainContainer" prefWidth="1200.0" 
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="launcher.ui.lobby.GDKGameLobbyController"
+      fx:controller="launcher.ui_areas.lobby.GDKGameLobbyController"
       styleClass="game-picker-container" spacing="0" alignment="TOP_LEFT">
     
     <padding>
@@ -155,15 +155,15 @@
     
     <!-- 
         STATUS BAR (Bottom)
-        Shows loading progress, status messages, and game count
+        Shows ui_loading progress, status messages, and game count
     -->
     <HBox alignment="CENTER_LEFT" spacing="20" styleClass="status-bar" VBox.vgrow="NEVER">
         <padding>
             <Insets top="10" right="15" bottom="10" left="15"/>
         </padding>
-        <!-- Progress bar shown during module loading/compilation -->
+        <!-- Progress bar shown during module ui_loading/compilation -->
         <ProgressBar fx:id="loadingProgressBar" visible="false" prefWidth="250" styleClass="loading-progress"/>
-        <!-- Label showing current loading status (e.g., "Compiling module...") -->
+        <!-- Label showing current ui_loading status (e.g., "Compiling module...") -->
         <Label fx:id="loadingStatusLabel" text="" visible="false" styleClass="loading-status-text"/>
         <Region HBox.hgrow="ALWAYS"/>
         <!-- Label showing number of available games -->

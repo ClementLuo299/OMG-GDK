@@ -78,7 +78,7 @@ public class ModuleChangesReporter {
         // Log the analysis for debugging
         logModuleChanges(previousModuleNames, currentModuleNames, addedModules, removedModules);
         
-        // Only report changes for subsequent reloads (not first time loading)
+        // Only report changes for subsequent reloads (not first time ui_loading)
         if (!previousModuleNames.isEmpty()) {
             reportChangesToUI(addedModules, removedModules, currentModuleNames.size());
         }

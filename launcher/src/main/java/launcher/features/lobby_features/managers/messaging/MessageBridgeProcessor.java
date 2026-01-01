@@ -2,7 +2,7 @@ package launcher.features.lobby_features.managers.messaging;
 
 import javafx.application.Platform;
 import launcher.features.game_messaging.MessageProcessingService;
-import launcher.ui.lobby.json_editor.JsonEditor;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
 
 import java.util.Map;
 

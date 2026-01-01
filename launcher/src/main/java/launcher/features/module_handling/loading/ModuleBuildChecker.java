@@ -2,10 +2,10 @@ package launcher.features.module_handling.loading;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
-import launcher.core.StartupDelayUtil;
+import launcher.features.development_features.StartupDelayUtil;
 
 /**
- * Checks if modules need to be built before loading.
+ * Checks if modules need to be built before ui_loading.
  * Responsible for checking build status and preparing for discovery.
  * 
  * @author Clement Luo
@@ -18,7 +18,7 @@ public final class ModuleBuildChecker {
     private ModuleBuildChecker() {}
     
     /**
-     * Checks if modules need to be built and initializes the loading process.
+     * Checks if modules need to be built and initializes the ui_loading process.
      * 
      * @param progressManager The progress manager for updates
      */
@@ -27,7 +27,7 @@ public final class ModuleBuildChecker {
         progressManager.updateProgress("Initializing game modules");
         StartupDelayUtil.addDevelopmentDelay("After initializing game modules");
         
-        // Check if modules need to be compiled before loading
+        // Check if modules need to be compiled before ui_loading
         if (ModuleCompiler.needToBuildModules()) {
             Logging.info("Modules need to be built");
             progressManager.updateProgress("Building modules");

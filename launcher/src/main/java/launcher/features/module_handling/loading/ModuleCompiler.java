@@ -2,7 +2,7 @@ package launcher.features.module_handling.loading;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
-import launcher.ui.lobby.GDKGameLobbyController;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
 
 import java.io.File;
 import java.net.URL;
@@ -13,7 +13,7 @@ import javafx.application.Platform;
 import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 /**
- * Handles module compilation and loading.
+ * Handles module compilation and ui_loading.
  * 
  * <p>This class has a single responsibility: compiling modules and creating
  * GameModule instances from compiled classes. It also tracks compilation failures
@@ -97,7 +97,7 @@ public class ModuleCompiler {
     /**
      * Loads a module from its compiled classes.
      * 
-     * <p>This method performs the complete module loading process:
+     * <p>This method performs the complete module ui_loading process:
      * <ol>
      *   <li>Validates module structure</li>
      *   <li>Checks for compiled classes</li>
@@ -110,7 +110,7 @@ public class ModuleCompiler {
      * initialization issues.
      * 
      * @param moduleDir The module directory
-     * @return The loaded GameModule instance, or null if loading failed
+     * @return The loaded GameModule instance, or null if ui_loading failed
      */
     public static GameModule loadModule(File moduleDir) {
         String moduleName = moduleDir.getName();
@@ -118,9 +118,9 @@ public class ModuleCompiler {
         Logging.info("   Current thread: " + Thread.currentThread().getName());
         Logging.info("   Is JavaFX thread: " + javafx.application.Platform.isFxApplicationThread());
         
-        // Add timeout protection for individual module loading
+        // Add timeout protection for individual module ui_loading
         long startTime = System.currentTimeMillis();
-        long timeout = 30000; // 30 second timeout for individual module loading (increased for JavaFX initialization)
+        long timeout = 30000; // 30 second timeout for individual module ui_loading (increased for JavaFX initialization)
         
         try {
             // Validate source files first
@@ -131,7 +131,7 @@ public class ModuleCompiler {
             
             // Check timeout
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module ui_loading timeout for " + moduleName);
                 return null;
             }
             
@@ -144,7 +144,7 @@ public class ModuleCompiler {
             
             // Check timeout
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module ui_loading timeout for " + moduleName);
                 return null;
             }
             
@@ -157,7 +157,7 @@ public class ModuleCompiler {
             
             // Check timeout
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module ui_loading timeout for " + moduleName);
                 return null;
             }
             
@@ -168,7 +168,7 @@ public class ModuleCompiler {
             
             // Check timeout
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module ui_loading timeout for " + moduleName);
                 return null;
             }
             
@@ -176,7 +176,7 @@ public class ModuleCompiler {
             Logging.info("📥 Loading Main class for module: " + moduleName);
             Logging.info("   Elapsed time: " + (System.currentTimeMillis() - startTime) + "ms");
             
-            // Ensure JavaFX Platform is initialized before loading JavaFX-dependent classes
+            // Ensure JavaFX Platform is initialized before ui_loading JavaFX-dependent classes
             Logging.info("   JavaFX Platform check - on FX thread: " + Platform.isFxApplicationThread());
             try {
                 // Verify JavaFX is accessible
@@ -223,7 +223,7 @@ public class ModuleCompiler {
                 e.printStackTrace();
                 return null;
             } catch (Exception e) {
-                Logging.error("❌ Error loading Main class for module " + moduleName + ": " + e.getMessage(), e);
+                Logging.error("❌ Error ui_loading Main class for module " + moduleName + ": " + e.getMessage(), e);
                 Logging.error("   Exception type: " + e.getClass().getName());
                 e.printStackTrace();
                 return null;
@@ -236,7 +236,7 @@ public class ModuleCompiler {
             
             // Check timeout
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module ui_loading timeout for " + moduleName);
                 return null;
             }
             
@@ -262,7 +262,7 @@ public class ModuleCompiler {
             }
             
         } catch (Exception e) {
-            Logging.error("❌ Error loading module " + moduleName + ": " + e.getMessage(), e);
+            Logging.error("❌ Error ui_loading module " + moduleName + ": " + e.getMessage(), e);
             Logging.error("   Module directory: " + moduleDir.getAbsolutePath(), e);
             return null;
         }
@@ -272,7 +272,7 @@ public class ModuleCompiler {
      * Loads multiple modules from their compiled classes.
      * 
      * <p>This method loads multiple modules sequentially with timeout protection.
-     * It continues loading other modules even if one fails, ensuring maximum
+     * It continues ui_loading other modules even if one fails, ensuring maximum
      * module availability.
      * 
      * @param moduleDirectories List of module directories to load
@@ -281,14 +281,14 @@ public class ModuleCompiler {
     public static List<GameModule> loadModules(List<File> moduleDirectories) {
         List<GameModule> loadedModules = new ArrayList<>();
         
-        // Add timeout protection for module loading
+        // Add timeout protection for module ui_loading
         long startTime = System.currentTimeMillis();
-        long timeout = 15000; // 15 second timeout for all module loading
+        long timeout = 15000; // 15 second timeout for all module ui_loading
         
         for (File moduleDir : moduleDirectories) {
             // Check timeout
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout reached, stopping module loading");
+                Logging.warning("Module ui_loading timeout reached, stopping module ui_loading");
                 break;
             }
             
@@ -302,12 +302,12 @@ public class ModuleCompiler {
                         " (check logs above for details)");
                 }
             } catch (Exception e) {
-                Logging.error("❌ Exception while loading module " + moduleDir.getName() + ": " + e.getMessage(), e);
+                Logging.error("❌ Exception while ui_loading module " + moduleDir.getName() + ": " + e.getMessage(), e);
                 // Continue with other modules instead of failing completely
             }
         }
         
-        Logging.info("Module loading completed. Successfully loaded " + loadedModules.size() + " modules");
+        Logging.info("Module ui_loading completed. Successfully loaded " + loadedModules.size() + " modules");
         return loadedModules;
     }
     
@@ -570,7 +570,7 @@ public class ModuleCompiler {
      * Sets the UI controller for progress updates.
      * 
      * <p>This method allows the UI controller to be set for displaying
-     * compilation and loading progress to the user.
+     * compilation and ui_loading progress to the user.
      * 
      * @param controller The UI controller
      */

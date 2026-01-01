@@ -14,7 +14,7 @@ import java.util.ArrayList;
 /**
  * Utility class for managing start messages for different game modes.
  * 
- * <p>This class has a single responsibility: loading and managing start messages
+ * <p>This class has a single responsibility: ui_loading and managing start messages
  * for different game modes (single player, local multiplayer, all modes).
  * 
  * <p>Key responsibilities:
@@ -65,7 +65,7 @@ public final class StartMessageUtil {
      * it creates a default start message and saves it for future use. The method also
      * ensures that the localPlayerId field is present in the message.
      * 
-     * @return The start message map, or null if loading fails
+     * @return The start message map, or null if ui_loading fails
      */
     public static Map<String, Object> loadDefaultStartMessage() {
         Map<String, Object> msg = loadStartMessage(Path.of(DEFAULT_FILE_NAME));
@@ -103,7 +103,7 @@ public final class StartMessageUtil {
     /**
      * Loads a start message for local multiplayer mode.
      * 
-     * @return The start message map for local multiplayer, or null if loading fails
+     * @return The start message map for local multiplayer, or null if ui_loading fails
      */
     public static Map<String, Object> loadLocalMultiplayerStartMessage() {
         return loadStartMessage(Path.of(LOCAL_MULTIPLAYER_FILE));
@@ -112,7 +112,7 @@ public final class StartMessageUtil {
     /**
      * Loads a start message for single player mode.
      * 
-     * @return The start message map for single player, or null if loading fails
+     * @return The start message map for single player, or null if ui_loading fails
      */
     public static Map<String, Object> loadSinglePlayerStartMessage() {
         return loadStartMessage(Path.of(SINGLE_PLAYER_FILE));
@@ -121,7 +121,7 @@ public final class StartMessageUtil {
     /**
      * Loads a start message for all modes (multi player).
      * 
-     * @return The start message map for all modes, or null if loading fails
+     * @return The start message map for all modes, or null if ui_loading fails
      */
     public static Map<String, Object> loadAllModesStartMessage() {
         return loadStartMessage(Path.of(ALL_MODES_FILE));
@@ -136,7 +136,7 @@ public final class StartMessageUtil {
      * Returns null if the file doesn't exist, is not readable, or parsing fails.
      * 
      * @param filePath The file_paths to the start message file
-     * @return The parsed start message map, or null if loading fails
+     * @return The parsed start message map, or null if ui_loading fails
      */
     public static Map<String, Object> loadStartMessage(Path filePath) {
         try {

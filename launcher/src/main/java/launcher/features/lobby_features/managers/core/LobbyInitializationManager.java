@@ -2,31 +2,31 @@ package launcher.features.lobby_features.managers.core;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.ui.lobby.json_editor.JsonEditor;
-import launcher.ui.lobby.GDKGameLobbyController;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
-import launcher.ui.lobby.subcontrollers.TopBarController;
-import launcher.ui.lobby.subcontrollers.GameSelectionController;
-import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
-import launcher.ui.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui.lobby.managers.ui.StatusLabelManager;
-import launcher.ui.lobby.managers.ui.LoadingAnimationManager;
-import launcher.ui.lobby.managers.game_launching.GameLaunchingManager;
+import launcher.ui_areas.lobby.subcontrollers.TopBarController;
+import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
+import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
+import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
+import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
 import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
 import launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter;
 import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
-import launcher.ui.lobby.managers.json.JsonEditorOperations;
-import launcher.ui.lobby.managers.messaging.MessageManager;
+import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
+import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import launcher.features.lobby_features.managers.messaging.MessageBridgeManager;
 import launcher.features.lobby_features.managers.core.factories.BasicManagerFactory;
 import launcher.features.lobby_features.managers.core.factories.DependentManagerFactory;
 import launcher.features.lobby_features.managers.core.factories.SubcontrollerFactory;
 import launcher.features.lobby_features.managers.core.factories.ViewModelDependentsFactory;
 import launcher.features.lobby_features.managers.core.setup.CallbackWiring;
-import launcher.ui.lobby.managers.setup.JsonEditorSetup;
+import launcher.ui_areas.lobby.managers.setup.JsonEditorSetup;
 import launcher.features.lobby_features.managers.core.setup.PostInitializationSetup;
-import launcher.ui.lobby.managers.setup.UiSetup;
+import launcher.ui_areas.lobby.managers.setup.UiSetup;
 import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
 
@@ -101,8 +101,8 @@ public class LobbyInitializationManager {
      * @param jsonPersistenceToggle The JSON persistence toggle
      * @param exitButton The exit button
      * @param statusLabel The status label
-     * @param loadingProgressBar The loading progress bar
-     * @param loadingStatusLabel The loading status label
+     * @param loadingProgressBar The ui_loading progress bar
+     * @param loadingStatusLabel The ui_loading status label
      */
     public LobbyInitializationManager(
             GDKGameLobbyController controller,

@@ -2,7 +2,7 @@ package launcher.features.lobby_features.managers.messaging;
 
 import gdk.internal.MessagingBridge;
 import launcher.features.game_messaging.MessageProcessingService;
-import launcher.ui.lobby.subcontrollers.JsonActionButtonsController;
+import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
 import java.util.Map;
 

@@ -2,16 +2,16 @@ package launcher.features.module_handling;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.ui.lobby.GDKGameLobbyController;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.module_handling.startup.ModuleLoadingThread;
-import launcher.ui.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindowManager;
 import launcher.core.lifecycle.stop.Shutdown;
-import launcher.core.StartupDelayUtil;
+import launcher.features.development_features.StartupDelayUtil;
 
 import javax.swing.SwingUtilities;
 
 /**
- * Coordinates the module loading process during startup.
+ * Coordinates the module ui_loading process during startup.
  * Sets up and starts the background thread that loads game modules and manages cleanup tasks.
  * 
  * @author Clement Luo
@@ -28,18 +28,18 @@ public final class LoadModules {
      * 
      * @param primaryApplicationStage The main window (hidden until modules are loaded)
      * @param lobbyController The UI controller that will show the list of games
-     * @param windowManager The startup progress window (visible during loading)
+     * @param windowManager The startup progress window (visible during ui_loading)
      */
     public static void load(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
         // Get the total number of steps in the startup process
         int totalSteps = windowManager.getTotalSteps();
         
         // Step 2: Update the startup window accordingly (step 1 is used by "Loading user interface")
-        Logging.info("Starting module loading process...");
+        Logging.info("Starting module ui_loading process...");
         SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(2, "Starting module loading");
+            windowManager.updateProgress(2, "Starting module ui_loading");
         });
-        StartupDelayUtil.addDevelopmentDelay("After 'Starting module loading' message");
+        StartupDelayUtil.addDevelopmentDelay("After 'Starting module ui_loading' message");
         
         // Step 2: Wait a tiny bit to make sure the window is fully visible
         try {
@@ -76,9 +76,9 @@ public final class LoadModules {
      * @param windowManager The window manager to hide on shutdown
      */
     private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindowManager windowManager) {
-        // Clean up the module loading thread if app shuts down while loading
+        // Clean up the module ui_loading thread if app shuts down while ui_loading
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up module loading thread...");
+            Logging.info("Cleaning up module ui_loading thread...");
             if (moduleLoadingThread.isAlive()) {
                 moduleLoadingThread.interrupt();
             }

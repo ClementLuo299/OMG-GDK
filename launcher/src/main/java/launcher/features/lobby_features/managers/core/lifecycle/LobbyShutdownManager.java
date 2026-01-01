@@ -3,7 +3,7 @@ package launcher.features.lobby_features.managers.core.lifecycle;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.lobby_features.business.JsonPersistenceManager;
-import launcher.ui.lobby.subcontrollers.GameSelectionController;
+import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 
 /**
  * Manages shutdown operations for the lobby controller.

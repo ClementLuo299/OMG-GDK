@@ -1,11 +1,11 @@
 package launcher.features.module_handling.progress;
 
-import launcher.ui.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindowManager;
 
 import javax.swing.SwingUtilities;
 
 /**
- * Handles progress tracking and updates for the module loading process.
+ * Handles progress tracking and updates for the module ui_loading process.
  * Manages step counting and progress window updates on the Swing EDT.
  * Distributes steps evenly across the available range to ensure smooth progress bar movement.
  * 
@@ -17,9 +17,9 @@ import javax.swing.SwingUtilities;
 public final class ModuleLoadingProgressManager {
     
     private final StartupWindowManager windowManager;
-    private final int startStep; // First step available for module loading (typically 2)
-    private final int endStep; // Last step available for module loading (totalSteps - 4, to reserve last 4 steps)
-    private int stepIndex; // Current index in the sequence of module loading steps (0-based)
+    private final int startStep; // First step available for module ui_loading (typically 2)
+    private final int endStep; // Last step available for module ui_loading (totalSteps - 4, to reserve last 4 steps)
+    private int stepIndex; // Current index in the sequence of module ui_loading steps (0-based)
     
     /**
      * Creates a new progress manager that increments steps sequentially.

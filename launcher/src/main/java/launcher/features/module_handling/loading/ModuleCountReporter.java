@@ -1,7 +1,7 @@
 package launcher.features.module_handling.loading;
 
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
-import launcher.core.StartupDelayUtil;
+import launcher.features.development_features.StartupDelayUtil;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package launcher.features.module_handling.loading;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.core.StartupDelayUtil;
+import launcher.features.development_features.StartupDelayUtil;
 import launcher.features.module_handling.discovery.ModuleDiscoverySteps;
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
 
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Orchestrates the module loading workflow.
- * Coordinates initialization, module processing, loading, and finalization.
+ * Orchestrates the module ui_loading workflow.
+ * Coordinates initialization, module processing, ui_loading, and finalization.
  * 
  * @author Clement Luo
  * @date December 21, 2025
@@ -23,8 +23,8 @@ public final class ModuleLoadingSteps {
     private ModuleLoadingSteps() {}
     
     /**
-     * Orchestrates the complete module loading process.
-     * Coordinates initialization, processing, loading, and reporting.
+     * Orchestrates the complete module ui_loading process.
+     * Coordinates initialization, processing, ui_loading, and reporting.
      * 
      * @param progressManager The progress manager for updates
      * @param discoveryResult The result from module discovery
@@ -36,7 +36,7 @@ public final class ModuleLoadingSteps {
                                                   int totalSteps) {
         // Step 1: Check if there are any modules to load
         if (!discoveryResult.isSuccess() || discoveryResult.getValidModuleDirectories().isEmpty()) {
-            Logging.info("No modules to load - skipping loading workflow");
+            Logging.info("No modules to load - skipping ui_loading workflow");
             return new ArrayList<>();
         }
         
@@ -54,7 +54,7 @@ public final class ModuleLoadingSteps {
     }
     
     /**
-     * Initializes module loading and checks if modules need to be built.
+     * Initializes module ui_loading and checks if modules need to be built.
      * 
      * @param progressManager The progress manager for updates
      */
@@ -63,14 +63,14 @@ public final class ModuleLoadingSteps {
     }
     
     /**
-     * Finalizes the module loading process.
+     * Finalizes the module ui_loading process.
      * 
      * @param progressManager The progress manager for updates
      */
     public static void finalizeModuleLoading(ModuleLoadingProgressManager progressManager) {
-        Logging.info("Finalizing module loading...");
-        progressManager.updateProgress("Finalizing module loading");
-        StartupDelayUtil.addDevelopmentDelay("After finalizing module loading");
+        Logging.info("Finalizing module ui_loading...");
+        progressManager.updateProgress("Finalizing module ui_loading");
+        StartupDelayUtil.addDevelopmentDelay("After finalizing module ui_loading");
     }
 }
 

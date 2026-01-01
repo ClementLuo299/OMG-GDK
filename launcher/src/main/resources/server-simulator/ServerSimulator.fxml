@@ -9,7 +9,7 @@
     - Save and load message history
     - Clear the message display
     
-    Controller: launcher.ui.server_simulator.ServerSimulatorController
+    Controller: launcher.ui_pages_pages.server_simulator.ServerSimulatorController
     Layout: Vertical box (VBox) with message display, input area, and controls
 -->
 
@@ -20,7 +20,7 @@
 <!-- Main container for the server simulator window -->
 <VBox fx:id="rootContainer" spacing="10" styleClass="server-simulator"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="launcher.ui.server_simulator.ServerSimulatorController">
+      fx:controller="launcher.ui_areas.server_simulator.ServerSimulatorController">
     <children>
         <!-- Page title -->
         <Label text="Server Simulator" styleClass="title-label" />

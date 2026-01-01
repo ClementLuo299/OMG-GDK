@@ -4,10 +4,10 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.core.lifecycle.StartupCompletionHandler;
 import launcher.core.lifecycle.StartupWorkflow;
-import launcher.ui.lobby.GDKGameLobbyController;
-import launcher.ui.startup_window.StartupWindowManager;
-import launcher.core.StartupDelayUtil;
-import launcher.core.lifecycle.start.StartupTransitionUtil;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
+import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.features.development_features.StartupDelayUtil;
+import launcher.core.ui.ui_loading.stage.StartupWindowToMainStageTransition;
 
 /**
  * Creates and manages the background thread that loads game modules during startup.
@@ -38,7 +38,7 @@ public final class ModuleLoadingThread {
 
         return new Thread(() -> {
             try {
-                Logging.info("Starting module loading on background thread");
+                Logging.info("Starting module ui_loading on background thread");
                 
                 // Phase 1: Load all game modules
                 int currentStep = StartupWorkflow.executeWorkflow(windowManager, totalSteps);
@@ -64,9 +64,9 @@ public final class ModuleLoadingThread {
                 
                 // Phase 5: Show main stage and hide startup window
                 Logging.info("All startup tasks complete - showing main stage");
-                StartupTransitionUtil.showMainStage(primaryApplicationStage, windowManager);
+                StartupWindowToMainStageTransition.showMainStage(primaryApplicationStage, windowManager);
                 
-                Logging.info("Module loading thread completed successfully");
+                Logging.info("Module ui_loading thread completed successfully");
                 
             } catch (Exception e) {
                 handleModuleLoadingError(e, primaryApplicationStage, windowManager);
@@ -75,7 +75,7 @@ public final class ModuleLoadingThread {
     }
     
     /**
-     * Handles errors that occur during module loading.
+     * Handles errors that occur during module ui_loading.
      * Attempts to show the main stage even if errors occurred.
      * 
      * @param error The exception that occurred
@@ -85,11 +85,11 @@ public final class ModuleLoadingThread {
     private static void handleModuleLoadingError(Exception error, 
                                                  Stage primaryApplicationStage, 
                                                  StartupWindowManager windowManager) {
-        Logging.error("Critical error in module loading thread: " + error.getMessage(), error);
+        Logging.error("Critical error in module ui_loading thread: " + error.getMessage(), error);
         
         // Even on error, try to show the main stage
         try {
-            StartupTransitionUtil.showMainStage(primaryApplicationStage, windowManager);
+            StartupWindowToMainStageTransition.showMainStage(primaryApplicationStage, windowManager);
         } catch (Exception showError) {
             Logging.error("Failed to show main stage after error: " + showError.getMessage());
         }

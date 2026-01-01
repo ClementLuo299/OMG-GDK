@@ -16,7 +16,7 @@ import java.util.List;
  * 
  * <p>This class has a single responsibility: finding and validating game modules
  * in the modules directory. It checks module structure and required components
- * but does not handle compilation or loading (delegated to ModuleCompiler).
+ * but does not handle compilation or ui_loading (delegated to ModuleCompiler).
  * 
  * <p>Key responsibilities:
  * <ul>
@@ -52,11 +52,11 @@ public class ModuleDiscovery {
      * Discovers all valid modules in the modules directory.
      * 
      * <p>This method identifies module candidates and logs validation results.
-     * Actual loading is delegated to ModuleCompiler (kept intentionally
+     * Actual ui_loading is delegated to ModuleCompiler (kept intentionally
      * side-effect free here).
      * 
      * @param modulesDirectoryPath The path to the modules directory
-     * @return List of discovered game modules (currently empty, loading is done elsewhere)
+     * @return List of discovered game modules (currently empty, ui_loading is done elsewhere)
      */
     public static List<GameModule> discoverModules(String modulesDirectoryPath) {
         Logging.info("Starting module discovery in: " + modulesDirectoryPath);
@@ -81,7 +81,7 @@ public class ModuleDiscovery {
             String moduleName = subdir.getName();
             Logging.info("Checking subdirectory: " + moduleName);
             
-            // Only log validity here; loading is performed by ModuleCompiler
+            // Only log validity here; ui_loading is performed by ModuleCompiler
             if (isValidModuleStructure(subdir)) {
                 Logging.info("Valid module structure found: " + moduleName);
             } else {
@@ -359,13 +359,13 @@ public class ModuleDiscovery {
         try {
             // Count all messages that will be displayed:
             // Initial: 2 messages (steps 0-1)
-            // Module loading init: 4 messages (steps 2-5)
+            // Module ui_loading init: 4 messages (steps 2-5)
             // Module processing: moduleCount messages (steps 6 to 5+moduleCount)
-            // Module loading final: 3 messages (loading, found, finalizing)
+            // Module ui_loading final: 3 messages (ui_loading, found, finalizing)
             // Final: 3 messages (compilation check, complete, ready)
             // Total: 2 + 4 + moduleCount + 3 + 3 = 12 + moduleCount
             
-            int initialSteps = 2; // "Starting GDK application...", "Starting module loading..."
+            int initialSteps = 2; // "Starting GDK application...", "Starting module ui_loading..."
             int moduleInitSteps = 4; // "Initializing...", "Building...", "Preparing...", "Discovering..."
             int moduleFinalSteps = 3; // "Loading compiled...", "Found X modules", "Finalizing..."
             int finalSteps = 3; // "Checking compilation...", "Startup complete", "Ready!"

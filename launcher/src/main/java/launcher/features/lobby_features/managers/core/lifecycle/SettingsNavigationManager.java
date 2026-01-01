@@ -5,16 +5,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import launcher.ui.lobby.GDKGameLobbyController;
-import launcher.ui.settings_page.SettingsPageController;
-import launcher.core.core_ui.DialogUtil;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
+import launcher.ui_areas.settings_page.SettingsPageController;
+import launcher.core.ui.pop_up_dialogs.DialogUtil;
 
 import java.net.URL;
 import java.util.function.Supplier;
 
 /**
  * Manages navigation to and from the settings page.
- * Handles FXML loading, scene switching, and CSS application.
+ * Handles FXML ui_loading, scene switching, and CSS application.
  * 
  * @author Clement Luo
  * @date December 29, 2025

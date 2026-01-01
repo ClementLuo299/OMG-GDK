@@ -3,7 +3,7 @@ package launcher.features.module_handling.loading;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
-import launcher.core.StartupDelayUtil;
+import launcher.features.development_features.StartupDelayUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Loads compiled modules into the runtime.
- * Responsible for loading discovered modules into memory and handling loading errors.
+ * Responsible for ui_loading discovered modules into memory and handling ui_loading errors.
  * 
  * @author Clement Luo
  * @date December 27, 2025
@@ -57,25 +57,25 @@ public final class ModuleRuntimeLoader {
         List<GameModule> discoveredModules = new ArrayList<>();
         
         try {
-            // Update progress and delegate to ModuleCompiler for actual loading
-            Logging.info("Starting module loading...");
+            // Update progress and delegate to ModuleCompiler for actual ui_loading
+            Logging.info("Starting module ui_loading...");
             progressManager.updateProgress("Loading compiled modules");
             discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
-            Logging.info("Module loading completed. Successfully loaded " + discoveredModules.size() + " modules");
+            Logging.info("Module ui_loading completed. Successfully loaded " + discoveredModules.size() + " modules");
             
             // Warn if no modules were loaded (might indicate compilation issues)
             if (discoveredModules.isEmpty()) {
                 Logging.warning("No modules were loaded! Check module compilation status.");
             }
-            StartupDelayUtil.addDevelopmentDelay("After loading compiled modules - loaded " + 
+            StartupDelayUtil.addDevelopmentDelay("After ui_loading compiled modules - loaded " +
                 discoveredModules.size() + " modules");
             
         } catch (Exception e) {
-            // Handle loading errors gracefully - continue with empty list
-            Logging.error("Module loading failed: " + e.getMessage(), e);
+            // Handle ui_loading errors gracefully - continue with empty list
+            Logging.error("Module ui_loading failed: " + e.getMessage(), e);
             e.printStackTrace();
-            progressManager.updateProgress("Module loading failed - continuing with empty list");
-            StartupDelayUtil.addDevelopmentDelay("After module loading failure");
+            progressManager.updateProgress("Module ui_loading failed - continuing with empty list");
+            StartupDelayUtil.addDevelopmentDelay("After module ui_loading failure");
         }
         
         return discoveredModules;

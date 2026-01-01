@@ -3,8 +3,8 @@ package launcher.features.lobby_features.managers.game_launching;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.ModuleDiscoveryService;
-import launcher.ui.lobby.managers.messaging.MessageManager;
-import launcher.ui.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.managers.messaging.MessageManager;
+import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class ModuleDiscoveryHandler {
             Logging.info("Ready to update UI with " + businessResult.totalCount + " modules");
         } else {
             uiMessages.add("No games detected - check modules directory");
-            Logging.warning("No modules were loaded. Check logs above for loading errors.");
+            Logging.warning("No modules were loaded. Check logs above for ui_loading errors.");
         }
         
         return new ModuleDiscoveryResult(businessResult.moduleNames, uiMessages);
