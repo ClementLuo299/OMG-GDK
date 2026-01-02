@@ -1,7 +1,6 @@
 package launcher.features.game_messaging;
 
 import launcher.features.lobby_features.business.JsonFormatter;
-import launcher.features.lobby_features.business.TranscriptManager;
 
 import java.util.Map;
 
@@ -32,7 +31,7 @@ public class MessageProcessingService {
      * @param msg The message map from the game
      */
     public void recordMessageToTranscript(Map<String, Object> msg) {
-        TranscriptManager.recordFromGame(msg);
+        TranscriptRecorder.recordFromGame(msg);
     }
     
     /**

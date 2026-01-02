@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import launcher.core.ui.ui_loading.fonts.FontLoader;
+import launcher.core.ui_features.ui_loading.fonts.FontLoader;
 import launcher.core.GDKApplication;
 
 import java.net.URL;

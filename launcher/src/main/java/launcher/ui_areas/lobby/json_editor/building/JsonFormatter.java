@@ -1,6 +1,6 @@
 package launcher.ui_areas.lobby.json_editor.building;
 
-import launcher.core.ui.pop_up_dialogs.DialogUtil;
+import launcher.core.ui_features.pop_up_dialogs.DialogUtil;
 
 /**
  * Utility class for formatting JSON content.

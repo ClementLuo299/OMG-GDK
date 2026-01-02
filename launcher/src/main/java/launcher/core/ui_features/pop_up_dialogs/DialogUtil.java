@@ -1,4 +1,4 @@
-package launcher.core.ui.pop_up_dialogs;
+package launcher.core.ui_features.pop_up_dialogs;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;

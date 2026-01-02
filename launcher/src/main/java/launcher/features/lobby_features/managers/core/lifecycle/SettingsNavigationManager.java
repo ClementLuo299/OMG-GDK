@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.settings_page.SettingsPageController;
-import launcher.core.ui.pop_up_dialogs.DialogUtil;
+import launcher.core.ui_features.pop_up_dialogs.DialogUtil;
 
 import java.net.URL;
 import java.util.function.Supplier;

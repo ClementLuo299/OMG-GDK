@@ -1,4 +1,4 @@
-package launcher.core.ui.ui_loading.stage;
+package launcher.core.ui_features.ui_loading.stage;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;

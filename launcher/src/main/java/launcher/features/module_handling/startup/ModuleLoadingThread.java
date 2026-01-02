@@ -6,7 +6,7 @@ import launcher.features.module_handling.StartupWorkflow;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindowManager;
 import launcher.features.development_features.StartupDelayUtil;
-import launcher.core.ui.ui_loading.stage.StartupWindowToMainStageTransition;
+import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;
 
 /**
  * Creates and manages the background thread that loads game modules during startup.

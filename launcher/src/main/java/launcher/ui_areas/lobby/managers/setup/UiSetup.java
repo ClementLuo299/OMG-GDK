@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.managers.setup;
 
 import gdk.internal.Logging;
 import javafx.scene.layout.VBox;
-import launcher.core.ui.ui_loading.fonts.FontLoader;
+import launcher.core.ui_features.ui_loading.fonts.FontLoader;
 
 /**
  * Handles UI component setup and styling.
