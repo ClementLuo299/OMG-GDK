@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.more_managers.core.factories;
+package launcher.ui_areas.lobby.managers.factories;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,10 +10,10 @@ import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.features.json_processing.JsonProcessingService;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.persistence.JsonPersistenceManager;
-import launcher.ui_areas.lobby.more_managers.core.LobbyInitializationManager;
-import launcher.ui_areas.lobby.more_managers.game_launching.GameLaunchErrorHandler;
-import launcher.ui_areas.lobby.more_managers.game_launching.ModuleChangesReporter;
-import launcher.ui_areas.lobby.more_managers.game_launching.ModuleCompilationChecker;
+import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
+import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
+import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
+import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;

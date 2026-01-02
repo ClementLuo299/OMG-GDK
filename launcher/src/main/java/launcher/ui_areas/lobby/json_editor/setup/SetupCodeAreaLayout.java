@@ -13,7 +13,7 @@ import org.fxmisc.richtext.CodeArea;
  * @edited December 28, 2025
  * @since Beta 1.0
  */
-public class BuildLayout {
+public class SetupLayout {
     
     /**
      * Build the complete layout for a JSON editor.

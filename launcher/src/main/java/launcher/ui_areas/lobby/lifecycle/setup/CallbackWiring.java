@@ -1,10 +1,10 @@
-package launcher.ui_areas.lobby.more_managers.core.setup;
+package launcher.ui_areas.lobby.core.setup;
 
 import gdk.api.GameModule;
-import launcher.ui_areas.lobby.more_managers.core.lifecycle.LobbyShutdownManager;
-import launcher.ui_areas.lobby.more_managers.core.lifecycle.SettingsNavigationManager;
+import launcher.ui_areas.lobby.core.lifecycle.LobbyShutdownManager;
+import launcher.ui_areas.lobby.core.lifecycle.SettingsNavigationManager;
 import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
-import launcher.ui_areas.lobby.more_managers.game_launching.GameModuleRefreshManager;
+import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 import launcher.ui_areas.lobby.subcontrollers.TopBarController;

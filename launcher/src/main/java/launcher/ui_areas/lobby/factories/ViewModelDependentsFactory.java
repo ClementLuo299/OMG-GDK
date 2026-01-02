@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.more_managers.core.factories;
+package launcher.ui_areas.lobby.managers.factories;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -7,11 +7,11 @@ import javafx.scene.control.ProgressBar;
 import launcher.features.game_launching.GameLaunchService;
 import launcher.features.json_processing.JsonProcessingService;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.ui_areas.lobby.more_managers.core.LobbyInitializationManager;
-import launcher.ui_areas.lobby.more_managers.game_launching.GameLaunchErrorHandler;
-import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
-import launcher.ui_areas.lobby.more_managers.game_launching.GameModuleRefreshManager;
-import launcher.ui_areas.lobby.more_managers.game_launching.ModuleCompilationChecker;
+import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
+import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
+import launcher.ui_areas.lobby.game_launching.GameLaunchingManager;
+import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
+import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
 import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;

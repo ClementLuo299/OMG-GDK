@@ -9,8 +9,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
-import launcher.ui_areas.lobby.more_managers.game_launching.ModuleChangesReporter;
-import launcher.ui_areas.lobby.more_managers.game_launching.ModuleDiscoveryHandler;
+import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
+import launcher.ui_areas.lobby.game_launching.ModuleDiscoveryHandler;
 
 import java.util.List;
 import java.util.Set;
