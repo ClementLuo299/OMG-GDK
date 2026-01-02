@@ -1,6 +1,5 @@
 package launcher.features.module_handling.loading.helpers;
 
-import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
 import launcher.features.development_features.StartupDelayUtil;
 
 import java.util.List;
@@ -21,14 +20,9 @@ public final class ModuleCountReporter {
     /**
      * Reports the number of modules found and loaded.
      * 
-     * @param progressManager The progress manager for updates
      * @param discoveredModules List of discovered modules
      */
-    public static void reportModuleCount(ModuleLoadingProgressManager progressManager,
-                                        List<?> discoveredModules) {
-        // Count modules and update progress with the result
-        int moduleCount = discoveredModules.size();
-        progressManager.updateProgress("Found " + moduleCount + " modules");
+    public static void reportModuleCount(List<?> discoveredModules) {
         StartupDelayUtil.addDevelopmentDelay("After reporting module count");
     }
 }
