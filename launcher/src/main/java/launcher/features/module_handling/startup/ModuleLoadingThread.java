@@ -2,7 +2,6 @@ package launcher.features.module_handling.startup;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.core.lifecycle.StartupCompletionHandler;
 import launcher.core.lifecycle.StartupWorkflow;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindowManager;
@@ -49,8 +48,7 @@ public final class ModuleLoadingThread {
                 ModuleUIUpdater.updateUIWithLoadedGames(lobbyController);
                 StartupDelayUtil.addDevelopmentDelay("After refreshing game modules");
                 
-                // Phase 4: Mark startup as complete
-                StartupCompletionHandler.markStartupComplete(windowManager);
+                // Phase 4: Startup complete
                 StartupDelayUtil.addDevelopmentDelay("After startup complete and ready");
                 
                 // Phase 5: Show main stage and hide startup window
