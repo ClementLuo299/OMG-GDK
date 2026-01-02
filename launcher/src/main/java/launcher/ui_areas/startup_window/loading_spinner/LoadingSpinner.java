@@ -38,15 +38,6 @@ public class LoadingSpinner extends JComponent {
     }
     
     /**
-     * Gets the current rotation angle.
-     * 
-     * @return The current rotation angle in degrees (0-360)
-     */
-    double getRotationAngle() {
-        return rotationAngle;
-    }
-    
-    /**
      * Paints the spinner component.
      * 
      * First paints the background, then draws

@@ -11,6 +11,7 @@ import launcher.ui_areas.startup_window.styling.theme.SpinnerConstants;
  * 
  * @author Clement Luo
  * @date January 1, 2026
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
 public final class LoadingSpinnerBuilder {

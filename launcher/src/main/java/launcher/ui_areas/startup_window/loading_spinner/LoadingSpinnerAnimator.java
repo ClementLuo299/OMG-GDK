@@ -12,9 +12,10 @@ import javax.swing.Timer;
  * 
  * @author Clement Luo
  * @date January 1, 2026
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
-public final class LoadingSpinnerController {
+public final class LoadingSpinnerAnimator {
     
     /** The spinner component this controller manages */
     private final LoadingSpinner spinner;
@@ -30,38 +31,9 @@ public final class LoadingSpinnerController {
      * 
      * @param spinner The spinner component to control
      */
-    public LoadingSpinnerController(LoadingSpinner spinner) {
+    public LoadingSpinnerAnimator(LoadingSpinner spinner) {
         this.spinner = spinner;
         initializeTimer();
-    }
-    
-    /**
-     * Initializes the animation timer.
-     * 
-     * Creates a timer that updates the rotation angle and triggers repaints
-     * at the configured frame rate.
-     */
-    private void initializeTimer() {
-        animationTimer = new Timer(SpinnerConstants.ANIMATION_DELAY_MS, e -> {
-            // Rotate by the configured increment per frame
-            rotationAngle += SpinnerConstants.ROTATION_INCREMENT;
-            if (rotationAngle >= 360.0) {
-                rotationAngle -= 360.0; // Keep angle in 0-360 range
-            }
-            
-            // Update the spinner's rotation angle and trigger repaint
-            spinner.setRotationAngle(rotationAngle);
-            spinner.repaint();
-        });
-    }
-    
-    /**
-     * Gets the current rotation angle.
-     * 
-     * @return The current rotation angle in degrees (0-360)
-     */
-    public double getRotationAngle() {
-        return rotationAngle;
     }
     
     /**
@@ -87,14 +59,25 @@ public final class LoadingSpinnerController {
             animationTimer.stop();
         }
     }
-    
+
     /**
-     * Checks if the animation is currently running.
-     * 
-     * @return true if the animation is running, false otherwise
+     * Initializes the animation timer.
+     *
+     * Creates a timer that updates the rotation angle and triggers repaints
+     * at the configured frame rate.
      */
-    public boolean isRunning() {
-        return animationTimer.isRunning();
+    private void initializeTimer() {
+        animationTimer = new Timer(SpinnerConstants.ANIMATION_DELAY_MS, e -> {
+            // Rotate by the configured increment per frame
+            rotationAngle += SpinnerConstants.ROTATION_INCREMENT;
+            if (rotationAngle >= 360.0) {
+                rotationAngle -= 360.0; // Keep angle in 0-360 range
+            }
+
+            // Update the spinner's rotation angle and trigger repaint
+            spinner.setRotationAngle(rotationAngle);
+            spinner.repaint();
+        });
     }
 }
 

@@ -12,7 +12,7 @@ import launcher.ui_areas.startup_window.styling.theme.Typography;
  * 
  * @author Clement Luo
  * @date December 23, 2025
- * @edited January 2025
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
 public class LoadingLabel {
