@@ -2,7 +2,6 @@ package launcher.features.module_handling.loading.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
-import launcher.features.development_features.StartupDelayUtil;
 
 /**
  * Orchestrates the startup workflow phases.
@@ -24,7 +23,6 @@ public final class StartupWorkflow {
         // Execute the module loading workflow
         loadModules();
         Logging.info("Module loading completed");
-        StartupDelayUtil.addDevelopmentDelay("After module loading process completed");
     }
     
     /**
@@ -38,22 +36,17 @@ public final class StartupWorkflow {
             ModuleLoadingSteps.initializeModuleLoading();
             
             // Step 2: Discover available modules in the modules directory
-            StartupDelayUtil.addDevelopmentDelay("After 'Discovering modules' message");
             ModuleDiscoverySteps.DiscoveryResult discoveryResult = 
                 ModuleDiscoverySteps.discover();
             
             // Step 3: Handle discovery results
             if (!discoveryResult.isSuccess()) {
                 // Discovery failed - continue
-                StartupDelayUtil.addDevelopmentDelay("After discovery error");
             } else if (discoveryResult.getValidModuleDirectories().isEmpty()) {
                 // No modules found - continue without loading anything
                 Logging.info("No modules discovered - continuing without modules");
             } else {
                 // Modules found - proceed with loading
-                StartupDelayUtil.addDevelopmentDelay("After module discovery completed - found " + 
-                    discoveryResult.getValidModuleDirectories().size() + " modules");
-                
                 // Step 4: Load the discovered modules into memory
                 ModuleLoadingSteps.executeLoading(discoveryResult);
             }
@@ -75,7 +68,6 @@ public final class StartupWorkflow {
         // Log the error and continue execution even if module loading fails
         Logging.error("Critical error during module loading: " + e.getMessage(), e);
         e.printStackTrace();
-        StartupDelayUtil.addDevelopmentDelay("After 'Error during module loading' message");
     }
 }
 

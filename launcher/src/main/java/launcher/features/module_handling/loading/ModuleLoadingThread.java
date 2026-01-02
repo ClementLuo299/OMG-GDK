@@ -6,7 +6,6 @@ import launcher.features.module_handling.loading.helpers.CompilationChecker;
 import launcher.features.module_handling.loading.helpers.StartupWorkflow;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
-import launcher.features.development_features.StartupDelayUtil;
 import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;
 
 /**
@@ -43,16 +42,11 @@ public final class ModuleLoadingThread {
                 
                 // Phase 2: Check for compilation issues
                 CompilationChecker.checkForCompilationIssues(lobbyController);
-                StartupDelayUtil.addDevelopmentDelay("After checking for compilation issues");
                 
                 // Phase 3: Update UI with loaded games
                 ModuleUIUpdater.updateUIWithLoadedGames(lobbyController);
-                StartupDelayUtil.addDevelopmentDelay("After refreshing game modules");
                 
-                // Phase 4: Startup complete
-                StartupDelayUtil.addDevelopmentDelay("After startup complete and ready");
-                
-                // Phase 5: Show main stage and hide startup window
+                // Phase 4: Show main stage and hide startup window
                 Logging.info("All startup tasks complete - showing main stage");
                 StartupWindowToMainStageTransition.showMainStage(primaryApplicationStage, windowManager);
                 

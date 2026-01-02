@@ -2,7 +2,6 @@ package launcher.features.module_handling.loading.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.development_features.StartupDelayUtil;
 import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
 
 import java.util.ArrayList;
@@ -60,7 +59,6 @@ public final class ModuleLoadingSteps {
      */
     public static void finalizeModuleLoading() {
         Logging.info("Finalizing module loading...");
-        StartupDelayUtil.addDevelopmentDelay("After finalizing module loading");
     }
 }
 

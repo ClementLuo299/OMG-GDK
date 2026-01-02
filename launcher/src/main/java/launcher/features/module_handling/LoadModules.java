@@ -6,7 +6,6 @@ import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.module_handling.loading.ModuleLoadingThread;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.stop.Shutdown;
-import launcher.features.development_features.StartupDelayUtil;
 
 /**
  * Coordinates the module ui_loading process during startup.
@@ -30,7 +29,6 @@ public final class LoadModules {
      */
     public static void load(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindow windowManager) {
         Logging.info("Starting module ui_loading process...");
-        StartupDelayUtil.addDevelopmentDelay("After 'Starting module ui_loading' message");
         
         // Wait a tiny bit to make sure the window is fully visible
         try {

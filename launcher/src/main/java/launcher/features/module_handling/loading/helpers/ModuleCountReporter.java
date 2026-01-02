@@ -1,6 +1,5 @@
 package launcher.features.module_handling.loading.helpers;
 
-import launcher.features.development_features.StartupDelayUtil;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public final class ModuleCountReporter {
      * @param discoveredModules List of discovered modules
      */
     public static void reportModuleCount(List<?> discoveredModules) {
-        StartupDelayUtil.addDevelopmentDelay("After reporting module count");
+        // Module count reporting (no delay needed)
     }
 }
 

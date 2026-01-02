@@ -56,7 +56,7 @@ public final class StartupDelayUtil {
             return; // Skip delay if disabled
         }
         
-        final long delayMs = 1500; // 1.5 seconds
+        final long delayMs = 5000; // 5 seconds
         final long startTime = System.currentTimeMillis();
         
         Logging.info("DEVELOPMENT DELAY: " + reason + " - waiting 1.5 seconds...");

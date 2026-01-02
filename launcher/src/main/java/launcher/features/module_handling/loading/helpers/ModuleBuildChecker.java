@@ -2,7 +2,6 @@ package launcher.features.module_handling.loading.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.loading.ModuleCompiler;
-import launcher.features.development_features.StartupDelayUtil;
 
 /**
  * Checks if modules need to be built before ui_loading.
@@ -21,21 +20,16 @@ public final class ModuleBuildChecker {
      * Checks if modules need to be built and initializes the loading process.
      */
     public static void checkAndInitialize() {
-        StartupDelayUtil.addDevelopmentDelay("After initializing game modules");
-        
         // Check if modules need to be compiled before loading
         if (ModuleCompiler.needToBuildModules()) {
             Logging.info("Modules need to be built");
-            StartupDelayUtil.addDevelopmentDelay("After checking if modules need to be built");
         } else {
             // Modules are already compiled, use existing builds
             Logging.info("Using existing builds (recent compilation detected)");
-            StartupDelayUtil.addDevelopmentDelay("After checking if modules need to be built");
         }
         
         // Prepare for module discovery phase
         Logging.info("Preparing module discovery...");
-        StartupDelayUtil.addDevelopmentDelay("After preparing module discovery");
     }
 }
 

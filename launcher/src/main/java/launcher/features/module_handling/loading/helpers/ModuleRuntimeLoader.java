@@ -3,7 +3,6 @@ package launcher.features.module_handling.loading.helpers;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.loading.ModuleCompiler;
-import launcher.features.development_features.StartupDelayUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ public final class ModuleRuntimeLoader {
         for (File moduleDir : validModuleDirectories) {
             String moduleName = moduleDir.getName();
             Logging.info("Processing module: " + moduleName);
-            StartupDelayUtil.addDevelopmentDelay("After processing module: " + moduleName);
         }
     }
     
@@ -55,14 +53,11 @@ public final class ModuleRuntimeLoader {
             if (discoveredModules.isEmpty()) {
                 Logging.warning("No modules were loaded! Check module compilation status.");
             }
-            StartupDelayUtil.addDevelopmentDelay("After loading compiled modules - loaded " +
-                discoveredModules.size() + " modules");
             
         } catch (Exception e) {
             // Handle loading errors gracefully - continue with empty list
             Logging.error("Module loading failed: " + e.getMessage(), e);
             e.printStackTrace();
-            StartupDelayUtil.addDevelopmentDelay("After module loading failure");
         }
         
         return discoveredModules;
