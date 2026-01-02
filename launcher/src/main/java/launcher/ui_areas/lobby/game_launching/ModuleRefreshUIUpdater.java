@@ -1,16 +1,14 @@
-package launcher.ui_areas.lobby.managers.game_launching;
+package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.ui_areas.lobby.managers.messaging.MessageManager;
-import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.messaging.MessageManager;
+import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
+import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
-import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
-import launcher.ui_areas.lobby.game_launching.ModuleDiscoveryHandler;
 
 import java.util.List;
 import java.util.Set;

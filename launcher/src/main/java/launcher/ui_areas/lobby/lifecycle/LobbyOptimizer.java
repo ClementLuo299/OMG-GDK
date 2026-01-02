@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby;
+package launcher.ui_areas.lobby.lifecycle;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;

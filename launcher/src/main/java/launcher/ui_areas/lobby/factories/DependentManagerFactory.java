@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.managers.factories;
+package launcher.ui_areas.lobby.factories;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -14,11 +14,11 @@ import launcher.ui_areas.lobby.game_launching.GameLaunchingManager;
 import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
 import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
 import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
-import launcher.ui_areas.lobby.managers.messaging.MessageManager;
+import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.messaging.MessageBridgeManager;
-import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
-import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
+import launcher.ui_areas.lobby.ui_management.LoadingAnimationManager;
+import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.features.persistence.JsonPersistenceManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;

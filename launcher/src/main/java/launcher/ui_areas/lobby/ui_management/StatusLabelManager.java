@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.managers.ui;
+package launcher.ui_areas.lobby.ui_management;
 
 import gdk.internal.Logging;
 import javafx.scene.control.Label;

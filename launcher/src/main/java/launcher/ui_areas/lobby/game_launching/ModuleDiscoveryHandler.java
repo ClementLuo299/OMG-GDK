@@ -1,10 +1,10 @@
-package launcher.ui_areas.lobby.more_managers.game_launching;
+package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.ModuleDiscoveryService;
-import launcher.ui_areas.lobby.managers.messaging.MessageManager;
-import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.messaging.MessageManager;
+import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import javafx.application.Platform;
 
 import java.util.ArrayList;

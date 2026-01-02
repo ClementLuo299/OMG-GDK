@@ -5,8 +5,6 @@ import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.core.ui_features.ui_loading.stage.MainStageInitializer;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.LobbyOptimizer;
-import launcher.ui_areas.lobby.LobbySceneLoader;
 import launcher.ui_areas.startup_window.StartupWindowManager;
 
 /**

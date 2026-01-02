@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.more_managers.messaging;
+package launcher.ui_areas.lobby.messaging;
 
 import javafx.application.Platform;
 import launcher.features.game_messaging.MessageProcessingService;

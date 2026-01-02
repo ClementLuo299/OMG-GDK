@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.json_editor.building;
+package launcher.ui_areas.lobby.json_editor.setup;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.Priority;
@@ -13,7 +13,7 @@ import org.fxmisc.richtext.CodeArea;
  * @edited December 28, 2025
  * @since Beta 1.0
  */
-public class SetupLayout {
+public class SetupCodeAreaLayout {
     
     /**
      * Build the complete layout for a JSON editor.

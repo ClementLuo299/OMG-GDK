@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.core.lifecycle;
+package launcher.ui_areas.lobby.lifecycle;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;

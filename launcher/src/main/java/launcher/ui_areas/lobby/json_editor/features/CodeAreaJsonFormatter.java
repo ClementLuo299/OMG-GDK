@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.json_editor.building;
+package launcher.ui_areas.lobby.json_editor.features;
 
 import launcher.features.json_processing.JsonFormatter;
 import launcher.core.ui_features.pop_up_dialogs.DialogUtil;

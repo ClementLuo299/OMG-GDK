@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.managers.factories;
+package launcher.ui_areas.lobby.factories;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -12,8 +12,8 @@ import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.game_launching.GameLaunchingManager;
 import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
 import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
-import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
-import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
+import launcher.ui_areas.lobby.json_editor.JsonEditorOperations;
+import launcher.ui_areas.lobby.ui_management.LoadingAnimationManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 
 /**

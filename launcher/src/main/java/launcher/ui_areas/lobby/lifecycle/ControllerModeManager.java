@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.core.lifecycle;
+package launcher.ui_areas.lobby.lifecycle;
 
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.ControllerMode;

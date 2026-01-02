@@ -4,7 +4,6 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.features.module_handling.loading.helpers.CompilationChecker;
 import launcher.features.module_handling.loading.helpers.StartupWorkflow;
-import launcher.ui_areas.lobby.ModuleUIUpdater;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindowManager;
 import launcher.features.development_features.StartupDelayUtil;

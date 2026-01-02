@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.json_editor.building;
+package launcher.ui_areas.lobby.json_editor.setup;
 
 import javafx.beans.property.StringProperty;
 import org.fxmisc.richtext.CodeArea;

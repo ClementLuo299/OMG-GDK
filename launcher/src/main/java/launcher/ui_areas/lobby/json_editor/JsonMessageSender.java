@@ -1,8 +1,7 @@
-package launcher.ui_areas.lobby.managers.json;
+package launcher.ui_areas.lobby.json_editor;
 
 import gdk.api.GameModule;
 import launcher.features.json_processing.JsonProcessingService;
-import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.features.game_messaging.GameMessageHandler;
 
 import java.util.Map;

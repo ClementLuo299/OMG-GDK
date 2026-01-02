@@ -1,5 +1,6 @@
-package launcher.ui_areas.lobby.json_editor.building;
+package launcher.ui_areas.lobby.json_editor.setup;
 
+import launcher.ui_areas.lobby.json_editor.features.CodeAreaJsonFormatter;
 import org.fxmisc.richtext.CodeArea;
 import launcher.ui_areas.lobby.json_editor.features.CodeColorHighlight;
 import launcher.ui_areas.lobby.json_editor.features.JsonEditorContextMenu;

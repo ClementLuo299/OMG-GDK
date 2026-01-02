@@ -1,7 +1,6 @@
-package launcher.ui_areas.lobby.managers.json;
+package launcher.ui_areas.lobby.json_editor;
 
 import launcher.features.json_processing.JsonProcessingService;
-import launcher.ui_areas.lobby.json_editor.JsonEditor;
 
 import java.util.Map;
 

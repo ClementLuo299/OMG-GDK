@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.managers.factories;
+package launcher.ui_areas.lobby.factories;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,11 +14,11 @@ import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
 import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
 import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
-import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
-import launcher.ui_areas.lobby.managers.messaging.MessageManager;
-import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
-import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
-import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
+import launcher.ui_areas.lobby.json_editor.JsonEditorOperations;
+import launcher.ui_areas.lobby.messaging.MessageManager;
+import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
+import launcher.ui_areas.lobby.ui_management.LoadingAnimationManager;
+import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 
 /**
  * Factory for creating basic more_managers that don't depend on subcontrollers.

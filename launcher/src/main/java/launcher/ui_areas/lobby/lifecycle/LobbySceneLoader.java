@@ -1,9 +1,10 @@
-package launcher.ui_areas.lobby;
+package launcher.ui_areas.lobby.lifecycle;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import launcher.core.ui_features.ui_loading.fonts.FontLoader;
 import launcher.core.GDKApplication;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
 
 import java.net.URL;
 

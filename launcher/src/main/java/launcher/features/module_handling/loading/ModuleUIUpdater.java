@@ -1,7 +1,8 @@
-package launcher.ui_areas.lobby;
+package launcher.features.module_handling.loading;
 
 import gdk.internal.Logging;
 import javafx.application.Platform;
+import launcher.ui_areas.lobby.GDKGameLobbyController;
 
 /**
  * Handles JavaFX UI updates during startup.

@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.managers.factories;
+package launcher.ui_areas.lobby.factories;
 
 import gdk.api.GameModule;
 import javafx.collections.FXCollections;
@@ -8,9 +8,9 @@ import javafx.scene.control.ComboBox;
 import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.features.persistence.JsonPersistenceManager;
-import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
-import launcher.ui_areas.lobby.managers.messaging.MessageManager;
-import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
+import launcher.ui_areas.lobby.json_editor.JsonEditorOperations;
+import launcher.ui_areas.lobby.messaging.MessageManager;
+import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 import launcher.ui_areas.lobby.subcontrollers.TopBarController;
