@@ -1,7 +1,6 @@
-package launcher.features.module_handling.startup;
+package launcher.ui_areas.lobby;
 
 import gdk.internal.Logging;
-import launcher.ui_areas.lobby.GDKGameLobbyController;
 import javafx.application.Platform;
 
 /**

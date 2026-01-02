@@ -1,4 +1,4 @@
-package launcher.features.module_handling.loading;
+package launcher.features.module_handling.loading.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
