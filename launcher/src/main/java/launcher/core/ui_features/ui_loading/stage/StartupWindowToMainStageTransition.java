@@ -2,7 +2,7 @@ package launcher.core.ui_features.ui_loading.stage;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 
 /**
  * Utility class for transitioning from startup window to main application stage.
@@ -23,9 +23,9 @@ public final class StartupWindowToMainStageTransition {
      * Called after module ui_loading completes.
      * 
      * @param primaryApplicationStage The primary application stage
-     * @param windowManager The startup window manager to hide
+     * @param windowManager The startup window to hide
      */
-    public static void showMainStage(Stage primaryApplicationStage, StartupWindowManager windowManager) {
+    public static void showMainStage(Stage primaryApplicationStage, StartupWindow windowManager) {
         windowManager.hide();
         Platform.runLater(() -> {
             primaryApplicationStage.setOpacity(1.0);

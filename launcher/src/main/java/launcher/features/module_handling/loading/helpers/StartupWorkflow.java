@@ -2,7 +2,7 @@ package launcher.features.module_handling.loading.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.features.development_features.StartupDelayUtil;
 
 /**
@@ -21,10 +21,10 @@ public final class StartupWorkflow {
     /**
      * Executes the complete startup workflow.
      * 
-     * @param windowManager The startup window manager
+     * @param windowManager The startup window
      */
-    public static void executeWorkflow(StartupWindowManager windowManager) {
-        // Execute the module ui_loading workflow
+    public static void executeWorkflow(StartupWindow windowManager) {
+        // Execute the module loading workflow
         loadModules(windowManager);
         Logging.info("Module ui_loading completed");
         StartupDelayUtil.addDevelopmentDelay("After module ui_loading process completed");
@@ -33,9 +33,9 @@ public final class StartupWorkflow {
     /**
      * Loads game modules.
      * 
-     * @param windowManager The startup window manager
+     * @param windowManager The startup window
      */
-    private static void loadModules(StartupWindowManager windowManager) {
+    private static void loadModules(StartupWindow windowManager) {
         try {
             Logging.info("Starting module loading process");
             

@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import launcher.features.module_handling.loading.helpers.CompilationChecker;
 import launcher.features.module_handling.loading.helpers.StartupWorkflow;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.features.development_features.StartupDelayUtil;
 import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;
 
@@ -27,12 +27,12 @@ public final class ModuleLoadingThread {
      * 
      * @param primaryApplicationStage The primary stage to show when ready
      * @param lobbyController The controller to update with loaded games
-     * @param windowManager The startup window manager
+     * @param windowManager The startup window
      * @return The configured but not-yet-started thread
      */
     public static Thread create(Stage primaryApplicationStage,
                                 GDKGameLobbyController lobbyController, 
-                                StartupWindowManager windowManager) {
+                                StartupWindow windowManager) {
 
         return new Thread(() -> {
             try {
@@ -70,11 +70,11 @@ public final class ModuleLoadingThread {
      * 
      * @param error The exception that occurred
      * @param primaryApplicationStage The primary stage to show
-     * @param windowManager The startup window manager
+     * @param windowManager The startup window
      */
     private static void handleModuleLoadingError(Exception error, 
                                                  Stage primaryApplicationStage, 
-                                                 StartupWindowManager windowManager) {
+                                                 StartupWindow windowManager) {
         Logging.error("Critical error in module ui_loading thread: " + error.getMessage(), error);
         
         // Even on error, try to show the main stage

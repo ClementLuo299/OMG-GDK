@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.core.ui_features.ui_loading.stage.MainStageInitializer;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 
 /**
  * Initializes the main user interface components.
@@ -28,10 +28,10 @@ public final class LobbyUIInitializer {
      * and wiring up the controller.
      * 
      * @param primaryApplicationStage The primary JavaFX stage for the application
-     * @param windowManager The startup window manager for progress updates
+     * @param windowManager The startup window
      * @return The initialized GDKGameLobbyController
      */
-    public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindowManager windowManager) {
+    public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindow windowManager) {
         // Load the main scene from FXML
         LobbySceneLoader.SceneLoadResult loadResult = LobbySceneLoader.loadMainScene();
         Scene mainLobbyScene = loadResult.scene;

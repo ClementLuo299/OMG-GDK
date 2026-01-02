@@ -4,7 +4,7 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.core.lifecycle.start.auto_launch.AutoLaunchProcess;
 import launcher.core.lifecycle.start.launch.StandardLaunchProcess;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.start.auto_launch.AutoLaunchUtil;
 
 /**
@@ -34,7 +34,7 @@ public final class Startup {
         Logging.info("Beginning GDK application startup process");
         
         // Show startup window
-        StartupWindowManager windowManager = StartupWindowManager.createAndShow();
+        StartupWindow windowManager = StartupWindow.createAndShow();
         
         // Execute launch mode
         try {

@@ -4,7 +4,7 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.module_handling.loading.ModuleLoadingThread;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.stop.Shutdown;
 import launcher.features.development_features.StartupDelayUtil;
 
@@ -26,9 +26,9 @@ public final class LoadModules {
      * 
      * @param primaryApplicationStage The main window (hidden until modules are loaded)
      * @param lobbyController The UI controller that will show the list of games
-     * @param windowManager The startup progress window (visible during ui_loading)
+     * @param windowManager The startup window (visible during loading)
      */
-    public static void load(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
+    public static void load(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindow windowManager) {
         Logging.info("Starting module ui_loading process...");
         StartupDelayUtil.addDevelopmentDelay("After 'Starting module ui_loading' message");
         
@@ -64,20 +64,20 @@ public final class LoadModules {
      * These tasks will be executed when the application shuts down.
      * 
      * @param moduleLoadingThread The thread to interrupt on shutdown
-     * @param windowManager The window manager to hide on shutdown
+     * @param windowManager The startup window to hide on shutdown
      */
-    private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindowManager windowManager) {
-        // Clean up the module ui_loading thread if app shuts down while ui_loading
+    private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindow windowManager) {
+        // Clean up the module loading thread if app shuts down while loading
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up module ui_loading thread...");
+            Logging.info("Cleaning up module loading thread...");
             if (moduleLoadingThread.isAlive()) {
                 moduleLoadingThread.interrupt();
             }
         });
         
-        // Clean up the startup window manager
+        // Clean up the startup window
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up StartupWindowManager...");
+            Logging.info("Cleaning up StartupWindow...");
             if (windowManager != null) {
                 windowManager.hide();
             }

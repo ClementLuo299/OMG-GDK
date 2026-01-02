@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.lifecycle.LobbyUIInitializer;
 import launcher.features.module_handling.LoadModules;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.features.development_features.StartupDelayUtil;
 
 /**
@@ -31,7 +31,7 @@ public final class StandardLaunchProcess {
      * @param primaryApplicationStage The primary JavaFX stage
      * @throws RuntimeException if the startup process fails
      */
-    public static void launch(Stage primaryApplicationStage, StartupWindowManager windowManager) {
+    public static void launch(Stage primaryApplicationStage, StartupWindow windowManager) {
         try {
             StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application' message");
 

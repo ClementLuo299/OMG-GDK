@@ -3,7 +3,7 @@ package launcher.features.module_handling.loading.helpers;
 import gdk.internal.Logging;
 import javafx.application.Platform;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.startup_window.StartupWindowManager;
+import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.features.development_features.StartupDelayUtil;
 
 /**
@@ -24,10 +24,10 @@ public final class CompilationChecker {
      * The controller check must run on the JavaFX thread.
      * 
      * @param lobbyController The controller to check for issues
-     * @param windowManager The startup window manager
+     * @param windowManager The startup window
      */
     public static void checkForCompilationIssues(GDKGameLobbyController lobbyController, 
-                                                StartupWindowManager windowManager) {
+                                                StartupWindow windowManager) {
         StartupDelayUtil.addDevelopmentDelay("After 'Checking for compilation issues' message");
         
         // Check for compilation failures (must run on JavaFX thread for controller access)
