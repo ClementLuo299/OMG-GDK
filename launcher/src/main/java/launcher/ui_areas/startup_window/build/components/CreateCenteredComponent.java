@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.component_construction.components;
+package launcher.ui_areas.startup_window.build.components;
 
 import java.awt.FlowLayout;
 import javax.swing.JComponent;
