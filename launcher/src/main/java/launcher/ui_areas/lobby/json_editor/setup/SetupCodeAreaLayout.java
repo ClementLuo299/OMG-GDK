@@ -23,7 +23,7 @@ public class SetupCodeAreaLayout {
      * @param codeArea The code area component to include in the layout
      */
     public static void build(VBox container, String title, CodeArea codeArea) {
-        // Container styling
+        // Container styling_theme
         container.setSpacing(0);
         container.getStyleClass().add("single-json_processing-editor");
         

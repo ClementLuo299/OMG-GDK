@@ -6,7 +6,7 @@ import launcher.ui_areas.lobby.json_editor.features.AutoIndent;
 
 /**
  * Configures the core CodeArea component for JSON editing with line numbers,
- * styling, and auto-indentation.
+ * styling_theme, and auto-indentation.
  * 
  * @author Clement Luo
  * @date December 27, 2025
@@ -36,7 +36,7 @@ public class ConfigureCodeArea {
         // Remove any internal margins or padding
         codeArea.setStyle("-fx-margin: 0; -fx-padding: 0;");
         
-        // Apply CSS class for styling
+        // Apply CSS class for styling_theme
         codeArea.getStyleClass().add("code-area");
         
         // Bind text property

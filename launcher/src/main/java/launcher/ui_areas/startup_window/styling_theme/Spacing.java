@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.styling.theme;
+package launcher.ui_areas.startup_window.styling_theme;
 
 /**
  * Spacing constants for the startup window theme.

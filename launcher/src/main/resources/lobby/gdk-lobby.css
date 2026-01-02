@@ -1099,14 +1099,14 @@
 
 
 
-/* Simple message styling */
+/* Simple message styling_theme */
 .simple-message {
     -fx-text-fill: #495057;
     -fx-font-size: 12px;
     -fx-padding: 2 0;
 }
 
-/* Message container and scroll pane styling */
+/* Message container and scroll pane styling_theme */
 .message-container {
     -fx-background-color: white;
     -fx-padding: 6 2 2 8;
@@ -1332,7 +1332,7 @@
     -fx-border-color: #6c757d;
 }
 
-/* Line numbers styling */
+/* Line numbers styling_theme */
 .json-code-area .lineno {
     -fx-background-color: #f3f4f6;
     -fx-text-fill: #6b7280;
@@ -1350,7 +1350,7 @@
     -fx-padding: 5;
 }
 
-/* CodeArea styling */
+/* CodeArea styling_theme */
 .code-area {
     -fx-font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     -fx-font-size: 12px;

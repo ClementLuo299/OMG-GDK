@@ -82,7 +82,7 @@ public class Main implements GameModule {
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Scene scene = new Scene(loader.load());
             
-            // Apply CSS styling
+            // Apply CSS styling_theme
             URL cssUrl = getClass().getResource("/games/tictactoe/css/tictactoe.css");
             if (cssUrl != null) {
                 scene.getStylesheets().add(cssUrl.toExternalForm());

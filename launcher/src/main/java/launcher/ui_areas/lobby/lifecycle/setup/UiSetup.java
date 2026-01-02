@@ -5,7 +5,7 @@ import javafx.scene.layout.VBox;
 import launcher.core.ui_features.ui_loading.fonts.FontLoader;
 
 /**
- * Handles UI component setup and styling.
+ * Handles UI component setup and styling_theme.
  * Encapsulates UI setup logic to reduce complexity in LobbyInitializationManager.
  * 
  * @author Clement Luo
@@ -17,12 +17,12 @@ public class UiSetup {
     
     /**
      * Set up all user interface components.
-     * Applies styling and configuration to UI elements.
+     * Applies styling_theme and configuration to UI elements.
      * 
      * @param messageContainer The message container VBox
      */
     public static void setupUserInterface(VBox messageContainer) {
-        // Apply consistent styling to the message container for better readability
+        // Apply consistent styling_theme to the message container for better readability
         // Use the same font as the startup window
         String fontFamily = FontLoader.getApplicationFontFamily();
         Logging.info("Message container font: " + fontFamily);

@@ -12,7 +12,7 @@ import launcher.ui_areas.startup_window.build.builders.MainPanelCreator;
 import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinner;
 import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinnerBuilder;
 import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinnerAnimator;
-import launcher.ui_areas.startup_window.styling.theme.Typography;
+import launcher.ui_areas.startup_window.styling_theme.Font;
 
 /**
  * Builds and assembles all components for the startup window.
@@ -32,7 +32,7 @@ public class StartupWindowBuilder {
      */
     public static StartupWindow build() {
         System.out.println("Creating startup loading window");
-        System.out.println("Using font: " + Typography.getCurrentFontFamily());
+        System.out.println("Using font: " + Font.getCurrentFontFamily());
         
         // Create and configure the main JFrame with transparency
         JFrame frame = CreateMainFrame.create();

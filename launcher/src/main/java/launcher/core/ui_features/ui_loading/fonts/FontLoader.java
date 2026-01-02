@@ -268,5 +268,89 @@ public class FontLoader {
         Logging.info("⚠️ Using final fallback: sans-serif");
         return "sans-serif";
     }
+    
+    /**
+     * Gets the font family to use for Swing (AWT) components.
+     * 
+     * <p>This method tries Inter first if loaded, then falls back to system fonts.
+     * It checks AWT font lists to find the best available font.
+     * 
+     * <p>The method prioritizes modern system fonts (SF Pro, Segoe UI, Roboto, etc.)
+     * and falls back to classic fonts (Arial, Helvetica) if needed.
+     * 
+     * @return The font family name to use for Swing components, or "SansSerif" as final fallback
+     */
+    public static String getSwingFontFamily() {
+        // If Inter is loaded, try to use it
+        if (fontsLoaded) {
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            String[] awtFonts = ge.getAvailableFontFamilyNames();
+            
+            // Try to find Inter or Inter 18pt in AWT fonts
+            for (String font : awtFonts) {
+                if (font.equalsIgnoreCase(INTER_FONT_FAMILY) || 
+                    font.equalsIgnoreCase("Inter 18pt") ||
+                    font.startsWith("Inter")) {
+                    return font;
+                }
+            }
+        }
+        
+        // Fall back to system fonts
+        try {
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            String[] awtFonts = ge.getAvailableFontFamilyNames();
+            
+            String[] preferredFonts = {
+                // macOS - modern system fonts
+                "SF Pro Display", "SF Pro Text", "SF Mono", "Helvetica Neue",
+                // Windows - modern system fonts
+                "Segoe UI", "Segoe UI Variable", "Segoe UI Semibold",
+                // Linux/Android - modern fonts
+                "Roboto", "Roboto Medium", "Noto Sans", "Ubuntu", "Cantarell",
+                // Cross-platform alternatives
+                "Inter", "Source Sans Pro", "Open Sans", "Lato",
+                // Classic fallbacks
+                "Arial", "Helvetica", "Verdana",
+                // Logical font names (Java fallback)
+                "SansSerif", "Dialog", "DialogInput"
+            };
+            
+            for (String preferred : preferredFonts) {
+                for (String available : awtFonts) {
+                    if (available.equalsIgnoreCase(preferred)) {
+                        return available;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.warning("⚠️ Error getting Swing font family: " + e.getMessage());
+        }
+        
+        // Final fallback
+        return "SansSerif";
+    }
+    
+    /**
+     * Creates a Swing (AWT) font with the specified family, style, and size.
+     * 
+     * <p>This method creates a font using the centralized font family selection.
+     * If a custom font is loaded, it will attempt to use the appropriate weight.
+     * 
+     * @param family The font family name (if null, uses getSwingFontFamily())
+     * @param style The font style (Font.PLAIN, Font.BOLD, etc.)
+     * @param size The font size in points
+     * @return The created font
+     */
+    public static java.awt.Font createSwingFont(String family, int style, int size) {
+        if (family == null) {
+            family = getSwingFontFamily();
+        }
+        
+        // Create the font
+        java.awt.Font font = new java.awt.Font(family, style, size);
+        // Use derived font for better rendering
+        return font.deriveFont((float) size);
+    }
 }
 

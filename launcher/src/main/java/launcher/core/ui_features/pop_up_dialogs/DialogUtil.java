@@ -19,7 +19,7 @@ import java.util.Optional;
  * 
  * <p>This class has a single responsibility: providing a centralized way to show
  * error, warning, information, confirmation, and exception pop_up_dialogs with consistent
- * styling and behavior.
+ * styling_theme and behavior.
  * 
  * <p>Key responsibilities:
  * <ul>

@@ -10,7 +10,7 @@ import java.net.URL;
 
 /**
  * Loads the main user interface scene from FXML resources.
- * Handles FXML ui_loading, scene creation, CSS styling, and controller extraction.
+ * Handles FXML ui_loading, scene creation, CSS styling_theme, and controller extraction.
  * 
  * @author Clement Luo
  * @date December 26, 2025
@@ -38,7 +38,7 @@ public final class LobbySceneLoader {
     
     /**
      * Loads the main user interface from FXML and creates the scene.
-     * Loads the GDKGameLobby.fxml file, extracts the controller, and applies CSS styling.
+     * Loads the GDKGameLobby.fxml file, extracts the controller, and applies CSS styling_theme.
      * 
      * @return A SceneLoadResult containing the scene and controller
      * @throws RuntimeException if FXML resource is not found or ui_loading fails
@@ -62,7 +62,7 @@ public final class LobbySceneLoader {
                 throw new RuntimeException("Lobby controller is null - FXML ui_loading may have failed");
             }
             
-            // Apply CSS styling first (CSS has global font rules)
+            // Apply CSS styling_theme first (CSS has global font rules)
             URL cssResourceUrl = GDKApplication.class.getResource("/lobby/gdk-lobby.css");
             if (cssResourceUrl != null) {
                 mainLobbyScene.getStylesheets().add(cssResourceUrl.toExternalForm());

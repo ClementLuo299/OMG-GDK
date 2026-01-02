@@ -5,8 +5,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Arc2D;
-import launcher.ui_areas.startup_window.styling.theme.Colors;
-import launcher.ui_areas.startup_window.styling.theme.SpinnerConstants;
+import launcher.ui_areas.startup_window.styling_theme.Colors;
+import launcher.ui_areas.startup_window.styling_theme.LoadingSpinnerStyle;
 
 /**
  * A circular loading spinner component with smooth rotation animation.
@@ -71,7 +71,7 @@ public class LoadingSpinner extends JComponent {
             int centerX = width / 2;
             int centerY = height / 2;
             // Radius accounts for stroke width to keep arc within bounds
-            int radius = Math.min(width, height) / 2 - SpinnerConstants.STROKE_WIDTH;
+            int radius = Math.min(width, height) / 2 - LoadingSpinnerStyle.STROKE_WIDTH;
             
             // Transform graphics context: translate to center, then rotate
             // This allows us to draw the arc at a fixed position and rotate it
@@ -87,7 +87,7 @@ public class LoadingSpinner extends JComponent {
             
             // Set stroke with rounded caps and joins for smooth appearance
             g2d.setStroke(new java.awt.BasicStroke(
-                SpinnerConstants.STROKE_WIDTH,
+                LoadingSpinnerStyle.STROKE_WIDTH,
                 java.awt.BasicStroke.CAP_ROUND,
                 java.awt.BasicStroke.JOIN_ROUND
             ));
@@ -96,7 +96,7 @@ public class LoadingSpinner extends JComponent {
             Arc2D arc = new Arc2D.Double(
                 -radius, -radius,  // Top-left corner of bounding rectangle
                 radius * 2, radius * 2,  // Width and height of bounding rectangle
-                SpinnerConstants.ARC_START_ANGLE, SpinnerConstants.ARC_EXTENT,  // Start angle and extent
+                LoadingSpinnerStyle.ARC_START_ANGLE, LoadingSpinnerStyle.ARC_EXTENT,  // Start angle and extent
                 Arc2D.OPEN  // Open arc (not closed)
             );
             g2d.draw(arc);

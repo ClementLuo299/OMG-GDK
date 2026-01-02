@@ -8,13 +8,13 @@ package launcher.ui_areas.startup_window.styling_theme;
  * @edited January 1, 2026
  * @since Beta 1.0
  */
-public class Dimensions {
+public class Padding {
     
     /** Panel padding in pixels */
     public static final int PANEL_PADDING = 18;
     
     /** Private constructor to prevent instantiation */
-    private Dimensions() {
+    private Padding() {
         throw new AssertionError("Utility class should not be instantiated");
     }
 }

@@ -1,7 +1,7 @@
 package launcher.ui_areas.startup_window.loading_spinner;
 
-import launcher.ui_areas.startup_window.styling.theme.Colors;
-import launcher.ui_areas.startup_window.styling.theme.SpinnerConstants;
+import launcher.ui_areas.startup_window.styling_theme.Colors;
+import launcher.ui_areas.startup_window.styling_theme.LoadingSpinnerStyle;
 
 /**
  * Builds and configures a LoadingSpinner component.
@@ -35,16 +35,16 @@ public final class LoadingSpinnerBuilder {
         
         // Set fixed size for the spinner (square component)
         spinner.setPreferredSize(new java.awt.Dimension(
-            SpinnerConstants.SPINNER_SIZE,
-            SpinnerConstants.SPINNER_SIZE
+            LoadingSpinnerStyle.SPINNER_SIZE,
+            LoadingSpinnerStyle.SPINNER_SIZE
         ));
         spinner.setMinimumSize(new java.awt.Dimension(
-            SpinnerConstants.SPINNER_SIZE,
-            SpinnerConstants.SPINNER_SIZE
+            LoadingSpinnerStyle.SPINNER_SIZE,
+            LoadingSpinnerStyle.SPINNER_SIZE
         ));
         spinner.setMaximumSize(new java.awt.Dimension(
-            SpinnerConstants.SPINNER_SIZE,
-            SpinnerConstants.SPINNER_SIZE
+            LoadingSpinnerStyle.SPINNER_SIZE,
+            LoadingSpinnerStyle.SPINNER_SIZE
         ));
         
         // Make opaque with background matching parent panel to prevent flickering

@@ -180,7 +180,7 @@
     -fx-background-radius: 6px;
 }
 
-/* Player 1 avatar color styling - blue tint */
+/* Player 1 avatar color styling_theme - blue tint */
 #player1Avatar {
     -fx-effect: innershadow(gaussian, -fx-player-x-color, 25, 0.5, 0, 0);
     -fx-border-color: -fx-player-x-color;
@@ -188,7 +188,7 @@
     -fx-border-radius: 6px;
 }
 
-/* Player 2 avatar color styling - red tint */
+/* Player 2 avatar color styling_theme - red tint */
 #player2Avatar {
     -fx-effect: innershadow(gaussian, -fx-player-o-color, 25, 0.5, 0, 0);
     -fx-border-color: -fx-player-o-color;
@@ -227,7 +227,7 @@
     -fx-border-color: transparent;
 }
 
-/* Specific button border styling for TicTacToe grid effect */
+/* Specific button border styling_theme for TicTacToe grid effect */
 /* Top row */
 #btn00 {
     -fx-border-width: 0 2px 2px 0;

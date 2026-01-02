@@ -465,7 +465,7 @@ public class GDKViewModel {
         // Store the controller reference
         this.serverSimulatorController = fxmlLoader.getController();
         
-        // Apply CSS styling if available
+        // Apply CSS styling_theme if available
         URL cssResourceUrl = getClass().getResource("/server-simulator/server-simulator.css");
         if (cssResourceUrl != null) {
             serverSimulatorScene.getStylesheets().add(cssResourceUrl.toExternalForm());

@@ -1,8 +1,8 @@
 package launcher.ui_areas.startup_window.build.builders;
 
 import javax.swing.JFrame;
-import launcher.ui_areas.startup_window.styling.theme.Colors;
-import launcher.ui_areas.startup_window.styling.theme.TextContent;
+import launcher.ui_areas.startup_window.styling_theme.Colors;
+import launcher.ui_areas.startup_window.styling_theme.Labels;
 
 /**
  * Creates and configures the main JFrame with transparency support.
@@ -21,13 +21,13 @@ public class CreateMainFrame {
      */
     public static JFrame create() {
         // Create the main application window
-        JFrame frame = new JFrame(TextContent.WINDOW_TITLE);
+        JFrame frame = new JFrame(Labels.WINDOW_TITLE);
         
         // Configure window behavior: prevent closing, disable resizing, keep on top
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.setResizable(false);
         frame.setAlwaysOnTop(true);
-        frame.setUndecorated(true); // Remove title bar and borders for custom styling
+        frame.setUndecorated(true); // Remove title bar and borders for custom styling_theme
         
         // Enable window transparency for shadow effects
         try {

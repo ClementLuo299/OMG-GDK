@@ -1,6 +1,5 @@
 package launcher.ui_areas.startup_window.styling_theme;
 
-import java.awt.Font;
 import launcher.core.ui_features.ui_loading.fonts.FontLoader;
 
 /**
@@ -12,13 +11,13 @@ import launcher.core.ui_features.ui_loading.fonts.FontLoader;
  * @edited January 1, 2026
  * @since Beta 1.0
  */
-public class Typography {
+public class Font {
     
     /** Font family name (from centralized font loader) */
     public static final String FONT_FAMILY = FontLoader.getSwingFontFamily();
     
     /** Status font (bold, 16pt) - for loading label */
-    public static final Font STATUS_FONT = FontLoader.createSwingFont(FONT_FAMILY, Font.BOLD, 16);
+    public static final java.awt.Font STATUS_FONT = FontLoader.createSwingFont(FONT_FAMILY, java.awt.Font.BOLD, 16);
     
     /**
      * Gets the currently selected font family name.
@@ -31,7 +30,7 @@ public class Typography {
     }
     
     /** Private constructor to prevent instantiation */
-    private Typography() {
+    private Font() {
         throw new AssertionError("Utility class should not be instantiated");
     }
 }

@@ -4,7 +4,7 @@ import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import launcher.ui_areas.startup_window.styling.theme.Spacing;
+import launcher.ui_areas.startup_window.styling_theme.Spacing;
 
 /**
  * Assembles all components into the main panel with proper spacing.

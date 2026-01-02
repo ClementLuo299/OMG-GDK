@@ -4,7 +4,7 @@ import javafx.scene.control.Button;
 
 /**
  * Manages the launch button UI component.
- * Handles updating the launch button state and styling.
+ * Handles updating the launch button state and styling_theme.
  * 
  * @author Clement Luo
  * @date December 29, 2025

@@ -1,6 +1,6 @@
 package launcher.ui_areas.startup_window.loading_spinner;
 
-import launcher.ui_areas.startup_window.styling.theme.SpinnerConstants;
+import launcher.ui_areas.startup_window.styling_theme.LoadingSpinnerStyle;
 
 import javax.swing.Timer;
 
@@ -67,9 +67,9 @@ public final class LoadingSpinnerAnimator {
      * at the configured frame rate.
      */
     private void initializeTimer() {
-        animationTimer = new Timer(SpinnerConstants.ANIMATION_DELAY_MS, e -> {
+        animationTimer = new Timer(LoadingSpinnerStyle.ANIMATION_DELAY_MS, e -> {
             // Rotate by the configured increment per frame
-            rotationAngle += SpinnerConstants.ROTATION_INCREMENT;
+            rotationAngle += LoadingSpinnerStyle.ROTATION_INCREMENT;
             if (rotationAngle >= 360.0) {
                 rotationAngle -= 360.0; // Keep angle in 0-360 range
             }

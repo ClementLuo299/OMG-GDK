@@ -3,11 +3,11 @@ package launcher.ui_areas.startup_window.build.builders;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import launcher.ui_areas.startup_window.styling.components.RoundedPanel;
-import launcher.ui_areas.startup_window.styling.theme.Dimensions;
+import launcher.ui_areas.startup_window.styling_theme.Colors;
+import launcher.ui_areas.startup_window.styling_theme.Padding;
 
 /**
- * Creates the main panel with proper layout and modern styling.
+ * Creates the main panel with proper layout and modern styling_theme.
  * Uses rounded corners and shadow effects for a modern look.
  * 
  * @author Clement Luo
@@ -18,26 +18,25 @@ import launcher.ui_areas.startup_window.styling.theme.Dimensions;
 public class MainPanelCreator {
     
     /**
-     * Creates the main panel with proper layout and modern styling.
+     * Creates the main panel with proper layout and modern styling_theme.
      * 
      * @return A configured main panel with rounded corners and shadow
      */
     public static JPanel create() {
-        // Use custom rounded panel with shadow
-        RoundedPanel panel = new RoundedPanel(
-            Dimensions.CORNER_RADIUS,
-            true // Enable shadow
-        );
+        // Create a simple panel with background color
+        JPanel panel = new JPanel();
+        panel.setBackground(Colors.BACKGROUND);
+        panel.setOpaque(true);
         
         // Use vertical box layout to stack components top to bottom
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
-        // Add padding using border (shadow is drawn by the panel itself)
+        // Add padding using border
         panel.setBorder(new EmptyBorder(
-            Dimensions.PANEL_PADDING,
-            Dimensions.PANEL_PADDING,
-            Dimensions.PANEL_PADDING,
-            Dimensions.PANEL_PADDING
+            Padding.PANEL_PADDING,
+            Padding.PANEL_PADDING,
+            Padding.PANEL_PADDING,
+            Padding.PANEL_PADDING
         ));
         
         return panel;

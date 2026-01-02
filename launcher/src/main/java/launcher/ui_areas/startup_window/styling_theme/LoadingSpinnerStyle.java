@@ -5,9 +5,10 @@ package launcher.ui_areas.startup_window.styling_theme;
  * 
  * @author Clement Luo
  * @date January 1, 2026
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
-public final class SpinnerConstants {
+public final class LoadingSpinnerStyle {
     
     /** The size of the spinner in pixels (width and height) */
     public static final int SPINNER_SIZE = 48;
@@ -28,7 +29,7 @@ public final class SpinnerConstants {
     public static final double ARC_START_ANGLE = 0.0;
     
     /** Private constructor to prevent instantiation */
-    private SpinnerConstants() {
+    private LoadingSpinnerStyle() {
         throw new AssertionError("Utility class should not be instantiated");
     }
 }

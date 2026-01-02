@@ -8,7 +8,7 @@ package launcher.ui_areas.startup_window.styling_theme;
  * @edited January 1, 2026
  * @since Beta 1.0
  */
-public class TextContent {
+public class Labels {
     
     /** Window title */
     public static final String WINDOW_TITLE = "OMG Game Development Kit";
@@ -17,7 +17,7 @@ public class TextContent {
     public static final String LOADING_TEXT = "Loading";
     
     /** Private constructor to prevent instantiation */
-    private TextContent() {
+    private Labels() {
         throw new AssertionError("Utility class should not be instantiated");
     }
 }
