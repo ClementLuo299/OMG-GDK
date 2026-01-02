@@ -31,12 +31,12 @@ public final class HideStartupWindow {
 
         // Hide and dispose the window on the EDT
         if (SwingUtilities.isEventDispatchThread()) {
-            window.spinner.stop();
+            window.spinnerController.stop();
             window.progressFrame.setVisible(false);
             window.progressFrame.dispose();
         } else {
             SwingUtilities.invokeLater(() -> {
-                window.spinner.stop();
+                window.spinnerController.stop();
                 window.progressFrame.setVisible(false);
                 window.progressFrame.dispose();
             });

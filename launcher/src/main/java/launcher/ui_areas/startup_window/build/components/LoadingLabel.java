@@ -15,7 +15,7 @@ import launcher.ui_areas.startup_window.styling.theme.Typography;
  * @edited January 2025
  * @since Beta 1.0
  */
-public class LabelCreator {
+public class LoadingLabel {
     
     /**
      * Creates the loading label with modern typography.

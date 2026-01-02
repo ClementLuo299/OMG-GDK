@@ -7,9 +7,11 @@ import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.ui_areas.startup_window.build.arrangement.ComponentAssembler;
 import launcher.ui_areas.startup_window.build.arrangement.WindowPositioner;
 import launcher.ui_areas.startup_window.build.builders.CreateMainFrame;
-import launcher.ui_areas.startup_window.build.components.LabelCreator;
+import launcher.ui_areas.startup_window.build.components.LoadingLabel;
 import launcher.ui_areas.startup_window.build.components.MainPanelCreator;
-import launcher.ui_areas.startup_window.build.components.LoadingSpinner;
+import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinner;
+import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinnerBuilder;
+import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinnerController;
 import launcher.ui_areas.startup_window.styling.theme.Typography;
 
 /**
@@ -35,11 +37,14 @@ public class StartupWindowBuilder {
         // Create and configure the main JFrame with transparency
         JFrame frame = CreateMainFrame.create();
         
-        // Create animated spinner
-        LoadingSpinner spinner = new LoadingSpinner();
+        // Create animated spinner using builder
+        LoadingSpinner spinner = LoadingSpinnerBuilder.build();
+        
+        // Create controller for the spinner
+        LoadingSpinnerController spinnerController = new LoadingSpinnerController(spinner);
 
         // Create "Loading" label
-        JLabel loadingLabel = LabelCreator.create();
+        JLabel loadingLabel = LoadingLabel.create();
         
         // Create and configure the main panel layout
         JPanel mainPanel = MainPanelCreator.create();
@@ -56,7 +61,7 @@ public class StartupWindowBuilder {
         System.out.println("Startup loading window created");
         
         // Create and return the StartupWindow
-        return new StartupWindow(frame, spinner);
+        return new StartupWindow(frame, spinner, spinnerController);
     }
 }
 
