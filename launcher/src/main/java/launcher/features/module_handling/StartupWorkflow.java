@@ -1,4 +1,4 @@
-package launcher.core.lifecycle;
+package launcher.features.module_handling;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.ModuleDiscoverySteps;

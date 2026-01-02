@@ -2,7 +2,6 @@ package launcher.ui_areas.lobby.lifecycle;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import launcher.core.ui.ui_loading.fonts.FontLoaderWrapper;
 import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.core.ui.ui_loading.stage.MainStageInitializer;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
@@ -35,9 +34,6 @@ public final class LobbyUIInitializer {
      * @return The initialized GDKGameLobbyController
      */
     public static GDKGameLobbyController initialize(Stage primaryApplicationStage, StartupWindowManager windowManager) {
-        // Initialize application resources before UI creation
-        FontLoaderWrapper.initialize();
-        
         // Load the main scene from FXML
         LobbySceneLoader.SceneLoadResult loadResult = LobbySceneLoader.loadMainScene();
         Scene mainLobbyScene = loadResult.scene;
