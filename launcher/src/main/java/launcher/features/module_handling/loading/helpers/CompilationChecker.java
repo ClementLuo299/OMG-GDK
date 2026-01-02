@@ -1,4 +1,4 @@
-package launcher.features.module_handling.startup;
+package launcher.features.module_handling.loading;
 
 import gdk.internal.Logging;
 import javafx.application.Platform;
