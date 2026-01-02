@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
 
 import java.util.ArrayList;
 import java.util.HashSet;

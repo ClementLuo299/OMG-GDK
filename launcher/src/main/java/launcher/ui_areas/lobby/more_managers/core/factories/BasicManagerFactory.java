@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.core.factories;
+package launcher.ui_areas.lobby.more_managers.core.factories;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,10 +10,10 @@ import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.features.json_processing.JsonProcessingService;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.persistence.JsonPersistenceManager;
-import launcher.features.lobby_features.managers.core.LobbyInitializationManager;
-import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
-import launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter;
-import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
+import launcher.ui_areas.lobby.more_managers.core.LobbyInitializationManager;
+import launcher.ui_areas.lobby.more_managers.game_launching.GameLaunchErrorHandler;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleChangesReporter;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
@@ -21,7 +21,7 @@ import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
 import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
 
 /**
- * Factory for creating basic managers that don't depend on subcontrollers.
+ * Factory for creating basic more_managers that don't depend on subcontrollers.
  * Encapsulates basic manager creation logic to reduce complexity in LobbyInitializationManager.
  * 
  * @author Clement Luo
@@ -32,7 +32,7 @@ import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
 public class BasicManagerFactory {
     
     /**
-     * Result containing all created basic managers.
+     * Result containing all created basic more_managers.
      */
     public record BasicManagerCreationResult(
         MessageManager messageManager,
@@ -47,7 +47,7 @@ public class BasicManagerFactory {
     ) {}
     
     /**
-     * Create all basic managers that don't depend on subcontrollers.
+     * Create all basic more_managers that don't depend on subcontrollers.
      * 
      * @param applicationViewModel The application ViewModel (may be null)
      * @param messageReporter Callback for reporting messages
@@ -61,7 +61,7 @@ public class BasicManagerFactory {
      * @param jsonPersistenceToggle The JSON persistence toggle
      * @param statusLabel The status label
      * @param launchGameButton The launch game button
-     * @return Result containing all created basic managers
+     * @return Result containing all created basic more_managers
      */
     public static BasicManagerCreationResult createBasicManagers(
             GDKViewModel applicationViewModel,

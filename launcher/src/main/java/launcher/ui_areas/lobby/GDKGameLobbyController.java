@@ -17,15 +17,14 @@ import com.jfoenix.controls.JFXToggleButton;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import launcher.features.lobby_features.business.GDKViewModel;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
-import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
-import launcher.features.lobby_features.managers.core.LobbyInitializationManager;
-import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
-import launcher.features.lobby_features.managers.core.lifecycle.ControllerModeManager;
-import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
+import launcher.ui_areas.lobby.more_managers.core.LobbyInitializationManager;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.LobbyShutdownManager;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.ControllerModeManager;
+import launcher.ui_areas.lobby.more_managers.game_launching.GameModuleRefreshManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 
 /**

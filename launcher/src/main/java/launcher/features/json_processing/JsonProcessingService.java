@@ -1,7 +1,6 @@
 package launcher.features.json_processing;
 
-import launcher.features.lobby_features.business.GDKViewModel;
-import launcher.features.lobby_features.business.JsonFormatter;
+import launcher.ui_areas.lobby.GDKViewModel;
 
 import java.util.Map;
 

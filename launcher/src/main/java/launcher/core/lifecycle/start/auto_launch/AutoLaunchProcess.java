@@ -4,7 +4,7 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 /**

@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.core.factories;
+package launcher.ui_areas.lobby.more_managers.core.factories;
 
 import gdk.api.GameModule;
 import javafx.collections.FXCollections;

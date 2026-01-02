@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.core;
+package launcher.ui_areas.lobby.more_managers.core;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -13,22 +13,22 @@ import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
 import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
 import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
 import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
-import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
-import launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter;
-import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
+import launcher.ui_areas.lobby.more_managers.game_launching.GameModuleRefreshManager;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleChangesReporter;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
-import launcher.features.lobby_features.managers.messaging.MessageBridgeManager;
-import launcher.features.lobby_features.managers.core.factories.BasicManagerFactory;
-import launcher.features.lobby_features.managers.core.factories.DependentManagerFactory;
-import launcher.features.lobby_features.managers.core.factories.SubcontrollerFactory;
-import launcher.features.lobby_features.managers.core.factories.ViewModelDependentsFactory;
-import launcher.features.lobby_features.managers.core.setup.CallbackWiring;
+import launcher.ui_areas.lobby.more_managers.messaging.MessageBridgeManager;
+import launcher.ui_areas.lobby.more_managers.core.factories.BasicManagerFactory;
+import launcher.ui_areas.lobby.more_managers.core.factories.DependentManagerFactory;
+import launcher.ui_areas.lobby.more_managers.core.factories.SubcontrollerFactory;
+import launcher.ui_areas.lobby.more_managers.core.factories.ViewModelDependentsFactory;
+import launcher.ui_areas.lobby.more_managers.core.setup.CallbackWiring;
 import launcher.ui_areas.lobby.managers.setup.JsonEditorSetup;
-import launcher.features.lobby_features.managers.core.setup.PostInitializationSetup;
+import launcher.ui_areas.lobby.more_managers.core.setup.PostInitializationSetup;
 import launcher.ui_areas.lobby.managers.setup.UiSetup;
-import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
-import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.LobbyShutdownManager;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.SettingsNavigationManager;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -53,7 +53,7 @@ public class LobbyInitializationManager {
     
     /**
      * Interface for reporting messages to the UI.
-     * This is a common interface used by multiple managers.
+     * This is a common interface used by multiple more_managers.
      */
     public interface MessageReporter {
         void addMessage(String message);
@@ -149,10 +149,10 @@ public class LobbyInitializationManager {
     
     /**
      * Initialize all lobby components.
-     * Creates all managers, subcontrollers, wires callbacks, and sets up the UI.
+     * Creates all more_managers, subcontrollers, wires callbacks, and sets up the UI.
      * 
      * @param applicationViewModel The application ViewModel (may be null initially)
-     * @return Initialization result containing all managers and subcontrollers
+     * @return Initialization result containing all more_managers and subcontrollers
      */
     public InitializationResult initialize(GDKViewModel applicationViewModel) {
         Logging.info("Initializing GDK Game Picker Controller");
@@ -163,7 +163,7 @@ public class LobbyInitializationManager {
         JsonEditor jsonOutputEditor = new JsonEditor("JSON Output");
         
         // ==================== CREATE BASIC MANAGERS ====================
-        // Basic managers don't depend on subcontrollers and are needed by them
+        // Basic more_managers don't depend on subcontrollers and are needed by them
         
         BasicManagerFactory.BasicManagerCreationResult basicManagers = BasicManagerFactory.createBasicManagers(
             applicationViewModel,
@@ -181,7 +181,7 @@ public class LobbyInitializationManager {
         );
         
         // ==================== CREATE SUBCONTROLLERS ====================
-        // Subcontrollers depend on basic managers
+        // Subcontrollers depend on basic more_managers
         
         SubcontrollerFactory.SubcontrollerCreationResult subcontrollerResult = SubcontrollerFactory.createSubcontrollers(
             gameSelector,
@@ -203,7 +203,7 @@ public class LobbyInitializationManager {
         );
         
         // ==================== CREATE DEPENDENT MANAGERS ====================
-        // These managers depend on subcontrollers
+        // These more_managers depend on subcontrollers
         
         DependentManagerFactory.DependentManagerCreationResult dependentManagers = DependentManagerFactory.createDependentManagers(
             applicationViewModel,
@@ -349,7 +349,7 @@ public class LobbyInitializationManager {
     // ==================== DATA STRUCTURES ====================
     
     /**
-     * Result of initialization containing all created managers and subcontrollers.
+     * Result of initialization containing all created more_managers and subcontrollers.
      * Used to pass initialization results between methods and to the main controller.
      */
     public record InitializationResult(

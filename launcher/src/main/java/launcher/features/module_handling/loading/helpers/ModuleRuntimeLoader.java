@@ -1,7 +1,8 @@
-package launcher.features.module_handling.loading;
+package launcher.features.module_handling.loading.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
+import launcher.features.module_handling.loading.ModuleCompiler;
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
 import launcher.features.development_features.StartupDelayUtil;
 

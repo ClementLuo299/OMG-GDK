@@ -5,7 +5,7 @@ import gdk.internal.Logging;
 import launcher.features.json_processing.JsonUtil;
 import launcher.features.game_launching.GameLaunchUtil;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.ControllerMode;
 import launcher.features.file_paths.FilePaths;
 

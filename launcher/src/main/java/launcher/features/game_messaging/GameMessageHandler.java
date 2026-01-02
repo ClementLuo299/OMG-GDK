@@ -1,7 +1,6 @@
-package launcher.features.lobby_features.business;
+package launcher.features.game_messaging;
 
 import gdk.api.GameModule;
-import launcher.features.game_messaging.TranscriptRecorder;
 
 import java.util.Map;
 

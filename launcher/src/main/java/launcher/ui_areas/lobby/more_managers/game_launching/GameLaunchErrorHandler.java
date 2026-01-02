@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.game_launching;
+package launcher.ui_areas.lobby.more_managers.game_launching;
 
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;

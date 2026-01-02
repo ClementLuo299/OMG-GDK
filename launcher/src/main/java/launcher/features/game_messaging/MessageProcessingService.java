@@ -1,6 +1,6 @@
 package launcher.features.game_messaging;
 
-import launcher.features.lobby_features.business.JsonFormatter;
+import launcher.features.json_processing.JsonFormatter;
 
 import java.util.Map;
 

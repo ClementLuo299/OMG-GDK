@@ -1,9 +1,9 @@
-package launcher.features.lobby_features.managers.core.setup;
+package launcher.ui_areas.lobby.more_managers.core.setup;
 
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.persistence.JsonPersistenceManager;
-import launcher.features.lobby_features.managers.messaging.MessageBridgeManager;
+import launcher.ui_areas.lobby.more_managers.messaging.MessageBridgeManager;
 import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;

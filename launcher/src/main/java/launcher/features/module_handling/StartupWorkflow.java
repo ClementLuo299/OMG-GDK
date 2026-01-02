@@ -1,7 +1,7 @@
 package launcher.features.module_handling;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.ModuleDiscoverySteps;
+import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
 import launcher.features.module_handling.loading.ModuleLoadingSteps;
 import launcher.features.module_handling.progress.ModuleLoadingProgressManager;
 import launcher.ui_areas.startup_window.StartupWindowManager;

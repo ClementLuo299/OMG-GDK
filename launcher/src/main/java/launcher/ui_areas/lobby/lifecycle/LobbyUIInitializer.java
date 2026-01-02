@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.lifecycle;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.core.ui_features.ui_loading.stage.MainStageInitializer;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.LobbyOptimizer;

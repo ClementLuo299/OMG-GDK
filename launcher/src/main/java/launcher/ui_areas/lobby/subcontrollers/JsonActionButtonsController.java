@@ -3,7 +3,7 @@ package launcher.ui_areas.lobby.subcontrollers;
 import gdk.api.GameModule;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
-import launcher.features.lobby_features.business.JsonPersistenceManager;
+import launcher.features.persistence.JsonPersistenceManager;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import javafx.scene.control.Button;
 import com.jfoenix.controls.JFXToggleButton;
@@ -139,7 +139,7 @@ public class JsonActionButtonsController {
     
     /**
      * Get the JSON input editor.
-     * Exposed for use by other managers (e.g., GameLaunchManager).
+     * Exposed for use by other more_managers (e.g., GameLaunchManager).
      * 
      * @return The input editor
      */
@@ -149,7 +149,7 @@ public class JsonActionButtonsController {
     
     /**
      * Get the JSON output editor.
-     * Exposed for use by other managers (e.g., MessageBridgeManager).
+     * Exposed for use by other more_managers (e.g., MessageBridgeManager).
      * 
      * @return The output editor
      */
@@ -159,7 +159,7 @@ public class JsonActionButtonsController {
     
     /**
      * Parse JSON configuration data from the input editor.
-     * Exposed for use by other managers (e.g., GameLaunchManager).
+     * Exposed for use by other more_managers (e.g., GameLaunchManager).
      * Delegates to JsonEditorOperations for parsing logic.
      * 
      * @return The parsed JSON data, or null if parsing fails or input is empty

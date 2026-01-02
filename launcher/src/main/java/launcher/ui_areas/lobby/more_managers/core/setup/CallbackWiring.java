@@ -1,16 +1,16 @@
-package launcher.features.lobby_features.managers.core.setup;
+package launcher.ui_areas.lobby.more_managers.core.setup;
 
 import gdk.api.GameModule;
-import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
-import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.LobbyShutdownManager;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.SettingsNavigationManager;
 import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
-import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
+import launcher.ui_areas.lobby.more_managers.game_launching.GameModuleRefreshManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 import launcher.ui_areas.lobby.subcontrollers.TopBarController;
 
 /**
- * Handles wiring of callbacks between subcontrollers and managers.
+ * Handles wiring of callbacks between subcontrollers and more_managers.
  * Encapsulates callback wiring logic to reduce complexity in LobbyInitializationManager.
  * 
  * @author Clement Luo
@@ -21,7 +21,7 @@ import launcher.ui_areas.lobby.subcontrollers.TopBarController;
 public class CallbackWiring {
     
     /**
-     * Wire up callbacks between subcontrollers and managers.
+     * Wire up callbacks between subcontrollers and more_managers.
      * Connects UI events to business logic handlers.
      * 
      * @param gameSelectionController The game selection controller

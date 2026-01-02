@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.managers.core.factories;
+package launcher.ui_areas.lobby.more_managers.core.factories;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
@@ -7,15 +7,15 @@ import javafx.stage.Stage;
 import launcher.features.game_launching.GameLaunchService;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
-import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
-import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.LobbyShutdownManager;
+import launcher.ui_areas.lobby.more_managers.core.lifecycle.SettingsNavigationManager;
+import launcher.ui_areas.lobby.more_managers.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;
-import launcher.features.lobby_features.managers.game_launching.GameModuleRefreshManager;
-import launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter;
-import launcher.features.lobby_features.managers.game_launching.ModuleCompilationChecker;
+import launcher.ui_areas.lobby.more_managers.game_launching.GameModuleRefreshManager;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleChangesReporter;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
-import launcher.features.lobby_features.managers.messaging.MessageBridgeManager;
+import launcher.ui_areas.lobby.more_managers.messaging.MessageBridgeManager;
 import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
 import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
 import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
@@ -24,9 +24,9 @@ import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
 /**
- * Factory for creating managers that depend on subcontrollers.
- * These managers must be created after subcontrollers are available.
- * Basic managers (that don't depend on subcontrollers) are created by BasicManagerFactory.
+ * Factory for creating more_managers that depend on subcontrollers.
+ * These more_managers must be created after subcontrollers are available.
+ * Basic more_managers (that don't depend on subcontrollers) are created by BasicManagerFactory.
  * 
  * @author Clement Luo
  * @date December 29, 2025
@@ -36,8 +36,8 @@ import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 public class DependentManagerFactory {
     
     /**
-     * Result containing only the managers created by this factory.
-     * These are the managers that depend on subcontrollers.
+     * Result containing only the more_managers created by this factory.
+     * These are the more_managers that depend on subcontrollers.
      */
     public record DependentManagerCreationResult(
         GameModuleRefreshManager gameModuleRefreshManager,
@@ -48,8 +48,8 @@ public class DependentManagerFactory {
     ) {}
     
     /**
-     * Create managers that depend on subcontrollers.
-     * Basic managers should be created by BasicManagerFactory before calling this method.
+     * Create more_managers that depend on subcontrollers.
+     * Basic more_managers should be created by BasicManagerFactory before calling this method.
      * 
      * @param applicationViewModel The application ViewModel (may be null)
      * @param controller The main lobby controller
@@ -66,7 +66,7 @@ public class DependentManagerFactory {
      * @param moduleCompilationChecker The module compilation checker (already created by BasicManagerFactory)
      * @param gameLaunchErrorHandler The game launch error handler (already created by BasicManagerFactory)
      * @param jsonPersistenceManager The JSON persistence manager (already created by BasicManagerFactory)
-     * @return Result containing only the dependent managers created by this factory
+     * @return Result containing only the dependent more_managers created by this factory
      */
     public static DependentManagerCreationResult createDependentManagers(
             GDKViewModel applicationViewModel,

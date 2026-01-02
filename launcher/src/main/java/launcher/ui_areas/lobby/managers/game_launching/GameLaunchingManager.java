@@ -3,7 +3,8 @@ package launcher.ui_areas.lobby.managers.game_launching;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.game_launching.GameLaunchService;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
+import launcher.ui_areas.lobby.more_managers.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
 import java.util.Map;
@@ -42,7 +43,7 @@ public class GameLaunchingManager {
     private final JsonActionButtonsController jsonActionButtonsController;
     
     /** Error handler for reporting launch failures to UI. */
-    private final launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler errorHandler;
+    private final GameLaunchErrorHandler errorHandler;
     
     // ==================== CONSTRUCTOR ====================
     
@@ -55,7 +56,7 @@ public class GameLaunchingManager {
      */
     public GameLaunchingManager(GameLaunchService launchService,
                              JsonActionButtonsController jsonActionButtonsController,
-                             launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler errorHandler) {
+                             GameLaunchErrorHandler errorHandler) {
         this.launchService = launchService;
         this.jsonActionButtonsController = jsonActionButtonsController;
         this.errorHandler = errorHandler;

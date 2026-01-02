@@ -3,7 +3,7 @@ package launcher.ui_areas.lobby.managers.json;
 import gdk.api.GameModule;
 import launcher.features.json_processing.JsonProcessingService;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
-import launcher.features.lobby_features.business.GameMessageHandler;
+import launcher.features.game_messaging.GameMessageHandler;
 
 import java.util.Map;
 

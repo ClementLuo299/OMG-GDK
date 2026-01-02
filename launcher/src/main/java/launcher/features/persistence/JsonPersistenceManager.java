@@ -1,4 +1,4 @@
-package launcher.features.lobby_features.business;
+package launcher.features.persistence;
 
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;

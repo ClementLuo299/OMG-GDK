@@ -9,6 +9,8 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleChangesReporter;
+import launcher.ui_areas.lobby.more_managers.game_launching.ModuleDiscoveryHandler;
 
 import java.util.List;
 import java.util.Set;
@@ -114,9 +116,9 @@ public class ModuleRefreshUIUpdater {
      * @return The new module count after update
      */
     public int updateUIForFastRefresh(List<GameModule> validModules,
-                                      launcher.features.lobby_features.managers.game_launching.ModuleDiscoveryHandler.ModuleDiscoveryResult discoveryResult,
+                                      ModuleDiscoveryHandler.ModuleDiscoveryResult discoveryResult,
                                       MessageManager messageManager,
-                                      launcher.features.lobby_features.managers.game_launching.ModuleChangesReporter moduleChangeReporter,
+                                      ModuleChangesReporter moduleChangeReporter,
                                       Set<String> previousModuleNames) {
         Runnable uiUpdate = () -> {
             try {
