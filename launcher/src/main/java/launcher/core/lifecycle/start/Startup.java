@@ -34,7 +34,7 @@ public final class Startup {
         Logging.info("Beginning GDK application startup process");
         
         // Show startup window
-        StartupWindow startupWindow = StartupWindow.createAndShow();
+        StartupWindow startupWindow = StartupWindow.show();
         
         // Execute launch mode
         try {

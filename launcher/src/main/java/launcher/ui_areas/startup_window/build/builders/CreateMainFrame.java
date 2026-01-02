@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.build.components;
+package launcher.ui_areas.startup_window.build.builders;
 
 import javax.swing.JFrame;
 import launcher.ui_areas.startup_window.styling.theme.Colors;
@@ -12,7 +12,7 @@ import launcher.ui_areas.startup_window.styling.theme.TextContent;
  * @edited December 23, 2025
  * @since Beta 1.0
  */
-public class MainWindowCreator {
+public class CreateMainFrame {
     
     /**
      * Creates and configures the main JFrame with transparency support.
@@ -32,6 +32,10 @@ public class MainWindowCreator {
         // Enable window transparency for shadow effects
         try {
             frame.setBackground(Colors.TRANSPARENT);
+            // Ensure root pane is also transparent
+            frame.getRootPane().setOpaque(false);
+            frame.getContentPane().setBackground(Colors.TRANSPARENT);
+            ((javax.swing.JComponent) frame.getContentPane()).setOpaque(false);
         } catch (Exception e) {
             // Fallback for systems that don't support transparency
             frame.setBackground(Colors.FALLBACK_BACKGROUND);

@@ -1,9 +1,10 @@
 package launcher.ui_areas.startup_window;
 
 import gdk.internal.Logging;
-import launcher.core.lifecycle.stop.Shutdown;
-import launcher.ui_areas.startup_window.component_construction.StartupWindowBuilder;
-import launcher.ui_areas.startup_window.component_construction.components.LoadingSpinner;
+import launcher.ui_areas.startup_window.build.StartupWindowBuilder;
+import launcher.ui_areas.startup_window.build.components.LoadingSpinner;
+import launcher.ui_areas.startup_window.window_control.ShowStartupWindow;
+import launcher.ui_areas.startup_window.window_control.HideStartupWindow;
 
 import javax.swing.*;
 
@@ -12,24 +13,27 @@ import javax.swing.*;
  * 
  * @author Clement Luo
  * @date August 5, 2025
- * @edited January 2025 
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
 public class StartupWindow {
     
-    // Swing components for the pre-startup loading window UI
-    final JFrame progressFrame;
-    final LoadingSpinner spinner;
+    // The main frame of the startup window
+    public final JFrame progressFrame;
+
+    // The animated loading spinner
+    public final LoadingSpinner spinner;
     
     /**
-     * Initialize the startup loading window
+     * Initialize the startup loading window.
+     * This constructor is public to allow StartupWindowBuilder to create instances.
+     * 
+     * @param frame The JFrame for the window
+     * @param spinner The loading spinner component
      */
-    private StartupWindow() {
-        StartupWindowBuilder.InitializationResult result =
-            StartupWindowBuilder.build();
-        
-        this.progressFrame = result.frame;
-        this.spinner = result.spinner;
+    public StartupWindow(JFrame frame, LoadingSpinner spinner) {
+        this.progressFrame = frame;
+        this.spinner = spinner;
     }
     
     /**
@@ -38,54 +42,46 @@ public class StartupWindow {
      * 
      * @return A new StartupWindow instance with the window already visible
      */
-    public static StartupWindow createAndShow() {
-        // Create the window on the Event Dispatch Thread (required for Swing)
-        final StartupWindow[] windowRef = new StartupWindow[1];
-        
+    public static StartupWindow show() {
+        StartupWindow window;
+
+        // Create the window on the EDT
         try {
+
             if (SwingUtilities.isEventDispatchThread()) {
                 // Already on EDT - create directly
-                windowRef[0] = new StartupWindow();
-            } else {
+                window = StartupWindowBuilder.build();
+            }
+
+            else {
                 // Not on EDT - dispatch to EDT and wait for completion
+                // We need the startup window to be final for us to use invokeAndWait.
+                // Thus, we create an array of size 1 as a workaround.
+                final StartupWindow[] windowRef = new StartupWindow[1];
+
                 SwingUtilities.invokeAndWait(() -> {
                     try {
-                        windowRef[0] = new StartupWindow();
+                        windowRef[0] = StartupWindowBuilder.build();
                     } catch (Exception e) {
                         Logging.error("Error creating startup window: " + e.getMessage(), e);
                         throw new RuntimeException("Failed to create startup window", e);
                     }
                 });
+
+                // Capture the resulting startup window
+                window = windowRef[0];
             }
+
         } catch (Exception e) {
             // Handle both direct creation failures and EDT dispatch failures
             Logging.error("Error creating startup window: " + e.getMessage(), e);
             throw new RuntimeException("Failed to create startup window", e);
         }
-        
-        // Get the window
-        StartupWindow window = windowRef[0];
 
         // Display the window
-        window.show();
-        
+        ShowStartupWindow.show(window);
+
         return window;
-    }
-    
-    /**
-     * Shows the loading window.
-     */
-    public void show() {
-        // Show the loading window on the Event Dispatch Thread
-        if (SwingUtilities.isEventDispatchThread()) {
-            progressFrame.setVisible(true);
-            spinner.start();
-        } else {
-            SwingUtilities.invokeLater(() -> {
-                progressFrame.setVisible(true);
-                spinner.start();
-            });
-        }
     }
     
     /**
@@ -93,40 +89,6 @@ public class StartupWindow {
      * Also registers cleanup tasks with the shutdown system to ensure proper resource cleanup.
      */
     public void hide() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            spinner.stop();
-            progressFrame.setVisible(false);
-            progressFrame.dispose();
-        } else {
-            SwingUtilities.invokeLater(() -> {
-                spinner.stop();
-                progressFrame.setVisible(false);
-                progressFrame.dispose();
-            });
-        }
-        
-        // Register cleanup task with shutdown system
-        Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up StartupWindow resources");
-            try {
-                // Dispose of the window
-                if (progressFrame != null) {
-                    progressFrame.dispose();
-                }
-                
-                Logging.info("StartupWindow cleanup completed");
-            } catch (Exception e) {
-                Logging.error("Error during StartupWindow cleanup: " + e.getMessage(), e);
-            }
-        });
-    }
-    
-    /**
-     * Gets the loading spinner component.
-     * 
-     * @return The loading spinner
-     */
-    public LoadingSpinner getSpinner() {
-        return spinner;
+        HideStartupWindow.hide(this);
     }
 }

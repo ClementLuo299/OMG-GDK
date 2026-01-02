@@ -1,14 +1,15 @@
-package launcher.ui_areas.startup_window.component_construction;
+package launcher.ui_areas.startup_window.build;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import launcher.ui_areas.startup_window.component_construction.arrangement.ComponentAssembler;
-import launcher.ui_areas.startup_window.component_construction.arrangement.WindowPositioner;
-import launcher.ui_areas.startup_window.component_construction.components.MainWindowCreator;
-import launcher.ui_areas.startup_window.component_construction.components.LabelCreator;
-import launcher.ui_areas.startup_window.component_construction.components.MainPanelCreator;
-import launcher.ui_areas.startup_window.component_construction.components.LoadingSpinner;
+import launcher.ui_areas.startup_window.StartupWindow;
+import launcher.ui_areas.startup_window.build.arrangement.ComponentAssembler;
+import launcher.ui_areas.startup_window.build.arrangement.WindowPositioner;
+import launcher.ui_areas.startup_window.build.builders.CreateMainFrame;
+import launcher.ui_areas.startup_window.build.components.LabelCreator;
+import launcher.ui_areas.startup_window.build.components.MainPanelCreator;
+import launcher.ui_areas.startup_window.build.components.LoadingSpinner;
 import launcher.ui_areas.startup_window.styling.theme.Typography;
 
 /**
@@ -17,44 +18,28 @@ import launcher.ui_areas.startup_window.styling.theme.Typography;
  * 
  * @author Clement Luo
  * @date December 23, 2025
- * @edited January 2025
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
 public class StartupWindowBuilder {
     
     /**
-     * Result class containing all initialized components.
-     */
-    public static class InitializationResult {
-        public final JFrame frame;
-        public final LoadingSpinner spinner;
-        public final JLabel loadingLabel;
-        
-        public InitializationResult(
-                JFrame frame,
-                LoadingSpinner spinner,
-                JLabel loadingLabel) {
-            this.frame = frame;
-            this.spinner = spinner;
-            this.loadingLabel = loadingLabel;
-        }
-    }
-    
-    /**
      * Builds the complete startup window with all components.
      * 
-     * @return An InitializationResult containing all initialized components
+     * @return A new StartupWindow instance
      */
-    public static InitializationResult build() {
+    public static StartupWindow build() {
         System.out.println("Creating startup loading window");
         System.out.println("Using font: " + Typography.getCurrentFontFamily());
         
         // Create and configure the main JFrame with transparency
-        JFrame frame = MainWindowCreator.create();
+        JFrame frame = CreateMainFrame.create();
         
-        // Create UI components
+        // Create animated spinner
         LoadingSpinner spinner = new LoadingSpinner();
-        JLabel loadingLabel = LabelCreator.create(LabelCreator.LabelType.LOADING);
+
+        // Create "Loading" label
+        JLabel loadingLabel = LabelCreator.create();
         
         // Create and configure the main panel layout
         JPanel mainPanel = MainPanelCreator.create();
@@ -70,7 +55,8 @@ public class StartupWindowBuilder {
         
         System.out.println("Startup loading window created");
         
-        return new InitializationResult(frame, spinner, loadingLabel);
+        // Create and return the StartupWindow
+        return new StartupWindow(frame, spinner);
     }
 }
 

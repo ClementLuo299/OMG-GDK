@@ -31,6 +31,14 @@ public class RoundedPanel extends JPanel {
         this.cornerRadius = cornerRadius;
         this.drawShadow = drawShadow;
         setOpaque(false); // Make transparent to show rounded corners
+        setDoubleBuffered(true); // Enable double buffering to prevent flickering
+    }
+    
+    @Override
+    public boolean isOptimizedDrawingEnabled() {
+        // Return true to allow optimized drawing when children overlap
+        // This prevents unnecessary parent repaints when children repaint
+        return true;
     }
     
     /**
@@ -42,6 +50,8 @@ public class RoundedPanel extends JPanel {
      */
     @Override
     protected void paintComponent(Graphics g) {
+        // For non-opaque panels, super.paintComponent won't paint a background
+        // but we need to call it to ensure children are painted properly
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
         try {

@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.component_construction.arrangement;
+package launcher.ui_areas.startup_window.build.arrangement;
 
 import javax.swing.JFrame;
 import java.awt.Dimension;
