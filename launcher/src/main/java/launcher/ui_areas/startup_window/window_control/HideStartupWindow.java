@@ -3,12 +3,15 @@ package launcher.ui_areas.startup_window.window_control;
 import gdk.internal.Logging;
 import launcher.core.lifecycle.stop.Shutdown;
 import launcher.ui_areas.startup_window.StartupWindow;
-
 import javax.swing.SwingUtilities;
 
 /**
  * Handles hiding the startup window.
  * Ensures the window is hidden on the Event Dispatch Thread and registers cleanup tasks.
+ * 
+ * <p><b>Internal class - do not import.</b> This class is for internal use within
+ * the startup_window package only. Use {@link launcher.ui_areas.startup_window.StartupWindow}
+ * as the public API.
  * 
  * @author Clement Luo
  * @date January 1, 2026

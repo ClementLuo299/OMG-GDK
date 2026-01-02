@@ -10,6 +10,10 @@ import launcher.ui_areas.startup_window.styling_theme.Padding;
  * Creates the main panel with proper layout and modern styling_theme.
  * Uses rounded corners and shadow effects for a modern look.
  * 
+ * <p><b>Internal class - do not import.</b> This class is for internal use within
+ * the startup_window package only. Use {@link launcher.ui_areas.startup_window.StartupWindow}
+ * as the public API.
+ * 
  * @author Clement Luo
  * @date December 23, 2025
  * @edited December 24, 2025

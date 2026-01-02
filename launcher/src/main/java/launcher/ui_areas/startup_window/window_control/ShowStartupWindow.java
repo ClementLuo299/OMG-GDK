@@ -1,12 +1,15 @@
 package launcher.ui_areas.startup_window.window_control;
 
 import launcher.ui_areas.startup_window.StartupWindow;
-
 import javax.swing.SwingUtilities;
 
 /**
  * Handles showing the startup window.
  * Ensures the window is displayed on the Event Dispatch Thread.
+ * 
+ * <p><b>Internal class - do not import.</b> This class is for internal use within
+ * the startup_window package only. Use {@link launcher.ui_areas.startup_window.StartupWindow}
+ * as the public API.
  * 
  * @author Clement Luo
  * @date January 1, 2026

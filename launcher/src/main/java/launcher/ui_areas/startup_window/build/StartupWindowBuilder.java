@@ -18,6 +18,10 @@ import launcher.ui_areas.startup_window.styling_theme.Font;
  * Builds and assembles all components for the startup window.
  * Handles the complete setup process from component creation to final assembly.
  * 
+ * <p><b>Internal class - do not import.</b> This class is for internal use within
+ * the startup_window package only. Use {@link launcher.ui_areas.startup_window.StartupWindow}
+ * as the public API.
+ * 
  * @author Clement Luo
  * @date December 23, 2025
  * @edited January 1, 2026

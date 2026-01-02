@@ -1,7 +1,6 @@
 package launcher.ui_areas.startup_window.loading_spinner;
 
 import launcher.ui_areas.startup_window.styling_theme.LoadingSpinnerStyle;
-
 import javax.swing.Timer;
 
 /**
@@ -9,6 +8,10 @@ import javax.swing.Timer;
  * 
  * Manages the rotation animation by updating the spinner's rotation angle
  * and triggering repaints. Handles starting and stopping the animation.
+ * 
+ * <p><b>Internal class - do not import.</b> This class is for internal use within
+ * the startup_window package only. Use {@link launcher.ui_areas.startup_window.StartupWindow}
+ * as the public API.
  * 
  * @author Clement Luo
  * @date January 1, 2026

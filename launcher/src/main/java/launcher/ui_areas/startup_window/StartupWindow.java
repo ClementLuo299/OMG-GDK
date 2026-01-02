@@ -6,7 +6,6 @@ import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinner;
 import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinnerAnimator;
 import launcher.ui_areas.startup_window.window_control.ShowStartupWindow;
 import launcher.ui_areas.startup_window.window_control.HideStartupWindow;
-
 import javax.swing.*;
 
 /**
