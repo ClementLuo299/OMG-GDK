@@ -39,10 +39,10 @@ public final class ModuleLoadingThread {
                 Logging.info("Starting module ui_loading on background thread");
                 
                 // Phase 1: Load all game modules
-                StartupWorkflow.executeWorkflow(windowManager);
+                StartupWorkflow.executeWorkflow();
                 
                 // Phase 2: Check for compilation issues
-                CompilationChecker.checkForCompilationIssues(lobbyController, windowManager);
+                CompilationChecker.checkForCompilationIssues(lobbyController);
                 StartupDelayUtil.addDevelopmentDelay("After checking for compilation issues");
                 
                 // Phase 3: Update UI with loaded games

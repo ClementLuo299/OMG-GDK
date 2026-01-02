@@ -34,21 +34,21 @@ public final class Startup {
         Logging.info("Beginning GDK application startup process");
         
         // Show startup window
-        StartupWindow windowManager = StartupWindow.createAndShow();
+        StartupWindow startupWindow = StartupWindow.createAndShow();
         
         // Execute launch mode
         try {
 
             // Attempt auto-launch
             if (AutoLaunchUtil.isAutoLaunchEnabled() && 
-                AutoLaunchProcess.launch(primaryApplicationStage, () -> StandardLaunchProcess.launch(primaryApplicationStage, windowManager))) {
+                AutoLaunchProcess.launch(primaryApplicationStage, () -> StandardLaunchProcess.launch(primaryApplicationStage, startupWindow))) {
                 Logging.info("Auto-launch successful");
                 return;
             }
             
             // Fall back to standard launch
             Logging.info("Proceeding with standard launch");
-            StandardLaunchProcess.launch(primaryApplicationStage, windowManager);
+            StandardLaunchProcess.launch(primaryApplicationStage, startupWindow);
 
         } catch (Exception startupError) {
             Logging.error("GDK application startup failed: " + startupError.getMessage(), startupError);
