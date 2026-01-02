@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import launcher.features.game_launching.GameLaunchService;
 import launcher.features.json_processing.JsonProcessingService;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.lobby_features.managers.core.LobbyInitializationManager;
 import launcher.features.lobby_features.managers.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.managers.game_launching.GameLaunchingManager;

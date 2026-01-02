@@ -5,7 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import launcher.features.game_launching.GameLaunchService;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.lobby_features.managers.core.lifecycle.LobbyShutdownManager;
 import launcher.features.lobby_features.managers.core.lifecycle.SettingsNavigationManager;
@@ -19,7 +19,7 @@ import launcher.features.lobby_features.managers.messaging.MessageBridgeManager;
 import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
 import launcher.ui_areas.lobby.managers.ui.LoadingAnimationManager;
 import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;
-import launcher.features.lobby_features.business.JsonPersistenceManager;
+import launcher.features.persistence.JsonPersistenceManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 

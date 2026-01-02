@@ -2,7 +2,7 @@ package launcher.features.lobby_features.managers.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.lobby_features.business.GDKViewModel;
+import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.module_handling.discovery.ModuleDiscoveryService;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import launcher.ui_areas.lobby.managers.ui.StatusLabelManager;

@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
-import launcher.features.lobby_features.business.JsonPersistenceManager;
+import launcher.features.persistence.JsonPersistenceManager;
 import launcher.ui_areas.lobby.managers.json.JsonEditorOperations;
 import launcher.ui_areas.lobby.managers.messaging.MessageManager;
 import launcher.ui_areas.lobby.managers.ui.LaunchButtonManager;
