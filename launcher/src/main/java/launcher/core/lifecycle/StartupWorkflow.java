@@ -24,37 +24,25 @@ public final class StartupWorkflow {
      * Executes the complete startup workflow.
      * 
      * @param windowManager The startup window manager
-     * @param totalSteps Total number of progress steps
-     * @return The current step number after module ui_loading completes
      */
-    public static int executeWorkflow(StartupWindowManager windowManager, int totalSteps) {
-        // Execute the module ui_loading workflow and get the step number after completion
-        int currentStep = loadModulesWithProgress(windowManager, totalSteps);
+    public static void executeWorkflow(StartupWindowManager windowManager) {
+        // Execute the module ui_loading workflow
+        loadModules(windowManager);
         Logging.info("Module ui_loading completed");
         StartupDelayUtil.addDevelopmentDelay("After module ui_loading process completed");
-        
-        // Return the current step so the caller knows where to continue
-        return currentStep;
     }
     
     /**
-     * Loads game modules with progress updates.
+     * Loads game modules.
      * 
-     * @param windowManager The startup window manager for progress updates
-     * @param totalSteps The total number of steps in the startup process
-     * @return The current step number after module ui_loading completes
+     * @param windowManager The startup window manager
      */
-    private static int loadModulesWithProgress(StartupWindowManager windowManager, int totalSteps) {
-        // Start at step 3 because:
-        // - Step 0: "Starting GDK application"
-        // - Step 1: "Loading user interface"
-        // - Step 2: "Starting module ui_loading"
-        // - Step 3+: Module ui_loading steps
-        // Create a progress manager starting at step 3 (steps 0-2 are used before module ui_loading)
-        ModuleLoadingProgressManager progressManager = new ModuleLoadingProgressManager(windowManager, 3, totalSteps);
+    private static void loadModules(StartupWindowManager windowManager) {
+        // Create a progress manager (no-op, kept for compatibility with existing code)
+        ModuleLoadingProgressManager progressManager = new ModuleLoadingProgressManager(windowManager);
         
         try {
-            Logging.info("Starting module ui_loading process with " + totalSteps + " total steps");
+            Logging.info("Starting module ui_loading process");
             
             // Step 1: Check if modules need to be built and initialize the ui_loading process
             ModuleLoadingSteps.initializeModuleLoading(progressManager);
@@ -79,19 +67,14 @@ public final class StartupWorkflow {
                     discoveryResult.getValidModuleDirectories().size() + " modules");
                 
                 // Step 4: Load the discovered modules into memory
-                ModuleLoadingSteps.executeLoading(progressManager, discoveryResult, totalSteps);
+                ModuleLoadingSteps.executeLoading(progressManager, discoveryResult);
             }
             
             // Step 5: Finalize the module ui_loading process
             ModuleLoadingSteps.finalizeModuleLoading(progressManager);
             
-            // Return the current step number after all module ui_loading is complete
-            return progressManager.getCurrentStep();
-            
         } catch (Exception e) {
             handleModuleLoadingException(progressManager, e);
-            // Return current step even on error
-            return progressManager.getCurrentStep();
         }
     }
     
@@ -103,8 +86,7 @@ public final class StartupWorkflow {
      */
     private static void handleModuleLoadingException(ModuleLoadingProgressManager progressManager,
                                                     Exception e) {
-        // Log the error and update progress to show the error message
-        // Continue execution even if module ui_loading fails
+        // Log the error and continue execution even if module ui_loading fails
         Logging.error("Critical error during module ui_loading: " + e.getMessage(), e);
         e.printStackTrace();
         progressManager.updateProgress("Error during module ui_loading - continuing");

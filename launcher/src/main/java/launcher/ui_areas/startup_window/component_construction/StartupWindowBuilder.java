@@ -3,14 +3,12 @@ package launcher.ui_areas.startup_window.component_construction;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import launcher.ui_areas.startup_window.component_construction.arrangement.ComponentAssembler;
 import launcher.ui_areas.startup_window.component_construction.arrangement.WindowPositioner;
 import launcher.ui_areas.startup_window.component_construction.components.MainWindowCreator;
 import launcher.ui_areas.startup_window.component_construction.components.LabelCreator;
 import launcher.ui_areas.startup_window.component_construction.components.MainPanelCreator;
-import launcher.ui_areas.startup_window.component_construction.components.ProgressBarCreator;
-import launcher.ui_areas.startup_window.styling.components.ProgressBarStyling;
+import launcher.ui_areas.startup_window.component_construction.components.LoadingSpinner;
 import launcher.ui_areas.startup_window.styling.theme.Typography;
 
 /**
@@ -19,7 +17,7 @@ import launcher.ui_areas.startup_window.styling.theme.Typography;
  * 
  * @author Clement Luo
  * @date December 23, 2025
- * @edited December 26, 2025
+ * @edited January 2025
  * @since Beta 1.0
  */
 public class StartupWindowBuilder {
@@ -29,55 +27,40 @@ public class StartupWindowBuilder {
      */
     public static class InitializationResult {
         public final JFrame frame;
-        public final JProgressBar progressBar;
-        public final JLabel percentageLabel;
-        public final JLabel statusLabel;
-        public final ProgressBarStyling progressBarStyling;
+        public final LoadingSpinner spinner;
+        public final JLabel loadingLabel;
         
         public InitializationResult(
                 JFrame frame,
-                JProgressBar progressBar,
-                JLabel percentageLabel,
-                JLabel statusLabel,
-                ProgressBarStyling progressBarStyling) {
+                LoadingSpinner spinner,
+                JLabel loadingLabel) {
             this.frame = frame;
-            this.progressBar = progressBar;
-            this.percentageLabel = percentageLabel;
-            this.statusLabel = statusLabel;
-            this.progressBarStyling = progressBarStyling;
+            this.spinner = spinner;
+            this.loadingLabel = loadingLabel;
         }
     }
     
     /**
      * Builds the complete startup window with all components.
      * 
-     * @param totalSteps The total number of steps for the progress bar
      * @return An InitializationResult containing all initialized components
      */
-    public static InitializationResult build(int totalSteps) {
-        System.out.println("Creating startup progress window");
+    public static InitializationResult build() {
+        System.out.println("Creating startup loading window");
         System.out.println("Using font: " + Typography.getCurrentFontFamily());
         
         // Create and configure the main JFrame with transparency
         JFrame frame = MainWindowCreator.create();
         
-        // Create UI components using creators
-        JLabel titleLabel = LabelCreator.create(LabelCreator.LabelType.TITLE);
-        JLabel subtitleLabel = LabelCreator.create(LabelCreator.LabelType.SUBTITLE);
-        JProgressBar progressBar = ProgressBarCreator.create(totalSteps);
-        JLabel percentageLabel = LabelCreator.create(LabelCreator.LabelType.PERCENTAGE);
-        JLabel statusLabel = LabelCreator.create(LabelCreator.LabelType.STATUS);
-        
-        // Apply custom ultra-modern progress bar styling
-        ProgressBarStyling styling = new ProgressBarStyling();
-        progressBar.setUI(styling);
+        // Create UI components
+        LoadingSpinner spinner = new LoadingSpinner();
+        JLabel loadingLabel = LabelCreator.create(LabelCreator.LabelType.LOADING);
         
         // Create and configure the main panel layout
         JPanel mainPanel = MainPanelCreator.create();
         
-        // Add all components to the panel with proper spacing
-        ComponentAssembler.assemble(
-            mainPanel, titleLabel, subtitleLabel, progressBar, percentageLabel, statusLabel);
+        // Add components to the panel with proper spacing
+        ComponentAssembler.assemble(mainPanel, spinner, loadingLabel);
         
         // Set the main panel as the frame's content pane
         frame.setContentPane(mainPanel);
@@ -85,9 +68,9 @@ public class StartupWindowBuilder {
         // Pack and center the window on screen
         WindowPositioner.position(frame);
         
-        System.out.println("Startup progress window created");
+        System.out.println("Startup loading window created");
         
-        return new InitializationResult(frame, progressBar, percentageLabel, statusLabel, styling);
+        return new InitializationResult(frame, spinner, loadingLabel);
     }
 }
 

@@ -17,8 +17,8 @@ public class Dimensions {
     /** Progress bar height (taller for better visibility) */
     public static final int PROGRESS_BAR_HEIGHT = 32;
     
-    /** Panel padding (more generous, 55px) */
-    public static final int PANEL_PADDING = 55;
+    /** Panel padding (minimal, 18px) */
+    public static final int PANEL_PADDING = 18;
     
     /** Border width (subtle) */
     public static final int BORDER_WIDTH = 1;

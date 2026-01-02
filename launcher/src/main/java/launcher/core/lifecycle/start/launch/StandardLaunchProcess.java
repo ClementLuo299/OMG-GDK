@@ -33,12 +33,9 @@ public final class StandardLaunchProcess {
      */
     public static void launch(Stage primaryApplicationStage, StartupWindowManager windowManager) {
         try {
-
-            // Step 1: Update progress to step 0, the first step
-            windowManager.updateProgress(0, "Starting GDK application");
             StartupDelayUtil.addDevelopmentDelay("After 'Starting GDK application' message");
 
-            // Step 2: Initialize the user interface by initializing the controller
+            // Initialize the user interface by initializing the controller
             GDKGameLobbyController lobbyController = 
                 LobbyUIInitializer.initialize(primaryApplicationStage, windowManager);
             StartupDelayUtil.addDevelopmentDelay("After 'Loading user interface' message");

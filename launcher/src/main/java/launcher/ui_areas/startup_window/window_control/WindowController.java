@@ -3,7 +3,6 @@ package launcher.ui_areas.startup_window.window_control;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.stop.Shutdown;
 import gdk.internal.Logging;
-import launcher.ui_areas.startup_window.animation.BarAnimationController;
 
 /**
  * Controls the visibility and lifecycle of a startup window instance.
@@ -11,7 +10,7 @@ import launcher.ui_areas.startup_window.animation.BarAnimationController;
  * 
  * @author Clement Luo
  * @date December 26, 2025
- * @edited December 26, 2025
+ * @edited January 2025
  * @since Beta 1.0
  */
 public class WindowController {
@@ -19,20 +18,13 @@ public class WindowController {
     /** The startup window to manage. */
     private final StartupWindow progressWindow;
     
-    /** Controller for smooth progress bar animation between steps. */
-    private final BarAnimationController barAnimationController;
-    
     /**
      * Constructs a new WindowController.
      * 
      * @param progressWindow The startup window to manage
-     * @param barAnimationController The progress bar animation controller
      */
-    public WindowController(
-            StartupWindow progressWindow,
-            BarAnimationController barAnimationController) {
+    public WindowController(StartupWindow progressWindow) {
         this.progressWindow = progressWindow;
-        this.barAnimationController = barAnimationController;
     }
     
     /**
@@ -43,21 +35,16 @@ public class WindowController {
     }
     
     /**
-     * Hides the startup window and stops all animations.
+     * Hides the startup window.
      * Also registers cleanup tasks with the shutdown system to ensure proper resource cleanup.
      */
     public void hide() {
-        // Stop all animations
-        barAnimationController.stop();
         progressWindow.hide();
         
         // Register cleanup task with shutdown system
         Shutdown.registerCleanupTask(() -> {
             Logging.info("Cleaning up WindowController resources");
             try {
-                // Ensure animations are stopped (redundant but safe - already stopped above)
-                barAnimationController.stop();
-                
                 // Dispose of the progress window
                 if (progressWindow != null) {
                     progressWindow.hide();

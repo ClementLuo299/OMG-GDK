@@ -27,28 +27,22 @@ public final class ModuleLoadingThread {
      * 
      * @param primaryApplicationStage The primary stage to show when ready
      * @param lobbyController The controller to update with loaded games
-     * @param windowManager The progress window manager
-     * @param totalSteps Total number of progress steps
+     * @param windowManager The startup window manager
      * @return The configured but not-yet-started thread
      */
     public static Thread create(Stage primaryApplicationStage,
                                 GDKGameLobbyController lobbyController, 
-                                StartupWindowManager windowManager, 
-                                int totalSteps) {
+                                StartupWindowManager windowManager) {
 
         return new Thread(() -> {
             try {
                 Logging.info("Starting module ui_loading on background thread");
                 
                 // Phase 1: Load all game modules
-                int currentStep = StartupWorkflow.executeWorkflow(windowManager, totalSteps);
+                StartupWorkflow.executeWorkflow(windowManager);
                 
                 // Phase 2: Check for compilation issues
-                // Always move forward: ensure consecutive steps
-                // Reserve last 3 steps: compilation (totalSteps-2), complete (totalSteps-1), ready (totalSteps)
-                int compilationStep = Math.max(currentStep + 1, totalSteps - 2);
-                compilationStep = Math.min(compilationStep, totalSteps - 2); // Cap at reserved step
-                CompilationChecker.checkForCompilationIssues(lobbyController, windowManager, compilationStep);
+                CompilationChecker.checkForCompilationIssues(lobbyController, windowManager);
                 StartupDelayUtil.addDevelopmentDelay("After checking for compilation issues");
                 
                 // Phase 3: Update UI with loaded games
@@ -56,10 +50,7 @@ public final class ModuleLoadingThread {
                 StartupDelayUtil.addDevelopmentDelay("After refreshing game modules");
                 
                 // Phase 4: Mark startup as complete
-                // Always move forward from compilation step - ensure consecutive steps
-                int completeStep = compilationStep + 1;
-                completeStep = Math.min(completeStep, totalSteps - 1); // Cap at reserved step
-                StartupCompletionHandler.markStartupComplete(windowManager, totalSteps, completeStep);
+                StartupCompletionHandler.markStartupComplete(windowManager);
                 StartupDelayUtil.addDevelopmentDelay("After startup complete and ready");
                 
                 // Phase 5: Show main stage and hide startup window

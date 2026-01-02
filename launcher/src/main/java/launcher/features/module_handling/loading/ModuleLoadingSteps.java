@@ -23,25 +23,23 @@ public final class ModuleLoadingSteps {
     private ModuleLoadingSteps() {}
     
     /**
-     * Orchestrates the complete module ui_loading process.
-     * Coordinates initialization, processing, ui_loading, and reporting.
+     * Orchestrates the complete module loading process.
+     * Coordinates initialization, processing, loading, and reporting.
      * 
      * @param progressManager The progress manager for updates
      * @param discoveryResult The result from module discovery
-     * @param totalSteps Total number of progress steps
      * @return List of successfully loaded GameModule instances
      */
     public static List<GameModule> executeLoading(ModuleLoadingProgressManager progressManager,
-                                                  ModuleDiscoverySteps.DiscoveryResult discoveryResult,
-                                                  int totalSteps) {
+                                                  ModuleDiscoverySteps.DiscoveryResult discoveryResult) {
         // Step 1: Check if there are any modules to load
         if (!discoveryResult.isSuccess() || discoveryResult.getValidModuleDirectories().isEmpty()) {
-            Logging.info("No modules to load - skipping ui_loading workflow");
+            Logging.info("No modules to load - skipping loading workflow");
             return new ArrayList<>();
         }
         
-        // Step 2: Process each discovered module (update progress for each)
-        ModuleRuntimeLoader.processModules(progressManager, discoveryResult.getValidModuleDirectories(), totalSteps);
+        // Step 2: Process each discovered module
+        ModuleRuntimeLoader.processModules(progressManager, discoveryResult.getValidModuleDirectories());
         
         // Step 3: Load the discovered modules into memory
         List<GameModule> discoveredModules = ModuleRuntimeLoader.loadModules(

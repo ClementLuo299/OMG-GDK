@@ -26,6 +26,9 @@ public class TextContent {
     /** Initial percentage text */
     public static final String INITIAL_PERCENTAGE = "0%";
     
+    /** Loading text */
+    public static final String LOADING_TEXT = "Loading";
+    
     /** Private constructor to prevent instantiation */
     private TextContent() {
         throw new AssertionError("Utility class should not be instantiated");

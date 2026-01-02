@@ -38,8 +38,6 @@ public final class LobbyUIInitializer {
         // Initialize application resources before UI creation
         FontLoaderWrapper.initialize();
         
-        windowManager.updateProgress(1, "Loading user interface");
-        
         // Load the main scene from FXML
         LobbySceneLoader.SceneLoadResult loadResult = LobbySceneLoader.loadMainScene();
         Scene mainLobbyScene = loadResult.scene;

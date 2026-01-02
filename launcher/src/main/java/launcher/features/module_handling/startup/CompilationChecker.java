@@ -6,8 +6,6 @@ import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindowManager;
 import launcher.features.development_features.StartupDelayUtil;
 
-import javax.swing.SwingUtilities;
-
 /**
  * Checks for compilation failures and displays warnings.
  * Handles both Swing EDT (progress updates) and JavaFX thread (controller checks).
@@ -23,27 +21,16 @@ public final class CompilationChecker {
     
     /**
      * Checks for compilation failures and displays warnings if needed.
-     * The progress update must run on the Swing EDT, but the controller check
-     * must run on the JavaFX thread.
+     * The controller check must run on the JavaFX thread.
      * 
      * @param lobbyController The controller to check for issues
-     * @param windowManager The progress window to update (Swing component)
-     * @param step The step number to use for progress update
+     * @param windowManager The startup window manager
      */
     public static void checkForCompilationIssues(GDKGameLobbyController lobbyController, 
-                                                StartupWindowManager windowManager, 
-                                                int step) {
-        // Step 1: Update progress window (must run on Swing EDT since it's a Swing component)
-        SwingUtilities.invokeLater(() -> {
-            try {
-                windowManager.updateProgress(step, "Checking for compilation issues");
-            } catch (Exception e) {
-                Logging.error("Error updating progress for compilation check: " + e.getMessage());
-            }
-        });
+                                                StartupWindowManager windowManager) {
         StartupDelayUtil.addDevelopmentDelay("After 'Checking for compilation issues' message");
         
-        // Step 2: Check for compilation failures (must run on JavaFX thread for controller access)
+        // Check for compilation failures (must run on JavaFX thread for controller access)
         Platform.runLater(() -> {
             try {
                 if (lobbyController != null) {

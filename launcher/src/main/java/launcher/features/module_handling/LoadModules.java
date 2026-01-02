@@ -8,8 +8,6 @@ import launcher.ui_areas.startup_window.StartupWindowManager;
 import launcher.core.lifecycle.stop.Shutdown;
 import launcher.features.development_features.StartupDelayUtil;
 
-import javax.swing.SwingUtilities;
-
 /**
  * Coordinates the module ui_loading process during startup.
  * Sets up and starts the background thread that loads game modules and manages cleanup tasks.
@@ -31,26 +29,19 @@ public final class LoadModules {
      * @param windowManager The startup progress window (visible during ui_loading)
      */
     public static void load(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindowManager windowManager) {
-        // Get the total number of steps in the startup process
-        int totalSteps = windowManager.getTotalSteps();
-        
-        // Step 2: Update the startup window accordingly (step 1 is used by "Loading user interface")
         Logging.info("Starting module ui_loading process...");
-        SwingUtilities.invokeLater(() -> {
-            windowManager.updateProgress(2, "Starting module ui_loading");
-        });
         StartupDelayUtil.addDevelopmentDelay("After 'Starting module ui_loading' message");
         
-        // Step 2: Wait a tiny bit to make sure the window is fully visible
+        // Wait a tiny bit to make sure the window is fully visible
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         
-        // Step 3: Create a background thread that will load all the modules
+        // Create a background thread that will load all the modules
         // This thread does the heavy work so the UI doesn't freeze
-        Thread moduleLoadingThread = ModuleLoadingThread.create(primaryApplicationStage, lobbyController, windowManager, totalSteps);
+        Thread moduleLoadingThread = ModuleLoadingThread.create(primaryApplicationStage, lobbyController, windowManager);
         
         // Step 4: Make sure we clean up the thread if the app closes unexpectedly
         registerCleanupTasks(moduleLoadingThread, windowManager);

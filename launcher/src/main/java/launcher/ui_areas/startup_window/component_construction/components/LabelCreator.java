@@ -30,7 +30,9 @@ public class LabelCreator {
         // Percentage: medium weight, no letter spacing
         PERCENTAGE(TextContent.INITIAL_PERCENTAGE, Typography.PERCENTAGE_FONT, Colors.SECONDARY_TEXT, 0.0f),
         // Status: bold, slight letter spacing
-        STATUS(TextContent.INITIAL_STATUS, Typography.STATUS_FONT, Colors.PRIMARY_TEXT, 0.01f);
+        STATUS(TextContent.INITIAL_STATUS, Typography.STATUS_FONT, Colors.PRIMARY_TEXT, 0.01f),
+        // Loading: medium weight, slight letter spacing
+        LOADING(TextContent.LOADING_TEXT, Typography.STATUS_FONT, Colors.PRIMARY_TEXT, 0.01f);
         
         private final String text;
         private final java.awt.Font font;

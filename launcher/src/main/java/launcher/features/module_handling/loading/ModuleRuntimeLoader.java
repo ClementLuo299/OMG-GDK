@@ -23,21 +23,15 @@ public final class ModuleRuntimeLoader {
     private ModuleRuntimeLoader() {}
     
     /**
-     * Processes each discovered module and updates progress.
+     * Processes each discovered module.
      * 
      * @param progressManager The progress manager for updates
      * @param validModuleDirectories List of valid module directories
-     * @param totalSteps Total number of progress steps
      */
     public static void processModules(ModuleLoadingProgressManager progressManager,
-                                     List<File> validModuleDirectories,
-                                     int totalSteps) {
-        // Iterate through each module directory and update progress
+                                     List<File> validModuleDirectories) {
+        // Iterate through each module directory
         for (File moduleDir : validModuleDirectories) {
-            // Reserve last 2 steps for finalization
-            if (progressManager.getCurrentStep() >= totalSteps - 2) {
-                break;
-            }
             String moduleName = moduleDir.getName();
             Logging.info("Processing module: " + moduleName);
             progressManager.updateProgress("Processing module: " + moduleName);

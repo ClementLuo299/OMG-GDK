@@ -1,71 +1,61 @@
 package launcher.ui_areas.startup_window;
 
 import javax.swing.*;
-import launcher.core.lifecycle.start.startup_window.component_construction.*;
 import launcher.ui_areas.startup_window.component_construction.StartupWindowBuilder;
-import launcher.ui_areas.startup_window.styling.components.ProgressBarStyling;
+import launcher.ui_areas.startup_window.component_construction.components.LoadingSpinner;
 
 /**
- * Startup progress window that is displayed before JavaFX starts, using Swing for immediate display.
+ * Startup loading window that is displayed before JavaFX starts, using Swing for immediate display.
  * 
  * @author Clement Luo
  * @date August 5, 2025
- * @edited December 26, 2025 
+ * @edited January 2025 
  * @since Beta 1.0
  */
 public class StartupWindow {
     
-    // Swing components for the pre-startup progress window UI
+    // Swing components for the pre-startup loading window UI
     final JFrame progressFrame;
-    final JProgressBar progressBar;
-    final JLabel percentageLabel;
-    final JLabel statusLabel;
-    final ProgressBarStyling progressBarStyling;
-    
-    // Total steps for the progress bar
-    final int totalSteps; 
+    final LoadingSpinner spinner;
     
     /**
-     * Initialize the startup progress window
-     * 
-     * @param totalSteps The total number of steps for the progress bar
+     * Initialize the startup loading window
      */
-    public StartupWindow(int totalSteps) {
-        this.totalSteps = totalSteps;
-        
+    public StartupWindow() {
         StartupWindowBuilder.InitializationResult result =
-            StartupWindowBuilder.build(totalSteps);
+            StartupWindowBuilder.build();
         
         this.progressFrame = result.frame;
-        this.progressBar = result.progressBar;
-        this.percentageLabel = result.percentageLabel;
-        this.statusLabel = result.statusLabel;
-        this.progressBarStyling = result.progressBarStyling;
+        this.spinner = result.spinner;
     }
     
     /**
-     * Shows the progress window.
+     * Shows the loading window.
      */
     public void show() {
-        // Show the progress window on the Event Dispatch Thread
+        // Show the loading window on the Event Dispatch Thread
         if (SwingUtilities.isEventDispatchThread()) {
             progressFrame.setVisible(true);
+            spinner.start();
         } else {
             SwingUtilities.invokeLater(() -> {
                 progressFrame.setVisible(true);
+                spinner.start();
             });
         }
     }
     
     /**
-     * Hides and disposes the progress window.
+     * Hides and disposes the loading window.
      */
     public void hide() {
         if (SwingUtilities.isEventDispatchThread()) {
+            spinner.stop();
             progressFrame.setVisible(false);
             progressFrame.dispose();
         } else {
             SwingUtilities.invokeLater(() -> {
+                spinner.stop();
                 progressFrame.setVisible(false);
                 progressFrame.dispose();
             });
@@ -73,47 +63,11 @@ public class StartupWindow {
     }
     
     /**
-     * Gets the progress bar component.
+     * Gets the loading spinner component.
      * 
-     * @return The progress bar
+     * @return The loading spinner
      */
-    public JProgressBar getProgressBar() {
-        return progressBar;
-    }
-    
-    /**
-     * Gets the percentage label component.
-     * 
-     * @return The percentage label
-     */
-    public JLabel getPercentageLabel() {
-        return percentageLabel;
-    }
-    
-    /**
-     * Gets the status label component.
-     * 
-     * @return The status label
-     */
-    public JLabel getStatusLabel() {
-        return statusLabel;
-    }
-    
-    /**
-     * Gets the progress bar styling component.
-     * 
-     * @return The progress bar styling
-     */
-    public ProgressBarStyling getProgressBarStyling() {
-        return progressBarStyling;
-    }
-    
-    /**
-     * Gets the total number of steps.
-     * 
-     * @return The total steps
-     */
-    public int getTotalSteps() {
-        return totalSteps;
+    public LoadingSpinner getSpinner() {
+        return spinner;
     }
 }
