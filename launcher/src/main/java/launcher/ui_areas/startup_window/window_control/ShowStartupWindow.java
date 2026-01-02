@@ -35,7 +35,7 @@ public final class ShowStartupWindow {
             window.progressFrame.repaint();
             // Use invokeLater to start spinner after the current paint cycle completes
             SwingUtilities.invokeLater(() -> {
-                window.spinnerController.start();
+                window.spinController.start();
             });
         }
         else {
@@ -45,7 +45,7 @@ public final class ShowStartupWindow {
                 window.progressFrame.repaint();
                 // Start spinner after the window is painted
                 SwingUtilities.invokeLater(() -> {
-                    window.spinnerController.start();
+                    window.spinController.start();
                 });
             });
         }

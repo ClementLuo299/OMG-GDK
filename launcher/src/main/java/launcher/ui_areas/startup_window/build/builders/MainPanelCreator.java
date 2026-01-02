@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.build.components;
+package launcher.ui_areas.startup_window.build.builders;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;

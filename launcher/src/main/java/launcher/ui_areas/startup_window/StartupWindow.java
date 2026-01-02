@@ -2,8 +2,8 @@ package launcher.ui_areas.startup_window;
 
 import gdk.internal.Logging;
 import launcher.ui_areas.startup_window.build.StartupWindowBuilder;
-import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinner;
-import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinnerController;
+import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinner;
+import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinnerAnimator;
 import launcher.ui_areas.startup_window.window_control.ShowStartupWindow;
 import launcher.ui_areas.startup_window.window_control.HideStartupWindow;
 
@@ -26,7 +26,7 @@ public class StartupWindow {
     public final LoadingSpinner spinner;
     
     // The controller that manages the spinner animation
-    public final LoadingSpinnerController spinnerController;
+    public final LoadingSpinnerAnimator spinController;
     
     /**
      * Initialize the startup loading window.
@@ -34,12 +34,12 @@ public class StartupWindow {
      * 
      * @param frame The JFrame for the window
      * @param spinner The loading spinner component
-     * @param spinnerController The controller that manages the spinner animation
+     * @param spinController The controller that manages the spinner animation
      */
-    public StartupWindow(JFrame frame, LoadingSpinner spinner, LoadingSpinnerController spinnerController) {
+    public StartupWindow(JFrame frame, LoadingSpinner spinner, LoadingSpinnerAnimator spinController) {
         this.progressFrame = frame;
         this.spinner = spinner;
-        this.spinnerController = spinnerController;
+        this.spinController = spinController;
     }
     
     /**

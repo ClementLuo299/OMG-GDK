@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.build.components;
+package launcher.ui_areas.startup_window.build.builders;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -15,7 +15,7 @@ import launcher.ui_areas.startup_window.styling.theme.Typography;
  * @edited January 1, 2026
  * @since Beta 1.0
  */
-public class LoadingLabel {
+public class LoadingLabelCreator {
     
     /**
      * Creates the loading label with modern typography.

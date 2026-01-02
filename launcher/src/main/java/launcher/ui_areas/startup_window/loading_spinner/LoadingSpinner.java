@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.build.components.loading_spinner;
+package launcher.ui_areas.startup_window.loading_spinner;
 
 import javax.swing.JComponent;
 import java.awt.Graphics;
@@ -11,7 +11,7 @@ import launcher.ui_areas.startup_window.styling.theme.SpinnerConstants;
 /**
  * A circular loading spinner component with smooth rotation animation.
  * 
- * This component displays an animated circular arc that rotates continuously
+ * This component is an animated circular arc that rotates continuously
  * to indicate loading progress. The component handles only the visual rendering;
  * animation control is managed by LoadingSpinnerController.
  * 

@@ -7,11 +7,11 @@ import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.ui_areas.startup_window.build.arrangement.ComponentAssembler;
 import launcher.ui_areas.startup_window.build.arrangement.WindowPositioner;
 import launcher.ui_areas.startup_window.build.builders.CreateMainFrame;
-import launcher.ui_areas.startup_window.build.components.LoadingLabel;
-import launcher.ui_areas.startup_window.build.components.MainPanelCreator;
-import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinner;
-import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinnerBuilder;
-import launcher.ui_areas.startup_window.build.components.loading_spinner.LoadingSpinnerController;
+import launcher.ui_areas.startup_window.build.builders.LoadingLabelCreator;
+import launcher.ui_areas.startup_window.build.builders.MainPanelCreator;
+import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinner;
+import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinnerBuilder;
+import launcher.ui_areas.startup_window.loading_spinner.LoadingSpinnerAnimator;
 import launcher.ui_areas.startup_window.styling.theme.Typography;
 
 /**
@@ -41,10 +41,10 @@ public class StartupWindowBuilder {
         LoadingSpinner spinner = LoadingSpinnerBuilder.build();
         
         // Create controller for the spinner
-        LoadingSpinnerController spinnerController = new LoadingSpinnerController(spinner);
+        LoadingSpinnerAnimator spinnerController = new LoadingSpinnerAnimator(spinner);
 
         // Create "Loading" label
-        JLabel loadingLabel = LoadingLabel.create();
+        JLabel loadingLabel = LoadingLabelCreator.create();
         
         // Create and configure the main panel layout
         JPanel mainPanel = MainPanelCreator.create();

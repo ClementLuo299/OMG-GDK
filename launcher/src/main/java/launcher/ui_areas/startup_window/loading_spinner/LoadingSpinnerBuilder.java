@@ -1,4 +1,4 @@
-package launcher.ui_areas.startup_window.build.components.loading_spinner;
+package launcher.ui_areas.startup_window.loading_spinner;
 
 import launcher.ui_areas.startup_window.styling.theme.Colors;
 import launcher.ui_areas.startup_window.styling.theme.SpinnerConstants;
