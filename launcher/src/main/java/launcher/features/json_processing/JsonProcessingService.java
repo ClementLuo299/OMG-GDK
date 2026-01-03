@@ -1,6 +1,7 @@
 package launcher.features.json_processing;
 
-import launcher.ui_areas.lobby.GDKViewModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import gdk.internal.Logging;
 
 import java.util.Map;
 
@@ -18,24 +19,22 @@ import java.util.Map;
  * 
  * @author Clement Luo
  * @date December 30, 2025
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
 public class JsonProcessingService {
     
-    // ==================== DEPENDENCIES ====================
+    // ==================== CONSTANTS ====================
     
-    /** ViewModel for business logic operations. */
-    private final GDKViewModel viewModel;
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
     
     // ==================== CONSTRUCTOR ====================
     
     /**
      * Creates a new JsonProcessingService.
-     * 
-     * @param viewModel The ViewModel for business logic (may be null initially)
      */
-    public JsonProcessingService(GDKViewModel viewModel) {
-        this.viewModel = viewModel;
+    public JsonProcessingService() {
+        // No dependencies needed - service is now self-contained
     }
     
     // ==================== PUBLIC METHODS ====================
@@ -43,17 +42,25 @@ public class JsonProcessingService {
     /**
      * Parses JSON configuration text into a map.
      * 
-     * <p>This method delegates to the ViewModel to parse the JSON configuration.
-     * Returns null if the ViewModel is unavailable or the text is empty/null.
+     * <p>This method parses a JSON string into a Map structure for use in game configuration.
+     * Returns null if the input is empty or parsing fails.
      * 
      * @param jsonText The JSON text to parse
-     * @return Parsed configuration map, or null if parsing fails or ViewModel is unavailable
+     * @return Parsed configuration map, or null if parsing fails or text is empty/null
      */
     public Map<String, Object> parseJsonConfiguration(String jsonText) {
-        if (viewModel == null || jsonText == null || jsonText.trim().isEmpty()) {
+        if (jsonText == null || jsonText.trim().isEmpty()) {
             return null;
         }
-        return viewModel.parseJsonConfiguration(jsonText);
+        
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> configurationData = JSON_MAPPER.readValue(jsonText.trim(), Map.class);
+            return configurationData;
+        } catch (Exception e) {
+            Logging.error("❌ Failed to parse JSON: " + e.getMessage());
+            return null;
+        }
     }
     
     /**

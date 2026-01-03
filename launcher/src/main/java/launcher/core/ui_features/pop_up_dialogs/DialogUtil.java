@@ -379,8 +379,8 @@ public class DialogUtil {
     /**
      * Ensures dialog is shown on the JavaFX Application Thread.
      * 
-     * <p>This method checks if the current thread is the JavaFX Application Thread.
-     * If not, it schedules the runnable to run on that thread using Platform.runLater().
+     * <p>This method checks if the current helpers is the JavaFX Application Thread.
+     * If not, it schedules the runnable to run on that helpers using Platform.runLater().
      * 
      * @param runnable The dialog display code to execute
      */

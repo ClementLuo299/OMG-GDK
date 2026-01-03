@@ -1,15 +1,15 @@
-package launcher.features.module_handling.on_program_start;
+package launcher.features.module_handling.on_start;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.features.module_handling.on_program_start.thread.ModuleLoadingThread;
+import launcher.features.module_handling.on_start.helpers.ModuleLoadingThread;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.stop.Shutdown;
 
 /**
  * Coordinates the module ui_loading process during startup.
- * Sets up and starts the background thread that loads game modules and manages cleanup tasks.
+ * Sets up and starts the background helpers that loads game modules and manages cleanup tasks.
  * 
  * @author Clement Luo
  * @date August 9, 2025
@@ -37,23 +37,23 @@ public final class ModuleLoadingProcess {
             Thread.currentThread().interrupt();
         }
         
-        // Create a background thread that will load all the modules
-        // This thread does the heavy work so the UI doesn't freeze
+        // Create a background helpers that will load all the modules
+        // This helpers does the heavy work so the UI doesn't freeze
         Thread moduleLoadingThread = ModuleLoadingThread.create(primaryApplicationStage, lobbyController, windowManager);
         
-        // Step 4: Make sure we clean up the thread if the app closes unexpectedly
+        // Step 4: Make sure we clean up the helpers if the app closes unexpectedly
         registerCleanupTasks(moduleLoadingThread, windowManager);
         
-        // Step 5: Start the background thread
+        // Step 5: Start the background helpers
         // After this line, the method returns immediately.
-        // The background thread continues working and will:
+        // The background helpers continues working and will:
         // - Load modules
         // - Update the UI
         // - Show the main window when done
         moduleLoadingThread.start();
         
         // Method returns here - the caller continues immediately
-        // Background thread keeps working in the background
+        // Background helpers keeps working in the background
     }
     
     
@@ -61,13 +61,13 @@ public final class ModuleLoadingProcess {
      * Registers cleanup tasks to ensure proper shutdown.
      * These tasks will be executed when the application shuts down.
      * 
-     * @param moduleLoadingThread The thread to interrupt on shutdown
+     * @param moduleLoadingThread The helpers to interrupt on shutdown
      * @param windowManager The startup window to hide on shutdown
      */
     private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindow windowManager) {
-        // Clean up the module loading thread if app shuts down while loading
+        // Clean up the module loading helpers if app shuts down while loading
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up module loading thread...");
+            Logging.info("Cleaning up module loading helpers...");
             if (moduleLoadingThread.isAlive()) {
                 moduleLoadingThread.interrupt();
             }

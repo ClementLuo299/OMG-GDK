@@ -1,4 +1,4 @@
-package launcher.features.module_handling.loading.helpers;
+package launcher.features.module_handling.on_start.helpers.thread_tasks_helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;

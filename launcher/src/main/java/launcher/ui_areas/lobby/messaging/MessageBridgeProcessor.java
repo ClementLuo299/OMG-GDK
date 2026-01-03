@@ -12,7 +12,7 @@ import java.util.Map;
  * <p>This processor handles UI-related operations:
  * <ul>
  *   <li>Updating JSON output editor with formatted messages</li>
- *   <li>Ensuring thread safety (JavaFX application thread)</li>
+ *   <li>Ensuring helpers safety (JavaFX application helpers)</li>
  * </ul>
  * 
  * <p>Business logic (transcript recording, JSON formatting) is delegated to
@@ -70,7 +70,7 @@ public class MessageBridgeProcessor {
             if (messageProcessingService.isEndMessage(msg) && jsonOutputEditor != null) {
                 // Format using business service
                 String pretty = messageProcessingService.formatJsonResponse(msg);
-                // Update UI on JavaFX thread
+                // Update UI on JavaFX helpers
                 Platform.runLater(() -> jsonOutputEditor.setText(pretty));
             }
         } catch (Exception ignored) {

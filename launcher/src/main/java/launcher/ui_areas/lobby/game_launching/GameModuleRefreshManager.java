@@ -2,7 +2,6 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.module_handling.discovery.ModuleDiscoveryService;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
@@ -58,9 +57,6 @@ public class GameModuleRefreshManager {
     /** Checker for module compilation failures. */
     private final ModuleCompilationChecker moduleCompilationChecker;
     
-    /** ViewModel for business logic operations (compilation checks). */
-    private final GDKViewModel viewModel;
-    
     // ==================== STATE ====================
     
     /** Previous module count for change detection. */
@@ -74,7 +70,6 @@ public class GameModuleRefreshManager {
     /**
      * Creates a new GameModuleRefreshManager with all required dependencies.
      * 
-     * @param viewModel The ViewModel for business logic operations
      * @param availableGameModules The observable list of available game modules
      * @param gameSelector The game selector ComboBox UI component
      * @param messageManager The message manager for user feedback
@@ -85,7 +80,6 @@ public class GameModuleRefreshManager {
      * @param moduleCompilationChecker The module compilation checker
      */
     public GameModuleRefreshManager(
-            GDKViewModel viewModel,
             ObservableList<GameModule> availableGameModules,
             ComboBox<GameModule> gameSelector,
             MessageManager messageManager,
@@ -95,7 +89,6 @@ public class GameModuleRefreshManager {
             LoadingAnimationManager loadingAnimationManager,
             ModuleCompilationChecker moduleCompilationChecker) {
         
-        this.viewModel = viewModel;
         this.messageManager = messageManager;
         this.moduleChangeReporter = moduleChangeReporter;
         this.loadingAnimationManager = loadingAnimationManager;
@@ -103,7 +96,7 @@ public class GameModuleRefreshManager {
         
         // Create business service for module discovery
         ModuleDiscoveryService discoveryService =
-            new ModuleDiscoveryService(viewModel);
+            new ModuleDiscoveryService();
         // Create handlers
         this.moduleDiscoveryHandler = new ModuleDiscoveryHandler(discoveryService, messageManager, statusLabelManager);
         this.uiUpdater = new ModuleRefreshUIUpdater(availableGameModules, gameSelector, statusLabelManager, launchButtonManager);
@@ -122,7 +115,7 @@ public class GameModuleRefreshManager {
      *   <li>Change detection and reporting</li>
      * </ul>
      * 
-     * <p>This operation runs in a background thread to keep the UI responsive.
+     * <p>This operation runs in a background helpers to keep the UI responsive.
      */
     public void handleRefresh() {
         // Initialize UI state for refresh operation
@@ -130,14 +123,14 @@ public class GameModuleRefreshManager {
         messageManager.setRefreshing(true);
         messageManager.clearMessages();
 
-        // Snapshot current state on JavaFX thread for safe background use
+        // Snapshot current state on JavaFX helpers for safe background use
         List<GameModule> previousModulesSnapshot = new ArrayList<>(uiUpdater.availableGameModules);
         int previousCountSnapshot = previousModuleCount;
 
         // Clear UI selections immediately to prevent launching stale modules
         uiUpdater.clearUISelections();
         
-        // Perform refresh in background thread to keep UI responsive
+        // Perform refresh in background helpers to keep UI responsive
         new Thread(() -> {
             try {
                 performFullRefresh(previousModulesSnapshot, previousCountSnapshot);
@@ -159,8 +152,8 @@ public class GameModuleRefreshManager {
      *   <li>Reports module changes if this is not the first load</li>
      * </ul>
      * 
-     * <p>Can be called from any thread; UI updates are automatically scheduled
-     * on the JavaFX application thread if needed.
+     * <p>Can be called from any helpers; UI updates are automatically scheduled
+     * on the JavaFX application helpers if needed.
      */
     public void refreshAvailableGameModulesFast() {
         try {
@@ -186,7 +179,7 @@ public class GameModuleRefreshManager {
             // Filter out any null modules
             List<GameModule> validModules = moduleDiscoveryHandler.filterValidModules(discoveredGameModules);
             
-            // Update UI on JavaFX thread
+            // Update UI on JavaFX helpers
             previousModuleCount = uiUpdater.updateUIForFastRefresh(
                 validModules, discoveryResult, messageManager, moduleChangeReporter, previousModuleNames);
             
@@ -198,7 +191,7 @@ public class GameModuleRefreshManager {
     // ==================== PRIVATE HELPER METHODS - FULL REFRESH ====================
     
     /**
-     * Performs the core full refresh logic in a background thread.
+     * Performs the core full refresh logic in a background helpers.
      * 
      * @param previousModulesSnapshot Snapshot of modules before refresh
      * @param previousCountSnapshot Count of modules before refresh
@@ -216,7 +209,7 @@ public class GameModuleRefreshManager {
         // Check for compilation failures
         checkAndReportCompilationFailures();
         
-        // Update ComboBox UI on JavaFX thread
+        // Update ComboBox UI on JavaFX helpers
         uiUpdater.updateComboBoxUI(discoveredGameModules);
         
         // Detect and report module changes
@@ -231,8 +224,8 @@ public class GameModuleRefreshManager {
      * Checks for compilation failures and reports them to the user.
      */
     private void checkAndReportCompilationFailures() {
-        if (viewModel != null && moduleCompilationChecker != null) {
-            List<String> compilationFailures = viewModel.checkForCompilationFailures();
+        if (moduleCompilationChecker != null) {
+            List<String> compilationFailures = launcher.features.module_handling.initialization.ModuleInitializationUtil.checkForCompilationFailures();
             if (!compilationFailures.isEmpty()) {
                 for (String moduleName : compilationFailures) {
                     messageManager.addMessage("Module '" + moduleName + "' failed to compile - check source code for errors");

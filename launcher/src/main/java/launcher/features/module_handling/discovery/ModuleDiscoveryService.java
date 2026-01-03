@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.ui_areas.lobby.GDKViewModel;
+import launcher.features.module_handling.initialization.ModuleInitializationUtil;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ import java.util.Set;
  * 
  * <p>This service handles:
  * <ul>
- *   <li>Discovering modules via ViewModel</li>
+ *   <li>Discovering modules via ModuleInitializationUtil</li>
  *   <li>Processing discovered modules (extracting names, metadata)</li>
  *   <li>Filtering out invalid (null) modules</li>
  *   <li>Collecting and extracting module names</li>
@@ -25,39 +25,29 @@ import java.util.Set;
  * 
  * @author Clement Luo
  * @date December 30, 2025
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
 public class ModuleDiscoveryService {
-    
-    // ==================== DEPENDENCIES ====================
-    
-    /** ViewModel for business logic operations (module discovery). */
-    private final GDKViewModel viewModel;
     
     // ==================== CONSTRUCTOR ====================
     
     /**
      * Creates a new ModuleDiscoveryService.
-     * 
-     * @param viewModel The ViewModel for business logic operations
      */
-    public ModuleDiscoveryService(GDKViewModel viewModel) {
-        this.viewModel = viewModel;
+    public ModuleDiscoveryService() {
+        // No dependencies needed - uses utility class
     }
     
     // ==================== PUBLIC METHODS ====================
     
     /**
-     * Discovers and loads game modules using the ViewModel.
+     * Discovers and loads game modules using ModuleInitializationUtil.
      * 
-     * @return List of discovered game modules, or null if ViewModel is unavailable
+     * @return List of discovered game modules, or empty list if error occurs
      */
     public List<GameModule> discoverModules() {
-        if (viewModel != null) {
-            return viewModel.discoverAndLoadModules();
-        }
-        Logging.error("ViewModel not available for module discovery");
-        return null;
+        return ModuleInitializationUtil.discoverAndLoadModules();
     }
     
     /**

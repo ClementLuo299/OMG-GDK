@@ -1,4 +1,4 @@
-package launcher.features.development_features;
+package launcher.features.development;
 
 import gdk.internal.Logging;
 
@@ -16,7 +16,7 @@ import gdk.internal.Logging;
  * @edited December 21, 2025
  * @since Beta 1.0
  */
-public final class StartupDelayUtil {
+public final class ProgramDelay {
 
     // ==================== CONSTANTS ====================
     
@@ -41,7 +41,7 @@ public final class StartupDelayUtil {
      * Private constructor to prevent instantiation.
      * This is a utility class with only static methods.
      */
-    private StartupDelayUtil() {
+    private ProgramDelay() {
         throw new AssertionError("StartupDelayUtil should not be instantiated");
     }
     
@@ -53,12 +53,12 @@ public final class StartupDelayUtil {
      * <p>This method adds a delay with logging to make it clear what's happening.
      * The delay is only executed if ENABLE_DEVELOPMENT_DELAYS is set to true.
      * 
-     * <p>The delay duration is controlled by DELAY_DURATION_MS. If the thread is interrupted,
+     * <p>The delay duration is controlled by DELAY_DURATION_MS. If the helpers is interrupted,
      * the interruption status is preserved.
      * 
      * @param reason The reason for the delay (for logging purposes)
      */
-    public static void addDevelopmentDelay(String reason) {
+    public static void delay(String reason) {
         if (!ENABLE_DEVELOPMENT_DELAYS) {
             return; // Skip delay if disabled
         }

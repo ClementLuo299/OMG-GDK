@@ -12,17 +12,17 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Utility class for managing start messages for different game modes.
+ * Utility class for managing init messages for different game modes.
  * 
- * <p>This class has a single responsibility: ui_loading and managing start messages
+ * <p>This class has a single responsibility: ui_loading and managing init messages
  * for different game modes (single player, local multiplayer, all modes).
  * 
  * <p>Key responsibilities:
  * <ul>
- *   <li>Loading start messages from JSON files</li>
- *   <li>Creating default start messages if files don't exist</li>
+ *   <li>Loading init messages from JSON files</li>
+ *   <li>Creating default init messages if files don't exist</li>
  *   <li>Ensuring required fields (like localPlayerId) are present</li>
- *   <li>Managing the saved directory for start message files</li>
+ *   <li>Managing the saved directory for init message files</li>
  * </ul>
  * 
  * @author Clement Luo
@@ -34,17 +34,17 @@ public final class StartMessageUtil {
     
     // ==================== CONSTANTS ====================
     
-    /** Path to the default start message file. */
-    private static final String DEFAULT_FILE_NAME = "saved/start-message.example.json_processing";
+    /** Path to the default init message file. */
+    private static final String DEFAULT_FILE_NAME = "saved/init-message.example.json_processing";
     
-    /** Path to the local multiplayer start message file. */
-    private static final String LOCAL_MULTIPLAYER_FILE = "saved/start-message-local-multiplayer.json_processing";
+    /** Path to the local multiplayer init message file. */
+    private static final String LOCAL_MULTIPLAYER_FILE = "saved/init-message-local-multiplayer.json_processing";
     
-    /** Path to the single player start message file. */
-    private static final String SINGLE_PLAYER_FILE = "saved/start-message-single-player.json_processing";
+    /** Path to the single player init message file. */
+    private static final String SINGLE_PLAYER_FILE = "saved/init-message-single-player.json_processing";
     
-    /** Path to the all modes start message file. */
-    private static final String ALL_MODES_FILE = "saved/start-message-all-modes.json_processing";
+    /** Path to the all modes init message file. */
+    private static final String ALL_MODES_FILE = "saved/init-message-all-modes.json_processing";
     
     // ==================== CONSTRUCTOR ====================
     
@@ -59,13 +59,13 @@ public final class StartMessageUtil {
     // ==================== PUBLIC METHODS - LOADING ====================
     
     /**
-     * Loads the default start message.
+     * Loads the default init message.
      * 
-     * <p>This method loads the default start message from file. If the file doesn't exist,
-     * it creates a default start message and saves it for future use. The method also
+     * <p>This method loads the default init message from file. If the file doesn't exist,
+     * it creates a default init message and saves it for future use. The method also
      * ensures that the localPlayerId field is present in the message.
      * 
-     * @return The start message map, or null if ui_loading fails
+     * @return The init message map, or null if ui_loading fails
      */
     public static Map<String, Object> loadDefaultStartMessage() {
         Map<String, Object> msg = loadStartMessage(Path.of(DEFAULT_FILE_NAME));
@@ -84,7 +84,7 @@ public final class StartMessageUtil {
                 }
             }
         } else {
-            // If file doesn't exist, create a default start message
+            // If file doesn't exist, create a default init message
             msg = createDefaultStartMessage();
             // Try to save it for future use
             try {
@@ -92,36 +92,36 @@ public final class StartMessageUtil {
                 ObjectMapper mapper = new ObjectMapper();
                 String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(msg);
                 Files.writeString(Path.of(DEFAULT_FILE_NAME), json);
-                Logging.info("📝 Created default start message file: " + DEFAULT_FILE_NAME);
+                Logging.info("📝 Created default init message file: " + DEFAULT_FILE_NAME);
             } catch (Exception e) {
-                Logging.error("Failed to save default start message: " + e.getMessage(), e);
+                Logging.error("Failed to save default init message: " + e.getMessage(), e);
             }
         }
         return msg;
     }
     
     /**
-     * Loads a start message for local multiplayer mode.
+     * Loads a init message for local multiplayer mode.
      * 
-     * @return The start message map for local multiplayer, or null if ui_loading fails
+     * @return The init message map for local multiplayer, or null if ui_loading fails
      */
     public static Map<String, Object> loadLocalMultiplayerStartMessage() {
         return loadStartMessage(Path.of(LOCAL_MULTIPLAYER_FILE));
     }
     
     /**
-     * Loads a start message for single player mode.
+     * Loads a init message for single player mode.
      * 
-     * @return The start message map for single player, or null if ui_loading fails
+     * @return The init message map for single player, or null if ui_loading fails
      */
     public static Map<String, Object> loadSinglePlayerStartMessage() {
         return loadStartMessage(Path.of(SINGLE_PLAYER_FILE));
     }
     
     /**
-     * Loads a start message for all modes (multi player).
+     * Loads a init message for all modes (multi player).
      * 
-     * @return The start message map for all modes, or null if ui_loading fails
+     * @return The init message map for all modes, or null if ui_loading fails
      */
     public static Map<String, Object> loadAllModesStartMessage() {
         return loadStartMessage(Path.of(ALL_MODES_FILE));
@@ -130,13 +130,13 @@ public final class StartMessageUtil {
     // ==================== PRIVATE METHODS - LOADING ====================
     
     /**
-     * Loads a start message from a file file_paths.
+     * Loads a init message from a file file_paths.
      * 
      * <p>This method reads a JSON file and parses it into a Map structure.
      * Returns null if the file doesn't exist, is not readable, or parsing fails.
      * 
-     * @param filePath The file_paths to the start message file
-     * @return The parsed start message map, or null if ui_loading fails
+     * @param filePath The file_paths to the init message file
+     * @return The parsed init message map, or null if ui_loading fails
      */
     public static Map<String, Object> loadStartMessage(Path filePath) {
         try {
@@ -154,7 +154,7 @@ public final class StartMessageUtil {
             Map<String, Object> data = mapper.readValue(json, Map.class);
             return data;
         } catch (Exception e) {
-            Logging.error("Failed to load start message: " + e.getMessage(), e);
+            Logging.error("Failed to load init message: " + e.getMessage(), e);
             return null;
         }
     }
@@ -162,21 +162,21 @@ public final class StartMessageUtil {
     // ==================== PRIVATE METHODS - CREATION ====================
     
     /**
-     * Creates a default start message with standard game configuration.
+     * Creates a default init message with standard game configuration.
      * 
-     * <p>This method creates a default start message with:
+     * <p>This method creates a default init message with:
      * <ul>
-     *   <li>Function: "start"</li>
+     *   <li>Function: "init"</li>
      *   <li>Game mode: "multi_player"</li>
      *   <li>Local player ID: "p1"</li>
      *   <li>Two players (p1 as host, p2 as guest)</li>
      * </ul>
      * 
-     * @return A default start message map
+     * @return A default init message map
      */
     private static Map<String, Object> createDefaultStartMessage() {
         Map<String, Object> defaultMsg = new HashMap<>();
-        defaultMsg.put("function", "start");
+        defaultMsg.put("function", "init");
         defaultMsg.put("gameMode", "multi_player");
         defaultMsg.put("localPlayerId", "p1");
         

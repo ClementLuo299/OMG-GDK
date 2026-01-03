@@ -1,4 +1,4 @@
-package launcher.features.module_handling.loading.helpers;
+package launcher.features.module_handling.on_start.helpers.thread_tasks_helpers;
 
 import gdk.internal.Logging;
 import javafx.application.Platform;
@@ -6,7 +6,7 @@ import launcher.ui_areas.lobby.GDKGameLobbyController;
 
 /**
  * Checks for compilation failures and displays warnings.
- * Handles both Swing EDT (progress updates) and JavaFX thread (controller checks).
+ * Handles both Swing EDT (progress updates) and JavaFX helpers (controller checks).
  * 
  * @author Clement Luo
  * @date December 27, 2025
@@ -19,12 +19,12 @@ public final class CompilationChecker {
     
     /**
      * Checks for compilation failures and displays warnings if needed.
-     * The controller check must run on the JavaFX thread.
+     * The controller check must run on the JavaFX helpers.
      * 
      * @param lobbyController The controller to check for issues
      */
     public static void checkForCompilationIssues(GDKGameLobbyController lobbyController) {
-        // Check for compilation failures (must run on JavaFX thread for controller access)
+        // Check for compilation failures (must run on JavaFX helpers for controller access)
         Platform.runLater(() -> {
             try {
                 if (lobbyController != null) {

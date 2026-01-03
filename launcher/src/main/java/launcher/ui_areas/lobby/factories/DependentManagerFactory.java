@@ -88,7 +88,6 @@ public class DependentManagerFactory {
         // ==================== CREATE DEPENDENT MANAGERS ====================
         
         GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
-            applicationViewModel,
             (ObservableList) availableGameModules,
             (ComboBox) gameSelector,
             messageManager,

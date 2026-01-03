@@ -28,7 +28,7 @@ public class Colors {
     /** Transparent color for window transparency */
     public static final Color TRANSPARENT = new Color(0, 0, 0, 0);
     
-    /** Spinner gradient start color (purple) */
+    /** Spinner gradient init color (purple) */
     public static final Color PROGRESS_START = new Color(139, 92, 246);
     
     /** Spinner gradient end color (blue) */

@@ -53,10 +53,10 @@ public class ViewModelDependentsFactory {
         
         // ==================== RECREATE VIEWMODEL-DEPENDENT COMPONENTS ====================
         
-        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
+        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter::addMessage);
         
         // Create business service for JSON processing
-        JsonProcessingService jsonProcessingService = new JsonProcessingService(applicationViewModel);
+        JsonProcessingService jsonProcessingService = new JsonProcessingService();
         JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(jsonProcessingService, 
             currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
         
@@ -83,7 +83,6 @@ public class ViewModelDependentsFactory {
         
         // Note: GameModuleRefreshManager creates ModuleDiscoveryService internally
         GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
-            applicationViewModel,
             currentResult.gameSelectionController().getAvailableGameModules(),
             (ComboBox) gameSelector,
             currentResult.messageManager(),

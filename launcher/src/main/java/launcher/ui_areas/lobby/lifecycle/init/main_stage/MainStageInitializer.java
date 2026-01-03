@@ -1,4 +1,4 @@
-package launcher.core.ui_features.ui_loading.stage;
+package launcher.ui_areas.lobby.lifecycle.init.main_stage;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -10,7 +10,7 @@ import gdk.internal.Logging;
  * 
  * @author Clement Luo
  * @date December 26, 2025
- * @edited December 26, 2025
+ * @edited January 2, 2026
  * @since Beta 1.0
  */
 public final class MainStageInitializer {
@@ -40,12 +40,12 @@ public final class MainStageInitializer {
      */
     private static void configureBasicProperties(Stage primaryApplicationStage, Scene mainScene) {
         primaryApplicationStage.setScene(mainScene);
-        primaryApplicationStage.setTitle("OMG Game Development Kit (GDK)");
-        primaryApplicationStage.setMinWidth(800);
-        primaryApplicationStage.setMinHeight(600);
-        primaryApplicationStage.setWidth(1200);
-        primaryApplicationStage.setHeight(900);
-        primaryApplicationStage.setOpacity(0.0);
+        primaryApplicationStage.setTitle(MainStageConfiguration.WINDOW_TITLE);
+        primaryApplicationStage.setMinWidth(MainStageConfiguration.MIN_WIDTH);
+        primaryApplicationStage.setMinHeight(MainStageConfiguration.MIN_HEIGHT);
+        primaryApplicationStage.setWidth(MainStageConfiguration.DEFAULT_WIDTH);
+        primaryApplicationStage.setHeight(MainStageConfiguration.DEFAULT_HEIGHT);
+        primaryApplicationStage.setOpacity(MainStageConfiguration.INITIAL_OPACITY);
     }
     
     /**

@@ -8,7 +8,7 @@ import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 import launcher.ui_areas.lobby.subcontrollers.TopBarController;
-import launcher.features.module_handling.loading.ModuleCompiler;
+import launcher.features.module_handling.compilation.ModuleCompiler;
 
 /**
  * Handles post-initialization setup tasks.

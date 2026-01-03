@@ -21,7 +21,7 @@ import java.util.Set;
  *   <li>Updating the ComboBox with discovered modules</li>
  *   <li>Updating status labels and button states</li>
  *   <li>Logging UI state for debugging</li>
- *   <li>Ensuring thread safety (JavaFX application thread)</li>
+ *   <li>Ensuring helpers safety (JavaFX application helpers)</li>
  * </ul>
  * 
  * @author Clement Luo
@@ -68,7 +68,7 @@ public class ModuleRefreshUIUpdater {
     // ==================== PUBLIC METHODS ====================
     
     /**
-     * Updates the ComboBox UI with discovered modules on the JavaFX thread.
+     * Updates the ComboBox UI with discovered modules on the JavaFX helpers.
      * 
      * @param discoveredGameModules List of discovered game modules
      */
@@ -120,7 +120,7 @@ public class ModuleRefreshUIUpdater {
                                       Set<String> previousModuleNames) {
         Runnable uiUpdate = () -> {
             try {
-                Logging.info("Updating UI on JavaFX thread...");
+                Logging.info("Updating UI on JavaFX helpers...");
                 Logging.info("   Current availableGameModules size: " + availableGameModules.size());
                 Logging.info("   Modules to add: " + validModules.size());
                 
@@ -154,12 +154,12 @@ public class ModuleRefreshUIUpdater {
             }
         };
         
-        // Execute on JavaFX thread
+        // Execute on JavaFX helpers
         if (Platform.isFxApplicationThread()) {
-            Logging.info("Already on JavaFX thread - running UI update directly");
+            Logging.info("Already on JavaFX helpers - running UI update directly");
             uiUpdate.run();
         } else {
-            Logging.info("Not on JavaFX thread - scheduling UI update");
+            Logging.info("Not on JavaFX helpers - scheduling UI update");
             Platform.runLater(uiUpdate);
         }
         

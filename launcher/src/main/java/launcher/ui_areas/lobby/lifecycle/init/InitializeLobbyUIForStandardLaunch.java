@@ -1,14 +1,15 @@
-package launcher.ui_areas.lobby.lifecycle.start;
+package launcher.ui_areas.lobby.lifecycle.init;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.core.ui_features.ui_loading.stage.MainStageInitializer;
+import launcher.ui_areas.lobby.lifecycle.init.main_stage.MainStageInitializer;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.lifecycle.LobbyOptimizer;
-import launcher.ui_areas.lobby.lifecycle.start.scene_controller.LoadLobbySceneAndGetController;
-import launcher.ui_areas.lobby.lifecycle.start.viewmodel.ViewModelInitializer;
-import launcher.ui_areas.lobby.lifecycle.start.viewmodel.ViewModelWiring;
+import launcher.ui_areas.lobby.lifecycle.init.optimization.SceneOptimizer;
+import launcher.ui_areas.lobby.lifecycle.init.optimization.StageOptimizer;
+import launcher.ui_areas.lobby.lifecycle.init.scene_controller.LoadLobbySceneAndGetController;
+import launcher.ui_areas.lobby.lifecycle.init.viewmodel.ViewModelInitializer;
+import launcher.ui_areas.lobby.lifecycle.init.viewmodel.WireViewModelToController;
 
 /**
  * Initializes the main user interface components.
@@ -47,10 +48,11 @@ public final class InitializeLobbyUIForStandardLaunch {
         MainStageInitializer.initialize(primaryApplicationStage, mainLobbyScene);
         
         // Apply performance optimizations
-        LobbyOptimizer.optimize(primaryApplicationStage, mainLobbyScene);
+        StageOptimizer.optimize(primaryApplicationStage, mainLobbyScene);
+        SceneOptimizer.optimize(mainLobbyScene);
         
         // Wire up the controller with the ViewModel
-        ViewModelWiring.wireUp(applicationViewModel, lobbyController);
+        WireViewModelToController.wireUp(applicationViewModel, lobbyController);
         
         return lobbyController;
     }

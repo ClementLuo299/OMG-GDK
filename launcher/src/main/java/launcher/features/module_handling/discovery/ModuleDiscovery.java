@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.loading.ModuleCompiler;
+import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
 
 import java.io.File;

@@ -3,10 +3,10 @@ package launcher.core.lifecycle.start.launch;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.lifecycle.LobbyUIInitializer;
-import launcher.features.module_handling.LoadModules;
+import launcher.ui_areas.lobby.lifecycle.init.InitializeLobbyUIForStandardLaunch;
+import launcher.features.module_handling.on_start.ModuleLoadingProcess;
 import launcher.ui_areas.startup_window.StartupWindow;
-import launcher.features.development_features.StartupDelayUtil;
+import launcher.features.development.ProgramDelay;
 
 /**
  * Handles the standard launch flow for the GDK application.
@@ -34,20 +34,20 @@ public final class StandardLaunchProcess {
     public static void launch(Stage primaryApplicationStage, StartupWindow windowManager) {
         try {
             // Single development delay point for debugging startup window
-            StartupDelayUtil.addDevelopmentDelay("Startup process beginning");
+            ProgramDelay.delay("Startup process beginning");
 
             // Initialize the user interface by initializing the controller
             GDKGameLobbyController lobbyController = 
-                LobbyUIInitializer.initialize(primaryApplicationStage, windowManager);
+                InitializeLobbyUIForStandardLaunch.initialize(primaryApplicationStage);
 
-            // Step 3: Start loading modules in a background thread
-            LoadModules.load(primaryApplicationStage, lobbyController, windowManager);
+            // Step 3: Start loading modules in a background helpers
+            ModuleLoadingProcess.start(primaryApplicationStage, lobbyController, windowManager);
 
             Logging.info("GDK application startup completed successfully");
             
         } catch (Exception startupError) {
             Logging.error("GDK application startup failed: " + startupError.getMessage(), startupError);
-            throw new RuntimeException("Failed to start GDK application", startupError);
+            throw new RuntimeException("Failed to init GDK application", startupError);
         }
     }
 }

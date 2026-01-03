@@ -58,7 +58,7 @@ public final class TranscriptRecorder {
      * Starts a basic transcript session without game metadata.
      * 
      * <p>This method initializes a new transcript session and clears any
-     * previous entries. A session start meta entry is added to the transcript.
+     * previous entries. A session init meta entry is added to the transcript.
      */
     public static void startSession() {
         inSession = true;
@@ -77,7 +77,7 @@ public final class TranscriptRecorder {
      * Starts a transcript session with game metadata.
      * 
      * <p>This method initializes a new transcript session with game information
-     * and clears any previous entries. A session start meta entry is added
+     * and clears any previous entries. A session init meta entry is added
      * to the transcript with the game name and version.
      * 
      * @param gameName The name of the game being played
@@ -283,14 +283,14 @@ public final class TranscriptRecorder {
                 }
             }
             
-            // Add game start message if available
+            // Add game init message if available
             for (Map<String, Object> entry : transcriptEntries) {
                 if ("meta".equals(entry.get("type")) && "session_start".equals(entry.get("event"))) {
                     Map<String, Object> startMessage = new HashMap<>();
                     String timestamp = (String) entry.get("timestamp");
                                             startMessage.put("timestamp", formatTimestamp(Instant.parse(timestamp)));
                         startMessage.put("direction", "in");
-                        startMessage.put("function", "start");
+                        startMessage.put("function", "init");
                     startMessage.put("gameName", entry.get("gameName"));
                     startMessage.put("gameVersion", entry.get("gameVersion"));
                     startMessage.put("event", "session_start");
@@ -391,13 +391,13 @@ public final class TranscriptRecorder {
             textTranscript.append("MESSAGE FLOW:\n");
             textTranscript.append("-".repeat(80)).append("\n\n");
             
-            // Add game start message first if available
+            // Add game init message first if available
             for (Map<String, Object> entry : transcriptEntries) {
                 if ("meta".equals(entry.get("type")) && "session_start".equals(entry.get("event"))) {
                                             textTranscript.append("Message #1\n");
                         textTranscript.append("Time: ").append(formatTimestamp(Instant.parse((String) entry.get("timestamp")))).append("\n");
                         textTranscript.append("Direction: IN\n");
-                        textTranscript.append("Function: start\n");
+                        textTranscript.append("Function: init\n");
                     textTranscript.append("Summary: Game session started\n");
                     textTranscript.append("Details:\n");
                     textTranscript.append("  gameName: ").append(entry.get("gameName")).append("\n");
@@ -408,7 +408,7 @@ public final class TranscriptRecorder {
                 }
             }
             
-            int messageNumber = 2; // Start from 2 since we already added the start message
+            int messageNumber = 2; // Start from 2 since we already added the init message
             for (Map<String, Object> entry : transcriptEntries) {
                 if (!"meta".equals(entry.get("type"))) {
                     String direction = (String) entry.get("direction");
@@ -632,7 +632,7 @@ public final class TranscriptRecorder {
      * Gets a summary of the current transcript session.
      * 
      * <p>This method returns a map containing session summary information including
-     * session state, total entries, and start/end timestamps.
+     * session state, total entries, and init/end timestamps.
      * 
      * @return A map containing session summary information
      */
@@ -642,7 +642,7 @@ public final class TranscriptRecorder {
         summary.put("totalEntries", transcriptEntries.size());
         
         if (!transcriptEntries.isEmpty()) {
-            // Find start and end timestamps
+            // Find init and end timestamps
             String startTime = null;
             String endTime = null;
             
@@ -770,7 +770,7 @@ public final class TranscriptRecorder {
         if (function == null) return "unknown";
         
         switch (function) {
-            case "start": return "game_initialization";
+            case "init": return "game_initialization";
             case "end": return "game_termination";
             case "ack": return "acknowledgment";
             case "message": return "player_communication";
@@ -794,7 +794,7 @@ public final class TranscriptRecorder {
         if (function == null) return null;
         
         switch (function) {
-            case "start":
+            case "init":
                 String gameMode = (String) details.get("gameMode");
                 Object players = details.get("players");
                 String localPlayer = (String) details.get("localPlayerId");

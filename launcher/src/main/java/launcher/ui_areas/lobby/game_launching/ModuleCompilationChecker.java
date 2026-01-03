@@ -1,8 +1,7 @@
 package launcher.ui_areas.lobby.game_launching;
 
 import gdk.internal.Logging;
-import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.features.module_handling.loading.ModuleCompiler;
+import launcher.features.module_handling.initialization.ModuleInitializationUtil;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
@@ -13,16 +12,16 @@ import java.util.List;
  * 
  * <p>This class is responsible for:
  * <ul>
- *   <li>Checking for compilation failures (delegates to ViewModel or ModuleCompiler)</li>
+ *   <li>Checking for compilation failures (delegates to ModuleInitializationUtil)</li>
  *   <li>Reporting compilation failures to the UI via messages</li>
  * </ul>
  * 
- * <p>The business logic of checking for failures is delegated to the ViewModel
- * (or ModuleCompiler as a fallback), while this class handles the UI reporting aspect.
+ * <p>The business logic of checking for failures is delegated to ModuleInitializationUtil,
+ * while this class handles the UI reporting aspect.
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @edited December 30, 2025
+ * @edited January 1, 2026
  * @since Beta 1.0
  */
 public class ModuleCompilationChecker {
@@ -44,9 +43,6 @@ public class ModuleCompilationChecker {
     
     // ==================== DEPENDENCIES ====================
     
-    /** ViewModel for business logic (may be null initially). */
-    private final GDKViewModel viewModel;
-    
     /** Callback for reporting messages to the UI. */
     private final MessageReporter messageReporter;
     
@@ -55,11 +51,9 @@ public class ModuleCompilationChecker {
     /**
      * Creates a new ModuleCompilationChecker.
      * 
-     * @param viewModel The ViewModel for business logic (may be null initially)
      * @param messageReporter Callback to report messages to the UI
      */
-    public ModuleCompilationChecker(GDKViewModel viewModel, MessageReporter messageReporter) {
-        this.viewModel = viewModel;
+    public ModuleCompilationChecker(MessageReporter messageReporter) {
         this.messageReporter = messageReporter;
     }
     
@@ -70,18 +64,18 @@ public class ModuleCompilationChecker {
      * 
      * <p>This method:
      * <ol>
-     *   <li>Delegates compilation checking to ViewModel (or ModuleCompiler as fallback)</li>
+     *   <li>Delegates compilation checking to ModuleInitializationUtil</li>
      *   <li>Reports any failures to the UI via the MessageReporter</li>
      * </ol>
      * 
-     * <p>UI updates are scheduled on the JavaFX application thread to ensure thread safety.
+     * <p>UI updates are scheduled on the JavaFX application helpers to ensure helpers safety.
      */
     public void checkStartupCompilationFailures() {
         try {
             Logging.info("Checking for compilation failures on startup...");
             
-            // Get compilation failures from ViewModel or fallback to ModuleCompiler
-            List<String> compilationFailures = getCompilationFailures();
+            // Get compilation failures from ModuleInitializationUtil
+            List<String> compilationFailures = ModuleInitializationUtil.checkForCompilationFailures();
             
             // Report failures to UI if any were found
             if (!compilationFailures.isEmpty()) {
@@ -98,24 +92,7 @@ public class ModuleCompilationChecker {
     // ==================== PRIVATE HELPER METHODS ====================
     
     /**
-     * Gets compilation failures from ViewModel or ModuleCompiler fallback.
-     * 
-     * @return List of module names that failed to compile
-     */
-    private List<String> getCompilationFailures() {
-        if (viewModel != null) {
-            // Use ViewModel for business logic
-            return viewModel.checkForCompilationFailures();
-        } else {
-            // Fallback: get from ModuleCompiler directly
-            List<String> failures = ModuleCompiler.getLastCompilationFailures();
-            ModuleCompiler.clearCompilationFailures();
-            return failures;
-        }
-    }
-    
-    /**
-     * Reports compilation failures to the UI on the JavaFX thread.
+     * Reports compilation failures to the UI on the JavaFX helpers.
      * 
      * @param compilationFailures List of module names that failed to compile
      */

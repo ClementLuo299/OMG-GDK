@@ -19,7 +19,7 @@ import java.util.Map;
  * <ul>
  *   <li>Validating game module selection</li>
  *   <li>Applying JSON configuration to game modules</li>
- *   <li>Sending start messages to games</li>
+ *   <li>Sending init messages to games</li>
  *   <li>Recording configuration and messages to transcripts</li>
  *   <li>Parsing JSON configuration strings</li>
  * </ul>
@@ -56,12 +56,12 @@ public class GameLaunchUtil {
      * <ol>
      *   <li>Validates that a game module is selected</li>
      *   <li>Applies JSON configuration to the game module (if provided)</li>
-     *   <li>Loads and sends the default start message</li>
+     *   <li>Loads and sends the default init message</li>
      *   <li>Records all messages to the transcript</li>
      * </ol>
      * 
      * <p>Note: The actual scene creation and stage management is handled by the ViewModel.
-     * This method just prepares the game with configuration and start messages.
+     * This method just prepares the game with configuration and init messages.
      * 
      * @param gameModule The game module to launch
      * @param jsonConfigurationData The JSON configuration data, or null for defaults
@@ -114,11 +114,11 @@ public class GameLaunchUtil {
                 }
             }
             
-            // Step 4: Load and send start message
+            // Step 4: Load and send init message
             Map<String, Object> startMessage = StartMessageUtil.loadDefaultStartMessage();
             if (startMessage != null) {
                 try {
-                    // Record start message to transcript
+                    // Record init message to transcript
                     TranscriptRecorder.recordToGame(startMessage);
                     
                     Map<String, Object> response = gameModule.handleMessage(startMessage);
@@ -129,14 +129,14 @@ public class GameLaunchUtil {
                     }
                 } catch (Exception e) {
                     if (!isAutoLaunch) {
-                        Logging.error("⚠️ Failed to send start message: " + e.getMessage());
+                        Logging.error("⚠️ Failed to send init message: " + e.getMessage());
                     }
                 }
             }
             
             // Step 5: Launch the game
             // Note: The actual scene creation and stage management is handled by the ViewModel
-            // This method just prepares the game with configuration and start messages
+            // This method just prepares the game with configuration and init messages
             
             return true;
             

@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.start.scene_controller;
+package launcher.ui_areas.lobby.lifecycle.init.scene_controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

@@ -80,10 +80,10 @@ public class BasicManagerFactory {
         MessageManager messageManager = new MessageManager(messageContainer, messageScrollPane);
         LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
         JsonPersistenceManager jsonPersistenceManager = new JsonPersistenceManager(jsonInputEditor, jsonPersistenceToggle);
-        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(applicationViewModel, messageReporter::addMessage);
+        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter::addMessage);
         
         // Create business service for JSON processing
-        JsonProcessingService jsonProcessingService = new JsonProcessingService(applicationViewModel);
+        JsonProcessingService jsonProcessingService = new JsonProcessingService();
         JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(jsonProcessingService, jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
         GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(messageManager);
         StatusLabelManager statusLabelManager = new StatusLabelManager(statusLabel);

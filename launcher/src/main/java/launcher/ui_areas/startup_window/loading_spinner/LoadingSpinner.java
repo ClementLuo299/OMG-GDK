@@ -96,7 +96,7 @@ public class LoadingSpinner extends JComponent {
                 java.awt.BasicStroke.JOIN_ROUND
             ));
             
-            // Draw arc using constants for start angle and extent
+            // Draw arc using constants for init angle and extent
             Arc2D arc = new Arc2D.Double(
                 -radius, -radius,  // Top-left corner of bounding rectangle
                 radius * 2, radius * 2,  // Width and height of bounding rectangle

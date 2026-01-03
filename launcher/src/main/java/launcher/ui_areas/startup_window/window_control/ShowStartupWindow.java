@@ -36,7 +36,7 @@ public final class ShowStartupWindow {
             // Ensure the window is painted before starting the spinner
             window.progressFrame.validate();
             window.progressFrame.repaint();
-            // Use invokeLater to start spinner after the current paint cycle completes
+            // Use invokeLater to init spinner after the current paint cycle completes
             SwingUtilities.invokeLater(() -> {
                 window.spinController.start();
             });

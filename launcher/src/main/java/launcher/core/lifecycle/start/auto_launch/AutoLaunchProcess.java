@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.module_handling.discovery.ModuleDiscovery;
+import launcher.ui_areas.lobby.lifecycle.init.InitializeLobbyUIForAutoLaunch;
 
 /**
  * Handles the auto-launch flow for the GDK application.
@@ -43,7 +44,7 @@ public final class AutoLaunchProcess {
     public static boolean launch(Stage primaryApplicationStage, Runnable normalLaunchCallback) {
         try {
             // Step 1: Load and validate saved auto-launch data
-            AutoLaunchUtil.AutoLaunchData data = AutoLaunchUtil.loadAutoLaunchData();
+            InitializeLobbyUIForAutoLaunch.AutoLaunchData data = InitializeLobbyUIForAutoLaunch.loadAutoLaunchData();
             if (data == null) {
                 return false;
             }
@@ -58,21 +59,21 @@ public final class AutoLaunchProcess {
             }
 
             // Step 3: Create and configure controller/viewmodel
-            AutoLaunchUtil.AutoLaunchComponents components = 
-                AutoLaunchUtil.createAutoLaunchComponents(primaryApplicationStage);
+            InitializeLobbyUIForAutoLaunch.AutoLaunchComponents components =
+                InitializeLobbyUIForAutoLaunch.createAutoLaunchComponents(primaryApplicationStage);
             GDKGameLobbyController controller = components.getController();
             GDKViewModel viewModel = components.getViewModel();
             
             // Step 4: Configure the primary stage for the game
-            AutoLaunchUtil.configureStageForGame(primaryApplicationStage, selectedModule);
+            InitializeLobbyUIForAutoLaunch.configureStageForGame(primaryApplicationStage, selectedModule);
             
             // Step 5: Set up callback for returning to normal GDK
             viewModel.setReturnToNormalGDKCallback(() -> {
-                AutoLaunchUtil.returnToNormalGDK(controller, normalLaunchCallback);
+                InitializeLobbyUIForAutoLaunch.returnToNormalGDK(controller, normalLaunchCallback);
             });
             
             // Step 6: Launch the game with saved configuration
-            if (AutoLaunchUtil.launchGame(selectedModule, data.getSavedJson(), viewModel)) {
+            if (InitializeLobbyUIForAutoLaunch.launchGame(selectedModule, data.getSavedJson(), viewModel)) {
                 Logging.info("Auto-launch: Successfully launched " + data.getSelectedGameName() + 
                     " using ViewModel (consistent with normal mode)");
                 return true;

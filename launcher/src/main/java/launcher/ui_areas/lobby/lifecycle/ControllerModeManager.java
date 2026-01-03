@@ -3,7 +3,7 @@ package launcher.ui_areas.lobby.lifecycle;
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.ControllerMode;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.features.module_handling.loading.ModuleCompiler;
+import launcher.features.module_handling.compilation.ModuleCompiler;
 
 /**
  * Manager for handling controller mode logic.

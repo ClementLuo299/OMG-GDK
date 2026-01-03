@@ -1,4 +1,4 @@
-package launcher.features.module_handling.loading;
+package launcher.features.module_handling.compilation;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
@@ -115,8 +115,8 @@ public class ModuleCompiler {
     public static GameModule loadModule(File moduleDir) {
         String moduleName = moduleDir.getName();
         Logging.info("Loading module from: " + moduleName);
-        Logging.info("   Current thread: " + Thread.currentThread().getName());
-        Logging.info("   Is JavaFX thread: " + javafx.application.Platform.isFxApplicationThread());
+        Logging.info("   Current helpers: " + Thread.currentThread().getName());
+        Logging.info("   Is JavaFX helpers: " + javafx.application.Platform.isFxApplicationThread());
         
         // Add timeout protection for individual module ui_loading
         long startTime = System.currentTimeMillis();
@@ -177,7 +177,7 @@ public class ModuleCompiler {
             Logging.info("   Elapsed time: " + (System.currentTimeMillis() - startTime) + "ms");
             
             // Ensure JavaFX Platform is initialized before ui_loading JavaFX-dependent classes
-            Logging.info("   JavaFX Platform check - on FX thread: " + Platform.isFxApplicationThread());
+            Logging.info("   JavaFX Platform check - on FX helpers: " + Platform.isFxApplicationThread());
             try {
                 // Verify JavaFX is accessible
                 Platform.isFxApplicationThread(); // This will throw if JavaFX is not initialized

@@ -64,27 +64,27 @@ public final class FilePaths {
     // ==================== START MESSAGE PATHS ====================
     
     /**
-     * Path to the example start message file.
-     * Contains a template/example start message configuration.
+     * Path to the example init message file.
+     * Contains a template/example init message configuration.
      */
-    public static final String START_MESSAGE_EXAMPLE_FILE = "saved/start-message.example.json_processing";
+    public static final String START_MESSAGE_EXAMPLE_FILE = "saved/init-message.example.json_processing";
     
     /**
-     * Path to the local multiplayer start message file.
-     * Contains the start message configuration for local multiplayer mode.
+     * Path to the local multiplayer init message file.
+     * Contains the init message configuration for local multiplayer mode.
      */
-    public static final String START_MESSAGE_LOCAL_MULTIPLAYER_FILE = "saved/start-message-local-multiplayer.json_processing";
+    public static final String START_MESSAGE_LOCAL_MULTIPLAYER_FILE = "saved/init-message-local-multiplayer.json_processing";
     
     /**
-     * Path to the single player start message file.
-     * Contains the start message configuration for single player mode.
+     * Path to the single player init message file.
+     * Contains the init message configuration for single player mode.
      */
-    public static final String START_MESSAGE_SINGLE_PLAYER_FILE = "saved/start-message-single-player.json_processing";
+    public static final String START_MESSAGE_SINGLE_PLAYER_FILE = "saved/init-message-single-player.json_processing";
     
     /**
-     * Path to the all modes start message file.
-     * Contains the start message configuration for all game modes.
+     * Path to the all modes init message file.
+     * Contains the init message configuration for all game modes.
      */
-    public static final String START_MESSAGE_ALL_MODES_FILE = "saved/start-message-all-modes.json_processing";
+    public static final String START_MESSAGE_ALL_MODES_FILE = "saved/init-message-all-modes.json_processing";
 }
 

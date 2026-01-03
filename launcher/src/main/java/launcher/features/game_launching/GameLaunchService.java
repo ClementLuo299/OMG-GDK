@@ -3,6 +3,7 @@ package launcher.features.game_launching;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.GDKViewModel;
+import launcher.features.json_processing.JsonProcessingService;
 
 import java.util.Map;
 
@@ -65,11 +66,11 @@ public class GameLaunchService {
      * @param selectedGameModule The game module to validate
      * @return Validation result containing whether launch is valid and error message if not
      */
-    public GDKViewModel.LaunchValidationResult validateGameLaunch(GameModule selectedGameModule) {
-        if (applicationViewModel == null) {
-            return new GDKViewModel.LaunchValidationResult(false, "ViewModel not available");
+    public LaunchValidationResult validateGameLaunch(GameModule selectedGameModule) {
+        if (selectedGameModule == null) {
+            return new LaunchValidationResult(false, "No game module is selected");
         }
-        return applicationViewModel.validateGameLaunch(selectedGameModule);
+        return new LaunchValidationResult(true, null);
     }
     
     // ==================== PUBLIC METHODS - CONFIGURATION ====================
@@ -77,18 +78,26 @@ public class GameLaunchService {
     /**
      * Parses JSON configuration text into a map.
      * 
-     * <p>This method delegates to the ViewModel to parse the JSON configuration.
-     * Returns null if the ViewModel is unavailable or the text is empty.
+     * <p>This method uses JsonProcessingService to parse the JSON configuration.
+     * Returns null if the text is empty or parsing fails.
      * 
      * @param jsonText The JSON text to parse (may be null or empty)
      * @return Parsed configuration map, or null if parsing failed or text was empty
      */
     public Map<String, Object> parseJsonConfiguration(String jsonText) {
-        if (applicationViewModel == null || jsonText == null || jsonText.trim().isEmpty()) {
-            return null;
-        }
-        return applicationViewModel.parseJsonConfiguration(jsonText);
+        JsonProcessingService jsonService = new JsonProcessingService();
+        return jsonService.parseJsonConfiguration(jsonText);
     }
+    
+    // ==================== INNER CLASSES ====================
+    
+    /**
+     * Result of game launch validation.
+     * 
+     * @param isValid Whether the launch is valid
+     * @param errorMessage Error message if validation failed, null if valid
+     */
+    public record LaunchValidationResult(boolean isValid, String errorMessage) {}
     
     /**
      * Applies JSON configuration to a game module.

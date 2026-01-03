@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.start;
+package launcher.ui_areas.lobby.lifecycle.init;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -11,8 +11,8 @@ import launcher.features.file_paths.FilePaths;
 
 import javafx.stage.Stage;
 import javafx.application.Platform;
-import launcher.ui_areas.lobby.lifecycle.start.viewmodel.ViewModelInitializer;
-import launcher.ui_areas.lobby.lifecycle.start.viewmodel.ViewModelWiring;
+import launcher.ui_areas.lobby.lifecycle.init.viewmodel.ViewModelInitializer;
+import launcher.ui_areas.lobby.lifecycle.init.viewmodel.WireViewModelToController;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -222,7 +222,7 @@ public final class InitializeLobbyUIForAutoLaunch {
         GDKGameLobbyController controller = new GDKGameLobbyController();
         controller.setControllerMode(ControllerMode.AUTO_LAUNCH);
         GDKViewModel viewModel = ViewModelInitializer.createForAutoLaunch(primaryApplicationStage);
-        ViewModelWiring.wireUp(viewModel, controller);
+        WireViewModelToController.wireUp(viewModel, controller);
         return new AutoLaunchComponents(controller, viewModel);
     }
     
@@ -294,7 +294,7 @@ public final class InitializeLobbyUIForAutoLaunch {
      * It uses the same cleanup logic as normal mode to ensure consistency.
      * 
      * @param controller The controller instance managing the game
-     * @param startNormalGDKCallback Callback to start the normal GDK interface
+     * @param startNormalGDKCallback Callback to init the normal GDK interface
      */
     public static void returnToNormalGDK(GDKGameLobbyController controller, Runnable startNormalGDKCallback) {
         // Use ViewModel's cleanup method (same cleanup logic as normal mode)

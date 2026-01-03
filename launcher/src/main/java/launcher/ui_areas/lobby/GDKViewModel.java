@@ -4,11 +4,6 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import gdk.internal.MessagingBridge;
 import launcher.features.game_messaging.TranscriptRecorder;
-import launcher.features.module_handling.discovery.ModuleDiscovery;
-import launcher.features.module_handling.loading.ModuleCompiler;
-import launcher.features.file_paths.PathUtil;
-
-import java.io.File;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -20,9 +15,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import launcher.ui_areas.server_simulator.ServerSimulatorController;
 
@@ -99,14 +91,34 @@ public class GDKViewModel {
     /** Subscription for transcript recording during a game session. */
     private MessagingBridge.Subscription transcriptSubscription;
 
-    // ==================== CONSTRUCTOR ====================
+    // ==================== CONSTRUCTORS ====================
     
     /**
-     * Create a new GDK ViewModel.
+     * Create a new GDK ViewModel with default configuration.
      * Module discovery and ui_loading is now handled by static methods.
      */
     public GDKViewModel() {
         // No module loader instance needed - using static methods now
+    }
+    
+    /**
+     * Create a new GDK ViewModel configured with the primary stage.
+     * 
+     * @param primaryApplicationStage The primary JavaFX stage for the application
+     */
+    public GDKViewModel(Stage primaryApplicationStage) {
+        this.primaryApplicationStage = primaryApplicationStage;
+    }
+    
+    /**
+     * Create a new GDK ViewModel configured with the primary stage and main lobby scene.
+     * 
+     * @param primaryApplicationStage The primary JavaFX stage for the application
+     * @param mainLobbyScene The main lobby scene
+     */
+    public GDKViewModel(Stage primaryApplicationStage, Scene mainLobbyScene) {
+        this.primaryApplicationStage = primaryApplicationStage;
+        this.mainLobbyScene = mainLobbyScene;
     }
 
     // ==================== PUBLIC SETTERS ====================
@@ -137,13 +149,13 @@ public class GDKViewModel {
     /**
      * Public method for games to call when they want to return to the lobby.
      * This method safely cleans up the game and returns to the lobby scene.
-     * In auto-launch mode (when returnToNormalGDKCallback is set), it will start the normal GDK interface instead.
+     * In auto-launch mode (when returnToNormalGDKCallback is set), it will init the normal GDK interface instead.
      */
     public void returnToLobby() {
         Logging.info("🎮 Game requested return to lobby via returnToLobby()");
         cleanupGameAndServerSimulator();
         
-        // If in auto-launch mode, use the callback to start normal GDK
+        // If in auto-launch mode, use the callback to init normal GDK
         if (returnToNormalGDKCallback != null) {
             Logging.info("🎮 Auto-launch mode: Starting normal GDK interface");
             returnToNormalGDKCallback.run();
@@ -265,9 +277,9 @@ public class GDKViewModel {
             primaryApplicationStage.setScene(gameScene);
             updateGameStateAfterSuccessfulLaunch(selectedGameModule);
             
-            // Auto-start server simulator with game (ensure single instance) - with delay to allow game to configure
+            // Auto-init server simulator with game (ensure single instance) - with delay to allow game to configure
             if (serverSimulatorStage == null) {
-                // Add a small delay to allow the game to process start messages and potentially close the simulator
+                // Add a small delay to allow the game to process init messages and potentially close the simulator
                 new Thread(() -> {
                     try {
                         Thread.sleep(1000); // 1 second delay
@@ -598,19 +610,13 @@ public class GDKViewModel {
     /**
      * Refresh the list of available game modules.
      * 
-     * This method scans the modules directory for available game modules
-     * and updates the internal list and UI accordingly.
+     * This method uses ModuleInitializationUtil to discover and load modules.
+     * The actual module discovery is now handled by the utility class.
      */
     private void refreshAvailableGameModules() {
         try {
-            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
-            
-            // Use ModuleDiscovery to find valid modules, then ModuleCompiler to load them
-            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(new File(modulesDirectoryPath));
-            List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
-            Logging.info("✅ Found " + discoveredModules.size() + " game module(s)");
-            
+            launcher.features.module_handling.initialization.ModuleInitializationUtil.discoverAndLoadModules();
+            Logging.info("✅ Module refresh completed");
         } catch (Exception moduleDiscoveryError) {
             Logging.error("❌ Error discovering modules: " + moduleDiscoveryError.getMessage());
         }
@@ -723,143 +729,4 @@ public class GDKViewModel {
         return false;
     }
     
-    // ==================== MODULE DISCOVERY & LOADING ====================
-    
-    /**
-     * Discovers and loads all available game modules from the modules directory.
-     * 
-     * <p>This method scans the modules directory, validates module directories,
-     * and compiles/loads them into GameModule instances.
-     * 
-     * @return List of discovered game modules, or empty list if error occurs
-     */
-    public List<GameModule> discoverAndLoadModules() {
-        try {
-            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            Logging.info("📂 Scanning for modules in: " + modulesDirectoryPath);
-            
-            File modulesDir = new File(modulesDirectoryPath);
-            if (!modulesDir.exists()) {
-                Logging.error("❌ Modules directory does not exist: " + modulesDirectoryPath);
-                return new ArrayList<>();
-            }
-            
-            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDir);
-            List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
-            
-            // Filter out null modules
-            List<GameModule> validModules = new ArrayList<>();
-            for (GameModule module : discoveredModules) {
-                if (module != null) {
-                    validModules.add(module);
-                }
-            }
-            
-            Logging.info("✅ Found " + validModules.size() + " game module(s)");
-            return validModules;
-            
-        } catch (Exception moduleDiscoveryError) {
-            Logging.error("❌ Error discovering modules: " + moduleDiscoveryError.getMessage());
-            return new ArrayList<>();
-        }
-    }
-    
-    /**
-     * Checks for compilation failures in modules.
-     * 
-     * <p>This method checks both the ModuleCompiler's failure list and
-     * scans the modules directory for modules that have source files but
-     * no compiled classes.
-     * 
-     * @return List of module names that failed to compile
-     */
-    public List<String> checkForCompilationFailures() {
-        List<String> failures = new ArrayList<>();
-        try {
-            // Get compilation failures from ModuleCompiler
-            List<String> compilerFailures = ModuleCompiler.getLastCompilationFailures();
-            failures.addAll(compilerFailures);
-            
-            // Check for additional compilation issues
-            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            File modulesDir = new File(modulesDirectoryPath);
-            File[] subdirs = modulesDir.listFiles(File::isDirectory);
-            
-            if (subdirs != null) {
-                for (File subdir : subdirs) {
-                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
-                        continue;
-                    }
-                    
-                    File pomFile = new File(subdir, "pom.xml");
-                    if (pomFile.exists()) {
-                        File mainJava = new File(subdir, "src/main/java/Main.java");
-                        File metadataJava = new File(subdir, "src/main/java/Metadata.java");
-                        
-                        if (mainJava.exists() && metadataJava.exists()) {
-                            // Check if compiled classes exist
-                            File targetClassesDir = new File(subdir, "target/classes");
-                            if (!targetClassesDir.exists() || targetClassesDir.listFiles() == null || targetClassesDir.listFiles().length == 0) {
-                                if (!failures.contains(subdir.getName())) {
-                                    failures.add(subdir.getName());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Logging.error("❌ Error checking compilation failures: " + e.getMessage(), e);
-        }
-        return failures;
-    }
-    
-    /**
-     * Validates game launch parameters.
-     * 
-     * <p>This method checks if a game module is selected and ready to launch.
-     * 
-     * @param gameModule The game module to validate
-     * @return Validation result with error message if invalid, or success result if valid
-     */
-    public LaunchValidationResult validateGameLaunch(GameModule gameModule) {
-        if (gameModule == null) {
-            return new LaunchValidationResult(false, "No game module is selected");
-        }
-        return new LaunchValidationResult(true, null);
-    }
-    
-    /**
-     * Parses JSON configuration string into a Map.
-     * 
-     * <p>This method parses a JSON string into a Map structure for use in game configuration.
-     * Returns null if the input is empty or parsing fails.
-     * 
-     * @param jsonString The JSON string to parse
-     * @return The parsed Map, or null if parsing fails or input is empty
-     */
-    public Map<String, Object> parseJsonConfiguration(String jsonString) {
-        if (jsonString == null || jsonString.trim().isEmpty()) {
-            return null;
-        }
-        
-        try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> configurationData = JSON_MAPPER.readValue(jsonString.trim(), Map.class);
-            return configurationData;
-        } catch (Exception e) {
-            Logging.error("❌ Failed to parse JSON: " + e.getMessage());
-            return null;
-        }
-    }
-    
-    // ==================== INNER CLASSES ====================
-    
-    /**
-     * Result of game launch validation.
-     * 
-     * @param isValid Whether the launch is valid
-     * @param errorMessage Error message if validation failed, null if valid
-     */
-    public record LaunchValidationResult(boolean isValid, String errorMessage) {}
 } 

@@ -3,7 +3,6 @@ package launcher.ui_areas.lobby.game_launching;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.game_launching.GameLaunchService;
-import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
 import java.util.Map;
@@ -152,7 +151,7 @@ public class GameLaunchingManager {
         }
         
         // Validate game launch using business service
-        GDKViewModel.LaunchValidationResult validation = 
+        launcher.features.game_launching.GameLaunchService.LaunchValidationResult validation = 
             launchService.validateGameLaunch(selectedGameModule);
         if (!validation.isValid()) {
             errorHandler.handleValidationError(validation.errorMessage(), isAutoLaunch);
