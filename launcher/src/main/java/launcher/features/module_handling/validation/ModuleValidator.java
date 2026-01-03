@@ -309,8 +309,8 @@ public final class ModuleValidator {
                 String moduleName = subdir.getName();
                 Logging.info("🔍 Checking subdirectory: " + moduleName);
                 
-                // Skip internal directories
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
+                // Skip infrastructure and hidden directories
+                if (launcher.features.module_handling.directory_management.ModuleDirectoryFilter.shouldSkip(subdir)) {
                     Logging.info("⏭️ Skipping internal directory: " + moduleName);
                     continue;
                 }

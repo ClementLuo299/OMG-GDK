@@ -52,7 +52,7 @@ public final class AutoLaunchProcess {
             Logging.info("Auto-launch: Attempting to launch " + data.getSelectedGameName() + " with saved JSON");
 
             // Step 2: Find and load the selected game module
-            GameModule selectedModule = ModuleDiscovery.findModuleByName(data.getSelectedGameName());
+            GameModule selectedModule = ModuleDiscovery.getModuleByName(data.getSelectedGameName());
             if (selectedModule == null) {
                 Logging.info("Auto-launch: Selected game module not found: " + data.getSelectedGameName());
                 return false;

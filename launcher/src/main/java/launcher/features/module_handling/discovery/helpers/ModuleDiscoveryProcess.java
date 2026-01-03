@@ -33,7 +33,7 @@ final class ModuleDiscoveryProcess {
         try {
             // Scan the modules directory and validate each subdirectory as a module
             Logging.info("Starting module discovery...");
-            validModuleDirectories = ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectory);
+            validModuleDirectories = ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectoryPath);
             Logging.info("Module discovery completed. Found " + validModuleDirectories.size() + " valid modules");
             
         } catch (Exception e) {

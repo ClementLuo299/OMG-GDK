@@ -3,6 +3,7 @@ package launcher.ui_areas.lobby.game_launching;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.ModuleDiscovery;
+import launcher.features.module_handling.metadata.ModuleMetadataExtractor;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import javafx.application.Platform;
@@ -64,7 +65,7 @@ public class ModuleDiscoveryHandler {
      * @return List of discovered game modules, or null if service is unavailable
      */
     public List<GameModule> discoverModules(int availableGameModulesSize) {
-        List<GameModule> discovered = ModuleDiscovery.discoverAndLoadModules();
+        List<GameModule> discovered = ModuleDiscovery.getAllModules();
         if (discovered == null) {
             Platform.runLater(() -> {
                 messageManager.addMessage("Error: ViewModel not available");
@@ -88,13 +89,13 @@ public class ModuleDiscoveryHandler {
      * @return Result containing module names and UI messages
      */
     public ModuleDiscoveryResult processDiscoveredModules(List<GameModule> discoveredGameModules) {
-        // Process using ModuleDiscovery
-        ModuleDiscovery.ModuleDiscoveryResult businessResult = 
-            ModuleDiscovery.processDiscoveredModules(discoveredGameModules);
+        // Process using ModuleMetadataExtractor
+        ModuleMetadataExtractor.ModuleDiscoveryResult businessResult = 
+            ModuleMetadataExtractor.processDiscoveredModules(discoveredGameModules);
         
         // Create UI messages from business results
         List<String> uiMessages = new ArrayList<>();
-        for (ModuleDiscovery.ModuleInfo info : businessResult.moduleInfos) {
+        for (ModuleMetadataExtractor.ModuleInfo info : businessResult.moduleInfos) {
             uiMessages.add("Detected game: " + info.gameName);
         }
         
@@ -117,7 +118,7 @@ public class ModuleDiscoveryHandler {
      * @return List containing only valid (non-null) modules
      */
     public List<GameModule> filterValidModules(List<GameModule> discoveredGameModules) {
-        return ModuleDiscovery.filterValidModules(discoveredGameModules);
+        return ModuleMetadataExtractor.filterValidModules(discoveredGameModules);
     }
     
     /**
@@ -147,7 +148,7 @@ public class ModuleDiscoveryHandler {
      * @return Set of module names
      */
     public Set<String> collectModuleNames(Iterable<GameModule> modules) {
-        return ModuleDiscovery.collectModuleNames(modules);
+        return ModuleMetadataExtractor.collectModuleNames(modules);
     }
     
     /**
@@ -159,7 +160,7 @@ public class ModuleDiscoveryHandler {
      * @return Set of module names
      */
     public Set<String> extractModuleNames(List<GameModule> modules, int previousCount) {
-        return ModuleDiscovery.extractModuleNames(modules, previousCount);
+        return ModuleMetadataExtractor.extractModuleNames(modules, previousCount);
     }
     
     // ==================== INNER CLASSES ====================

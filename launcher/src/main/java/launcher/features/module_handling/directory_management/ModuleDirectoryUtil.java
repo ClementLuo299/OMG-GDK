@@ -18,14 +18,9 @@ import java.util.List;
  *   <li>Reporting compilation status for all modules in the directory</li>
  * </ul>
  * 
- * <p>This class does NOT handle:
- * <ul>
- *   <li>Validating individual module structures (see ModuleDiscovery)</li>
- *   <li>Loading or processing GameModule instances (see ModuleDiscovery)</li>
- * </ul>
- * 
  * @author Clement Luo
  * @date January 2, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
 public final class ModuleDirectoryUtil {
@@ -39,29 +34,34 @@ public final class ModuleDirectoryUtil {
     /**
      * Counts the number of valid modules in the modules directory.
      * 
-     * <p>This method scans the modules directory and counts only those directories
-     * that pass structural validation checks. It skips infrastructure directories
-     * like "target" and ".git".
-     * 
-     * @param modulesDirectory The modules directory to scan
+     * @param modulesDirectoryPath The path to the modules directory to scan
      * @return The number of valid modules found
      */
-    public static int countValidModules(File modulesDirectory) {
+    public static int countValidModules(String modulesDirectoryPath) {
+
+        // Number of valid modules found
         int validCount = 0;
         
         try {
+
+            // Create File object from path string 
+            File modulesDirectory = new File(modulesDirectoryPath);
+
+            // Get the subdirectories of the modules directory
             File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
             if (subdirs == null) {
                 return 0; // nothing to scan
             }
             
             for (File subdir : subdirs) {
-                String moduleName = subdir.getName();
-                
-                // Skip infra/hidden directories that are not game modules
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
+
+                // Skip infrastructure and hidden directories that are not game modules
+                if (ModuleDirectoryFilter.shouldSkip(subdir)) {
                     continue;
                 }
+                
+                // Get the name of the module
+                String moduleName = subdir.getName();
                 
                 // Only structural validity is checked here (not compilation)
                 if (launcher.features.module_handling.validation.ModuleValidator.isValidModuleStructure(subdir)) {
@@ -85,20 +85,26 @@ public final class ModuleDirectoryUtil {
      * that pass structural validation. It includes timeout protection for file
      * operations and filters out infrastructure directories.
      * 
-     * @param modulesDirectory The modules directory to scan
+     * @param modulesDirectoryPath The path to the modules directory to scan
      * @return List of valid module directories
      */
-    public static List<File> getValidModuleDirectories(File modulesDirectory) {
+    public static List<File> getValidModuleDirectories(String modulesDirectoryPath) {
         List<File> validModules = new ArrayList<>();
         
         try {
+            // Create File object from path string to enable file system operations
+            File modulesDirectory = new File(modulesDirectoryPath);
             Logging.info("🔍 Starting module discovery in: " + modulesDirectory.getAbsolutePath());
             
             // Add timeout protection for file operations
             long startTime = System.currentTimeMillis();
             long timeout = 5000; // Reduced to 5 second timeout for faster failure detection
             
-            // First, check if we can even list the directory
+            // Use file operations to discover subdirectories - this is necessary because:
+            // 1. We need to read the filesystem to see what module directories actually exist
+            // 2. There's no registry or database of modules - discovery happens by scanning
+            // 3. listFiles(File::isDirectory) filters to only directories, excluding files
+            // 4. Returns File objects needed for validation and further operations
             Logging.info("🔍 Attempting to list directory contents...");
             File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
             
@@ -121,14 +127,15 @@ public final class ModuleDirectoryUtil {
                     break;
                 }
                 
-                String moduleName = subdir.getName();
-                Logging.info("🔍 Checking module: " + moduleName);
-                
-                // Filter out infra/hidden directories
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
+                // Filter out infrastructure and hidden directories
+                if (ModuleDirectoryFilter.shouldSkip(subdir)) {
+                    String moduleName = subdir.getName();
                     Logging.info("⏭️ Skipping internal directory: " + moduleName);
                     continue;
                 }
+                
+                String moduleName = subdir.getName();
+                Logging.info("🔍 Checking module: " + moduleName);
                 
                 try {
                     Logging.info("✅ Validating module structure for: " + moduleName);
@@ -167,16 +174,19 @@ public final class ModuleDirectoryUtil {
         List<File> allModules = new ArrayList<>();
         
         try {
+            // Use file operations to discover subdirectories - this is necessary because:
+            // 1. We need to read the filesystem to see what module directories actually exist
+            // 2. There's no registry or database of modules - discovery happens by scanning
+            // 3. listFiles(File::isDirectory) filters to only directories, excluding files
+            // 4. Returns File objects needed for further operations
             File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
             if (subdirs == null) {
                 return allModules;
             }
             
             for (File subdir : subdirs) {
-                String moduleName = subdir.getName();
-                
-                // Skip infra/hidden directories
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
+                // Skip infrastructure and hidden directories
+                if (ModuleDirectoryFilter.shouldSkip(subdir)) {
                     continue;
                 }
                 
@@ -235,7 +245,7 @@ public final class ModuleDirectoryUtil {
                 return fixedSteps;
             }
             
-            int validModuleCount = countValidModules(modulesDirectory);
+            int validModuleCount = countValidModules(modulesDirectoryPath);
             Logging.info("Found " + validModuleCount + " valid modules");
             
             // Total = fixed steps + one per module for processing
@@ -330,12 +340,12 @@ public final class ModuleDirectoryUtil {
             }
             
             for (File subdir : subdirs) {
-                String moduleName = subdir.getName();
-                
-                // Skip internal directories
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
+                // Skip infrastructure and hidden directories
+                if (ModuleDirectoryFilter.shouldSkip(subdir)) {
                     continue;
                 }
+                
+                String moduleName = subdir.getName();
                 
                 Logging.info("🔍 Module: " + moduleName);
                 boolean needsCompilation = launcher.features.module_handling.validation.ModuleValidator.moduleNeedsCompilation(subdir);
