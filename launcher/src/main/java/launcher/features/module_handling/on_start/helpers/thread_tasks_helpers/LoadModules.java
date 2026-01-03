@@ -12,23 +12,16 @@ import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
  * @edited December 27, 2025
  * @since Beta 1.0
  */
-public final class StartupWorkflow {
+public final class LoadModules {
     
-    private StartupWorkflow() {}
-    
-    /**
-     * Executes the complete startup workflow.
-     */
-    public static void executeWorkflow() {
-        // Execute the module loading workflow
-        loadModules();
-        Logging.info("Module loading completed");
-    }
+    private LoadModules() {}
     
     /**
      * Loads game modules.
+     * Executes the complete module loading workflow including initialization,
+     * discovery, loading, and finalization.
      */
-    private static void loadModules() {
+    public static void loadModules() {
         try {
             Logging.info("Starting module loading process");
             
@@ -53,6 +46,8 @@ public final class StartupWorkflow {
             
             // Step 5: Finalize the module loading process
             ModuleLoadingSteps.finalizeModuleLoading();
+            
+            Logging.info("Module loading completed");
             
         } catch (Exception e) {
             handleModuleLoadingException(e);

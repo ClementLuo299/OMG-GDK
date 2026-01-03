@@ -2,7 +2,7 @@ package launcher.features.module_handling.loading.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.loading.ModuleCompiler;
+import launcher.features.module_handling.compilation.ModuleCompiler;
 
 import java.io.File;
 import java.util.ArrayList;

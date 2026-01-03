@@ -1,9 +1,10 @@
-package launcher.features.module_handling.loading;
+package launcher.features.module_handling.on_program_start.thread;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.features.module_handling.loading.helpers.CompilationChecker;
-import launcher.features.module_handling.loading.helpers.StartupWorkflow;
+import launcher.features.module_handling.loading.helpers.ModuleUIUpdater;
+import launcher.features.module_handling.loading.helpers.LoadModules;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;
@@ -38,7 +39,7 @@ public final class ModuleLoadingThread {
                 Logging.info("Starting module ui_loading on background thread");
                 
                 // Phase 1: Load all game modules
-                StartupWorkflow.executeWorkflow();
+                LoadModules.loadModules();
                 
                 // Phase 2: Check for compilation issues
                 CompilationChecker.checkForCompilationIssues(lobbyController);

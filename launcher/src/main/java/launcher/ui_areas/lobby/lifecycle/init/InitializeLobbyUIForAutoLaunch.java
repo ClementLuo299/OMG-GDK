@@ -1,4 +1,4 @@
-package launcher.core.lifecycle.start.auto_launch;
+package launcher.ui_areas.lobby.lifecycle.start;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -11,6 +11,8 @@ import launcher.features.file_paths.FilePaths;
 
 import javafx.stage.Stage;
 import javafx.application.Platform;
+import launcher.ui_areas.lobby.lifecycle.start.viewmodel.ViewModelInitializer;
+import launcher.ui_areas.lobby.lifecycle.start.viewmodel.ViewModelWiring;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,7 +40,7 @@ import java.nio.file.Paths;
  * @edited December 20, 2025
  * @since Beta 1.0
  */
-public final class AutoLaunchUtil {
+public final class InitializeLobbyUIForAutoLaunch {
     
     // ==================== CONSTRUCTOR ====================
     
@@ -46,7 +48,7 @@ public final class AutoLaunchUtil {
      * Private constructor to prevent instantiation.
      * This is a utility class with only static methods.
      */
-    private AutoLaunchUtil() {
+    private InitializeLobbyUIForAutoLaunch() {
         throw new AssertionError("AutoLaunchUtil should not be instantiated");
     }
     
@@ -219,9 +221,8 @@ public final class AutoLaunchUtil {
     public static AutoLaunchComponents createAutoLaunchComponents(Stage primaryApplicationStage) {
         GDKGameLobbyController controller = new GDKGameLobbyController();
         controller.setControllerMode(ControllerMode.AUTO_LAUNCH);
-        GDKViewModel viewModel = new GDKViewModel();
-        viewModel.setPrimaryStage(primaryApplicationStage);
-        controller.setViewModel(viewModel);
+        GDKViewModel viewModel = ViewModelInitializer.createForAutoLaunch(primaryApplicationStage);
+        ViewModelWiring.wireUp(viewModel, controller);
         return new AutoLaunchComponents(controller, viewModel);
     }
     

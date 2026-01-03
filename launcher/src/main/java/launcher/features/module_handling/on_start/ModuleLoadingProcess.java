@@ -1,9 +1,9 @@
-package launcher.features.module_handling;
+package launcher.features.module_handling.on_program_start;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
+import launcher.features.module_handling.on_program_start.thread.ModuleLoadingThread;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.features.module_handling.loading.ModuleLoadingThread;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.stop.Shutdown;
 
@@ -16,9 +16,9 @@ import launcher.core.lifecycle.stop.Shutdown;
  * @edited December 22, 2025
  * @since Beta 1.0
  */
-public final class LoadModules {
+public final class ModuleLoadingProcess {
 
-    private LoadModules() {}
+    private ModuleLoadingProcess() {}
 
     /**
      * Loads game modules in the background and prepares the UI.
@@ -27,7 +27,7 @@ public final class LoadModules {
      * @param lobbyController The UI controller that will show the list of games
      * @param windowManager The startup window (visible during loading)
      */
-    public static void load(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindow windowManager) {
+    public static void start(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindow windowManager) {
         Logging.info("Starting module ui_loading process...");
         
         // Wait a tiny bit to make sure the window is fully visible

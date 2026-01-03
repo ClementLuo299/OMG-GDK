@@ -1,7 +1,7 @@
 package launcher.features.module_handling.loading.helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.loading.ModuleCompiler;
+import launcher.features.module_handling.compilation.ModuleCompiler;
 
 /**
  * Checks if modules need to be built before ui_loading.
