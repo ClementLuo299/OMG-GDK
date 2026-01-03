@@ -48,10 +48,10 @@ public final class ModuleLoadingSteps {
     }
     
     /**
-     * Initializes module loading and checks if modules need to be built.
+     * Initializes module loading.
      */
     public static void initializeModuleLoading() {
-        ModuleBuildChecker.checkAndInitialize();
+        Logging.info("Preparing module discovery...");
     }
     
     /**

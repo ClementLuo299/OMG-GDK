@@ -4,12 +4,15 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
+import launcher.features.module_handling.directory_management.ModuleDirectoryUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Handles module discovery and validation.
@@ -31,7 +34,7 @@ import java.util.List;
  * 
  * @author Clement Luo
  * @date August 12, 2025
- * @edited December 20, 2025
+ * @edited January 2, 2026
  * @since Beta 1.0
  */
 public class ModuleDiscovery {
@@ -91,124 +94,6 @@ public class ModuleDiscovery {
         
         Logging.info("Total modules discovered: " + discoveredModules.size());
         return discoveredModules;
-    }
-    
-    /**
-     * Counts the number of valid modules in the modules directory.
-     * 
-     * <p>This method scans the modules directory and counts only those directories
-     * that pass structural validation checks. It skips infrastructure directories
-     * like "target" and ".git".
-     * 
-     * @param modulesDirectory The modules directory to scan
-     * @return The number of valid modules found
-     */
-    public static int countValidModules(File modulesDirectory) {
-        int validCount = 0;
-        
-        try {
-            File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
-            if (subdirs == null) {
-                return 0; // nothing to scan
-            }
-            
-            for (File subdir : subdirs) {
-                String moduleName = subdir.getName();
-                
-                // Skip infra/hidden directories that are not game modules
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
-                    continue;
-                }
-                
-                // Only structural validity is checked here (not compilation)
-                if (isValidModuleStructure(subdir)) {
-                    validCount++;
-                    Logging.info("Valid module found: " + moduleName);
-                } else {
-                    Logging.info("Invalid module found: " + moduleName);
-                }
-            }
-        } catch (Exception e) {
-            Logging.error("Error counting valid modules: " + e.getMessage(), e);
-        }
-        
-        return validCount;
-    }
-    
-    /**
-     * Gets a list of valid module directories for processing.
-     * 
-     * <p>This method scans the modules directory and returns a list of directories
-     * that pass structural validation. It includes timeout protection for file
-     * operations and filters out infrastructure directories.
-     * 
-     * @param modulesDirectory The modules directory to scan
-     * @return List of valid module directories
-     */
-    public static List<File> getValidModuleDirectories(File modulesDirectory) {
-        List<File> validModules = new ArrayList<>();
-        
-        try {
-            Logging.info("🔍 Starting module discovery in: " + modulesDirectory.getAbsolutePath());
-            
-            // Add timeout protection for file operations
-            long startTime = System.currentTimeMillis();
-            long timeout = 5000; // Reduced to 5 second timeout for faster failure detection
-            
-            // First, check if we can even list the directory
-            Logging.info("🔍 Attempting to list directory contents...");
-            File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
-            
-            if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("⚠️ Directory listing timeout reached");
-                return validModules;
-            }
-            
-            if (subdirs == null) {
-                Logging.info("📁 No subdirectories found in modules directory");
-                return validModules; // empty if nothing to scan
-            }
-            
-            Logging.info("📁 Found " + subdirs.length + " subdirectories to check");
-            
-            for (File subdir : subdirs) {
-                // Check timeout
-                if (System.currentTimeMillis() - startTime > timeout) {
-                    Logging.warning("⚠️ Module discovery timeout reached, stopping discovery");
-                    break;
-                }
-                
-                String moduleName = subdir.getName();
-                Logging.info("🔍 Checking module: " + moduleName);
-                
-                // Filter out infra/hidden directories
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
-                    Logging.info("⏭️ Skipping internal directory: " + moduleName);
-                    continue;
-                }
-                
-                try {
-                    Logging.info("✅ Validating module structure for: " + moduleName);
-                    // Collect only those passing structural checks
-                    if (isValidModuleStructure(subdir)) {
-                        validModules.add(subdir);
-                        Logging.info("✅ Valid module found: " + moduleName);
-                    } else {
-                        Logging.info("❌ Invalid module structure: " + moduleName);
-                    }
-                } catch (Exception e) {
-                    Logging.error("💥 Error validating module " + moduleName + ": " + e.getMessage());
-                    // Continue with other modules instead of failing completely
-                }
-            }
-            
-            Logging.info("🏁 Module discovery completed. Found " + validModules.size() + " valid modules");
-            
-        } catch (Exception e) {
-            Logging.error("💥 Error getting valid module directories: " + e.getMessage(), e);
-        }
-        
-        return validModules;
     }
     
     // ==================== PUBLIC METHODS - VALIDATION ====================
@@ -380,7 +265,7 @@ public class ModuleDiscovery {
                 return fixedSteps;
             }
             
-            int validModuleCount = countValidModules(modulesDirectory);
+            int validModuleCount = ModuleDirectoryUtil.countValidModules(modulesDirectory);
             Logging.info("Found " + validModuleCount + " valid modules");
             
             // Total = fixed steps + one per module for processing
@@ -676,7 +561,6 @@ public class ModuleDiscovery {
             
             // Check if source files are newer than compiled classes
             File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
-            File metadataJavaFile = new File(moduleDir, "src/main/java/Metadata.java");
             
             if (mainJavaFile.exists() && mainClassFile.exists()) {
                 if (mainJavaFile.lastModified() > mainClassFile.lastModified()) {
@@ -685,57 +569,12 @@ public class ModuleDiscovery {
                 }
             }
             
-            // Note: metadataJavaFile is checked but not used in the comparison above
-            // This is intentional - we only need to check if Main.java is newer
-            
             Logging.info("✅ Module " + moduleDir.getName() + " is compiled and up to date");
             return false;
             
         } catch (Exception e) {
             Logging.error("💥 Error checking compilation status for " + moduleDir.getName() + ": " + e.getMessage());
             return true; // Assume compilation is needed if we can't check
-        }
-    }
-    
-    /**
-     * Reports compilation status for all modules in the directory.
-     * 
-     * <p>This method scans all modules and reports which ones need compilation.
-     * Useful for debugging and user feedback.
-     * 
-     * @param modulesDirectory The modules directory to check
-     */
-    public static void reportModuleCompilationStatus(File modulesDirectory) {
-        try {
-            Logging.info("🔍 === MODULE COMPILATION STATUS ===");
-            
-            File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
-            if (subdirs == null) {
-                Logging.info("📁 No subdirectories found");
-                return;
-            }
-            
-            for (File subdir : subdirs) {
-                String moduleName = subdir.getName();
-                
-                // Skip internal directories
-                if (moduleName.equals("target") || moduleName.equals(".git") || moduleName.startsWith(".")) {
-                    continue;
-                }
-                
-                Logging.info("🔍 Module: " + moduleName);
-                boolean needsCompilation = moduleNeedsCompilation(subdir);
-                Logging.info("   📦 Compilation needed: " + needsCompilation);
-                
-                if (needsCompilation) {
-                    Logging.info("   💡 Run 'mvn compile' in modules/" + moduleName + " to compile");
-                }
-            }
-            
-            Logging.info("🔍 === END COMPILATION STATUS ===");
-            
-        } catch (Exception e) {
-            Logging.error("💥 Error reporting compilation status: " + e.getMessage(), e);
         }
     }
     
@@ -760,7 +599,7 @@ public class ModuleDiscovery {
             // Discover valid module directories
             String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
             File modulesDirectory = new File(modulesDirectoryPath);
-            List<File> validModuleDirectories = getValidModuleDirectories(modulesDirectory);
+            List<File> validModuleDirectories = ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectory);
             
             if (validModuleDirectories.isEmpty()) {
                 Logging.info("Module lookup: No valid modules found");
@@ -782,6 +621,158 @@ public class ModuleDiscovery {
         } catch (Exception e) {
             Logging.error("Module lookup failed: " + e.getMessage(), e);
             return null;
+        }
+    }
+    
+    // ==================== PUBLIC METHODS - MODULE PROCESSING ====================
+    
+    /**
+     * Discovers and loads game modules using ModuleInitializationUtil.
+     * 
+     * @return List of discovered game modules, or empty list if error occurs
+     */
+    public static List<GameModule> discoverAndLoadModules() {
+        return launcher.features.module_handling.initialization.ModuleInitializationUtil.discoverAndLoadModules();
+    }
+    
+    /**
+     * Processes discovered modules and extracts information.
+     * 
+     * <p>This method:
+     * <ul>
+     *   <li>Extracts module names and metadata</li>
+     *   <li>Logs discovered modules</li>
+     *   <li>Handles errors gracefully</li>
+     * </ul>
+     * 
+     * @param discoveredGameModules List of discovered game modules
+     * @return Result containing module names and processing information
+     */
+    public static ModuleDiscoveryResult processDiscoveredModules(List<GameModule> discoveredGameModules) {
+        Set<String> moduleNames = new HashSet<>();
+        List<ModuleInfo> moduleInfos = new ArrayList<>();
+        
+        for (GameModule gameModule : discoveredGameModules) {
+            if (gameModule == null) {
+                Logging.warning("Null game module in discovered list - skipping");
+                continue;
+            }
+            
+            try {
+                String gameName = gameModule.getMetadata().getGameName();
+                String className = gameModule.getClass().getSimpleName();
+                moduleNames.add(gameName);
+                moduleInfos.add(new ModuleInfo(gameName, className));
+                Logging.info("Loaded game module: " + gameName + " (" + className + ")");
+            } catch (Exception e) {
+                Logging.error("Error getting metadata from game module: " + e.getMessage(), e);
+            }
+        }
+        
+        return new ModuleDiscoveryResult(moduleNames, moduleInfos, discoveredGameModules.size());
+    }
+    
+    /**
+     * Filters out null modules from the discovered list.
+     * 
+     * @param discoveredGameModules List of discovered modules (may contain nulls)
+     * @return List containing only valid (non-null) modules
+     */
+    public static List<GameModule> filterValidModules(List<GameModule> discoveredGameModules) {
+        List<GameModule> validModules = new ArrayList<>();
+        for (GameModule module : discoveredGameModules) {
+            if (module != null) {
+                validModules.add(module);
+            }
+        }
+        Logging.info("Valid modules to add to UI: " + validModules.size());
+        return validModules;
+    }
+    
+    /**
+     * Collects module names from a collection of game modules.
+     * 
+     * @param modules Collection of game modules (list or observable list)
+     * @return Set of module names
+     */
+    public static Set<String> collectModuleNames(Iterable<GameModule> modules) {
+        Set<String> moduleNames = new HashSet<>();
+        for (GameModule module : modules) {
+            if (module != null) {
+                moduleNames.add(module.getMetadata().getGameName());
+            }
+        }
+        return moduleNames;
+    }
+    
+    /**
+     * Extracts module names from a list of modules.
+     * 
+     * <p>This method only extracts names if previousCount > 0, indicating this is not
+     * the first load. This is used to determine which modules are new vs existing.
+     * 
+     * @param modules List of game modules
+     * @param previousCount Previous module count (used to determine if this is first load)
+     * @return Set of module names (empty if previousCount is 0)
+     */
+    public static Set<String> extractModuleNames(List<GameModule> modules, int previousCount) {
+        Set<String> moduleNames = new HashSet<>();
+        if (previousCount > 0) {
+            for (GameModule module : modules) {
+                moduleNames.add(module.getMetadata().getGameName());
+            }
+        }
+        return moduleNames;
+    }
+    
+    // ==================== INNER CLASSES ====================
+    
+    /**
+     * Result object containing module discovery information.
+     */
+    public static class ModuleDiscoveryResult {
+        /** Set of discovered module names. */
+        public final Set<String> moduleNames;
+        
+        /** List of module information. */
+        public final List<ModuleInfo> moduleInfos;
+        
+        /** Total count of discovered modules. */
+        public final int totalCount;
+        
+        /**
+         * Creates a new ModuleDiscoveryResult.
+         * 
+         * @param moduleNames Set of discovered module names
+         * @param moduleInfos List of module information
+         * @param totalCount Total count of discovered modules
+         */
+        public ModuleDiscoveryResult(Set<String> moduleNames, List<ModuleInfo> moduleInfos, int totalCount) {
+            this.moduleNames = moduleNames;
+            this.moduleInfos = moduleInfos;
+            this.totalCount = totalCount;
+        }
+    }
+    
+    /**
+     * Information about a discovered module.
+     */
+    public static class ModuleInfo {
+        /** Name of the game module. */
+        public final String gameName;
+        
+        /** Class name of the game module. */
+        public final String className;
+        
+        /**
+         * Creates a new ModuleInfo.
+         * 
+         * @param gameName Name of the game module
+         * @param className Class name of the game module
+         */
+        public ModuleInfo(String gameName, String className) {
+            this.gameName = gameName;
+            this.className = className;
         }
     }
 }

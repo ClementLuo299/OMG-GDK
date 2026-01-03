@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.discovery.ModuleDiscovery;
+import launcher.features.module_handling.directory_management.ModuleDirectoryUtil;
 
 import java.io.File;
 
@@ -69,7 +69,7 @@ final class ModuleDirectoryValidator {
         if (!modulesDirectory.exists()) {
             Logging.warning("Modules directory does not exist: " + modulesDirectoryPath);
             // Run diagnostics to help identify where the directory should be
-            ModuleDiscovery.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            ModuleDirectoryUtil.diagnoseModuleDetectionIssues(modulesDirectoryPath);
             return ValidationResult.invalid("Modules directory not found: " + modulesDirectoryPath);
         }
         
@@ -77,10 +77,10 @@ final class ModuleDirectoryValidator {
         
         // Second check: verify we can actually read and list contents of the directory
         Logging.info("Testing modules directory access...");
-        if (!ModuleDiscovery.testModulesDirectoryAccess(modulesDirectoryPath)) {
+        if (!ModuleDirectoryUtil.testModulesDirectoryAccess(modulesDirectoryPath)) {
             // Directory exists but we can't access it (permissions issue)
             Logging.error("Modules directory access test failed - skipping module discovery");
-            ModuleDiscovery.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            ModuleDirectoryUtil.diagnoseModuleDetectionIssues(modulesDirectoryPath);
             return ValidationResult.invalid("Modules directory access failed");
         }
         

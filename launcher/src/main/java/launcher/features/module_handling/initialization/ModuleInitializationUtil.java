@@ -2,7 +2,7 @@ package launcher.features.module_handling.initialization;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.ModuleDiscovery;
+import launcher.features.module_handling.directory_management.ModuleDirectoryUtil;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
 
@@ -46,7 +46,7 @@ public final class ModuleInitializationUtil {
                 return new ArrayList<>();
             }
             
-            List<File> validModuleDirectories = ModuleDiscovery.getValidModuleDirectories(modulesDir);
+            List<File> validModuleDirectories = ModuleDirectoryUtil.getValidModuleDirectories(modulesDir);
             List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
             
             // Filter out null modules

@@ -81,7 +81,7 @@ public class ViewModelDependentsFactory {
         
         // ==================== RECREATE VIEWMODEL-DEPENDENT MANAGERS ====================
         
-        // Note: GameModuleRefreshManager creates ModuleDiscoveryService internally
+        // Note: GameModuleRefreshManager uses ModuleDiscovery utility class
         GameModuleRefreshManager gameModuleRefreshManager = new GameModuleRefreshManager(
             currentResult.gameSelectionController().getAvailableGameModules(),
             (ComboBox) gameSelector,

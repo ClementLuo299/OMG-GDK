@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.ModuleDiscoveryService;
+import launcher.features.module_handling.discovery.ModuleDiscovery;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import javafx.application.Platform;
@@ -22,7 +22,7 @@ import java.util.Set;
  * </ul>
  * 
  * <p>Business logic (discovery, processing, filtering) is delegated to
- * {@link ModuleDiscoveryService}.
+ * {@link ModuleDiscovery}.
  * 
  * @author Clement Luo
  * @date December 30, 2025
@@ -33,8 +33,7 @@ public class ModuleDiscoveryHandler {
     
     // ==================== DEPENDENCIES ====================
     
-    /** Business logic service for module discovery. */
-    private final ModuleDiscoveryService discoveryService;
+    // ModuleDiscovery is now a utility class with static methods, no service instance needed
     
     /** Message manager for user feedback. */
     private final MessageManager messageManager;
@@ -47,14 +46,11 @@ public class ModuleDiscoveryHandler {
     /**
      * Creates a new ModuleDiscoveryHandler.
      * 
-     * @param discoveryService The business logic service for module discovery
      * @param messageManager The message manager for user feedback
      * @param statusLabelManager The status label manager for status updates
      */
-    public ModuleDiscoveryHandler(ModuleDiscoveryService discoveryService,
-                                  MessageManager messageManager,
+    public ModuleDiscoveryHandler(MessageManager messageManager,
                                   StatusLabelManager statusLabelManager) {
-        this.discoveryService = discoveryService;
         this.messageManager = messageManager;
         this.statusLabelManager = statusLabelManager;
     }
@@ -68,7 +64,7 @@ public class ModuleDiscoveryHandler {
      * @return List of discovered game modules, or null if service is unavailable
      */
     public List<GameModule> discoverModules(int availableGameModulesSize) {
-        List<GameModule> discovered = discoveryService.discoverModules();
+        List<GameModule> discovered = ModuleDiscovery.discoverAndLoadModules();
         if (discovered == null) {
             Platform.runLater(() -> {
                 messageManager.addMessage("Error: ViewModel not available");
@@ -92,13 +88,13 @@ public class ModuleDiscoveryHandler {
      * @return Result containing module names and UI messages
      */
     public ModuleDiscoveryResult processDiscoveredModules(List<GameModule> discoveredGameModules) {
-        // Process using business service
-        ModuleDiscoveryService.ModuleDiscoveryResult businessResult = 
-            discoveryService.processDiscoveredModules(discoveredGameModules);
+        // Process using ModuleDiscovery
+        ModuleDiscovery.ModuleDiscoveryResult businessResult = 
+            ModuleDiscovery.processDiscoveredModules(discoveredGameModules);
         
         // Create UI messages from business results
         List<String> uiMessages = new ArrayList<>();
-        for (ModuleDiscoveryService.ModuleInfo info : businessResult.moduleInfos) {
+        for (ModuleDiscovery.ModuleInfo info : businessResult.moduleInfos) {
             uiMessages.add("Detected game: " + info.gameName);
         }
         
@@ -121,7 +117,7 @@ public class ModuleDiscoveryHandler {
      * @return List containing only valid (non-null) modules
      */
     public List<GameModule> filterValidModules(List<GameModule> discoveredGameModules) {
-        return discoveryService.filterValidModules(discoveredGameModules);
+        return ModuleDiscovery.filterValidModules(discoveredGameModules);
     }
     
     /**
@@ -151,7 +147,7 @@ public class ModuleDiscoveryHandler {
      * @return Set of module names
      */
     public Set<String> collectModuleNames(Iterable<GameModule> modules) {
-        return discoveryService.collectModuleNames(modules);
+        return ModuleDiscovery.collectModuleNames(modules);
     }
     
     /**
@@ -163,7 +159,7 @@ public class ModuleDiscoveryHandler {
      * @return Set of module names
      */
     public Set<String> extractModuleNames(List<GameModule> modules, int previousCount) {
-        return discoveryService.extractModuleNames(modules, previousCount);
+        return ModuleDiscovery.extractModuleNames(modules, previousCount);
     }
     
     // ==================== INNER CLASSES ====================

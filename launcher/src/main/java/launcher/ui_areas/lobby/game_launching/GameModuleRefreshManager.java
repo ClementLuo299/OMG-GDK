@@ -2,7 +2,6 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.ModuleDiscoveryService;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
@@ -94,11 +93,8 @@ public class GameModuleRefreshManager {
         this.loadingAnimationManager = loadingAnimationManager;
         this.moduleCompilationChecker = moduleCompilationChecker;
         
-        // Create business service for module discovery
-        ModuleDiscoveryService discoveryService =
-            new ModuleDiscoveryService();
         // Create handlers
-        this.moduleDiscoveryHandler = new ModuleDiscoveryHandler(discoveryService, messageManager, statusLabelManager);
+        this.moduleDiscoveryHandler = new ModuleDiscoveryHandler(messageManager, statusLabelManager);
         this.uiUpdater = new ModuleRefreshUIUpdater(availableGameModules, gameSelector, statusLabelManager, launchButtonManager);
     }
     
