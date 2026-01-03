@@ -40,7 +40,7 @@ final class ModuleDiscoveryProcess {
             // If discovery fails (e.g., file system error), log and run diagnostics
             Logging.error("Module discovery failed: " + e.getMessage(), e);
             e.printStackTrace();
-            ModuleDirectoryUtil.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            launcher.features.module_handling.validation.ModuleValidator.diagnoseModuleDetectionIssues(modulesDirectoryPath);
         }
         
         // Return list of valid module directories (empty if none found or on error)
@@ -56,7 +56,7 @@ final class ModuleDiscoveryProcess {
     public static void runEmptyDiscoveryDiagnostics(File modulesDirectory, String modulesDirectoryPath) {
         // Run comprehensive diagnostics to help identify why no modules were found
         Logging.warning("No valid modules found - running diagnostics...");
-        ModuleDirectoryUtil.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+        launcher.features.module_handling.validation.ModuleValidator.diagnoseModuleDetectionIssues(modulesDirectoryPath);
         
         // Check if modules exist but just need to be compiled
         Logging.info("Checking module compilation status...");

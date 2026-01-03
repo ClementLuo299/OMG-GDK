@@ -10,7 +10,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
-import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 /**
  * Handles module compilation and ui_loading.
@@ -124,7 +123,7 @@ public class ModuleCompiler {
         
         try {
             // Validate source files first
-            if (!ModuleDiscovery.isValidModuleStructure(moduleDir)) {
+            if (!launcher.features.module_handling.validation.ModuleValidator.isValidModuleStructure(moduleDir)) {
                 Logging.info("Module " + moduleName + " has invalid structure");
                 return null;
             }
@@ -637,6 +636,56 @@ public class ModuleCompiler {
             lastCompilationFailures.add(moduleName);
             Logging.info("💾 Added compilation failure: " + moduleName);
         }
+    }
+    
+    /**
+     * Checks for compilation failures in modules.
+     * 
+     * <p>This method checks both the ModuleCompiler's failure list and
+     * scans the modules directory for modules that have source files but
+     * no compiled classes.
+     * 
+     * @return List of module names that failed to compile
+     */
+    public static List<String> checkForCompilationFailures() {
+        List<String> failures = new ArrayList<>();
+        try {
+            // Get compilation failures from ModuleCompiler
+            List<String> compilerFailures = getLastCompilationFailures();
+            failures.addAll(compilerFailures);
+            
+            // Check for additional compilation issues
+            String modulesDirectoryPath = launcher.features.file_paths.PathUtil.getModulesDirectoryPath();
+            File modulesDir = new File(modulesDirectoryPath);
+            File[] subdirs = modulesDir.listFiles(File::isDirectory);
+            
+            if (subdirs != null) {
+                for (File subdir : subdirs) {
+                    if (subdir.getName().equals("target") || subdir.getName().equals(".git")) {
+                        continue;
+                    }
+                    
+                    File pomFile = new File(subdir, "pom.xml");
+                    if (pomFile.exists()) {
+                        File mainJava = new File(subdir, "src/main/java/Main.java");
+                        File metadataJava = new File(subdir, "src/main/java/Metadata.java");
+                        
+                        if (mainJava.exists() && metadataJava.exists()) {
+                            // Check if compiled classes exist
+                            File targetClassesDir = new File(subdir, "target/classes");
+                            if (!targetClassesDir.exists() || targetClassesDir.listFiles() == null || targetClassesDir.listFiles().length == 0) {
+                                if (!failures.contains(subdir.getName())) {
+                                    failures.add(subdir.getName());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logging.error("❌ Error checking compilation failures: " + e.getMessage(), e);
+        }
+        return failures;
     }
 }
 

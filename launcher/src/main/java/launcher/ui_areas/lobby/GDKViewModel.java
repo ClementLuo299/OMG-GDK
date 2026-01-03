@@ -615,7 +615,7 @@ public class GDKViewModel {
      */
     private void refreshAvailableGameModules() {
         try {
-            launcher.features.module_handling.initialization.ModuleInitializationUtil.discoverAndLoadModules();
+            launcher.features.module_handling.discovery.ModuleDiscovery.discoverAndLoadModules();
             Logging.info("✅ Module refresh completed");
         } catch (Exception moduleDiscoveryError) {
             Logging.error("❌ Error discovering modules: " + moduleDiscoveryError.getMessage());

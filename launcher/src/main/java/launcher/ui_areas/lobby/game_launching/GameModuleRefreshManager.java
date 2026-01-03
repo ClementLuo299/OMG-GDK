@@ -221,7 +221,7 @@ public class GameModuleRefreshManager {
      */
     private void checkAndReportCompilationFailures() {
         if (moduleCompilationChecker != null) {
-            List<String> compilationFailures = launcher.features.module_handling.initialization.ModuleInitializationUtil.checkForCompilationFailures();
+            List<String> compilationFailures = launcher.features.module_handling.compilation.ModuleCompiler.checkForCompilationFailures();
             if (!compilationFailures.isEmpty()) {
                 for (String moduleName : compilationFailures) {
                     messageManager.addMessage("Module '" + moduleName + "' failed to compile - check source code for errors");

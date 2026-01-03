@@ -1,8 +1,8 @@
-package launcher.features.module_handling.on_start;
+package launcher.features.module_handling.on_app_start;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.features.module_handling.on_start.helpers.ModuleLoadingThread;
+import launcher.features.module_handling.on_app_start.helpers.ModuleLoadingThread;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.stop.Shutdown;

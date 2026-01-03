@@ -1,10 +1,10 @@
-package launcher.features.module_handling.on_start.helpers;
+package launcher.features.module_handling.on_app_start.helpers;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.features.module_handling.on_start.helpers.thread_tasks_helpers.CompilationChecker;
-import launcher.features.module_handling.on_start.helpers.thread_tasks_helpers.LoadModules;
-import launcher.features.module_handling.on_start.helpers.thread_tasks_helpers.ModuleUIUpdater;
+import launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers.CompilationChecker;
+import launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers.LoadModules;
+import launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers.ModuleUIUpdater;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;

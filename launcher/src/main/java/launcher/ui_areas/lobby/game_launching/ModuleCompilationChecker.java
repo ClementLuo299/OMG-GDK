@@ -1,7 +1,7 @@
 package launcher.ui_areas.lobby.game_launching;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.initialization.ModuleInitializationUtil;
+import launcher.features.module_handling.compilation.ModuleCompiler;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
@@ -12,11 +12,11 @@ import java.util.List;
  * 
  * <p>This class is responsible for:
  * <ul>
- *   <li>Checking for compilation failures (delegates to ModuleInitializationUtil)</li>
+ *   <li>Checking for compilation failures (delegates to ModuleCompiler)</li>
  *   <li>Reporting compilation failures to the UI via messages</li>
  * </ul>
  * 
- * <p>The business logic of checking for failures is delegated to ModuleInitializationUtil,
+ * <p>The business logic of checking for failures is delegated to ModuleCompiler,
  * while this class handles the UI reporting aspect.
  * 
  * @author Clement Luo
@@ -62,11 +62,11 @@ public class ModuleCompilationChecker {
     /**
      * Checks for compilation failures on startup and reports them to the UI.
      * 
-     * <p>This method:
-     * <ol>
-     *   <li>Delegates compilation checking to ModuleInitializationUtil</li>
-     *   <li>Reports any failures to the UI via the MessageReporter</li>
-     * </ol>
+ * <p>This method:
+ * <ol>
+ *   <li>Delegates compilation checking to ModuleCompiler</li>
+ *   <li>Reports any failures to the UI via the MessageReporter</li>
+ * </ol>
      * 
      * <p>UI updates are scheduled on the JavaFX application helpers to ensure helpers safety.
      */
@@ -74,8 +74,8 @@ public class ModuleCompilationChecker {
         try {
             Logging.info("Checking for compilation failures on startup...");
             
-            // Get compilation failures from ModuleInitializationUtil
-            List<String> compilationFailures = ModuleInitializationUtil.checkForCompilationFailures();
+            // Get compilation failures from ModuleCompiler
+            List<String> compilationFailures = ModuleCompiler.checkForCompilationFailures();
             
             // Report failures to UI if any were found
             if (!compilationFailures.isEmpty()) {

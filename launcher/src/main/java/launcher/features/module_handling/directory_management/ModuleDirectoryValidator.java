@@ -1,8 +1,7 @@
-package launcher.features.module_handling.discovery.helpers;
+package launcher.features.module_handling.directory_management;
 
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.directory_management.ModuleDirectoryUtil;
 
 import java.io.File;
 

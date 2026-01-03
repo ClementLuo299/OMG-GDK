@@ -2,6 +2,7 @@ package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
+import launcher.features.module_handling.directory_management.ModuleDirectoryValidator;
 
 import java.io.File;
 import java.util.ArrayList;
