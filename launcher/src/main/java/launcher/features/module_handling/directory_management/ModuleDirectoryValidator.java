@@ -69,7 +69,7 @@ final class ModuleDirectoryValidator {
         if (!modulesDirectory.exists()) {
             Logging.warning("Modules directory does not exist: " + modulesDirectoryPath);
             // Run diagnostics to help identify where the directory should be
-            ModuleDirectoryUtil.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            launcher.features.module_handling.validation.ModuleValidator.diagnoseModuleDetectionIssues(modulesDirectoryPath);
             return ValidationResult.invalid("Modules directory not found: " + modulesDirectoryPath);
         }
         
@@ -80,7 +80,7 @@ final class ModuleDirectoryValidator {
         if (!ModuleDirectoryUtil.testModulesDirectoryAccess(modulesDirectoryPath)) {
             // Directory exists but we can't access it (permissions issue)
             Logging.error("Modules directory access test failed - skipping module discovery");
-            ModuleDirectoryUtil.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            launcher.features.module_handling.validation.ModuleValidator.diagnoseModuleDetectionIssues(modulesDirectoryPath);
             return ValidationResult.invalid("Modules directory access failed");
         }
         
