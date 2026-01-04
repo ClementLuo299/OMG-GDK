@@ -92,10 +92,10 @@ public class GameLaunchService {
     // ==================== INNER CLASSES ====================
     
     /**
-     * Result of game launch module_code_validation.
+     * Result of game launch module_source_validation.
      * 
      * @param isValid Whether the launch is valid
-     * @param errorMessage Error message if module_code_validation failed, null if valid
+     * @param errorMessage Error message if module_source_validation failed, null if valid
      */
     public record LaunchValidationResult(boolean isValid, String errorMessage) {}
     

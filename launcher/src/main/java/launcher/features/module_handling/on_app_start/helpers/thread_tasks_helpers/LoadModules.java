@@ -41,7 +41,10 @@ public final class LoadModules {
             } else {
                 // Modules found - proceed with loading
                 // Step 4: Load the discovered modules into memory
-                ModuleLoadingSteps.executeLoading(discoveryResult);
+                ModuleRuntimeLoader.ModuleLoadResult loadResult = ModuleLoadingSteps.executeLoading(discoveryResult);
+                
+                // Store failures for later reporting to UI
+                CompilationChecker.storeStartupFailures(loadResult.getCompilationFailures());
             }
             
             // Step 5: Finalize the module loading process

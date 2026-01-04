@@ -1,27 +1,26 @@
 package launcher.ui_areas.lobby.game_launching;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.compilation.CompilationFailures;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handles checking and reporting of module compilation failures.
+ * Handles reporting of module compilation failures to the UI.
  * 
  * <p>This class is responsible for:
  * <ul>
- *   <li>Checking for compilation failures (delegates to ModuleCompiler)</li>
  *   <li>Reporting compilation failures to the UI via messages</li>
  * </ul>
  * 
- * <p>The business logic of checking for failures is delegated to ModuleCompiler,
- * while this class handles the UI reporting aspect.
+ * <p>Failures should be obtained from module loading operations (e.g., from
+ * {@link launcher.features.module_handling.discovery.ModuleDiscovery.ModuleLoadResult})
+ * and passed to this class for UI reporting.
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @edited January 1, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
 public class ModuleCompilationChecker {
@@ -60,33 +59,36 @@ public class ModuleCompilationChecker {
     // ==================== PUBLIC METHODS ====================
     
     /**
+     * Reports compilation failures to the UI.
+     * 
+     * <p>This method reports the provided compilation failures to the UI
+     * via the MessageReporter. UI updates are scheduled on the JavaFX
+     * application thread to ensure thread safety.
+     * 
+     * @param compilationFailures List of module names that failed to compile
+     */
+    public void reportCompilationFailures(List<String> compilationFailures) {
+        if (compilationFailures == null || compilationFailures.isEmpty()) {
+            return;
+        }
+        
+        try {
+            Logging.info("Reporting " + compilationFailures.size() + " compilation failure(s) to UI");
+            reportFailuresToUI(compilationFailures);
+        } catch (Exception e) {
+            Logging.error("Error reporting compilation failures: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
      * Checks for compilation failures on startup and reports them to the UI.
      * 
- * <p>This method:
- * <ol>
- *   <li>Delegates compilation checking to ModuleCompiler</li>
- *   <li>Reports any failures to the UI via the MessageReporter</li>
- * </ol>
-     * 
-     * <p>UI updates are scheduled on the JavaFX application helpers to ensure helpers safety.
+     * @deprecated Use {@link #reportCompilationFailures(List)} with failures from module loading instead
      */
+    @Deprecated
     public void checkStartupCompilationFailures() {
-        try {
-            Logging.info("Checking for compilation failures on startup...");
-            
-            // Get compilation failures from ModuleCompiler
-            List<String> compilationFailures = CompilationFailures.check();
-            
-            // Report failures to UI if any were found
-            if (!compilationFailures.isEmpty()) {
-                reportFailuresToUI(compilationFailures);
-            }
-            
-            Logging.info("Startup compilation failure check completed");
-            
-        } catch (Exception e) {
-            Logging.error("Error during startup compilation failure check: " + e.getMessage(), e);
-        }
+        // This method is deprecated - failures should be obtained from module loading operations
+        Logging.warning("checkStartupCompilationFailures() is deprecated - use reportCompilationFailures() instead");
     }
     
     // ==================== PRIVATE HELPER METHODS ====================

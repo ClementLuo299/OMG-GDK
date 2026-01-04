@@ -34,7 +34,7 @@ public final class ModuleDiscoveryDiagnostics {
      *   <li>Checking compilation status</li>
      * </ul>
      * 
-     * <p>This will help identify file system, path, or module_code_validation issues.
+     * <p>This will help identify file system, path, or module_source_validation issues.
      * 
      * @param modulesDirectoryPath The path to the modules directory
      */

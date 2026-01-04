@@ -65,14 +65,33 @@ public class ModuleDiscoveryHandler {
      * @return List of discovered game modules, or null if service is unavailable
      */
     public List<GameModule> discoverModules(int availableGameModulesSize) {
-        List<GameModule> discovered = ModuleDiscovery.getAllModules();
-        if (discovered == null) {
+        ModuleDiscovery.ModuleLoadResult result = ModuleDiscovery.getAllModulesWithFailures();
+        if (result == null) {
             Platform.runLater(() -> {
                 messageManager.addMessage("Error: ViewModel not available");
                 statusLabelManager.updateGameCountStatus(availableGameModulesSize);
             });
+            return null;
         }
-        return discovered;
+        return result.getLoadedModules();
+    }
+    
+    /**
+     * Discovers and loads game modules with compilation failures.
+     * 
+     * @param availableGameModulesSize Current size of available modules (for status updates)
+     * @return ModuleLoadResult containing loaded modules and compilation failures, or null if service is unavailable
+     */
+    public ModuleDiscovery.ModuleLoadResult discoverModulesWithFailures(int availableGameModulesSize) {
+        ModuleDiscovery.ModuleLoadResult result = ModuleDiscovery.getAllModulesWithFailures();
+        if (result == null) {
+            Platform.runLater(() -> {
+                messageManager.addMessage("Error: ViewModel not available");
+                statusLabelManager.updateGameCountStatus(availableGameModulesSize);
+            });
+            return null;
+        }
+        return result;
     }
     
     /**

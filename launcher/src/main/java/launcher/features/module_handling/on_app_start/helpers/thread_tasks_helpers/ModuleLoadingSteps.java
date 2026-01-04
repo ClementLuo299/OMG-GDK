@@ -1,11 +1,9 @@
 package launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers;
 
-import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Orchestrates the module ui_loading workflow.
@@ -25,26 +23,26 @@ public final class ModuleLoadingSteps {
      * Coordinates initialization, processing, loading, and reporting.
      * 
      * @param discoveryResult The result from module discovery
-     * @return List of successfully loaded GameModule instances
+     * @return ModuleLoadResult containing loaded modules and compilation failures
      */
-    public static List<GameModule> executeLoading(ModuleDiscovery.DiscoveryResult discoveryResult) {
+    public static ModuleRuntimeLoader.ModuleLoadResult executeLoading(ModuleDiscovery.DiscoveryResult discoveryResult) {
         // Step 1: Check if there are any modules to load
         if (!discoveryResult.isSuccess() || discoveryResult.getValidModuleDirectories().isEmpty()) {
             Logging.info("No modules to load - skipping loading workflow");
-            return new ArrayList<>();
+            return new ModuleRuntimeLoader.ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
         }
         
         // Step 2: Process each discovered module
         ModuleRuntimeLoader.processModules(discoveryResult.getValidModuleDirectories());
         
         // Step 3: Load the discovered modules into memory
-        List<GameModule> discoveredModules = ModuleRuntimeLoader.loadModules(
+        ModuleRuntimeLoader.ModuleLoadResult loadResult = ModuleRuntimeLoader.loadModulesWithFailures(
             discoveryResult.getValidModuleDirectories());
         
         // Step 4: Report the number of successfully loaded modules
-        ModuleCountReporter.reportModuleCount(discoveredModules);
+        ModuleCountReporter.reportModuleCount(loadResult.getLoadedModules());
         
-        return discoveredModules;
+        return loadResult;
     }
     
     /**

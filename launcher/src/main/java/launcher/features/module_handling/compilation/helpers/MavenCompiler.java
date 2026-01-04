@@ -9,6 +9,7 @@ import java.io.File;
  * 
  * @author Clement Luo
  * @date January 3, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
 public final class MavenCompiler {

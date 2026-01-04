@@ -1,9 +1,9 @@
-package launcher.features.module_handling.module_code_validation;
+package launcher.features.module_handling.module_source_validation;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.module_code_validation.helpers.file_validation.ValidateMainFile;
-import launcher.features.module_handling.module_code_validation.helpers.file_validation.ValidateMetadataFile;
-import launcher.features.module_handling.module_code_validation.helpers.CheckForRequiredFiles;
+import launcher.features.module_handling.module_source_validation.helpers.file_validation.ValidateMainFile;
+import launcher.features.module_handling.module_source_validation.helpers.file_validation.ValidateMetadataFile;
+import launcher.features.module_handling.module_source_validation.helpers.CheckForRequiredFiles;
 
 import java.io.File;
 
@@ -11,10 +11,10 @@ import java.io.File;
  * Checks if a directory contains a valid module.
  * 
  * <p>This class provides a single method to check if a directory contains a valid module.
- * All other module_code_validation logic is delegated to helper classes.
+ * All other module_source_validation logic is delegated to helper classes.
  * 
  * <p>All other classes in this package are internal implementation details.
- * External code should only use this class for module module_code_validation operations.
+ * External code should only use this class for module module_source_validation operations.
  * 
  * @author Clement Luo
  * @date January 2, 2026

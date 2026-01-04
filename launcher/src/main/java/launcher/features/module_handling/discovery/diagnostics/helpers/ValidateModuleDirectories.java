@@ -1,8 +1,7 @@
 package launcher.features.module_handling.discovery.diagnostics.helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.module_code_validation.ModuleValidator;
-import launcher.features.module_handling.compilation.CheckCompilationNeeded;
+import launcher.features.module_handling.module_source_validation.ModuleValidator;
 import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 
 import java.io.File;

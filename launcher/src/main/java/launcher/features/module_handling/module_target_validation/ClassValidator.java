@@ -1,4 +1,4 @@
-package launcher.features.module_handling.compilation.helpers;
+package launcher.features.module_handling.module_target_validation;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -8,6 +8,7 @@ import gdk.internal.Logging;
  * 
  * @author Clement Luo
  * @date January 3, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
 public final class ClassValidator {

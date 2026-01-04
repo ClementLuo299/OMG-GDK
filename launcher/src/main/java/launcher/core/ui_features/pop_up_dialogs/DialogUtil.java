@@ -351,9 +351,9 @@ public class DialogUtil {
     }
     
     /**
-     * Displays a JSON module_code_validation error dialog.
+     * Displays a JSON module_source_validation error dialog.
      * 
-     * <p>This is a convenience method for showing errors related to JSON module_code_validation.
+     * <p>This is a convenience method for showing errors related to JSON module_source_validation.
      * 
      * @param title The dialog title
      * @param message The error message

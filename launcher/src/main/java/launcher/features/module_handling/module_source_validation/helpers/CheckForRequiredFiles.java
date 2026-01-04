@@ -1,4 +1,4 @@
-package launcher.features.module_handling.module_code_validation.helpers;
+package launcher.features.module_handling.module_source_validation.helpers;
 
 import gdk.internal.Logging;
 

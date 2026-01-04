@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.compilation.CompilationFailures;
+import launcher.features.module_handling.discovery.ModuleDiscovery;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
@@ -197,14 +197,20 @@ public class GameModuleRefreshManager {
         // Extract previous module names for change detection
         Set<String> previousModuleNames = moduleDiscoveryHandler.extractModuleNames(previousModulesSnapshot, previousCountSnapshot);
 
-        // Discover and load modules using ViewModel
-        List<GameModule> discoveredGameModules = moduleDiscoveryHandler.discoverModules(uiUpdater.availableGameModules.size());
+        // Discover and load modules using ViewModel (with failures)
+        ModuleDiscovery.ModuleLoadResult discoveryResult = moduleDiscoveryHandler.discoverModulesWithFailures(uiUpdater.availableGameModules.size());
+        
+        if (discoveryResult == null) {
+            return;
+        }
+        
+        List<GameModule> discoveredGameModules = discoveryResult.getLoadedModules();
         
         // Log and report discovered modules
         moduleDiscoveryHandler.reportDiscoveredModules(discoveredGameModules, previousCountSnapshot);
         
-        // Check for compilation failures
-        checkAndReportCompilationFailures();
+        // Check for compilation failures and report them
+        checkAndReportCompilationFailures(discoveryResult.getCompilationFailures());
         
         // Update ComboBox UI on JavaFX helpers
         uiUpdater.updateComboBoxUI(discoveredGameModules);
@@ -219,14 +225,13 @@ public class GameModuleRefreshManager {
     
     /**
      * Checks for compilation failures and reports them to the user.
+     * 
+     * @param compilationFailures List of module names that failed to compile
      */
-    private void checkAndReportCompilationFailures() {
-        if (moduleCompilationChecker != null) {
-            List<String> compilationFailures = CompilationFailures.check();
-            if (!compilationFailures.isEmpty()) {
-                for (String moduleName : compilationFailures) {
-                    messageManager.addMessage("Module '" + moduleName + "' failed to compile - check source code for errors");
-                }
+    private void checkAndReportCompilationFailures(List<String> compilationFailures) {
+        if (moduleCompilationChecker != null && !compilationFailures.isEmpty()) {
+            for (String moduleName : compilationFailures) {
+                messageManager.addMessage("Module '" + moduleName + "' failed to compile - check source code for errors");
             }
         }
     }

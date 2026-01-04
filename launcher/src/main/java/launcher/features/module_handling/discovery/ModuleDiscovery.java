@@ -5,7 +5,7 @@ import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
 import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
-import launcher.features.module_handling.module_code_validation.ModuleValidator;
+import launcher.features.module_handling.module_source_validation.ModuleValidator;
 import launcher.features.module_handling.discovery.diagnostics.ModuleDiscoveryDiagnostics;
 
 import java.io.File;
@@ -65,6 +65,28 @@ public final class ModuleDiscovery {
         
         public String getErrorMessage() {
             return errorMessage;
+        }
+    }
+    
+    /**
+     * Result container for module loading operations.
+     * Contains both successfully loaded modules and compilation failures.
+     */
+    public static class ModuleLoadResult {
+        private final List<GameModule> loadedModules;
+        private final List<String> compilationFailures;
+        
+        public ModuleLoadResult(List<GameModule> loadedModules, List<String> compilationFailures) {
+            this.loadedModules = loadedModules != null ? loadedModules : new ArrayList<>();
+            this.compilationFailures = compilationFailures != null ? compilationFailures : new ArrayList<>();
+        }
+        
+        public List<GameModule> getLoadedModules() {
+            return loadedModules;
+        }
+        
+        public List<String> getCompilationFailures() {
+            return compilationFailures;
         }
     }
     
@@ -134,8 +156,22 @@ public final class ModuleDiscovery {
      * and compiles/loads them into GameModule instances.
      * 
      * @return List of discovered game modules, or empty list if error occurs
+     * @deprecated Use {@link #getAllModulesWithFailures()} to also get compilation failures
      */
+    @Deprecated
     public static List<GameModule> getAllModules() {
+        return getAllModulesWithFailures().getLoadedModules();
+    }
+    
+    /**
+     * Discovers and loads all available game modules from the modules directory.
+     * 
+     * <p>This method scans the modules directory, validates module directories,
+     * and compiles/loads them into GameModule instances.
+     * 
+     * @return ModuleLoadResult containing loaded modules and compilation failures
+     */
+    public static ModuleLoadResult getAllModulesWithFailures() {
         try {
             // Get modules directory path
             String modulesDirectoryPath = launcher.features.file_paths.PathUtil.getModulesDirectoryPath();
@@ -146,33 +182,32 @@ public final class ModuleDiscovery {
             
             if (moduleDirectories.isEmpty()) {
                 Logging.error("No module directories found or directory not accessible: " + modulesDirectoryPath);
-                return new ArrayList<>();
+                return new ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
             }
             
             // Filter to only valid module structures
             List<File> validModuleDirectories = new ArrayList<>();
             for (File folder : moduleDirectories) {
-                if (launcher.features.module_handling.module_code_validation.ModuleValidator.isValidModule(folder)) {
+                if (launcher.features.module_handling.module_source_validation.ModuleValidator.isValidModule(folder)) {
                     validModuleDirectories.add(folder);
                 }
             }
             
-            List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
+            ModuleCompiler.ModuleLoadResult result = ModuleCompiler.loadModules(validModuleDirectories);
+            List<GameModule> discoveredModules = result.getLoadedModules();
             
-            // Filter out null modules
-            List<GameModule> validModules = new ArrayList<>();
-            for (GameModule module : discoveredModules) {
-                if (module != null) {
-                    validModules.add(module);
-                }
+            // Log compilation failures if any
+            List<String> failures = result.getCompilationFailures();
+            if (!failures.isEmpty()) {
+                Logging.warning("Failed to load " + failures.size() + " module(s): " + String.join(", ", failures));
             }
             
-            Logging.info("Found " + validModules.size() + " game module(s)");
-            return validModules;
+            Logging.info("Found " + discoveredModules.size() + " game module(s)");
+            return new ModuleLoadResult(discoveredModules, failures);
             
         } catch (Exception moduleDiscoveryError) {
-            Logging.error("Error discovering modules: " + moduleDiscoveryError.getMessage());
-            return new ArrayList<>();
+            Logging.error("Module discovery failed: " + moduleDiscoveryError.getMessage(), moduleDiscoveryError);
+            return new ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
         }
     }
     

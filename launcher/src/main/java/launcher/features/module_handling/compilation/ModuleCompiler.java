@@ -4,18 +4,14 @@ import gdk.api.GameModule;
 import launcher.features.module_handling.compilation.helpers.ModuleLoader;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Public API for module compilation and loading operations.
+ * Load a module from a directory.
  * 
  * <p>This class provides methods for loading modules from compiled classes.
- * 
- * <p>For other compilation-related operations:
- * <ul>
- *   <li>Checking if compilation is needed: use {@link CheckCompilationNeeded}</li>
- *   <li>Checking for compilation failures: use {@link CompilationFailures}</li>
- * </ul>
  * 
  * <p>All other classes in this package are internal implementation details.
  * External code should only use this class for compilation and loading operations.
@@ -29,6 +25,41 @@ public final class ModuleCompiler {
     
     private ModuleCompiler() {
         throw new AssertionError("Utility class should not be instantiated");
+    }
+
+    public static final class ModuleLoadResult {
+        
+        private final List<GameModule> loadedModules;
+        private final List<String> compilationFailures;
+        
+        /**
+         * Creates a new ModuleLoadResult.
+         * 
+         * @param loadedModules List of successfully loaded GameModule instances
+         * @param compilationFailures List of module names that failed to compile or load
+         */
+        public ModuleLoadResult(List<GameModule> loadedModules, List<String> compilationFailures) {
+            this.loadedModules = new ArrayList<>(loadedModules);
+            this.compilationFailures = new ArrayList<>(compilationFailures);
+        }
+        
+        /**
+         * Gets the list of successfully loaded modules.
+         * 
+         * @return Unmodifiable list of loaded GameModule instances
+         */
+        public List<GameModule> getLoadedModules() {
+            return Collections.unmodifiableList(loadedModules);
+        }
+        
+        /**
+         * Gets the list of compilation failures.
+         * 
+         * @return Unmodifiable list of module names that failed to compile or load
+         */
+        public List<String> getCompilationFailures() {
+            return Collections.unmodifiableList(compilationFailures);
+        }
     }
     
     // ==================== PUBLIC METHODS - MODULE LOADING ====================
@@ -63,9 +94,9 @@ public final class ModuleCompiler {
      * module availability.
      * 
      * @param moduleDirectories List of module directories to load
-     * @return List of successfully loaded GameModule instances
+     * @return ModuleLoadResult containing loaded modules and compilation failures
      */
-    public static List<GameModule> loadModules(List<File> moduleDirectories) {
+    public static ModuleLoadResult loadModules(List<File> moduleDirectories) {
         return ModuleLoader.loadModules(moduleDirectories);
     }
 }

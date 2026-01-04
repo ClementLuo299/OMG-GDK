@@ -1,4 +1,4 @@
-package launcher.features.module_handling.compilation.checking;
+package launcher.features.module_handling.discovery.diagnostics.helpers;
 
 import gdk.internal.Logging;
 

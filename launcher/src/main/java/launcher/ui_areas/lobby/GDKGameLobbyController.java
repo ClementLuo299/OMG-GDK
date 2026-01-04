@@ -32,11 +32,11 @@ import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
  * 
  * This class manages the main lobby interface where users can select and launch
  * game modules. It provides functionality for game selection, JSON configuration
- * module_code_validation, and game launching with proper error handling.
+ * module_source_validation, and game launching with proper error handling.
  * 
  * Key responsibilities:
  * - Manage the game selection interface
- * - Handle JSON configuration input and module_code_validation
+ * - Handle JSON configuration input and module_source_validation
  * - Coordinate game launching with the ViewModel
  * - Provide user feedback through messages and error pop_up_dialogs
  * - Manage the refresh of available game modules
@@ -301,12 +301,24 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== MODULE COMPILATION ====================
     
     /**
-     * Check for compilation failures on startup.
+     * Reports compilation failures from startup loading.
+     * 
+     * @param failures List of module names that failed to compile
      */
-    public void checkStartupCompilationFailures() {
+    public void reportStartupCompilationFailures(java.util.List<String> failures) {
         if (moduleCompilationChecker != null) {
-            moduleCompilationChecker.checkStartupCompilationFailures();
+            moduleCompilationChecker.reportCompilationFailures(failures);
         }
+    }
+    
+    /**
+     * Check for compilation failures on startup.
+     * 
+     * @deprecated Use {@link #reportStartupCompilationFailures(List)} instead
+     */
+    @Deprecated
+    public void checkStartupCompilationFailures() {
+        // Deprecated - failures are now passed directly from loading process
     }
     
     // ==================== GAME LAUNCHING ====================

@@ -108,7 +108,7 @@ public class GameSelectionController {
             }
         });
         
-        // Launch button: Start the selected game with module_code_validation
+        // Launch button: Start the selected game with module_source_validation
         launchGameButton.setOnAction(event -> {
             if (onLaunchGame != null) {
                 onLaunchGame.run();
@@ -125,7 +125,7 @@ public class GameSelectionController {
      * Set callback for when launch game is requested.
      * Typically delegates to GameLaunchingManager.launchGameFromUI().
      * 
-     * @param onLaunchGame The callback to execute (e.g., launch game with module_code_validation)
+     * @param onLaunchGame The callback to execute (e.g., launch game with module_source_validation)
      */
     public void setOnLaunchGame(Runnable onLaunchGame) {
         this.onLaunchGame = onLaunchGame;

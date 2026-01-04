@@ -2,12 +2,16 @@ package launcher.features.module_handling.compilation.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.module_code_validation.ModuleValidator;
+import launcher.features.module_handling.compilation.ModuleCompiler;
+import launcher.features.module_handling.module_target_validation.ClassValidator;
+import launcher.features.module_handling.module_target_validation.ModuleLoadValidator;
 
 import java.io.File;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javafx.application.Platform;
 
 /**
@@ -53,35 +57,8 @@ public final class ModuleLoader {
         long timeout = 30000; // 30 second timeout for individual module loading (increased for JavaFX initialization)
         
         try {
-            // Validate source files first
-            if (!ModuleValidator.isValidModule(moduleDir)) {
-                Logging.info("Module " + moduleName + " has invalid structure");
-                return null;
-            }
-            
-            // Check timeout
-            if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
-                return null;
-            }
-            
-            // Check if compiled classes exist
-            File targetClassesDir = new File(moduleDir, "target/classes");
-            if (!targetClassesDir.exists()) {
-                Logging.info("Module " + moduleName + " missing compiled classes - recompilation needed");
-                return null;
-            }
-            
-            // Check timeout
-            if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
-                return null;
-            }
-            
-            // Verify Main.class exists
-            File mainClassFile = new File(targetClassesDir, "Main.class");
-            if (!mainClassFile.exists()) {
-                Logging.info("Main.class missing in target");
+            // Validate module is ready to load (source + target validation)
+            if (!ModuleLoadValidator.isReadyToLoad(moduleDir)) {
                 return null;
             }
             
@@ -160,7 +137,7 @@ public final class ModuleLoader {
             }
             
             if (!ClassValidator.isValidMainClass(mainClass)) {
-                Logging.info("Main class module_code_validation failed for " + moduleName);
+                Logging.info("Main class validation failed for " + moduleName);
                 return null;
             }
             
@@ -171,23 +148,19 @@ public final class ModuleLoader {
             }
             
             // Create GameModule instance by instantiating the Main class
-            if (GameModule.class.isAssignableFrom(mainClass)) {
-                Logging.info("🎯 Instantiating Main class for module: " + moduleName);
-                try {
-                    GameModule module = (GameModule) mainClass.getDeclaredConstructor().newInstance();
-                    Logging.info("✅ Instance created for module: " + moduleName);
-                    
-                    String gameName = module.getMetadata().getGameName();
-                    Logging.info("✅ Successfully loaded module: " + moduleName + " (Game: " + gameName + ")");
-                    return module;
-                } catch (Exception instantiationError) {
-                    Logging.error("❌ Failed to instantiate Main class for module " + moduleName + ": " + 
-                        instantiationError.getMessage(), instantiationError);
-                    instantiationError.printStackTrace();
-                    return null;
-                }
-            } else {
-                Logging.warning("Main class does not implement GameModule interface for module: " + moduleName);
+            // ClassValidator already verified that mainClass implements GameModule
+            Logging.info("🎯 Instantiating Main class for module: " + moduleName);
+            try {
+                GameModule module = (GameModule) mainClass.getDeclaredConstructor().newInstance();
+                Logging.info("✅ Instance created for module: " + moduleName);
+                
+                String gameName = module.getMetadata().getGameName();
+                Logging.info("✅ Successfully loaded module: " + moduleName + " (Game: " + gameName + ")");
+                return module;
+            } catch (Exception instantiationError) {
+                Logging.error("❌ Failed to instantiate Main class for module " + moduleName + ": " + 
+                    instantiationError.getMessage(), instantiationError);
+                instantiationError.printStackTrace();
                 return null;
             }
             
@@ -206,10 +179,11 @@ public final class ModuleLoader {
      * module availability.
      * 
      * @param moduleDirectories List of module directories to load
-     * @return List of successfully loaded GameModule instances
+     * @return ModuleLoadResult containing loaded modules and compilation failures
      */
-    public static List<GameModule> loadModules(List<File> moduleDirectories) {
+    public static ModuleCompiler.ModuleLoadResult loadModules(List<File> moduleDirectories) {
         List<GameModule> loadedModules = new ArrayList<>();
+        Set<String> failures = new HashSet<>();
         
         // Add timeout protection for module loading
         long startTime = System.currentTimeMillis();
@@ -222,23 +196,31 @@ public final class ModuleLoader {
                 break;
             }
             
+            String moduleName = moduleDir.getName();
             try {
                 GameModule module = loadModule(moduleDir);
                 if (module != null) {
                     loadedModules.add(module);
-                    Logging.info("✅ Module added to loaded list: " + moduleDir.getName());
+                    Logging.info("✅ Module added to loaded list: " + moduleName);
                 } else {
-                    Logging.warning("⚠️ Module load returned null: " + moduleDir.getName() + 
+                    // Module failed to load
+                    Logging.warning("⚠️ Module load returned null: " + moduleName + 
                         " (check logs above for details)");
+                    failures.add(moduleName);
                 }
             } catch (Exception e) {
-                Logging.error("❌ Exception while loading module " + moduleDir.getName() + ": " + e.getMessage(), e);
+                Logging.error("❌ Exception while loading module " + moduleName + ": " + e.getMessage(), e);
+                failures.add(moduleName);
                 // Continue with other modules instead of failing completely
             }
         }
         
         Logging.info("Module loading completed. Successfully loaded " + loadedModules.size() + " modules");
-        return loadedModules;
+        if (!failures.isEmpty()) {
+            Logging.info("Failed to load " + failures.size() + " module(s): " + String.join(", ", failures));
+        }
+        
+        return new ModuleCompiler.ModuleLoadResult(loadedModules, new ArrayList<>(failures));
     }
 }
 

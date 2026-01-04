@@ -17,7 +17,7 @@ import java.util.Map;
  *   <li>Reporting errors and success to users via error handler</li>
  * </ul>
  * 
- * <p>Business logic (module_code_validation, parsing, launching) is delegated to {@link GameLaunchService}.
+ * <p>Business logic (module_source_validation, parsing, launching) is delegated to {@link GameLaunchService}.
  * 
  * <p>Supports two launch modes:
  * <ul>
