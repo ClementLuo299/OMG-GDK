@@ -3,18 +3,21 @@ package launcher.features.module_handling.directory_management;
 import java.io.File;
 
 /**
- * Utility class for filtering module directories.
+ * Internal utility class for filtering module directories.
  * 
  * <p>This class determines which directories should be skipped during module discovery.
  * It filters out infrastructure directories (like "target", ".git") and hidden directories
  * that are not actual game modules.
  * 
+ * <p>This class is package-private. External code should use {@link ModuleDirectoryValidator}
+ * as the public API for directory management operations.
+ * 
  * @author Clement Luo
  * @date January 3, 2026
- * @edited January 3, 2026`
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryFilter {
+final class ModuleDirectoryFilter {
     
     private ModuleDirectoryFilter() {
         throw new AssertionError("Utility class should not be instantiated");

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility class for operations on the modules directory.
+ * Internal utility class for operations on the modules directory.
  * 
  * <p>This class handles directory-level operations such as:
  * <ul>
@@ -18,12 +18,15 @@ import java.util.List;
  *   <li>Reporting compilation status for all modules in the directory</li>
  * </ul>
  * 
+ * <p>This class is package-private. External code should use {@link ModuleDirectoryValidator}
+ * as the public API for directory management operations.
+ * 
  * @author Clement Luo
  * @date January 2, 2026
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryUtil {
+final class ModuleDirectoryUtil {
     
     private ModuleDirectoryUtil() {
         throw new AssertionError("Utility class should not be instantiated");

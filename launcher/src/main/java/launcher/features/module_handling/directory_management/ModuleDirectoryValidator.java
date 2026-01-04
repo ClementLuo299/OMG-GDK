@@ -4,19 +4,32 @@ import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
 
 import java.io.File;
+import java.util.List;
 
 /**
- * Validates the modules directory for existence and accessibility.
- * Responsible for checking if the directory exists and can be accessed.
+ * Public API for module directory management operations.
+ * 
+ * <p>This class serves as the single entry point for all directory management operations.
+ * It provides methods for:
+ * <ul>
+ *   <li>Validating the modules directory for existence and accessibility</li>
+ *   <li>Scanning the modules directory for module subdirectories</li>
+ *   <li>Testing directory accessibility</li>
+ *   <li>Diagnosing directory access issues</li>
+ *   <li>Counting modules in the directory</li>
+ *   <li>Reporting compilation status for all modules in the directory</li>
+ * </ul>
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @edited December 27, 2025
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
-final class ModuleDirectoryValidator {
+public final class ModuleDirectoryValidator {
     
-    private ModuleDirectoryValidator() {}
+    private ModuleDirectoryValidator() {
+        throw new AssertionError("Utility class should not be instantiated");
+    }
     
     /**
      * Validation result for directory checks.
@@ -86,6 +99,127 @@ final class ModuleDirectoryValidator {
         // Both checks passed - directory is valid and accessible
         Logging.info("Modules directory access test passed");
         return ValidationResult.valid(modulesDirectory);
+    }
+    
+    // ==================== PUBLIC METHODS - DIRECTORY OPERATIONS ====================
+    
+    /**
+     * Counts the number of valid modules in the modules directory.
+     * 
+     * @param modulesDirectoryPath The path to the modules directory to scan
+     * @return The number of valid modules found
+     */
+    public static int countValidModules(String modulesDirectoryPath) {
+        return ModuleDirectoryUtil.countValidModules(modulesDirectoryPath);
+    }
+    
+    /**
+     * Gets a list of valid module directories for processing.
+     * 
+     * <p>This method scans the modules directory and returns a list of directories
+     * that pass structural validation. It includes timeout protection for file
+     * operations and filters out infrastructure directories.
+     * 
+     * @param modulesDirectoryPath The path to the modules directory to scan
+     * @return List of valid module directories
+     */
+    public static List<File> getValidModuleDirectories(String modulesDirectoryPath) {
+        return ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectoryPath);
+    }
+    
+    /**
+     * Gets the list of all module directories (valid or invalid).
+     * 
+     * <p>This method returns all directories in the modules directory, regardless
+     * of validation status. Useful for diagnostics or bulk operations before validation.
+     * 
+     * @param modulesDirectory The modules directory to scan
+     * @return List of all module directories (excluding infrastructure directories)
+     */
+    public static List<File> getAllModuleDirectories(File modulesDirectory) {
+        return ModuleDirectoryUtil.getAllModuleDirectories(modulesDirectory);
+    }
+    
+    /**
+     * Checks if a module directory exists and is accessible.
+     * 
+     * @param modulePath The path to the module directory
+     * @return true if the directory exists, is a directory, and is readable
+     */
+    public static boolean moduleDirectoryExists(String modulePath) {
+        return ModuleDirectoryUtil.moduleDirectoryExists(modulePath);
+    }
+    
+    /**
+     * Calculates the total number of steps needed for startup progress tracking.
+     * 
+     * <p>This method calculates progress steps based on fixed startup steps plus
+     * one step per valid module. The total is clamped to a reasonable range for UX.
+     * 
+     * @return The total number of progress steps
+     */
+    public static int calculateTotalSteps() {
+        return ModuleDirectoryUtil.calculateTotalSteps();
+    }
+    
+    // ==================== PUBLIC METHODS - DIAGNOSTICS ====================
+    
+    /**
+     * Quick test to check if modules directory is accessible.
+     * 
+     * <p>This method performs basic accessibility checks including existence,
+     * directory type, readability, and listing capability. This can help identify
+     * if the issue is with file system access.
+     * 
+     * @param modulesDirectoryPath The path to the modules directory
+     * @return true if the directory is accessible, false otherwise
+     */
+    public static boolean testModulesDirectoryAccess(String modulesDirectoryPath) {
+        return ModuleDirectoryUtil.testModulesDirectoryAccess(modulesDirectoryPath);
+    }
+    
+    /**
+     * Reports compilation status for all modules in the directory.
+     * 
+     * <p>This method scans all modules and reports which ones need compilation.
+     * Useful for debugging and user feedback.
+     * 
+     * @param modulesDirectory The modules directory to check
+     */
+    public static void reportModuleCompilationStatus(File modulesDirectory) {
+        ModuleDirectoryUtil.reportModuleCompilationStatus(modulesDirectory);
+    }
+    
+    /**
+     * Checks if a directory should be skipped during module discovery.
+     * 
+     * <p>Directories are skipped if they are:
+     * <ul>
+     *   <li>Infrastructure directories: "target", ".git"</li>
+     *   <li>Hidden directories: any directory starting with "."</li>
+     * </ul>
+     * 
+     * @param directory The directory to check
+     * @return true if the directory should be skipped, false otherwise
+     */
+    public static boolean shouldSkip(File directory) {
+        return ModuleDirectoryFilter.shouldSkip(directory);
+    }
+    
+    /**
+     * Checks if a directory name indicates it should be skipped during module discovery.
+     * 
+     * <p>Directories are skipped if they are:
+     * <ul>
+     *   <li>Infrastructure directories: "target", ".git"</li>
+     *   <li>Hidden directories: any directory starting with "."</li>
+     * </ul>
+     * 
+     * @param directoryName The name of the directory to check
+     * @return true if the directory should be skipped, false otherwise
+     */
+    public static boolean shouldSkip(String directoryName) {
+        return ModuleDirectoryFilter.shouldSkip(directoryName);
     }
 }
 

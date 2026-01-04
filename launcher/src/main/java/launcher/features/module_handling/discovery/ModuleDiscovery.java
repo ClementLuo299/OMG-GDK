@@ -4,7 +4,7 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.directory_management.ModuleDirectoryUtil;
+import launcher.features.module_handling.directory_management.ModuleDirectoryValidator;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class ModuleDiscovery {
         try {
             // Find module directory path
             String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            List<File> validModuleDirectories = ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectoryPath);
+            List<File> validModuleDirectories = ModuleDirectoryValidator.getValidModuleDirectories(modulesDirectoryPath);
             
             if (validModuleDirectories.isEmpty()) {
                 Logging.info("Module lookup: No valid modules found");
@@ -104,7 +104,7 @@ public class ModuleDiscovery {
                 return new ArrayList<>();
             }
             
-            List<File> validModuleDirectories = ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectoryPath);
+            List<File> validModuleDirectories = ModuleDirectoryValidator.getValidModuleDirectories(modulesDirectoryPath);
             List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
             
             // Filter out null modules

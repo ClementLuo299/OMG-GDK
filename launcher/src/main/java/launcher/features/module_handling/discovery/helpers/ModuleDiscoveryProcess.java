@@ -1,7 +1,7 @@
 package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.directory_management.ModuleDirectoryUtil;
+import launcher.features.module_handling.directory_management.ModuleDirectoryValidator;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ final class ModuleDiscoveryProcess {
         try {
             // Scan the modules directory and validate each subdirectory as a module
             Logging.info("Starting module discovery...");
-            validModuleDirectories = ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectoryPath);
+            validModuleDirectories = ModuleDirectoryValidator.getValidModuleDirectories(modulesDirectoryPath);
             Logging.info("Module discovery completed. Found " + validModuleDirectories.size() + " valid modules");
             
         } catch (Exception e) {
@@ -60,7 +60,7 @@ final class ModuleDiscoveryProcess {
         
         // Check if modules exist but just need to be compiled
         Logging.info("Checking module compilation status...");
-        ModuleDirectoryUtil.reportModuleCompilationStatus(modulesDirectory);
+        ModuleDirectoryValidator.reportModuleCompilationStatus(modulesDirectory);
     }
 }
 
