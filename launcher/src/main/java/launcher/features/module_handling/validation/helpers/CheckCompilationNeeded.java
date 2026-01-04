@@ -12,9 +12,9 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class CheckCompilationStatus {
+public final class CheckCompilationNeeded {
     
-    private CheckCompilationStatus() {
+    private CheckCompilationNeeded() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

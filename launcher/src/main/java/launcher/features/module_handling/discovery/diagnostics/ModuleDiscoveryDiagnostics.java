@@ -16,9 +16,9 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDiagnostics {
+public final class ModuleDiscoveryDiagnostics {
     
-    private ModuleDiagnostics() {
+    private ModuleDiscoveryDiagnostics() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -51,13 +51,13 @@ public final class ModuleDiagnostics {
             // Step 3: Check if directory exists and is accessible
             if (!CheckDirectoryAccess.check(modulesDirectory)) {
                 // If directory doesn't exist, search common locations
-                SearchCommonLocations.search();
+                SearchCommonLocationsForModuleDirectory.search();
                 Logging.info("=== END DIAGNOSTICS ===");
                 return;
             }
             
             // Step 4: List all directory contents
-            File[] allContents = ListDirectoryContents.list(modulesDirectory);
+            File[] allContents = ListModuleDirectoryContents.list(modulesDirectory);
             if (allContents == null) {
                 Logging.info("=== END DIAGNOSTICS ===");
                 return;

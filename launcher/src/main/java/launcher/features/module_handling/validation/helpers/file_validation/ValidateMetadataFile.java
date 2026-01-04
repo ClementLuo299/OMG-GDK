@@ -1,4 +1,4 @@
-package launcher.features.module_handling.validation.helpers;
+package launcher.features.module_handling.validation.helpers.file_validation;
 
 import gdk.internal.Logging;
 
@@ -11,11 +11,12 @@ import java.nio.file.Files;
  * 
  * @author Clement Luo
  * @date January 3, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class MetadataJavaFileValidator {
+public final class ValidateMetadataFile {
     
-    private MetadataJavaFileValidator() {
+    private ValidateMetadataFile() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -48,7 +49,8 @@ public final class MetadataJavaFileValidator {
                 Logging.warning("File reading timeout for Metadata.java");
                 return false;
             }
-            
+
+            // Check code content
             boolean extendsGameMetadata = content.contains("extends GameMetadata");
             boolean hasGetGameName = content.contains("getGameName()");
             boolean hasGetGameVersion = content.contains("getGameVersion()");

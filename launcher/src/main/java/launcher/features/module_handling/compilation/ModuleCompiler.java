@@ -2,6 +2,7 @@ package launcher.features.module_handling.compilation;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
+import launcher.features.module_handling.validation.helpers.CheckCompilationNeeded;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 
 import java.io.File;
@@ -123,7 +124,7 @@ public class ModuleCompiler {
         
         try {
             // Validate source files first
-            if (!launcher.features.module_handling.validation.ModuleValidator.isValidModuleStructure(moduleDir)) {
+            if (!launcher.features.module_handling.validation.ModuleValidator.isValidModule(moduleDir)) {
                 Logging.info("Module " + moduleName + " has invalid structure");
                 return null;
             }
@@ -477,7 +478,7 @@ public class ModuleCompiler {
                 String moduleName = subdir.getName();
                 
                 Logging.info("Module: " + moduleName);
-                boolean needsCompilation = launcher.features.module_handling.validation.ModuleValidator.moduleNeedsCompilation(subdir);
+                boolean needsCompilation = CheckCompilationNeeded.needsCompilation(subdir);
                 Logging.info("Compilation needed: " + needsCompilation);
                 
                 if (needsCompilation) {

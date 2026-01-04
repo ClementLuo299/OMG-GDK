@@ -1,11 +1,9 @@
 package launcher.features.module_handling.validation;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.validation.helpers.MainJavaFileValidator;
-import launcher.features.module_handling.validation.helpers.MetadataJavaFileValidator;
-import launcher.features.module_handling.validation.helpers.ModuleCompilationChecker;
-import launcher.features.module_handling.validation.helpers.ModuleDiagnostics;
-import launcher.features.module_handling.validation.helpers.ModuleStructureValidator;
+import launcher.features.module_handling.validation.helpers.file_validation.ValidateMainFile;
+import launcher.features.module_handling.validation.helpers.file_validation.ValidateMetadataFile;
+import launcher.features.module_handling.validation.helpers.file_validation.CheckForRequiredFiles;
 
 import java.io.File;
 
@@ -43,21 +41,21 @@ public final class ModuleValidator {
      */
     public static boolean isValidModule(File moduleDir) {
         try {
-            // Check for required files
-            if (!ModuleStructureValidator.hasRequiredFiles(moduleDir)) {
+            // Check for required file structure
+            if (!CheckForRequiredFiles.hasRequiredFiles(moduleDir)) {
                 return false;
             }
             
             // Validate Main.java content
             File mainJavaFile = new File(moduleDir, "src/main/java/Main.java");
-            if (!MainJavaFileValidator.isValid(mainJavaFile)) {
+            if (!ValidateMainFile.isValid(mainJavaFile)) {
                 Logging.info("Module " + moduleDir.getName() + " missing required methods in Main.java");
                 return false;
             }
             
             // Validate Metadata.java content
             File metadataJavaFile = new File(moduleDir, "src/main/java/Metadata.java");
-            if (!MetadataJavaFileValidator.isValid(metadataJavaFile)) {
+            if (!ValidateMetadataFile.isValid(metadataJavaFile)) {
                 Logging.info("Module " + moduleDir.getName() + " missing required methods in Metadata.java");
                 return false;
             }
@@ -67,32 +65,6 @@ public final class ModuleValidator {
             Logging.error("Error validating module " + moduleDir.getName() + ": " + e.getMessage(), e);
             return false;
         }
-    }
-    
-    // ==================== DEPRECATED METHODS - FOR BACKWARD COMPATIBILITY ====================
-    
-    /**
-     * @deprecated Use {@link #isValidModule(File)} instead.
-     */
-    @Deprecated
-    public static boolean isValidModuleStructure(File moduleDir) {
-        return isValidModule(moduleDir);
-    }
-    
-    /**
-     * @deprecated Use {@link launcher.features.module_handling.validation.helpers.ModuleCompilationChecker#needsCompilation(File)} instead.
-     */
-    @Deprecated
-    public static boolean moduleNeedsCompilation(File moduleDir) {
-        return ModuleCompilationChecker.needsCompilation(moduleDir);
-    }
-    
-    /**
-     * @deprecated Use {@link launcher.features.module_handling.validation.helpers.ModuleDiagnostics#diagnoseModuleDetectionIssues(String)} instead.
-     */
-    @Deprecated
-    public static void diagnoseModuleDetectionIssues(String modulesDirectoryPath) {
-        ModuleDiagnostics.diagnoseModuleDetectionIssues(modulesDirectoryPath);
     }
 }
 

@@ -1,7 +1,7 @@
-package launcher.features.module_handling.module_root_scanning.helpers;
+package launcher.features.module_handling.discovery.module_root_scanning.helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
+import launcher.features.module_handling.discovery.module_root_scanning.ScanForModuleFolders;
 
 import java.io.File;
 import java.util.ArrayList;

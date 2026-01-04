@@ -1,4 +1,4 @@
-package launcher.features.module_handling.validation.helpers;
+package launcher.features.module_handling.validation.helpers.file_validation;
 
 import gdk.internal.Logging;
 
@@ -12,11 +12,12 @@ import java.io.File;
  * 
  * @author Clement Luo
  * @date January 3, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleStructureValidator {
+public final class CheckForRequiredFiles {
     
-    private ModuleStructureValidator() {
+    private CheckForRequiredFiles() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

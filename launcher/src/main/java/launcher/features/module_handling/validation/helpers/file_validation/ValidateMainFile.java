@@ -1,4 +1,4 @@
-package launcher.features.module_handling.validation.helpers;
+package launcher.features.module_handling.validation.helpers.file_validation;
 
 import gdk.internal.Logging;
 
@@ -11,11 +11,12 @@ import java.nio.file.Files;
  * 
  * @author Clement Luo
  * @date January 3, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class MainJavaFileValidator {
+public final class ValidateMainFile {
     
-    private MainJavaFileValidator() {
+    private ValidateMainFile() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -46,7 +47,8 @@ public final class MainJavaFileValidator {
                 Logging.warning("File reading timeout for Main.java");
                 return false;
             }
-            
+
+            // Check code content
             boolean implementsGameModule = content.contains("implements GameModule");
             boolean hasClassMain = content.contains("class Main");
             return implementsGameModule && hasClassMain;

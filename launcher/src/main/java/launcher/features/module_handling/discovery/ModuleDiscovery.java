@@ -4,8 +4,9 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
+import launcher.features.module_handling.discovery.module_root_scanning.ScanForModuleFolders;
 import launcher.features.module_handling.validation.ModuleValidator;
+import launcher.features.module_handling.discovery.diagnostics.ModuleDiscoveryDiagnostics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public final class ModuleDiscovery {
             // Filter to only valid module structures
             List<File> validModuleDirectories = new ArrayList<>();
             for (File folder : moduleDirectories) {
-                if (launcher.features.module_handling.validation.ModuleValidator.isValidModuleStructure(folder)) {
+                if (launcher.features.module_handling.validation.ModuleValidator.isValidModule(folder)) {
                     validModuleDirectories.add(folder);
                 }
             }
@@ -232,7 +233,7 @@ public final class ModuleDiscovery {
             Logging.info("Validating " + moduleDirectories.size() + " module folders...");
             for (File moduleFolder : moduleDirectories) {
                 try {
-                    if (ModuleValidator.isValidModuleStructure(moduleFolder)) {
+                    if (ModuleValidator.isValidModule(moduleFolder)) {
                         validModuleDirectories.add(moduleFolder);
                         Logging.info("Valid module found: " + moduleFolder.getName());
                     } else {
@@ -250,7 +251,7 @@ public final class ModuleDiscovery {
             // If discovery fails (e.g., file system error), log and run diagnostics
             Logging.error("Module discovery failed: " + e.getMessage(), e);
             e.printStackTrace();
-            ModuleValidator.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+            ModuleDiscoveryDiagnostics.runModuleDetectionDiagnostics(modulesDirectoryPath);
         }
         
         // Return list of valid module directories (empty if none found or on error)
@@ -266,7 +267,7 @@ public final class ModuleDiscovery {
     private static void runEmptyDiscoveryDiagnostics(File modulesDirectory, String modulesDirectoryPath) {
         // Run comprehensive diagnostics to help identify why no modules were found
         Logging.warning("No valid modules found - running diagnostics...");
-        ModuleValidator.diagnoseModuleDetectionIssues(modulesDirectoryPath);
+        ModuleDiscoveryDiagnostics.runModuleDetectionDiagnostics(modulesDirectoryPath);
         
         // Check if modules exist but just need to be compiled
         Logging.info("Checking module compilation status...");
