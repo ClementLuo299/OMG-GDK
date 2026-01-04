@@ -4,7 +4,7 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.main_module_directory.ModuleFolderFinder;
+import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class ModuleDiscovery {
         try {
             // Find module directory path
             String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            List<File> moduleDirectories = ModuleFolderFinder.getModuleDirectories(modulesDirectoryPath);
+            List<File> moduleDirectories = ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
             
             if (moduleDirectories.isEmpty()) {
                 Logging.info("Module lookup: No module directories found");
@@ -99,7 +99,7 @@ public class ModuleDiscovery {
             Logging.info("Scanning for modules in: " + modulesDirectoryPath);
             
             // Get all module directories (checks access internally)
-            List<File> moduleDirectories = ModuleFolderFinder.getModuleDirectories(modulesDirectoryPath);
+            List<File> moduleDirectories = ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
             
             if (moduleDirectories.isEmpty()) {
                 Logging.error("No module directories found or directory not accessible: " + modulesDirectoryPath);

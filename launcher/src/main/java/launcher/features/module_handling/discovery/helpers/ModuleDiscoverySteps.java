@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.main_module_directory.ModuleFolderFinder;
+import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public final class ModuleDiscoverySteps {
     public static DiscoveryResult discover() {
         // Step 1: Get all module directories (checks access internally)
         String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-        List<File> moduleDirectories = ModuleFolderFinder.getModuleDirectories(modulesDirectoryPath);
+        List<File> moduleDirectories = ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
         
         File modulesDirectory = new File(modulesDirectoryPath);
         

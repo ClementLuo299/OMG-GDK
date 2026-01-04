@@ -1,13 +1,13 @@
-package launcher.features.module_handling.main_module_directory;
+package launcher.features.module_handling.module_root_scanning;
 
 import launcher.features.file_paths.DirectoryAccessCheck;
-import launcher.features.module_handling.main_module_directory.helpers.ModuleDirectoryFinder;
+import launcher.features.module_handling.module_root_scanning.helpers.ModuleFolderFinder;
 
 import java.io.File;
 import java.util.List;
 
 /**
- * Public API for module directory management operations.
+ * Finds the folders for individual game modules.
  * 
  * <p>This class handles the main modules directory. Given a path, it checks
  * if the directory is accessible and returns all possible module folders within it.
@@ -20,9 +20,9 @@ import java.util.List;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleFolderFinder {
+public final class ScanForModuleFolders {
     
-    private ModuleFolderFinder() {
+    private ScanForModuleFolders() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -39,14 +39,14 @@ public final class ModuleFolderFinder {
      * @return List of all possible module directories (excluding infrastructure directories),
      *         or empty list if the directory is not accessible
      */
-    public static List<File> getModuleDirectories(String modulesDirectoryPath) {
+    public static List<File> findModuleFolders(String modulesDirectoryPath) {
         // Check access first
         if (!DirectoryAccessCheck.checkAccess(modulesDirectoryPath)) {
             return new java.util.ArrayList<>();
         }
         
         // If accessible, find and return all module folders
-        return ModuleDirectoryFinder.findModuleFolders(modulesDirectoryPath);
+        return ModuleFolderFinder.findModuleFolders(modulesDirectoryPath);
     }
 }
 

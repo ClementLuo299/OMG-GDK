@@ -1,4 +1,6 @@
-package launcher.features.module_handling.main_module_directory.helpers;
+package launcher.features.module_handling.module_root_scanning.helpers;
+
+import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 
 import java.io.File;
 
@@ -9,8 +11,8 @@ import java.io.File;
  * infrastructure directories (like "target") and hidden directories (any directory
  * starting with ".") that are not actual game modules.
  * 
- * <p>This class is internal to the main_module_directory package. External code
- * should use {@link launcher.features.module_handling.main_module_directory.ModuleFolderFinder}
+ * <p>This class is internal to the module_root_scanning package. External code
+ * should use {@link ScanForModuleFolders}
  * as the public API for directory management operations.
  * 
  * @author Clement Luo
@@ -18,9 +20,9 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-final class ModuleDirectoryFilter {
+final class ModuleFolderFilter {
     
-    private ModuleDirectoryFilter() {
+    private ModuleFolderFilter() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

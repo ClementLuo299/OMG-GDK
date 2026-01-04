@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.discovery.ModuleFolderFilter;
-import launcher.features.module_handling.main_module_directory.ModuleFolderFinder;
+import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 
 import java.io.File;
 
@@ -14,7 +14,7 @@ import java.io.File;
  * operation that determines how many valid modules exist.
  * 
  * <p>This class is internal to the module handling system. External code should use 
- * {@link launcher.features.module_handling.main_module_directory.ModuleFolderFinder}
+ * {@link ScanForModuleFolders}
  * as the public API for directory management operations.
  * 
  * @author Clement Luo
