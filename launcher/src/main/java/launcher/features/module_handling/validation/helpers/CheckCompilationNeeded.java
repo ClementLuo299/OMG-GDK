@@ -5,15 +5,16 @@ import gdk.internal.Logging;
 import java.io.File;
 
 /**
- * Helper class for checking module compilation status.
+ * Checks if a module needs to be compiled.
  * 
  * @author Clement Luo
  * @date January 3, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleCompilationChecker {
+public final class CheckCompilationStatus {
     
-    private ModuleCompilationChecker() {
+    private CheckCompilationStatus() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -36,12 +37,12 @@ public final class ModuleCompilationChecker {
             File mainClassFile = new File(targetClassesDir, "Main.class");
             
             if (!targetClassesDir.exists()) {
-                Logging.info("📁 Module " + moduleDir.getName() + " missing target/classes directory");
+                Logging.info("Module " + moduleDir.getName() + " missing target/classes directory");
                 return true;
             }
             
             if (!mainClassFile.exists()) {
-                Logging.info("📄 Module " + moduleDir.getName() + " missing Main.class");
+                Logging.info("Module " + moduleDir.getName() + " missing Main.class");
                 return true;
             }
             
@@ -50,16 +51,16 @@ public final class ModuleCompilationChecker {
             
             if (mainJavaFile.exists() && mainClassFile.exists()) {
                 if (mainJavaFile.lastModified() > mainClassFile.lastModified()) {
-                    Logging.info("📝 Module " + moduleDir.getName() + " source files are newer than compiled classes");
+                    Logging.info("Module " + moduleDir.getName() + " source files are newer than compiled classes");
                     return true;
                 }
             }
             
-            Logging.info("✅ Module " + moduleDir.getName() + " is compiled and up to date");
+            Logging.info("Module " + moduleDir.getName() + " is compiled and up to date");
             return false;
             
         } catch (Exception e) {
-            Logging.error("💥 Error checking compilation status for " + moduleDir.getName() + ": " + e.getMessage());
+            Logging.error("Error checking compilation status for " + moduleDir.getName() + ": " + e.getMessage());
             return true; // Assume compilation is needed if we can't check
         }
     }
