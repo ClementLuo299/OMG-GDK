@@ -1,6 +1,6 @@
 package launcher.features.module_handling.main_module_directory;
 
-import launcher.features.module_handling.main_module_directory.helpers.ModuleDirectoryAccessCheck;
+import launcher.features.file_paths.DirectoryAccessCheck;
 import launcher.features.module_handling.main_module_directory.helpers.ModuleDirectoryFinder;
 
 import java.io.File;
@@ -41,7 +41,7 @@ public final class ModuleFolderFinder {
      */
     public static List<File> getModuleDirectories(String modulesDirectoryPath) {
         // Check access first
-        if (!ModuleDirectoryAccessCheck.checkAccess(modulesDirectoryPath)) {
+        if (!DirectoryAccessCheck.checkAccess(modulesDirectoryPath)) {
             return new java.util.ArrayList<>();
         }
         

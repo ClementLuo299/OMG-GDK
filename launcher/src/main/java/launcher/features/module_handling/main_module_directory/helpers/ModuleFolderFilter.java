@@ -3,9 +3,9 @@ package launcher.features.module_handling.main_module_directory.helpers;
 import java.io.File;
 
 /**
- * Internal filter for the main modules directory.
+ * Internal filter for the main modules' directory.
  * 
- * <p>This filter is used when scanning the main modules directory to skip
+ * <p>This filter is used when scanning the modules directory to skip
  * infrastructure directories (like "target") and hidden directories (any directory
  * starting with ".") that are not actual game modules.
  * 
