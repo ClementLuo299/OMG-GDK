@@ -2,7 +2,7 @@ package launcher.features.module_handling.on_app_start.helpers.thread_tasks_help
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
+import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public final class ModuleLoadingSteps {
      * @param discoveryResult The result from module discovery
      * @return List of successfully loaded GameModule instances
      */
-    public static List<GameModule> executeLoading(ModuleDiscoverySteps.DiscoveryResult discoveryResult) {
+    public static List<GameModule> executeLoading(ModuleDiscovery.DiscoveryResult discoveryResult) {
         // Step 1: Check if there are any modules to load
         if (!discoveryResult.isSuccess() || discoveryResult.getValidModuleDirectories().isEmpty()) {
             Logging.info("No modules to load - skipping loading workflow");

@@ -1,7 +1,7 @@
 package launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.helpers.ModuleDiscoverySteps;
+import launcher.features.module_handling.discovery.ModuleDiscovery;
 
 /**
  * Orchestrates the startup workflow phases.
@@ -29,8 +29,8 @@ public final class LoadModules {
             ModuleLoadingSteps.initializeModuleLoading();
             
             // Step 2: Discover available modules in the modules directory
-            ModuleDiscoverySteps.DiscoveryResult discoveryResult = 
-                ModuleDiscoverySteps.discover();
+            ModuleDiscovery.DiscoveryResult discoveryResult = 
+                ModuleDiscovery.discoverModuleDirectories();
             
             // Step 3: Handle discovery results
             if (!discoveryResult.isSuccess()) {

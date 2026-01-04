@@ -2,7 +2,6 @@ package launcher.features.module_handling.compilation;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
-import launcher.features.module_handling.discovery.ModuleFolderFilter;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 
 import java.io.File;
@@ -470,7 +469,8 @@ public class ModuleCompiler {
             
             for (File subdir : subdirs) {
                 // Skip infrastructure and hidden directories
-                if (ModuleFolderFilter.shouldSkip(subdir)) {
+                String dirName = subdir.getName();
+                if (dirName.equals("target") || dirName.startsWith(".")) {
                     continue;
                 }
                 
