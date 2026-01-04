@@ -17,15 +17,11 @@ import java.util.Set;
  *   <li>Filtering and validating module lists</li>
  *   <li>Collecting module names from collections</li>
  * </ul>
- * 
- * <p>This class does NOT handle:
- * <ul>
- *   <li>Module discovery or loading (see ModuleDiscovery)</li>
- *   <li>Module compilation (see ModuleCompiler)</li>
- * </ul>
+ *
  * 
  * @author Clement Luo
  * @date January 2, 2026
+ * @edited January 4, 2026
  * @since Beta 1.0
  */
 public final class ModuleMetadataExtractor {
@@ -129,7 +125,7 @@ public final class ModuleMetadataExtractor {
     // ==================== INNER CLASSES ====================
     
     /**
-     * Result object containing module discovery information.
+     * Result object containing module searching information.
      */
     public static class ModuleDiscoveryResult {
         /** Set of discovered module names. */

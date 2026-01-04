@@ -1,8 +1,12 @@
-package launcher.features.module_handling.compilation.helpers;
+package launcher.features.module_handling.loading.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.compilation.LoadModules;
+import launcher.features.module_handling.loading.LoadModules;
+import launcher.features.module_handling.loading.helpers.module_loading_steps.CreateClassLoader;
+import launcher.features.module_handling.loading.helpers.module_loading_steps.InstantiateModule;
+import launcher.features.module_handling.loading.helpers.module_loading_steps.LoadMainClass;
+import launcher.features.module_handling.loading.helpers.module_loading_steps.PreLoadValidator;
 import launcher.features.module_handling.module_target_validation.ModuleTargetValidator;
 
 import java.io.File;
@@ -22,12 +26,12 @@ import javafx.application.Platform;
  * 
  * @author Clement Luo
  * @date January 3, 2026
- * @edited January 3, 2026
+ * @edited January 4, 2026
  * @since Beta 1.0
  */
-public final class ModuleLoader {
+public final class ModuleLoadingProcess {
     
-    private ModuleLoader() {
+    private ModuleLoadingProcess() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -73,7 +77,7 @@ public final class ModuleLoader {
             //   - Source files are valid (Main.java, Metadata.java exist and have correct structure)
             //   - Compiled classes exist (target/classes/Main.class exists)
             // If either check fails, we can't load the module, so return early
-            if (!ModuleValidator.preLoadCheck(moduleDir)) {
+            if (!PreLoadValidator.preLoadCheck(moduleDir)) {
                 Logging.info("Module " + moduleName + " failed pre-load validation");
                 return null;
             }
@@ -105,93 +109,26 @@ public final class ModuleLoader {
             // ========================================================================
             // STEP 4: Load the Main class from bytecode into memory
             // ========================================================================
-            // This is where the actual class loading happens:
-            //   - The ClassLoader reads Main.class from disk
-            //   - Parses the bytecode and creates a Class<?> object
-            //   - Resolves any dependencies (other classes, interfaces, etc.)
-            //   - Executes static initializers if present
-            Logging.info("📥 Loading Main class for module: " + moduleName);
-            Logging.info("   Elapsed time: " + (System.currentTimeMillis() - startTime) + "ms");
-            
-            // JavaFX check: Some modules may use JavaFX, so we verify the platform is accessible
-            // This helps diagnose issues if JavaFX isn't properly initialized
-            Logging.info("   JavaFX Platform check - on FX thread: " + Platform.isFxApplicationThread());
-            try {
-                // This will throw if JavaFX is not initialized
-                Platform.isFxApplicationThread();
-            } catch (Exception javafxCheck) {
-                Logging.warning("   JavaFX Platform might not be initialized: " + javafxCheck.getMessage());
+            Class<?> mainClass = LoadMainClass.load(classLoader, moduleDir, moduleName, startTime);
+            if (mainClass == null) {
+                return null; // Error already logged in LoadMainClass
             }
             
-            Class<?> mainClass;
-            try {
-                // Actually load the class - this is where most errors occur
-                Logging.info("   Attempting to load class 'Main'...");
-                long classLoadStart = System.currentTimeMillis();
-                mainClass = classLoader.loadClass("Main");
-                long classLoadTime = System.currentTimeMillis() - classLoadStart;
-                Logging.info("✅ Main class loaded successfully for module: " + moduleName + " (took " + classLoadTime + "ms)");
-                Logging.info("   Class name: " + mainClass.getName());
-                Logging.info("   Class loader: " + mainClass.getClassLoader().getClass().getName());
-                
-            } catch (ClassNotFoundException e) {
-                // The Main.class file doesn't exist or can't be found by the ClassLoader
-                // This usually means compilation failed or the file is in the wrong location
-                Logging.error("❌ Main class not found for module " + moduleName + ": " + e.getMessage(), e);
-                
-                // Diagnostic: List what class files actually exist to help debug
-                try {
-                    File classesDir = new File(moduleDir, "target/classes");
-                    if (classesDir.exists()) {
-                        Logging.info("🔍 Checking for classes in: " + classesDir.getAbsolutePath());
-                        java.nio.file.Files.walk(classesDir.toPath())
-                            .filter(p -> p.toString().endsWith(".class"))
-                            .forEach(p -> Logging.info("   Found class file: " + p.toString()));
-                    }
-                } catch (Exception listError) {
-                    Logging.error("Error listing classes: " + listError.getMessage());
-                }
-                return null;
-                
-            } catch (NoClassDefFoundError e) {
-                // A dependency of Main.class is missing from the classpath
-                // This usually means a required library (like GDK or JavaFX) isn't available
-                Logging.error("❌ Class definition not found for module " + moduleName + ": " + e.getMessage(), e);
-                Logging.error("   This usually means a dependency is missing from the classpath");
-                e.printStackTrace();
-                return null;
-                
-            } catch (ExceptionInInitializerError e) {
-                // Main.class has a static initializer block that threw an exception
-                // This happens when static code in the class fails during loading
-                Logging.error("❌ Static initializer error for module " + moduleName + ": " + e.getMessage(), e);
-                Logging.error("   This means the class has a static initializer that failed");
-                if (e.getException() != null) {
-                    Logging.error("   Caused by: " + e.getException().getMessage(), e.getException());
-                }
-                e.printStackTrace();
-                return null;
-                
-            } catch (Exception e) {
-                // Catch-all for any other unexpected errors during class loading
-                Logging.error("❌ Error loading Main class for module " + moduleName + ": " + e.getMessage(), e);
-                Logging.error("   Exception type: " + e.getClass().getName());
-                e.printStackTrace();
+            // Check timeout after class loading
+            if (System.currentTimeMillis() - startTime > timeout) {
+                Logging.warning("Module loading timeout for " + moduleName);
                 return null;
             }
             
             // ========================================================================
             // STEP 5: Post-load validation - verify the loaded class is valid
             // ========================================================================
-            // Now that the class is loaded, we verify it implements the GameModule interface
-            // This uses reflection to check if the class implements GameModule
-            // We can't do this check before loading because we need the Class object
             if (!ModuleTargetValidator.postLoadCheck(mainClass)) {
                 Logging.info("Main class validation failed for " + moduleName + " - does not implement GameModule");
                 return null;
             }
             
-            // Check timeout after class loading and validation
+            // Check timeout after validation
             if (System.currentTimeMillis() - startTime > timeout) {
                 Logging.warning("Module loading timeout for " + moduleName);
                 return null;
@@ -200,29 +137,7 @@ public final class ModuleLoader {
             // ========================================================================
             // STEP 6: Instantiate the GameModule
             // ========================================================================
-            // Finally, create an instance of the Main class by calling its no-arg constructor
-            // We can safely cast to GameModule because we validated it in step 5
-            // This is where the module's constructor runs, so any initialization code executes here
-            Logging.info("🎯 Instantiating Main class for module: " + moduleName);
-            try {
-                // Use reflection to call the no-argument constructor
-                // This will fail if the class doesn't have a no-arg constructor or if
-                // the constructor throws an exception
-                GameModule module = (GameModule) mainClass.getDeclaredConstructor().newInstance();
-                Logging.info("✅ Instance created for module: " + moduleName);
-                
-                // Verify we can access the module's metadata (sanity check)
-                String gameName = module.getMetadata().getGameName();
-                Logging.info("✅ Successfully loaded module: " + moduleName + " (Game: " + gameName + ")");
-                return module;
-                
-            } catch (Exception instantiationError) {
-                // Constructor failed - could be missing no-arg constructor, constructor threw exception, etc.
-                Logging.error("❌ Failed to instantiate Main class for module " + moduleName + ": " + 
-                    instantiationError.getMessage(), instantiationError);
-                instantiationError.printStackTrace();
-                return null;
-            }
+            return InstantiateModule.instantiate(mainClass, moduleName);
             
         } catch (Exception e) {
             // Catch-all for any unexpected errors in the entire loading process

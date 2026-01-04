@@ -1,7 +1,7 @@
-package launcher.features.module_handling.compilation;
+package launcher.features.module_handling.loading;
 
 import gdk.api.GameModule;
-import launcher.features.module_handling.compilation.helpers.ModuleLoader;
+import launcher.features.module_handling.loading.helpers.ModuleLoadingProcess;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public final class LoadModules {
         }
         
         /**
-         * Gets the list of compilation failures.
+         * Gets the list of loading failures.
          * 
          * @return Unmodifiable list of module names that failed to compile or load
          */
@@ -85,7 +85,7 @@ public final class LoadModules {
      * @return The loaded GameModule instance, or null if loading failed
      */
     public static GameModule loadModule(File moduleDir) {
-        return ModuleLoader.loadModule(moduleDir);
+        return ModuleLoadingProcess.loadModule(moduleDir);
     }
     
     /**
@@ -96,10 +96,10 @@ public final class LoadModules {
      * module availability.
      * 
      * @param moduleDirectories List of module directories to load
-     * @return ModuleLoadResult containing loaded modules and compilation failures
+     * @return ModuleLoadResult containing loaded modules and loading failures
      */
     public static ModuleLoadResult loadModules(List<File> moduleDirectories) {
-        return ModuleLoader.loadModules(moduleDirectories);
+        return ModuleLoadingProcess.loadModules(moduleDirectories);
     }
 }
 
