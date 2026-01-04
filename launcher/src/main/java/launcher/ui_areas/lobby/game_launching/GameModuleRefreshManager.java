@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.ModuleDiscovery;
+import launcher.features.module_handling.load_modules.LoadModules;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
@@ -21,9 +21,9 @@ import java.util.Set;
  * 
  * <p>This manager handles two types of refresh operations:
  * <ul>
- *   <li><b>Full refresh</b> ({@link #handleRefresh()}): Performs complete module discovery
- *       with compilation checks, typically triggered by user clicking the refresh button.</li>
- *   <li><b>Fast refresh</b> ({@link #refreshAvailableGameModulesFast()}): Skips compilation
+ *   <li><b>Full refresh</b> ({@link #handleRefresh()}): Performs complete module module_finding
+ *       with load_modules checks, typically triggered by user clicking the refresh button.</li>
+ *   <li><b>Fast refresh</b> ({@link #refreshAvailableGameModulesFast()}): Skips load_modules
  *       checks for faster startup performance.</li>
  * </ul>
  * 
@@ -39,7 +39,7 @@ public class GameModuleRefreshManager {
     
     // ==================== DEPENDENCIES ====================
     
-    /** Handler for module discovery operations. */
+    /** Handler for module module_finding operations. */
     private final ModuleDiscoveryHandler moduleDiscoveryHandler;
     
     /** Updater for UI components during refresh. */
@@ -54,7 +54,7 @@ public class GameModuleRefreshManager {
     /** Manager for ui_loading animation display. */
     private final LoadingAnimationManager loadingAnimationManager;
     
-    /** Checker for module compilation failures. */
+    /** Checker for module load_modules failures. */
     private final ModuleCompilationChecker moduleCompilationChecker;
     
     // ==================== STATE ====================
@@ -77,7 +77,7 @@ public class GameModuleRefreshManager {
      * @param launchButtonManager The launch button manager for button state
      * @param moduleChangeReporter The module change reporter for change notifications
      * @param loadingAnimationManager The ui_loading animation manager
-     * @param moduleCompilationChecker The module compilation checker
+     * @param moduleCompilationChecker The module load_modules checker
      */
     public GameModuleRefreshManager(
             ObservableList<GameModule> availableGameModules,
@@ -106,7 +106,7 @@ public class GameModuleRefreshManager {
      * 
      * <p>Performs a full refresh operation that includes:
      * <ul>
-     *   <li>Module discovery and ui_loading</li>
+     *   <li>Module module_finding and ui_loading</li>
      *   <li>Compilation failure checks</li>
      *   <li>UI updates (ComboBox, status labels, messages)</li>
      *   <li>Change detection and reporting</li>
@@ -140,11 +140,11 @@ public class GameModuleRefreshManager {
     }
     
     /**
-     * Performs a fast refresh that skips compilation checks for faster startup.
+     * Performs a fast refresh that skips load_modules checks for faster startup.
      * 
      * <p>This method is optimized for startup performance and:
      * <ul>
-     *   <li>Skips compilation failure checks</li>
+     *   <li>Skips load_modules failure checks</li>
      *   <li>Updates UI components with discovered modules</li>
      *   <li>Reports module changes if this is not the first load</li>
      * </ul>
@@ -198,7 +198,7 @@ public class GameModuleRefreshManager {
         Set<String> previousModuleNames = moduleDiscoveryHandler.extractModuleNames(previousModulesSnapshot, previousCountSnapshot);
 
         // Discover and load modules using ViewModel (with failures)
-        ModuleDiscovery.ModuleLoadResult discoveryResult = moduleDiscoveryHandler.discoverModulesWithFailures(uiUpdater.availableGameModules.size());
+        LoadModules.ModuleLoadResult discoveryResult = moduleDiscoveryHandler.discoverModulesWithFailures(uiUpdater.availableGameModules.size());
         
         if (discoveryResult == null) {
             return;
@@ -209,7 +209,7 @@ public class GameModuleRefreshManager {
         // Log and report discovered modules
         moduleDiscoveryHandler.reportDiscoveredModules(discoveredGameModules, previousCountSnapshot);
         
-        // Check for compilation failures and report them
+        // Check for load_modules failures and report them
         checkAndReportCompilationFailures(discoveryResult.getCompilationFailures());
         
         // Update ComboBox UI on JavaFX steps
@@ -224,7 +224,7 @@ public class GameModuleRefreshManager {
     }
     
     /**
-     * Checks for compilation failures and reports them to the user.
+     * Checks for load_modules failures and reports them to the user.
      * 
      * @param compilationFailures List of module names that failed to compile
      */

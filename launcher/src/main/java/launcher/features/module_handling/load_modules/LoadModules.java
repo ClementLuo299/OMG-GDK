@@ -1,7 +1,7 @@
-package launcher.features.module_handling.loading;
+package launcher.features.module_handling.load_modules;
 
 import gdk.api.GameModule;
-import launcher.features.module_handling.loading.helpers.ModuleLoadingProcess;
+import launcher.features.module_handling.load_modules.helpers.ModuleLoadingProcess;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,12 +11,12 @@ import java.util.List;
 /**
  * Load modules given its/their directory.
  * 
- * <p>This class provides methods for loading modules from compiled classes.
- * It handles the complete module loading process including validation, class loading,
+ * <p>This class provides methods for load_modules modules from compiled classes.
+ * It handles the complete module load_modules process including validation, class load_modules,
  * and instantiation.
  * 
  * <p>All other classes in this package are internal implementation details.
- * External code should only use this class for module loading operations.
+ * External code should only use this class for module load_modules operations.
  *
  * @author Clement Luo
  * @date August 8, 2025
@@ -55,7 +55,7 @@ public final class LoadModules {
         }
         
         /**
-         * Gets the list of loading failures.
+         * Gets the list of load_modules failures.
          * 
          * @return Unmodifiable list of module names that failed to compile or load
          */
@@ -69,7 +69,7 @@ public final class LoadModules {
     /**
      * Loads a module from its compiled classes.
      * 
-     * <p>This method performs the complete module loading process:
+     * <p>This method performs the complete module load_modules process:
      * <ol>
      *   <li>Validates module structure</li>
      *   <li>Checks for compiled classes</li>
@@ -82,7 +82,7 @@ public final class LoadModules {
      * initialization issues.
      * 
      * @param moduleDir The module directory
-     * @return The loaded GameModule instance, or null if loading failed
+     * @return The loaded GameModule instance, or null if load_modules failed
      */
     public static GameModule loadModule(File moduleDir) {
         return ModuleLoadingProcess.loadModule(moduleDir);
@@ -92,11 +92,11 @@ public final class LoadModules {
      * Loads multiple modules from their compiled classes.
      * 
      * <p>This method loads multiple modules sequentially with timeout protection.
-     * It continues loading other modules even if one fails, ensuring maximum
+     * It continues load_modules other modules even if one fails, ensuring maximum
      * module availability.
      * 
      * @param moduleDirectories List of module directories to load
-     * @return ModuleLoadResult containing loaded modules and loading failures
+     * @return ModuleLoadResult containing loaded modules and load_modules failures
      */
     public static ModuleLoadResult loadModules(List<File> moduleDirectories) {
         return ModuleLoadingProcess.loadModules(moduleDirectories);

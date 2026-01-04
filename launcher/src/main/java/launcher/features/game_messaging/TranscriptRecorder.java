@@ -55,7 +55,7 @@ public final class TranscriptRecorder {
     // ==================== PUBLIC METHODS - SESSION MANAGEMENT ====================
     
     /**
-     * Starts a basic transcript session without game metadata.
+     * Starts a basic transcript session without game extract_metadata.
      * 
      * <p>This method initializes a new transcript session and clears any
      * previous entries. A session init meta entry is added to the transcript.
@@ -74,7 +74,7 @@ public final class TranscriptRecorder {
     }
     
     /**
-     * Starts a transcript session with game metadata.
+     * Starts a transcript session with game extract_metadata.
      * 
      * <p>This method initializes a new transcript session with game information
      * and clears any previous entries. A session init meta entry is added
@@ -775,7 +775,7 @@ public final class TranscriptRecorder {
             case "ack": return "acknowledgment";
             case "message": return "player_communication";
             case "chat": return "chat_message";
-            case "metadata": return "metadata_request";
+            case "extract_metadata": return "metadata_request";
             default: return "other";
         }
     }
@@ -834,7 +834,7 @@ public final class TranscriptRecorder {
                     chatFrom != null ? chatFrom : "unknown", 
                     chatText != null ? chatText : "no content");
                     
-            case "metadata":
+            case "extract_metadata":
                 return "Metadata request";
                 
             default:

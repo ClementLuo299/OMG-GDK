@@ -63,7 +63,7 @@ public class DependentManagerFactory {
      * @param launchButtonManager The launch button manager (already created by BasicManagerFactory)
      * @param moduleChangeReporter The module change reporter (already created by BasicManagerFactory)
      * @param loadingAnimationManager The ui_loading animation manager (already created by BasicManagerFactory)
-     * @param moduleCompilationChecker The module compilation checker (already created by BasicManagerFactory)
+     * @param moduleCompilationChecker The module load_modules checker (already created by BasicManagerFactory)
      * @param gameLaunchErrorHandler The game launch error handler (already created by BasicManagerFactory)
      * @param jsonPersistenceManager The JSON persistence manager (already created by BasicManagerFactory)
      * @return Result containing only the dependent more_managers created by this factory

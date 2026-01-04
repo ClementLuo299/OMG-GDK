@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Abstract base class for game metadata.
+ * Abstract base class for game extract_metadata.
  * Each game module extends this class to describe its unique configuration,
  * including supported modes, player counts, and difficulty levels.
  *
@@ -78,10 +78,10 @@ public abstract class GameMetadata {
     // ==================== SERIALIZATION HELPERS ====================
 
     /**
-     * Converts this metadata into a map structure for display or debugging.
+     * Converts this extract_metadata into a map structure for display or debugging.
      * Ideal for internal tools or UI elements.
      *
-     * @return A map representation of the game's metadata
+     * @return A map representation of the game's extract_metadata
      */
     public Map<String, Object> toMap() {
         Map<String, Object> metadata = new HashMap<>();

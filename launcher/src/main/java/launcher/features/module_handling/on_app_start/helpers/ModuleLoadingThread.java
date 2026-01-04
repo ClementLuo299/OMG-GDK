@@ -41,7 +41,7 @@ public final class ModuleLoadingThread {
                 // Phase 1: Load all game modules
                 LoadModules.loadModules();
                 
-                // Phase 2: Check for compilation issues
+                // Phase 2: Check for load_modules issues
                 CompilationChecker.checkForCompilationIssues(lobbyController);
                 
                 // Phase 3: Update UI with loaded games

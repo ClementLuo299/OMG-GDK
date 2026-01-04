@@ -35,7 +35,7 @@ public class StartupWindowBuilder {
      * @return A new StartupWindow instance
      */
     public static StartupWindow build() {
-        System.out.println("Creating startup loading window");
+        System.out.println("Creating startup load_modules window");
         System.out.println("Using font: " + Font.getCurrentFontFamily());
         
         // Create and configure the main JFrame with transparency
@@ -62,7 +62,7 @@ public class StartupWindowBuilder {
         // Pack and center the window on screen
         WindowPositioner.position(frame);
         
-        System.out.println("Startup loading window created");
+        System.out.println("Startup load_modules window created");
         
         // Create and return the StartupWindow
         return new StartupWindow(frame, spinner, spinnerController);

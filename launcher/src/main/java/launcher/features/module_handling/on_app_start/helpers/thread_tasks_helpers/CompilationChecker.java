@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Checks for compilation failures and displays warnings.
+ * Checks for load_modules failures and displays warnings.
  * Handles both Swing EDT (progress updates) and JavaFX steps (controller checks).
  * 
  * @author Clement Luo
@@ -18,13 +18,13 @@ import java.util.List;
  */
 public final class CompilationChecker {
     
-    /** Temporary storage for compilation failures from startup loading. */
+    /** Temporary storage for load_modules failures from startup load_modules. */
     private static List<String> startupFailures = new ArrayList<>();
     
     private CompilationChecker() {}
     
     /**
-     * Stores compilation failures from startup loading for later reporting.
+     * Stores load_modules failures from startup load_modules for later reporting.
      * 
      * @param failures List of module names that failed to compile
      */
@@ -33,23 +33,23 @@ public final class CompilationChecker {
     }
     
     /**
-     * Checks for compilation failures and displays warnings if needed.
+     * Checks for load_modules failures and displays warnings if needed.
      * The controller check must run on the JavaFX steps.
      * 
      * @param lobbyController The controller to check for issues
      */
     public static void checkForCompilationIssues(GDKGameLobbyController lobbyController) {
-        // Check for compilation failures (must run on JavaFX steps for controller access)
+        // Check for load_modules failures (must run on JavaFX steps for controller access)
         Platform.runLater(() -> {
             try {
                 if (lobbyController != null) {
-                    // Report failures from startup loading
+                    // Report failures from startup load_modules
                     lobbyController.reportStartupCompilationFailures(startupFailures);
                     // Clear stored failures after reporting
                     startupFailures.clear();
                 }
             } catch (Exception e) {
-                Logging.error("Error checking compilation issues: " + e.getMessage());
+                Logging.error("Error checking load_modules issues: " + e.getMessage());
             }
         });
     }

@@ -44,9 +44,9 @@ public interface GameModule {
     }
 
     /**
-     * Returns the metadata for this game module.
+     * Returns the extract_metadata for this game module.
      * 
-     * @return The game metadata describing the module's configuration
+     * @return The game extract_metadata describing the module's configuration
      */
     GameMetadata getMetadata();
 }

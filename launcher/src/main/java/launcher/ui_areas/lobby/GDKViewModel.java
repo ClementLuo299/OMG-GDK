@@ -15,6 +15,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 
 import java.net.URL;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import launcher.ui_areas.server_simulator.ServerSimulatorController;
 
@@ -25,11 +28,11 @@ import com.fasterxml.jackson.databind.ObjectWriter;
  * ViewModel for the GDK application that manages application state and business logic.
  * 
  * This class serves as the central data and logic layer for the GDK application.
- * It manages the application state, handles game module discovery and ui_loading,
+ * It manages the application state, handles game module module_finding and ui_loading,
  * coordinates between the UI and game modules, and manages the server simulator.
  * 
  * Key responsibilities:
- * - Handle game module discovery and ui_loading
+ * - Handle game module module_finding and ui_loading
  * - Coordinate game launching and management
  * - Manage server simulator lifecycle
  * - Handle application cleanup and shutdown
@@ -95,7 +98,7 @@ public class GDKViewModel {
     
     /**
      * Create a new GDK ViewModel with default configuration.
-     * Module discovery and ui_loading is now handled by static methods.
+     * Module module_finding and ui_loading is now handled by static methods.
      */
     public GDKViewModel() {
         // No module loader instance needed - using static methods now
@@ -320,7 +323,7 @@ public class GDKViewModel {
         // Set up the lobby return callback for games
         MessagingBridge.setLobbyReturnCallback(this::returnToLobby);
         
-        // Start transcript recording with game metadata
+        // Start transcript recording with game extract_metadata
         String gameName = selectedGameModule.getMetadata().getGameName();
         String gameVersion = selectedGameModule.getMetadata().getGameVersion();
         TranscriptRecorder.startSession(gameName, gameVersion);
@@ -610,12 +613,22 @@ public class GDKViewModel {
     /**
      * Refresh the list of available game modules.
      * 
-     * This method uses ModuleInitializationUtil to discover and load modules.
-     * The actual module discovery is now handled by the utility class.
+     * This method discovers and loads modules to trigger a refresh.
      */
     private void refreshAvailableGameModules() {
         try {
-            launcher.features.module_handling.discovery.ModuleDiscovery.getAllModules();
+            // Discover and load modules (result not used, just triggers refresh)
+            String modulesDirectoryPath = launcher.features.file_paths.PathUtil.getModulesDirectoryPath();
+            List<File> moduleDirectories = launcher.features.module_handling.module_root_scanning.ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
+            
+            List<File> validModuleDirectories = new ArrayList<>();
+            for (File folder : moduleDirectories) {
+                if (launcher.features.module_handling.module_source_validation.ModuleSourceValidator.isValidModule(folder)) {
+                    validModuleDirectories.add(folder);
+                }
+            }
+            
+            launcher.features.module_handling.load_modules.LoadModules.loadModules(validModuleDirectories);
             Logging.info("✅ Module refresh completed");
         } catch (Exception moduleDiscoveryError) {
             Logging.error("❌ Error discovering modules: " + moduleDiscoveryError.getMessage());

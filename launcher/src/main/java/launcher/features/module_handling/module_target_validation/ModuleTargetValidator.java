@@ -1,12 +1,11 @@
 package launcher.features.module_handling.module_target_validation;
 
-import launcher.features.module_handling.module_target_validation.helpers.CheckForCompiledClasses;
 import launcher.features.module_handling.module_target_validation.helpers.ClassValidator;
 
 import java.io.File;
 
 /**
- * Checks if a module has valid compiled classes ready for loading.
+ * Checks if a loaded module is valid.
  * 
  * <p>This class provides a single method to check if a module has valid compiled classes.
  * All other module_target_validation logic is delegated to helper classes.
@@ -23,22 +22,6 @@ public final class ModuleTargetValidator {
     
     private ModuleTargetValidator() {
         throw new AssertionError("Utility class should not be instantiated");
-    }
-    
-    /**
-     * Checks if a module has valid compiled classes ready for loading.
-     * 
-     * <p>Validity is determined by:
-     * <ul>
-     *   <li>Presence of compiled classes in target/classes directory</li>
-     *   <li>Main.class exists in target/classes</li>
-     * </ul>
-     * 
-     * @param moduleDir The module directory to validate
-     * @return true if the module has valid compiled classes, false otherwise
-     */
-    public static boolean preLoadCheck(File moduleDir) {
-        return CheckForCompiledClasses.hasCompiledClasses(moduleDir);
     }
     
     /**

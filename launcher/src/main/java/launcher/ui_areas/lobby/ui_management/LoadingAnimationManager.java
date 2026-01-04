@@ -60,7 +60,7 @@ public class LoadingAnimationManager {
         loadingProgressBar.setVisible(true);
         loadingProgressBar.setProgress(0.0);
         loadingStatusLabel.setVisible(true);
-        loadingStatusLabel.setText("Starting module discovery...");
+        loadingStatusLabel.setText("Starting module module_finding...");
         
         Logging.info("Progress bar made visible and set to 0%");
         

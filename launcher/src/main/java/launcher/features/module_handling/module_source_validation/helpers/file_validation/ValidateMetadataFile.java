@@ -21,7 +21,7 @@ public final class ValidateMetadataFile {
     }
     
     /**
-     * Validates that Metadata.java exposes minimal game metadata contract.
+     * Validates that Metadata.java exposes minimal game extract_metadata contract.
      * 
      * <p>This method checks that Metadata.java:
      * <ul>

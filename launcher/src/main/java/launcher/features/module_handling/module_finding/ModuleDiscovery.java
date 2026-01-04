@@ -1,4 +1,4 @@
-package launcher.features.module_handling.searching;
+package launcher.features.module_handling.module_finding;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -9,12 +9,12 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Public API for module searching operations.
+ * Public API for module module_finding operations.
  * 
  * <p>This class handles finding game modules by name from the modules directory.
  * 
  * <p>All other classes in this package are internal implementation details.
- * External code should only use this class for module searching operations.
+ * External code should only use this class for module module_finding operations.
  * 
  * @author Clement Luo
  * @date August 12, 2025

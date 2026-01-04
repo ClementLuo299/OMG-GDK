@@ -1,7 +1,7 @@
 package launcher.ui_areas.startup_window.styling_theme;
 
 /**
- * Constants for the loading spinner component.
+ * Constants for the load_modules spinner component.
  * 
  * <p><b>Internal class - do not import.</b> This class is for internal use within
  * the startup_window package only. Use {@link launcher.ui_areas.startup_window.StartupWindow}

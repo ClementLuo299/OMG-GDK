@@ -5,7 +5,7 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.features.module_handling.discovery.ModuleDiscovery;
+import launcher.features.module_handling.module_finding.ModuleDiscovery;
 import launcher.ui_areas.lobby.lifecycle.init.InitializeLobbyUIForAutoLaunch;
 
 /**

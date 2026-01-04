@@ -94,7 +94,7 @@ public class LobbyInitializationManager {
      * @param jsonOutputEditorContainer The JSON output editor container
      * @param clearInputButton The clear input button
      * @param clearOutputButton2 The clear output button
-     * @param metadataRequestButton The metadata request button
+     * @param metadataRequestButton The extract_metadata request button
      * @param sendMessageButton The send message button
      * @param jsonPersistenceToggle The JSON persistence toggle
      * @param exitButton The exit button

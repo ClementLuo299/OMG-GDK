@@ -72,7 +72,7 @@ public class GameSelectionController {
      * Sets up the ComboBox display, selection handler, and launch button handler.
      */
     public void initialize() {
-        // Configure the ComboBox to display game module names from metadata
+        // Configure the ComboBox to display game module names from extract_metadata
         gameSelector.setCellFactory(param -> new javafx.scene.control.ListCell<GameModule>() {
             @Override
             protected void updateItem(GameModule gameModule, boolean empty) {

@@ -2,7 +2,7 @@ package launcher.features.module_handling.on_app_start.helpers.thread_tasks_help
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.compilation.LoadModules;
+import launcher.features.module_handling.load_modules.LoadModules;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,32 +35,11 @@ public final class ModuleRuntimeLoader {
     }
     
     /**
-     * Result container for module loading operations.
-     */
-    public static class ModuleLoadResult {
-        private final List<GameModule> loadedModules;
-        private final List<String> compilationFailures;
-        
-        public ModuleLoadResult(List<GameModule> loadedModules, List<String> compilationFailures) {
-            this.loadedModules = loadedModules != null ? loadedModules : new ArrayList<>();
-            this.compilationFailures = compilationFailures != null ? compilationFailures : new ArrayList<>();
-        }
-        
-        public List<GameModule> getLoadedModules() {
-            return loadedModules;
-        }
-        
-        public List<String> getCompilationFailures() {
-            return compilationFailures;
-        }
-    }
-    
-    /**
      * Loads discovered modules into memory.
      * 
      * @param validModuleDirectories List of valid module directories to load
      * @return List of successfully loaded GameModule instances
-     * @deprecated Use {@link #loadModulesWithFailures(List)} to also get compilation failures
+     * @deprecated Use {@link #loadModulesWithFailures(List)} to also get load_modules failures
      */
     @Deprecated
     public static List<GameModule> loadModules(List<File> validModuleDirectories) {
@@ -71,35 +50,35 @@ public final class ModuleRuntimeLoader {
      * Loads discovered modules into memory.
      * 
      * @param validModuleDirectories List of valid module directories to load
-     * @return ModuleLoadResult containing loaded modules and compilation failures
+     * @return ModuleLoadResult containing loaded modules and load_modules failures
      */
-    public static ModuleLoadResult loadModulesWithFailures(List<File> validModuleDirectories) {
+    public static LoadModules.ModuleLoadResult loadModulesWithFailures(List<File> validModuleDirectories) {
         try {
-            // Delegate to ModuleCompiler for actual loading
-            Logging.info("Starting module loading...");
+            // Delegate to load_modules package for actual load_modules
+            Logging.info("Starting module load_modules...");
             LoadModules.ModuleLoadResult result = LoadModules.loadModules(validModuleDirectories);
             List<GameModule> discoveredModules = result.getLoadedModules();
             
-            // Log compilation failures if any
+            // Log load_modules failures if any
             List<String> failures = result.getCompilationFailures();
             if (!failures.isEmpty()) {
                 Logging.warning("Failed to load " + failures.size() + " module(s): " + String.join(", ", failures));
             }
             
-            Logging.info("Module loading completed. Successfully loaded " + discoveredModules.size() + " modules");
+            Logging.info("Module load_modules completed. Successfully loaded " + discoveredModules.size() + " modules");
             
-            // Warn if no modules were loaded (might indicate compilation issues)
+            // Warn if no modules were loaded (might indicate load_modules issues)
             if (discoveredModules.isEmpty()) {
-                Logging.warning("No modules were loaded! Check module compilation status.");
+                Logging.warning("No modules were loaded! Check module load_modules status.");
             }
             
-            return new ModuleLoadResult(discoveredModules, failures);
+            return result;
             
         } catch (Exception e) {
-            // Handle loading errors gracefully - continue with empty list
-            Logging.error("Module loading failed: " + e.getMessage(), e);
+            // Handle load_modules errors gracefully - continue with empty list
+            Logging.error("Module load_modules failed: " + e.getMessage(), e);
             e.printStackTrace();
-            return new ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
+            return new LoadModules.ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
         }
     }
 }

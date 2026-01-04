@@ -363,9 +363,9 @@ public class DialogUtil {
     }
     
     /**
-     * Displays a module compilation error dialog.
+     * Displays a module load_modules error dialog.
      * 
-     * <p>This is a convenience method for showing errors related to module compilation.
+     * <p>This is a convenience method for showing errors related to module load_modules.
      * 
      * @param title The dialog title
      * @param message The error message

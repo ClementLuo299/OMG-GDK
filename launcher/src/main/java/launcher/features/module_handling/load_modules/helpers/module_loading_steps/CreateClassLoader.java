@@ -1,4 +1,4 @@
-package launcher.features.module_handling.loading.helpers.module_loading_steps;
+package launcher.features.module_handling.load_modules.helpers.module_loading_steps;
 
 import gdk.internal.Logging;
 

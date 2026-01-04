@@ -84,8 +84,8 @@ public class Main implements GameModule {
         }
         
         String function = (String) message.get("function");
-        if ("metadata".equals(function)) {
-            Logging.info("📋 Returning metadata for Chatroom");
+        if ("extract_metadata".equals(function)) {
+            Logging.info("📋 Returning extract_metadata for Chatroom");
             return metadata.toMap();
         }
         if ("init".equals(function)) {

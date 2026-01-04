@@ -1,4 +1,4 @@
-package launcher.features.module_handling.compilation.helpers;
+package launcher.features.module_handling.compile_modules.helpers;
 
 import gdk.internal.Logging;
 
@@ -22,7 +22,7 @@ public final class MavenCompiler {
      * Compiles a specific module using Maven.
      * 
      * @param modulePath The absolute path to the module directory to compile
-     * @return true if compilation was successful, false otherwise
+     * @return true if compile_modules was successful, false otherwise
      */
     public static boolean compileModule(String modulePath) {
         Logging.info("Building module: " + modulePath);

@@ -7,7 +7,7 @@ import launcher.ui_areas.startup_window.styling_theme.Labels;
 import launcher.ui_areas.startup_window.styling_theme.Font;
 
 /**
- * Creates the loading label for the startup window.
+ * Creates the load_modules label for the startup window.
  * 
  * <p><b>Internal class - do not import.</b> This class is for internal use within
  * the startup_window package only. Use {@link launcher.ui_areas.startup_window.StartupWindow}
@@ -21,7 +21,7 @@ import launcher.ui_areas.startup_window.styling_theme.Font;
 public class LoadingLabelCreator {
     
     /**
-     * Creates the loading label with modern typography.
+     * Creates the load_modules label with modern typography.
      * 
      * @return A configured label with "Loading" text
      */

@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handles reporting of module compilation failures to the UI.
+ * Handles reporting of module load_modules failures to the UI.
  * 
  * <p>This class is responsible for:
  * <ul>
- *   <li>Reporting compilation failures to the UI via messages</li>
+ *   <li>Reporting load_modules failures to the UI via messages</li>
  * </ul>
  * 
- * <p>Failures should be obtained from module loading operations (e.g., from
- * {@link launcher.features.module_handling.discovery.ModuleDiscovery.ModuleLoadResult})
+ * <p>Failures should be obtained from module load_modules operations (e.g., from
+ * {@link launcher.features.module_handling.load_modules.LoadModules.ModuleLoadResult})
  * and passed to this class for UI reporting.
  * 
  * @author Clement Luo
@@ -29,7 +29,7 @@ public class ModuleCompilationChecker {
     
     /**
      * Interface for reporting messages to the UI.
-     * Allows this checker to report compilation failures without direct UI dependencies.
+     * Allows this checker to report load_modules failures without direct UI dependencies.
      */
     public interface MessageReporter {
         /**
@@ -59,9 +59,9 @@ public class ModuleCompilationChecker {
     // ==================== PUBLIC METHODS ====================
     
     /**
-     * Reports compilation failures to the UI.
+     * Reports load_modules failures to the UI.
      * 
-     * <p>This method reports the provided compilation failures to the UI
+     * <p>This method reports the provided load_modules failures to the UI
      * via the MessageReporter. UI updates are scheduled on the JavaFX
      * application thread to ensure thread safety.
      * 
@@ -73,28 +73,28 @@ public class ModuleCompilationChecker {
         }
         
         try {
-            Logging.info("Reporting " + compilationFailures.size() + " compilation failure(s) to UI");
+            Logging.info("Reporting " + compilationFailures.size() + " load_modules failure(s) to UI");
             reportFailuresToUI(compilationFailures);
         } catch (Exception e) {
-            Logging.error("Error reporting compilation failures: " + e.getMessage(), e);
+            Logging.error("Error reporting load_modules failures: " + e.getMessage(), e);
         }
     }
     
     /**
-     * Checks for compilation failures on startup and reports them to the UI.
+     * Checks for load_modules failures on startup and reports them to the UI.
      * 
-     * @deprecated Use {@link #reportCompilationFailures(List)} with failures from module loading instead
+     * @deprecated Use {@link #reportCompilationFailures(List)} with failures from module load_modules instead
      */
     @Deprecated
     public void checkStartupCompilationFailures() {
-        // This method is deprecated - failures should be obtained from module loading operations
+        // This method is deprecated - failures should be obtained from module load_modules operations
         Logging.warning("checkStartupCompilationFailures() is deprecated - use reportCompilationFailures() instead");
     }
     
     // ==================== PRIVATE HELPER METHODS ====================
     
     /**
-     * Reports compilation failures to the UI on the JavaFX steps.
+     * Reports load_modules failures to the UI on the JavaFX steps.
      * 
      * @param compilationFailures List of module names that failed to compile
      */

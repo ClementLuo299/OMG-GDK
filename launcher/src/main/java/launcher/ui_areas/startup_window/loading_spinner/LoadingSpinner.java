@@ -9,10 +9,10 @@ import launcher.ui_areas.startup_window.styling_theme.Colors;
 import launcher.ui_areas.startup_window.styling_theme.LoadingSpinnerStyle;
 
 /**
- * A circular loading spinner component with smooth rotation animation.
+ * A circular load_modules spinner component with smooth rotation animation.
  * 
  * This component is an animated circular arc that rotates continuously
- * to indicate loading progress. The component handles only the visual rendering;
+ * to indicate load_modules progress. The component handles only the visual rendering;
  * animation control is managed by LoadingSpinnerController.
  * 
  * <p><b>Internal class - do not import.</b> This class is for internal use within

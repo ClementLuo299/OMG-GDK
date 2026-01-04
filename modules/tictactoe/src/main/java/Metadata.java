@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * Metadata for the TicTacToe Game module.
- * Provides all the metadata information for the TicTacToe Game.
+ * Provides all the extract_metadata information for the TicTacToe Game.
  *
  * @authors Clement Luo
  * @date July 25, 2025

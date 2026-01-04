@@ -99,12 +99,12 @@
                 
                 <!-- 
                     JSON INPUT CONTROLS
-                    Buttons to clear input, request metadata, send messages, and toggle persistence
+                    Buttons to clear input, request extract_metadata, send messages, and toggle persistence
                 -->
                 <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 5 0 0 0; -fx-min-height: 35; -fx-pref-height: 35; -fx-max-height: 35;">
                     <!-- Clear all JSON input -->
                     <Button fx:id="clearInputButton" text="Clear Input" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
-                    <!-- Fill input with a metadata request JSON template -->
+                    <!-- Fill input with a extract_metadata request JSON template -->
                     <Button fx:id="metadataRequestButton" text="Request Metadata" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
                     <!-- Send the JSON input as a message to the selected game -->
                     <Button fx:id="sendMessageButton" text="Send Message" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-radius: 3; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 2 6; -fx-min-width: 60; -fx-min-height: 25; -fx-pref-height: 25; -fx-max-height: 25;"/>
@@ -161,7 +161,7 @@
         <padding>
             <Insets top="10" right="15" bottom="10" left="15"/>
         </padding>
-        <!-- Progress bar shown during module ui_loading/compilation -->
+        <!-- Progress bar shown during module ui_loading/load_modules -->
         <ProgressBar fx:id="loadingProgressBar" visible="false" prefWidth="250" styleClass="loading-progress"/>
         <!-- Label showing current ui_loading status (e.g., "Compiling module...") -->
         <Label fx:id="loadingStatusLabel" text="" visible="false" styleClass="loading-status-text"/>

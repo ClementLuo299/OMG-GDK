@@ -25,7 +25,7 @@ public final class ModuleLoadingProcess {
      * 
      * @param primaryApplicationStage The main window (hidden until modules are loaded)
      * @param lobbyController The UI controller that will show the list of games
-     * @param windowManager The startup window (visible during loading)
+     * @param windowManager The startup window (visible during load_modules)
      */
     public static void start(Stage primaryApplicationStage, GDKGameLobbyController lobbyController, StartupWindow windowManager) {
         Logging.info("Starting module ui_loading process...");
@@ -65,9 +65,9 @@ public final class ModuleLoadingProcess {
      * @param windowManager The startup window to hide on shutdown
      */
     private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindow windowManager) {
-        // Clean up the module loading steps if app shuts down while loading
+        // Clean up the module load_modules steps if app shuts down while load_modules
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up module loading steps...");
+            Logging.info("Cleaning up module load_modules steps...");
             if (moduleLoadingThread.isAlive()) {
                 moduleLoadingThread.interrupt();
             }

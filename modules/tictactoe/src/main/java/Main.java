@@ -51,8 +51,8 @@ public class Main implements GameModule {
         }
         
         String function = (String) message.get("function");
-        if ("metadata".equals(function)) {
-            Logging.info("📋 Returning metadata for TicTacToe Game");
+        if ("extract_metadata".equals(function)) {
+            Logging.info("📋 Returning extract_metadata for TicTacToe Game");
             return metadata.toMap();
         }
         

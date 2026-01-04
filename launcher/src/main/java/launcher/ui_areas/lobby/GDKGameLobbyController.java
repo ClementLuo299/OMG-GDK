@@ -102,7 +102,7 @@ public class GDKGameLobbyController implements Initializable {
     private LoadingAnimationManager loadingAnimationManager;
     
     /**
-     * Manager for module compilation checking
+     * Manager for module load_modules checking
      */
     private ModuleCompilationChecker moduleCompilationChecker;
     
@@ -290,7 +290,7 @@ public class GDKGameLobbyController implements Initializable {
     private GameModuleRefreshManager gameModuleRefreshManager;
     
     /**
-     * Fast refresh that skips compilation checks for faster startup.
+     * Fast refresh that skips load_modules checks for faster startup.
      */
     public void refreshAvailableGameModulesFast() {
         if (gameModuleRefreshManager != null) {
@@ -301,7 +301,7 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== MODULE COMPILATION ====================
     
     /**
-     * Reports compilation failures from startup loading.
+     * Reports load_modules failures from startup load_modules.
      * 
      * @param failures List of module names that failed to compile
      */
@@ -312,13 +312,13 @@ public class GDKGameLobbyController implements Initializable {
     }
     
     /**
-     * Check for compilation failures on startup.
+     * Check for load_modules failures on startup.
      * 
      * @deprecated Use {@link #reportStartupCompilationFailures(List)} instead
      */
     @Deprecated
     public void checkStartupCompilationFailures() {
-        // Deprecated - failures are now passed directly from loading process
+        // Deprecated - failures are now passed directly from load_modules process
     }
     
     // ==================== GAME LAUNCHING ====================

@@ -13,7 +13,7 @@ import com.jfoenix.controls.JFXToggleButton;
  * 
  * Handles only the buttons under the JSON editors:
  * - Clear input button
- * - Request metadata button
+ * - Request extract_metadata button
  * - Send message button
  * - Save JSON toggle (persistence toggle)
  * - Clear output button
@@ -53,7 +53,7 @@ public class JsonActionButtonsController {
      * @param jsonOutputEditor The output JSON editor (needed for operations)
      * @param clearInputButton Button to clear input
      * @param clearOutputButton Button to clear output
-     * @param metadataRequestButton Button to fill metadata request
+     * @param metadataRequestButton Button to fill extract_metadata request
      * @param sendMessageButton Button to send message
      * @param jsonPersistenceToggle Toggle for JSON persistence (save JSON)
      * @param jsonEditorOperations The JSON editor operations handler
@@ -97,7 +97,7 @@ public class JsonActionButtonsController {
         // Clear output button: Remove all JSON output
         clearOutputButton.setOnAction(event -> jsonEditorOperations.clearJsonOutputData());
         
-        // Metadata request button: Fill JSON with metadata request
+        // Metadata request button: Fill JSON with extract_metadata request
         metadataRequestButton.setOnAction(event -> jsonEditorOperations.fillMetadataRequest());
         
         // Send message button: Send a test message

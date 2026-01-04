@@ -97,17 +97,17 @@ public class JsonEditorOperations {
     }
     
     /**
-     * Fill the JSON text area with a metadata request.
+     * Fill the JSON text area with a extract_metadata request.
      */
     public void fillMetadataRequest() {
-        // Create a standard metadata request JSON
-        String metadataRequest = "{\n  \"function\": \"metadata\"\n}";
+        // Create a standard extract_metadata request JSON
+        String metadataRequest = "{\n  \"function\": \"extract_metadata\"\n}";
         
         // Set the JSON input area content
         jsonInputEditor.setText(metadataRequest);
         
         // Provide user feedback about the action
-        messageReporter.addMessage("Filled JSON input with metadata request");
+        messageReporter.addMessage("Filled JSON input with extract_metadata request");
     }
     
     /**

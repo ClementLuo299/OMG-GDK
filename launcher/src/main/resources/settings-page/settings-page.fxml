@@ -5,7 +5,7 @@
     This is the settings interface where users can configure:
     - Application behavior (auto-launch, auto-select, JSON persistence)
     - Interface preferences (theme, font size)
-    - Game-related settings (auto-refresh, compilation checks)
+    - Game-related settings (auto-refresh, load_modules checks)
     - Advanced options (debug mode, performance mode)
     
     Controller: launcher.ui_pages_pages.settings_page.SettingsPageController
@@ -110,7 +110,7 @@
             
             <!-- 
                 GAME SETTINGS SECTION
-                Controls game module discovery and compilation behavior
+                Controls game module module_finding and load_modules behavior
             -->
             <VBox spacing="20" styleClass="settings-section">
                 <Label text="Game Settings" styleClass="section-header"/>
@@ -124,7 +124,7 @@
                     <JFXToggleButton fx:id="settingsAutoRefreshToggle" selected="false"/>
                 </HBox>
                 
-                <!-- Compilation Check Setting: Verify module compilation on startup -->
+                <!-- Compilation Check Setting: Verify module load_modules on startup -->
                 <HBox spacing="20" alignment="CENTER_LEFT" styleClass="setting-row">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
                         <Label text="Check Compilation on Startup" styleClass="setting-label"/>

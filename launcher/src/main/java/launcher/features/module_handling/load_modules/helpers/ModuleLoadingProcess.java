@@ -1,12 +1,12 @@
-package launcher.features.module_handling.loading.helpers;
+package launcher.features.module_handling.load_modules.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.loading.LoadModules;
-import launcher.features.module_handling.loading.helpers.module_loading_steps.CreateClassLoader;
-import launcher.features.module_handling.loading.helpers.module_loading_steps.InstantiateModule;
-import launcher.features.module_handling.loading.helpers.module_loading_steps.LoadMainClass;
-import launcher.features.module_handling.loading.helpers.module_loading_steps.PreLoadValidator;
+import launcher.features.module_handling.load_modules.LoadModules;
+import launcher.features.module_handling.load_modules.helpers.module_loading_steps.CreateClassLoader;
+import launcher.features.module_handling.load_modules.helpers.module_loading_steps.InstantiateModule;
+import launcher.features.module_handling.load_modules.helpers.module_loading_steps.LoadMainClass;
+import launcher.features.module_handling.load_modules.helpers.module_loading_steps.PreLoadValidator;
 import launcher.features.module_handling.module_target_validation.ModuleTargetValidator;
 
 import java.io.File;
@@ -20,9 +20,9 @@ import javafx.application.Platform;
 /**
  * Given a directory, we load the game module given its compiled code.
  * 
- * <p>This class handles the complete process of loading a game module from its
+ * <p>This class handles the complete process of load_modules a game module from its
  * compiled bytecode into a usable GameModule instance. It performs validation,
- * class loading, and instantiation with comprehensive error handling.
+ * class load_modules, and instantiation with comprehensive error handling.
  * 
  * @author Clement Luo
  * @date January 3, 2026
@@ -38,26 +38,26 @@ public final class ModuleLoadingProcess {
     /**
      * Loads a module from its compiled classes.
      * 
-     * <p>This method performs the complete module loading process:
+     * <p>This method performs the complete module load_modules process:
      * <ol>
      *   <li><b>Pre-validation:</b> Checks that source files are valid and compiled classes exist</li>
      *   <li><b>ClassLoader creation:</b> Creates a URLClassLoader with module dependencies</li>
-     *   <li><b>Class loading:</b> Loads the Main class from bytecode into memory</li>
+     *   <li><b>Class load_modules:</b> Loads the Main class from bytecode into memory</li>
      *   <li><b>Post-validation:</b> Verifies the loaded class implements GameModule interface</li>
      *   <li><b>Instantiation:</b> Creates an instance of the Main class as a GameModule</li>
      * </ol>
      * 
      * <p>Includes timeout protection (30 seconds per module) and extensive error handling
      * for common issues like missing dependencies, JavaFX initialization problems, and
-     * class loading failures.
+     * class load_modules failures.
      * 
      * @param moduleDir The module directory (e.g., modules/tictactoe/)
-     * @return The loaded GameModule instance, or null if loading failed
+     * @return The loaded GameModule instance, or null if load_modules failed
      */
     public static GameModule loadModule(File moduleDir) {
 
         // ========================================================================
-        // STEP 1: Initialize and log module loading attempt
+        // STEP 1: Initialize and log module load_modules attempt
         // ========================================================================
         String moduleName = moduleDir.getName();
         Logging.info("Loading module from: " + moduleName);
@@ -65,9 +65,9 @@ public final class ModuleLoadingProcess {
         Logging.info("   Is JavaFX thread: " + Platform.isFxApplicationThread());
         
         // Set up timeout protection to prevent hanging on problematic modules
-        // 30 seconds should be enough for normal loading, but allows for JavaFX initialization delays
+        // 30 seconds should be enough for normal load_modules, but allows for JavaFX initialization delays
         long startTime = System.currentTimeMillis();
-        long timeout = 30000; // 30 second timeout for individual module loading
+        long timeout = 30000; // 30 second timeout for individual module load_modules
         
         try {
             // ========================================================================
@@ -84,7 +84,7 @@ public final class ModuleLoadingProcess {
             
             // Check timeout after validation (should be fast, but check anyway)
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module load_modules timeout for " + moduleName);
                 return null;
             }
             
@@ -94,7 +94,7 @@ public final class ModuleLoadingProcess {
             // The ClassLoader is responsible for:
             //   - Finding the compiled .class files in target/classes/
             //   - Loading dependencies (GDK, JavaFX, etc.) from the classpath
-            //   - Resolving class references when loading the Main class
+            //   - Resolving class references when load_modules the Main class
             // ModuleClassLoaderFactory creates a URLClassLoader with all necessary paths
             Logging.info("🔧 Creating classloader for module: " + moduleName);
             URLClassLoader classLoader = CreateClassLoader.create(moduleDir);
@@ -102,7 +102,7 @@ public final class ModuleLoadingProcess {
             
             // Check timeout after ClassLoader creation
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module load_modules timeout for " + moduleName);
                 return null;
             }
             
@@ -114,9 +114,9 @@ public final class ModuleLoadingProcess {
                 return null; // Error already logged in LoadMainClass
             }
             
-            // Check timeout after class loading
+            // Check timeout after class load_modules
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module load_modules timeout for " + moduleName);
                 return null;
             }
             
@@ -130,7 +130,7 @@ public final class ModuleLoadingProcess {
             
             // Check timeout after validation
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout for " + moduleName);
+                Logging.warning("Module load_modules timeout for " + moduleName);
                 return null;
             }
             
@@ -140,8 +140,8 @@ public final class ModuleLoadingProcess {
             return InstantiateModule.instantiate(mainClass, moduleName);
             
         } catch (Exception e) {
-            // Catch-all for any unexpected errors in the entire loading process
-            Logging.error("❌ Error loading module " + moduleName + ": " + e.getMessage(), e);
+            // Catch-all for any unexpected errors in the entire load_modules process
+            Logging.error("❌ Error load_modules module " + moduleName + ": " + e.getMessage(), e);
             Logging.error("   Module directory: " + moduleDir.getAbsolutePath(), e);
             return null;
         }
@@ -151,7 +151,7 @@ public final class ModuleLoadingProcess {
      * Loads multiple modules from their compiled classes.
      * 
      * <p>This method loads multiple modules sequentially with timeout protection.
-     * It continues loading other modules even if one fails, ensuring maximum
+     * It continues load_modules other modules even if one fails, ensuring maximum
      * module availability. This is a "best effort" approach - we want to load
      * as many modules as possible, even if some fail.
      * 
@@ -173,16 +173,16 @@ public final class ModuleLoadingProcess {
         List<GameModule> loadedModules = new ArrayList<>();
         Set<String> failures = new HashSet<>();
         
-        // Global timeout for loading ALL modules (15 seconds total)
-        // This prevents the entire loading process from hanging if modules are problematic
+        // Global timeout for load_modules ALL modules (15 seconds total)
+        // This prevents the entire load_modules process from hanging if modules are problematic
         long startTime = System.currentTimeMillis();
-        long timeout = 15000; // 15 second timeout for all module loading
+        long timeout = 15000; // 15 second timeout for all module load_modules
         
         // Process each module directory
         for (File moduleDir : moduleDirectories) {
             // Check if we've exceeded the global timeout
             if (System.currentTimeMillis() - startTime > timeout) {
-                Logging.warning("Module loading timeout reached, stopping module loading");
+                Logging.warning("Module load_modules timeout reached, stopping module load_modules");
                 break;
             }
             
@@ -197,23 +197,23 @@ public final class ModuleLoadingProcess {
                     Logging.info("✅ Module added to loaded list: " + moduleName);
                 } else {
                     // Module failed to load (loadModule returned null)
-                    // This could be due to validation failure, class loading error, etc.
+                    // This could be due to validation failure, class load_modules error, etc.
                     // We continue with other modules instead of stopping
                     Logging.warning("⚠️ Module load returned null: " + moduleName + 
                         " (check logs above for details)");
                     failures.add(moduleName);
                 }
             } catch (Exception e) {
-                // Unexpected exception during loading (shouldn't happen, but catch it anyway)
+                // Unexpected exception during load_modules (shouldn't happen, but catch it anyway)
                 // This is different from loadModule returning null - this is an actual exception
-                Logging.error("❌ Exception while loading module " + moduleName + ": " + e.getMessage(), e);
+                Logging.error("❌ Exception while load_modules module " + moduleName + ": " + e.getMessage(), e);
                 failures.add(moduleName);
                 // Continue with other modules instead of failing completely
             }
         }
         
-        // Log summary of loading results
-        Logging.info("Module loading completed. Successfully loaded " + loadedModules.size() + " modules");
+        // Log summary of load_modules results
+        Logging.info("Module load_modules completed. Successfully loaded " + loadedModules.size() + " modules");
         if (!failures.isEmpty()) {
             Logging.info("Failed to load " + failures.size() + " module(s): " + String.join(", ", failures));
         }

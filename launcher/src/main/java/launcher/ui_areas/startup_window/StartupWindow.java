@@ -9,7 +9,7 @@ import launcher.ui_areas.startup_window.window_control.HideStartupWindow;
 import javax.swing.*;
 
 /**
- * Startup loading window that is displayed before JavaFX starts, using Swing for immediate display.
+ * Startup load_modules window that is displayed before JavaFX starts, using Swing for immediate display.
  * 
  * @author Clement Luo
  * @date August 5, 2025
@@ -21,18 +21,18 @@ public class StartupWindow {
     // The main frame of the startup window
     public final JFrame progressFrame;
 
-    // The animated loading spinner component
+    // The animated load_modules spinner component
     public final LoadingSpinner spinner;
     
     // The controller that manages the spinner animation
     public final LoadingSpinnerAnimator spinController;
     
     /**
-     * Initialize the startup loading window.
+     * Initialize the startup load_modules window.
      * This constructor is public to allow StartupWindowBuilder to create instances.
      * 
      * @param frame The JFrame for the window
-     * @param spinner The loading spinner component
+     * @param spinner The load_modules spinner component
      * @param spinController The controller that manages the spinner animation
      */
     public StartupWindow(JFrame frame, LoadingSpinner spinner, LoadingSpinnerAnimator spinController) {
@@ -90,7 +90,7 @@ public class StartupWindow {
     }
     
     /**
-     * Hides and disposes the loading window.
+     * Hides and disposes the load_modules window.
      * Also registers cleanup tasks with the shutdown system to ensure proper resource cleanup.
      */
     public void hide() {

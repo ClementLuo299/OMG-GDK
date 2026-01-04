@@ -24,8 +24,8 @@ public class ComponentAssembler {
      * Adds all components to the main panel with proper spacing.
      * 
      * @param mainPanel The main panel to add components to
-     * @param spinner The loading spinner
-     * @param loadingLabel The loading label
+     * @param spinner The load_modules spinner
+     * @param loadingLabel The load_modules label
      */
     public static void assemble(
             JPanel mainPanel,

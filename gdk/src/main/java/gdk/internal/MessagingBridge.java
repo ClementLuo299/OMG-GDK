@@ -8,7 +8,7 @@ import java.util.function.Consumer;
  * Thread-safe publish/subscribe bridge for inter-module communication.
  *
  * Provides a lightweight event system where components can publish and subscribe
- * to generic metadata messages ({@code Map<String, Object>}), as well as a global
+ * to generic extract_metadata messages ({@code Map<String, Object>}), as well as a global
  * "return to lobby" callback.
  *
  * @authors Clement Luo
@@ -104,7 +104,7 @@ public final class MessagingBridge {
     /**
      * Broadcast a message to all registered consumers.
      *
-     * @param message key-value map representing the message metadata
+     * @param message key-value map representing the message extract_metadata
      */
     public static void publish(Map<String, Object> message) {
         if (message == null) {

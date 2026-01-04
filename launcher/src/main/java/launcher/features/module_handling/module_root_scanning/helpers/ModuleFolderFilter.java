@@ -27,7 +27,7 @@ final class ModuleFolderFilter {
     }
     
     /**
-     * Checks if a directory should be skipped during module discovery.
+     * Checks if a directory should be skipped during module module_finding.
      * 
      * <p>Directories are skipped if they are:
      * <ul>
@@ -44,7 +44,7 @@ final class ModuleFolderFilter {
     }
     
     /**
-     * Checks if a directory name indicates it should be skipped during module discovery.
+     * Checks if a directory name indicates it should be skipped during module module_finding.
      * 
      * <p>Directories are skipped if they are:
      * <ul>

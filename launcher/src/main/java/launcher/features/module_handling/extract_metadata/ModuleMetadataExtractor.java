@@ -1,4 +1,4 @@
-package launcher.features.module_handling.metadata;
+package launcher.features.module_handling.extract_metadata;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Utility class for extracting and processing metadata from game modules.
+ * Utility class for extracting and processing extract_metadata from game modules.
  * 
  * <p>This class handles:
  * <ul>
- *   <li>Extracting module names and metadata from GameModule instances</li>
+ *   <li>Extracting module names and extract_metadata from GameModule instances</li>
  *   <li>Filtering and validating module lists</li>
  *   <li>Collecting module names from collections</li>
  * </ul>
@@ -37,7 +37,7 @@ public final class ModuleMetadataExtractor {
      * 
      * <p>This method:
      * <ul>
-     *   <li>Extracts module names and metadata</li>
+     *   <li>Extracts module names and extract_metadata</li>
      *   <li>Logs discovered modules</li>
      *   <li>Handles errors gracefully</li>
      * </ul>
@@ -62,7 +62,7 @@ public final class ModuleMetadataExtractor {
                 moduleInfos.add(new ModuleInfo(gameName, className));
                 Logging.info("Loaded game module: " + gameName + " (" + className + ")");
             } catch (Exception e) {
-                Logging.error("Error getting metadata from game module: " + e.getMessage(), e);
+                Logging.error("Error getting extract_metadata from game module: " + e.getMessage(), e);
             }
         }
         
@@ -125,7 +125,7 @@ public final class ModuleMetadataExtractor {
     // ==================== INNER CLASSES ====================
     
     /**
-     * Result object containing module searching information.
+     * Result object containing module module_finding information.
      */
     public static class ModuleDiscoveryResult {
         /** Set of discovered module names. */

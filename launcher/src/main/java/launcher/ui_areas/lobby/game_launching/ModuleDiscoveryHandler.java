@@ -2,27 +2,31 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.ModuleDiscovery;
-import launcher.features.module_handling.metadata.ModuleMetadataExtractor;
+import launcher.features.file_paths.PathUtil;
+import launcher.features.module_handling.load_modules.LoadModules;
+import launcher.features.module_handling.extract_metadata.ModuleMetadataExtractor;
+import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
+import launcher.features.module_handling.module_source_validation.ModuleSourceValidator;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import javafx.application.Platform;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Handles UI coordination for module discovery operations.
+ * Handles UI coordination for module module_finding operations.
  * 
  * <p>This handler is responsible for UI-related operations:
  * <ul>
  *   <li>Reporting discovered modules to users via messages</li>
  *   <li>Updating status labels</li>
- *   <li>Creating UI-friendly messages from discovery results</li>
+ *   <li>Creating UI-friendly messages from module_finding results</li>
  * </ul>
  * 
- * <p>Business logic (discovery, processing, filtering) is delegated to
+ * <p>Business logic (module_finding, processing, filtering) is delegated to
  * {@link ModuleDiscovery}.
  * 
  * @author Clement Luo
@@ -59,43 +63,68 @@ public class ModuleDiscoveryHandler {
     // ==================== PUBLIC METHODS ====================
     
     /**
-     * Discovers and loads game modules using the business service.
+     * Discovers and loads game modules.
      * 
      * @param availableGameModulesSize Current size of available modules (for status updates)
-     * @return List of discovered game modules, or null if service is unavailable
+     * @return List of discovered game modules
      */
     public List<GameModule> discoverModules(int availableGameModulesSize) {
-        ModuleDiscovery.ModuleLoadResult result = ModuleDiscovery.getAllModulesWithFailures();
-        if (result == null) {
-            Platform.runLater(() -> {
-                messageManager.addMessage("Error: ViewModel not available");
-                statusLabelManager.updateGameCountStatus(availableGameModulesSize);
-            });
-            return null;
-        }
+        LoadModules.ModuleLoadResult result = discoverModulesWithFailures(availableGameModulesSize);
         return result.getLoadedModules();
     }
     
     /**
-     * Discovers and loads game modules with compilation failures.
+     * Discovers and loads game modules with load_modules failures.
      * 
      * @param availableGameModulesSize Current size of available modules (for status updates)
-     * @return ModuleLoadResult containing loaded modules and compilation failures, or null if service is unavailable
+     * @return ModuleLoadResult containing loaded modules and load_modules failures
      */
-    public ModuleDiscovery.ModuleLoadResult discoverModulesWithFailures(int availableGameModulesSize) {
-        ModuleDiscovery.ModuleLoadResult result = ModuleDiscovery.getAllModulesWithFailures();
-        if (result == null) {
+    public LoadModules.ModuleLoadResult discoverModulesWithFailures(int availableGameModulesSize) {
+        try {
+            // Get modules directory path
+            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
+            Logging.info("Scanning for modules in: " + modulesDirectoryPath);
+            
+            // Scan for module folders
+            List<File> moduleDirectories = ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
+            
+            if (moduleDirectories.isEmpty()) {
+                Logging.info("No module directories found in: " + modulesDirectoryPath);
+                return new LoadModules.ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
+            }
+            
+            // Filter to only valid module structures
+            List<File> validModuleDirectories = new ArrayList<>();
+            for (File folder : moduleDirectories) {
+                if (ModuleSourceValidator.isValidModule(folder)) {
+                    validModuleDirectories.add(folder);
+                }
+            }
+            
+            // Load modules
+            LoadModules.ModuleLoadResult result = LoadModules.loadModules(validModuleDirectories);
+            
+            // Log load_modules failures if any
+            List<String> failures = result.getCompilationFailures();
+            if (!failures.isEmpty()) {
+                Logging.warning("Failed to load " + failures.size() + " module(s): " + String.join(", ", failures));
+            }
+            
+            Logging.info("Found " + result.getLoadedModules().size() + " game module(s)");
+            return result;
+            
+        } catch (Exception e) {
+            Logging.error("Module module_finding failed: " + e.getMessage(), e);
             Platform.runLater(() -> {
-                messageManager.addMessage("Error: ViewModel not available");
+                messageManager.addMessage("Error discovering modules: " + e.getMessage());
                 statusLabelManager.updateGameCountStatus(availableGameModulesSize);
             });
-            return null;
+            return new LoadModules.ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
         }
-        return result;
     }
     
     /**
-     * Processes discovered modules and prepares UI-friendly discovery result.
+     * Processes discovered modules and prepares UI-friendly module_finding result.
      * 
      * <p>This method:
      * <ul>
@@ -185,7 +214,7 @@ public class ModuleDiscoveryHandler {
     // ==================== INNER CLASSES ====================
     
     /**
-     * Result object containing module discovery information.
+     * Result object containing module module_finding information.
      */
     public static class ModuleDiscoveryResult {
         /** Set of discovered module names. */
