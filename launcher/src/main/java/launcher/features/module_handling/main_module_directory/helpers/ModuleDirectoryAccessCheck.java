@@ -20,7 +20,7 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryAccessCheck {
+final class ModuleDirectoryAccessCheck {
     
     private ModuleDirectoryAccessCheck() {
         throw new AssertionError("Utility class should not be instantiated");

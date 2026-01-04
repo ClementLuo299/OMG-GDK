@@ -17,7 +17,13 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryFilter {
+/**
+ * Internal filter for the main modules directory.
+ * 
+ * <p>This filter is used when scanning the main modules directory to skip
+ * infrastructure and hidden directories that are not actual game modules.
+ */
+final class ModuleDirectoryFilter {
     
     private ModuleDirectoryFilter() {
         throw new AssertionError("Utility class should not be instantiated");
