@@ -8,7 +8,7 @@ import launcher.features.module_handling.validation.helpers.file_validation.Chec
 import java.io.File;
 
 /**
- * Public API for module validation.
+ * Checks if a directory contains a valid module.
  * 
  * <p>This class provides a single method to check if a directory contains a valid module.
  * All other validation logic is delegated to helper classes.
