@@ -9,15 +9,15 @@ import java.io.File;
  * It filters out infrastructure directories (like "target", ".git") and hidden directories
  * that are not actual game modules.
  * 
- * <p>This class is package-private. External code should use {@link ModuleDirectoryValidator}
- * as the public API for directory management operations.
+ * <p>This class is internal to the directory_management package. External code should use
+ * {@link ModuleDirectoryManager} as the public API for directory management operations.
  * 
  * @author Clement Luo
  * @date January 3, 2026
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-final class ModuleDirectoryFilter {
+public final class ModuleDirectoryFilter {
     
     private ModuleDirectoryFilter() {
         throw new AssertionError("Utility class should not be instantiated");

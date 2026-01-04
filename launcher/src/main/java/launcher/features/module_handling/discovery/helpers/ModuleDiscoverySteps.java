@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.directory_management.ModuleDirectoryValidator;
+import launcher.features.module_handling.directory_management.ModuleDirectoryManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public final class ModuleDiscoverySteps {
      */
     public static DiscoveryResult discover() {
         // Step 1: Validate that the modules directory exists and is accessible
-        ModuleDirectoryValidator.ValidationResult validationResult = ModuleDirectoryValidator.validate();
+        ModuleDirectoryManager.ValidationResult validationResult = ModuleDirectoryManager.validate();
         if (!validationResult.isValid()) {
             // Directory validation failed - return error immediately
             return DiscoveryResult.failure(validationResult.getErrorMessage());

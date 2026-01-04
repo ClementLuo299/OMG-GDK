@@ -1,6 +1,7 @@
 package launcher.features.module_handling.validation;
 
 import gdk.internal.Logging;
+import launcher.features.module_handling.directory_management.ModuleDirectoryManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.nio.file.Files;
  * 
  * <p>This class does NOT handle:
  * <ul>
- *   <li>Directory scanning or discovery (see ModuleDirectoryValidator)</li>
+ *   <li>Directory scanning or discovery (see ModuleDirectoryManager)</li>
  *   <li>Module loading or processing (see ModuleDiscovery)</li>
  * </ul>
  * 
@@ -310,7 +311,7 @@ public final class ModuleValidator {
                 Logging.info("🔍 Checking subdirectory: " + moduleName);
                 
                 // Skip infrastructure and hidden directories
-                if (launcher.features.module_handling.directory_management.ModuleDirectoryValidator.shouldSkip(subdir)) {
+                if (ModuleDirectoryManager.shouldSkip(subdir)) {
                     Logging.info("⏭️ Skipping internal directory: " + moduleName);
                     continue;
                 }

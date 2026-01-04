@@ -28,9 +28,9 @@ import java.util.List;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryValidator {
+public final class ModuleDirectoryManager {
     
-    private ModuleDirectoryValidator() {
+    private ModuleDirectoryManager() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

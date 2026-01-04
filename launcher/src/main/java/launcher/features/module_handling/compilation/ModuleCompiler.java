@@ -2,6 +2,7 @@ package launcher.features.module_handling.compilation;
 
 import gdk.internal.Logging;
 import gdk.api.GameModule;
+import launcher.features.module_handling.directory_management.ModuleDirectoryManager;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 
 import java.io.File;
@@ -448,6 +449,48 @@ public class ModuleCompiler {
     }
     
     // ==================== PUBLIC METHODS - COMPILATION STATUS ====================
+    
+    /**
+     * Reports compilation status for all modules in the directory.
+     * 
+     * <p>This method scans all modules and reports which ones need compilation.
+     * Useful for debugging and user feedback.
+     * 
+     * @param modulesDirectory The modules directory to check
+     */
+    public static void reportModuleCompilationStatus(File modulesDirectory) {
+        try {
+            Logging.info("=== MODULE COMPILATION STATUS ===");
+            
+            File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
+            if (subdirs == null) {
+                Logging.info("No subdirectories found");
+                return;
+            }
+            
+            for (File subdir : subdirs) {
+                // Skip infrastructure and hidden directories
+                if (ModuleDirectoryManager.shouldSkip(subdir)) {
+                    continue;
+                }
+                
+                String moduleName = subdir.getName();
+                
+                Logging.info("Module: " + moduleName);
+                boolean needsCompilation = launcher.features.module_handling.validation.ModuleValidator.moduleNeedsCompilation(subdir);
+                Logging.info("Compilation needed: " + needsCompilation);
+                
+                if (needsCompilation) {
+                    Logging.info("Run 'mvn compile' in modules/" + moduleName + " to compile");
+                }
+            }
+            
+            Logging.info("=== END COMPILATION STATUS ===");
+            
+        } catch (Exception e) {
+            Logging.error("Error reporting compilation status: " + e.getMessage(), e);
+        }
+    }
     
     /**
      * Checks if a module needs to be compiled.

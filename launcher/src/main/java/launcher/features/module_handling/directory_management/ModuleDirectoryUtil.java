@@ -7,26 +7,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Internal utility class for finding module directories.
+ * Internal utility class for operations on the modules directory.
  * 
- * <p>This class handles directory-level operations for discovering module subdirectories:
+ * <p>This class handles directory-level operations such as:
  * <ul>
  *   <li>Scanning the modules directory for module subdirectories</li>
- *   <li>Finding valid module directories (with structural validation)</li>
- *   <li>Finding all module directories (valid or invalid)</li>
+ *   <li>Counting modules in the directory</li>
  * </ul>
  * 
- * <p>This class is internal to the directory_management package. External code should use
- * {@link ModuleDirectoryManager} as the public API for directory management operations.
+ * <p>This class is package-private. External code should use {@link ModuleDirectoryValidator}
+ * as the public API for directory management operations.
  * 
  * @author Clement Luo
  * @date January 2, 2026
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryFinder {
+public final class ModuleDirectoryUtil {
     
-    private ModuleDirectoryFinder() {
+    private ModuleDirectoryUtil() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
