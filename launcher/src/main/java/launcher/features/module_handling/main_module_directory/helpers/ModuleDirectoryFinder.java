@@ -1,4 +1,4 @@
-package launcher.features.module_handling.directory_management;
+package launcher.features.module_handling.main_module_directory.helpers;
 
 import gdk.internal.Logging;
 
@@ -12,15 +12,16 @@ import java.util.List;
  * <p>This class scans the modules directory and finds all possible module folders,
  * filtering out infrastructure directories (like "target", ".git") and hidden directories.
  * 
- * <p>This class is internal to the directory_management package. External code should use
- * {@link ModuleDirectoryManager} as the public API for directory management operations.
+ * <p>This class is internal to the main_module_directory package. External code should use
+ * {@link launcher.features.module_handling.main_module_directory.ModuleFolderFinder}
+ * as the public API for directory management operations.
  * 
  * @author Clement Luo
  * @date January 2, 2026
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-final class ModuleDirectoryFinder {
+public final class ModuleDirectoryFinder {
     
     private ModuleDirectoryFinder() {
         throw new AssertionError("Utility class should not be instantiated");

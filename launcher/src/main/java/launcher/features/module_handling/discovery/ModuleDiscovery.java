@@ -4,7 +4,7 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.directory_management.ModuleDirectoryManager;
+import launcher.features.module_handling.main_module_directory.ModuleFolderFinder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,15 +58,15 @@ public class ModuleDiscovery {
         try {
             // Find module directory path
             String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-            List<File> validModuleDirectories = ModuleDirectoryManager.getValidModuleDirectories(modulesDirectoryPath);
+            List<File> moduleDirectories = ModuleFolderFinder.getModuleDirectories(modulesDirectoryPath);
             
-            if (validModuleDirectories.isEmpty()) {
-                Logging.info("Module lookup: No valid modules found");
+            if (moduleDirectories.isEmpty()) {
+                Logging.info("Module lookup: No module directories found");
                 return null;
             }
             
             // Load modules one by one until we find the selected game
-            for (File moduleDir : validModuleDirectories) {
+            for (File moduleDir : moduleDirectories) {
                 GameModule module = ModuleCompiler.loadModule(moduleDir);
                 if (module != null && gameName.equals(module.getMetadata().getGameName())) {
                     Logging.info("Module lookup: Found game module: " + gameName);
@@ -98,13 +98,22 @@ public class ModuleDiscovery {
             String modulesDirectoryPath = launcher.features.file_paths.PathUtil.getModulesDirectoryPath();
             Logging.info("Scanning for modules in: " + modulesDirectoryPath);
             
-            File modulesDir = new File(modulesDirectoryPath);
-            if (!modulesDir.exists()) {
-                Logging.error("Modules directory does not exist: " + modulesDirectoryPath);
+            // Get all module directories (checks access internally)
+            List<File> moduleDirectories = ModuleFolderFinder.getModuleDirectories(modulesDirectoryPath);
+            
+            if (moduleDirectories.isEmpty()) {
+                Logging.error("No module directories found or directory not accessible: " + modulesDirectoryPath);
                 return new ArrayList<>();
             }
             
-            List<File> validModuleDirectories = ModuleDirectoryManager.getValidModuleDirectories(modulesDirectoryPath);
+            // Filter to only valid module structures
+            List<File> validModuleDirectories = new ArrayList<>();
+            for (File folder : moduleDirectories) {
+                if (launcher.features.module_handling.validation.ModuleValidator.isValidModuleStructure(folder)) {
+                    validModuleDirectories.add(folder);
+                }
+            }
+            
             List<GameModule> discoveredModules = ModuleCompiler.loadModules(validModuleDirectories);
             
             // Filter out null modules

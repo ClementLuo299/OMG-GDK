@@ -1,7 +1,8 @@
 package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.directory_management.ModuleDirectoryFilter;
+import launcher.features.module_handling.discovery.ModuleFolderFilter;
+import launcher.features.module_handling.main_module_directory.ModuleFolderFinder;
 
 import java.io.File;
 
@@ -13,7 +14,7 @@ import java.io.File;
  * operation that determines how many valid modules exist.
  * 
  * <p>This class is internal to the module handling system. External code should use 
- * {@link launcher.features.module_handling.directory_management.ModuleDirectoryManager}
+ * {@link launcher.features.module_handling.main_module_directory.ModuleFolderFinder}
  * as the public API for directory management operations.
  * 
  * @author Clement Luo
@@ -52,7 +53,7 @@ public final class ModuleCounter {
             for (File subdir : subdirs) {
 
                 // Skip infrastructure and hidden directories that are not game modules
-                if (ModuleDirectoryFilter.shouldSkip(subdir)) {
+                if (ModuleFolderFilter.shouldSkip(subdir)) {
                     continue;
                 }
                 

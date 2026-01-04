@@ -1,7 +1,6 @@
 package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.directory_management.ModuleDirectoryManager;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 
 import java.io.File;
@@ -22,19 +21,33 @@ final class ModuleDiscoveryProcess {
     private ModuleDiscoveryProcess() {}
     
     /**
-     * Performs module discovery on the validated modules directory.
+     * Performs module discovery by validating the provided module directories.
      * 
-     * @param modulesDirectory The validated modules directory
-     * @param modulesDirectoryPath The file_paths to the modules directory
+     * @param modulesDirectory The modules directory (for diagnostics)
+     * @param modulesDirectoryPath The path to the modules directory (for diagnostics)
+     * @param moduleDirectories List of module directories to validate
      * @return List of valid module directories
      */
-    public static List<File> findModules(File modulesDirectory, String modulesDirectoryPath) {
+    public static List<File> findModules(File modulesDirectory, String modulesDirectoryPath, List<File> moduleDirectories) {
         List<File> validModuleDirectories = new ArrayList<>();
         
         try {
-            // Scan the modules directory and validate each subdirectory as a module
-            Logging.info("Starting module discovery...");
-            validModuleDirectories = ModuleDirectoryManager.getValidModuleDirectories(modulesDirectoryPath);
+            // Validate each folder to determine if it's a valid module
+            Logging.info("Validating " + moduleDirectories.size() + " module folders...");
+            for (File moduleFolder : moduleDirectories) {
+                try {
+                    if (launcher.features.module_handling.validation.ModuleValidator.isValidModuleStructure(moduleFolder)) {
+                        validModuleDirectories.add(moduleFolder);
+                        Logging.info("Valid module found: " + moduleFolder.getName());
+                    } else {
+                        Logging.info("Invalid module structure: " + moduleFolder.getName());
+                    }
+                } catch (Exception e) {
+                    Logging.error("Error validating module " + moduleFolder.getName() + ": " + e.getMessage());
+                    // Continue with other modules instead of failing completely
+                }
+            }
+            
             Logging.info("Module discovery completed. Found " + validModuleDirectories.size() + " valid modules");
             
         } catch (Exception e) {

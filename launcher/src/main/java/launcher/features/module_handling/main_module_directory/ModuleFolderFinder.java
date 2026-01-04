@@ -1,4 +1,7 @@
-package launcher.features.module_handling.directory_management;
+package launcher.features.module_handling.main_module_directory;
+
+import launcher.features.module_handling.main_module_directory.helpers.ModuleDirectoryAccessCheck;
+import launcher.features.module_handling.main_module_directory.helpers.ModuleDirectoryFinder;
 
 import java.io.File;
 import java.util.List;
@@ -17,9 +20,9 @@ import java.util.List;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryManager {
+public final class ModuleFolderFinder {
     
-    private ModuleDirectoryManager() {
+    private ModuleFolderFinder() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

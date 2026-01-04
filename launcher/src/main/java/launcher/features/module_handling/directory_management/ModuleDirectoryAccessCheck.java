@@ -1,4 +1,4 @@
-package launcher.features.module_handling.main_module_directory.helpers;
+package launcher.features.module_handling.directory_management;
 
 import gdk.internal.Logging;
 
@@ -11,16 +11,16 @@ import java.io.File;
  * and listing capabilities. It performs basic accessibility checks including
  * existence, directory type, readability, and listing capability.
  * 
- * <p>This class is internal to the main_module_directory package. External code
- * should use {@link launcher.features.module_handling.main_module_directory.ModuleFolderFinder}
- * as the public API for directory management operations.
+ * <p>This class is internal to the directory_management package. External code
+ * should use {@link ModuleDirectoryManager} as the public API for directory
+ * management operations.
  * 
  * @author Clement Luo
  * @date January 3, 2026
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleDirectoryAccessCheck {
+final class ModuleDirectoryAccessCheck {
     
     private ModuleDirectoryAccessCheck() {
         throw new AssertionError("Utility class should not be instantiated");
@@ -83,6 +83,17 @@ public final class ModuleDirectoryAccessCheck {
             Logging.error("Error testing modules directory access: " + e.getMessage(), e);
             return false;
         }
+    }
+    
+    /**
+     * Checks if a module directory exists and is accessible.
+     * 
+     * @param modulePath The path to the module directory
+     * @return true if the directory exists, is a directory, and is readable
+     */
+    public static boolean moduleDirectoryExists(String modulePath) {
+        File moduleDir = new File(modulePath);
+        return moduleDir.exists() && moduleDir.isDirectory() && moduleDir.canRead();
     }
 }
 

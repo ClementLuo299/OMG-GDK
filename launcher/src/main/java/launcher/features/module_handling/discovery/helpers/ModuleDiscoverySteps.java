@@ -2,7 +2,7 @@ package launcher.features.module_handling.discovery.helpers;
 
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.directory_management.ModuleDirectoryManager;
+import launcher.features.module_handling.main_module_directory.ModuleFolderFinder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,25 +58,30 @@ public final class ModuleDiscoverySteps {
     
     /**
      * Orchestrates the complete module discovery workflow.
-     * Coordinates validation, discovery execution, and result assembly.
+     * Coordinates directory access check, module discovery, and result assembly.
      * 
      * @return Discovery result containing valid module directories or error information
      */
     public static DiscoveryResult discover() {
-        // Step 1: Validate that the modules directory exists and is accessible
-        ModuleDirectoryManager.ValidationResult validationResult = ModuleDirectoryManager.validate();
-        if (!validationResult.isValid()) {
-            // Directory validation failed - return error immediately
-            return DiscoveryResult.failure(validationResult.getErrorMessage());
+        // Step 1: Get all module directories (checks access internally)
+        String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
+        List<File> moduleDirectories = ModuleFolderFinder.getModuleDirectories(modulesDirectoryPath);
+        
+        File modulesDirectory = new File(modulesDirectoryPath);
+        
+        if (moduleDirectories.isEmpty()) {
+            // No modules found or directory not accessible - run diagnostics
+            if (!modulesDirectory.exists()) {
+                return DiscoveryResult.failure("Modules directory does not exist: " + modulesDirectoryPath);
+            }
+            // Directory exists but no modules found - run diagnostics
+            ModuleDiscoveryProcess.runEmptyDiscoveryDiagnostics(modulesDirectory, modulesDirectoryPath);
+            return DiscoveryResult.failure("No module directories found in: " + modulesDirectoryPath);
         }
         
-        // Extract the validated directory and file_paths for discovery
-        File modulesDirectory = validationResult.getModulesDirectory();
-        String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
-        
-        // Step 2: Scan the directory and find all valid module subdirectories
-        Logging.info("Modules directory access test passed - proceeding with discovery");
-        List<File> validModuleDirectories = ModuleDiscoveryProcess.findModules(modulesDirectory, modulesDirectoryPath);
+        // Step 2: Validate the found module folders
+        Logging.info("Found " + moduleDirectories.size() + " possible module folders - validating...");
+        List<File> validModuleDirectories = ModuleDiscoveryProcess.findModules(modulesDirectory, modulesDirectoryPath, moduleDirectories);
         
         // Step 3: If no modules found, run diagnostics to help identify the issue
         if (validModuleDirectories.isEmpty()) {
