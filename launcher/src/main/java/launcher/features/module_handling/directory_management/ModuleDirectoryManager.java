@@ -2,6 +2,7 @@ package launcher.features.module_handling.directory_management;
 
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
+import launcher.features.module_handling.discovery.helpers.ModuleCounter;
 
 import java.io.File;
 import java.util.List;
@@ -15,10 +16,12 @@ import java.util.List;
  *   <li>Validating the modules directory for existence and accessibility</li>
  *   <li>Scanning the modules directory for module subdirectories</li>
  *   <li>Testing directory accessibility</li>
- *   <li>Diagnosing directory access issues</li>
- *   <li>Counting modules in the directory</li>
- *   <li>Reporting compilation status for all modules in the directory</li>
+ *   <li>Counting valid modules in the directory</li>
+ *   <li>Filtering infrastructure and hidden directories</li>
  * </ul>
+ * 
+ * <p>All other classes in this package are internal implementation details.
+ * External code should only use this class for directory management operations.
  * 
  * @author Clement Luo
  * @date December 27, 2025
@@ -89,7 +92,7 @@ public final class ModuleDirectoryValidator {
         
         // Second check: verify we can actually read and list contents of the directory
         Logging.info("Testing modules directory access...");
-        if (!ModuleDirectoryUtil.testModulesDirectoryAccess(modulesDirectoryPath)) {
+        if (!ModuleDirectoryAccessCheck.checkAccess(modulesDirectoryPath)) {
             // Directory exists but we can't access it (permissions issue)
             Logging.error("Modules directory access test failed - skipping module discovery");
             launcher.features.module_handling.validation.ModuleValidator.diagnoseModuleDetectionIssues(modulesDirectoryPath);
@@ -110,7 +113,7 @@ public final class ModuleDirectoryValidator {
      * @return The number of valid modules found
      */
     public static int countValidModules(String modulesDirectoryPath) {
-        return ModuleDirectoryUtil.countValidModules(modulesDirectoryPath);
+        return ModuleCounter.countValidModules(modulesDirectoryPath);
     }
     
     /**
@@ -124,7 +127,7 @@ public final class ModuleDirectoryValidator {
      * @return List of valid module directories
      */
     public static List<File> getValidModuleDirectories(String modulesDirectoryPath) {
-        return ModuleDirectoryUtil.getValidModuleDirectories(modulesDirectoryPath);
+        return ModuleDirectoryFinder.getAllValidModuleDirectories(modulesDirectoryPath);
     }
     
     /**
@@ -133,11 +136,11 @@ public final class ModuleDirectoryValidator {
      * <p>This method returns all directories in the modules directory, regardless
      * of validation status. Useful for diagnostics or bulk operations before validation.
      * 
-     * @param modulesDirectory The modules directory to scan
+     * @param modulesDirectoryPath The path to the modules directory to scan
      * @return List of all module directories (excluding infrastructure directories)
      */
-    public static List<File> getAllModuleDirectories(File modulesDirectory) {
-        return ModuleDirectoryUtil.getAllModuleDirectories(modulesDirectory);
+    public static List<File> getAllModuleDirectories(String modulesDirectoryPath) {
+        return ModuleDirectoryFinder.getAllModuleDirectories(modulesDirectoryPath);
     }
     
     /**
@@ -147,19 +150,7 @@ public final class ModuleDirectoryValidator {
      * @return true if the directory exists, is a directory, and is readable
      */
     public static boolean moduleDirectoryExists(String modulePath) {
-        return ModuleDirectoryUtil.moduleDirectoryExists(modulePath);
-    }
-    
-    /**
-     * Calculates the total number of steps needed for startup progress tracking.
-     * 
-     * <p>This method calculates progress steps based on fixed startup steps plus
-     * one step per valid module. The total is clamped to a reasonable range for UX.
-     * 
-     * @return The total number of progress steps
-     */
-    public static int calculateTotalSteps() {
-        return ModuleDirectoryUtil.calculateTotalSteps();
+        return ModuleDirectoryAccessCheck.moduleDirectoryExists(modulePath);
     }
     
     // ==================== PUBLIC METHODS - DIAGNOSTICS ====================
@@ -175,19 +166,7 @@ public final class ModuleDirectoryValidator {
      * @return true if the directory is accessible, false otherwise
      */
     public static boolean testModulesDirectoryAccess(String modulesDirectoryPath) {
-        return ModuleDirectoryUtil.testModulesDirectoryAccess(modulesDirectoryPath);
-    }
-    
-    /**
-     * Reports compilation status for all modules in the directory.
-     * 
-     * <p>This method scans all modules and reports which ones need compilation.
-     * Useful for debugging and user feedback.
-     * 
-     * @param modulesDirectory The modules directory to check
-     */
-    public static void reportModuleCompilationStatus(File modulesDirectory) {
-        ModuleDirectoryUtil.reportModuleCompilationStatus(modulesDirectory);
+        return ModuleDirectoryAccessCheck.checkAccess(modulesDirectoryPath);
     }
     
     /**
