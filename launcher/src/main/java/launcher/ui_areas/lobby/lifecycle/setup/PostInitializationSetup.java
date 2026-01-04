@@ -8,7 +8,6 @@ import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 import launcher.ui_areas.lobby.subcontrollers.TopBarController;
-import launcher.features.module_handling.compilation.ModuleCompiler;
 
 /**
  * Handles post-initialization setup tasks.
@@ -45,11 +44,6 @@ public class PostInitializationSetup {
         
         // Mirror game 'end' messages into JSON output
         messageBridgeManager.subscribeToEndMessageMirror();
-        
-        // ==================== MODULE COMPILER SETUP ====================
-        
-        // Register controller with ModuleCompiler for progress updates
-        ModuleCompiler.setUIController(controller);
         
         // ==================== PERSISTENCE SETUP ====================
         

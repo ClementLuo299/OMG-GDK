@@ -1,7 +1,7 @@
 package launcher.ui_areas.lobby.game_launching;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.compilation.ModuleCompiler;
+import launcher.features.module_handling.compilation.CompilationFailures;
 import javafx.application.Platform;
 
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class ModuleCompilationChecker {
             Logging.info("Checking for compilation failures on startup...");
             
             // Get compilation failures from ModuleCompiler
-            List<String> compilationFailures = ModuleCompiler.checkForCompilationFailures();
+            List<String> compilationFailures = CompilationFailures.check();
             
             // Report failures to UI if any were found
             if (!compilationFailures.isEmpty()) {

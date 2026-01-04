@@ -268,10 +268,6 @@ public final class ModuleDiscovery {
         // Run comprehensive diagnostics to help identify why no modules were found
         Logging.warning("No valid modules found - running diagnostics...");
         ModuleDiscoveryDiagnostics.runModuleDetectionDiagnostics(modulesDirectoryPath);
-        
-        // Check if modules exist but just need to be compiled
-        Logging.info("Checking module compilation status...");
-        ModuleCompiler.reportModuleCompilationStatus(modulesDirectory);
     }
     
 }

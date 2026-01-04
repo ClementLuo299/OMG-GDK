@@ -2,6 +2,7 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
+import launcher.features.module_handling.compilation.CompilationFailures;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
@@ -221,7 +222,7 @@ public class GameModuleRefreshManager {
      */
     private void checkAndReportCompilationFailures() {
         if (moduleCompilationChecker != null) {
-            List<String> compilationFailures = launcher.features.module_handling.compilation.ModuleCompiler.checkForCompilationFailures();
+            List<String> compilationFailures = CompilationFailures.check();
             if (!compilationFailures.isEmpty()) {
                 for (String moduleName : compilationFailures) {
                     messageManager.addMessage("Module '" + moduleName + "' failed to compile - check source code for errors");

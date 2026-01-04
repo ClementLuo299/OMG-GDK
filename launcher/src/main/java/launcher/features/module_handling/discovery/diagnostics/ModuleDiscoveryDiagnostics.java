@@ -49,7 +49,7 @@ public final class ModuleDiscoveryDiagnostics {
             File modulesDirectory = CheckModulesDirectoryPath.check(modulesDirectoryPath);
             
             // Step 3: Check if directory exists and is accessible
-            if (!CheckDirectoryAccess.check(modulesDirectory)) {
+            if (!CheckModuleDirectoryAccess.check(modulesDirectory)) {
                 // If directory doesn't exist, search common locations
                 SearchCommonLocationsForModuleDirectory.search();
                 Logging.info("=== END DIAGNOSTICS ===");
@@ -65,9 +65,6 @@ public final class ModuleDiscoveryDiagnostics {
             
             // Step 5: Validate module directories
             ValidateModuleDirectories.validate(modulesDirectory);
-            
-            // Step 6: Check compilation status
-            ValidateModuleDirectories.checkCompilationStatus(modulesDirectory);
             
         } catch (Exception e) {
             Logging.error("Error during diagnostics: " + e.getMessage(), e);
