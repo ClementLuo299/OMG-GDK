@@ -2,7 +2,7 @@ package launcher.features.module_handling.on_app_start.helpers.thread_tasks_help
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.compilation.ModuleCompiler;
+import launcher.features.module_handling.compilation.LoadModules;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -77,7 +77,7 @@ public final class ModuleRuntimeLoader {
         try {
             // Delegate to ModuleCompiler for actual loading
             Logging.info("Starting module loading...");
-            ModuleCompiler.ModuleLoadResult result = ModuleCompiler.loadModules(validModuleDirectories);
+            LoadModules.ModuleLoadResult result = LoadModules.loadModules(validModuleDirectories);
             List<GameModule> discoveredModules = result.getLoadedModules();
             
             // Log compilation failures if any

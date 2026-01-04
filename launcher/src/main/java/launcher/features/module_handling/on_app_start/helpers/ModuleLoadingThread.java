@@ -10,8 +10,8 @@ import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;
 
 /**
- * Creates and manages the background helpers that loads game modules during startup.
- * Focuses on helpers creation, error handling, and coordinating startup phases.
+ * Creates and manages the background steps that loads game modules during startup.
+ * Focuses on steps creation, error handling, and coordinating startup phases.
  * 
  * @author Clement Luo
  * @date December 21, 2025
@@ -23,12 +23,12 @@ public final class ModuleLoadingThread {
     private ModuleLoadingThread() {}
 
     /**
-     * Creates and configures the background helpers that loads modules.
+     * Creates and configures the background steps that loads modules.
      * 
      * @param primaryApplicationStage The primary stage to show when ready
      * @param lobbyController The controller to update with loaded games
      * @param windowManager The startup window
-     * @return The configured but not-yet-started helpers
+     * @return The configured but not-yet-started steps
      */
     public static Thread create(Stage primaryApplicationStage,
                                 GDKGameLobbyController lobbyController, 
@@ -36,7 +36,7 @@ public final class ModuleLoadingThread {
 
         return new Thread(() -> {
             try {
-                Logging.info("Starting module ui_loading on background helpers");
+                Logging.info("Starting module ui_loading on background steps");
                 
                 // Phase 1: Load all game modules
                 LoadModules.loadModules();
@@ -51,7 +51,7 @@ public final class ModuleLoadingThread {
                 Logging.info("All startup tasks complete - showing main stage");
                 StartupWindowToMainStageTransition.showMainStage(primaryApplicationStage, windowManager);
                 
-                Logging.info("Module ui_loading helpers completed successfully");
+                Logging.info("Module ui_loading steps completed successfully");
                 
             } catch (Exception e) {
                 handleModuleLoadingError(e, primaryApplicationStage, windowManager);
@@ -70,7 +70,7 @@ public final class ModuleLoadingThread {
     private static void handleModuleLoadingError(Exception error, 
                                                  Stage primaryApplicationStage, 
                                                  StartupWindow windowManager) {
-        Logging.error("Critical error in module ui_loading helpers: " + error.getMessage(), error);
+        Logging.error("Critical error in module ui_loading steps: " + error.getMessage(), error);
         
         // Even on error, try to show the main stage
         try {

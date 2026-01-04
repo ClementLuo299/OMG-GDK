@@ -1,6 +1,7 @@
-package launcher.features.module_handling.discovery.diagnostics.helpers;
+package launcher.features.module_handling.discovery.diagnostics.steps;
 
 import gdk.internal.Logging;
+import launcher.features.module_handling.discovery.diagnostics.steps.helpers.CheckCompilationNeeded;
 import launcher.features.module_handling.module_source_validation.ModuleSourceValidator;
 import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 

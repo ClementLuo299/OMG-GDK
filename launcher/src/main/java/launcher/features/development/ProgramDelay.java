@@ -53,7 +53,7 @@ public final class ProgramDelay {
      * <p>This method adds a delay with logging to make it clear what's happening.
      * The delay is only executed if ENABLE_DEVELOPMENT_DELAYS is set to true.
      * 
-     * <p>The delay duration is controlled by DELAY_DURATION_MS. If the helpers is interrupted,
+     * <p>The delay duration is controlled by DELAY_DURATION_MS. If the steps is interrupted,
      * the interruption status is preserved.
      * 
      * @param reason The reason for the delay (for logging purposes)

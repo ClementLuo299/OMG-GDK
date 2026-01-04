@@ -9,7 +9,7 @@ import launcher.core.lifecycle.stop.Shutdown;
 
 /**
  * Coordinates the module ui_loading process during startup.
- * Sets up and starts the background helpers that loads game modules and manages cleanup tasks.
+ * Sets up and starts the background steps that loads game modules and manages cleanup tasks.
  * 
  * @author Clement Luo
  * @date August 9, 2025
@@ -37,23 +37,23 @@ public final class ModuleLoadingProcess {
             Thread.currentThread().interrupt();
         }
         
-        // Create a background helpers that will load all the modules
-        // This helpers does the heavy work so the UI doesn't freeze
+        // Create a background steps that will load all the modules
+        // This steps does the heavy work so the UI doesn't freeze
         Thread moduleLoadingThread = ModuleLoadingThread.create(primaryApplicationStage, lobbyController, windowManager);
         
-        // Step 4: Make sure we clean up the helpers if the app closes unexpectedly
+        // Step 4: Make sure we clean up the steps if the app closes unexpectedly
         registerCleanupTasks(moduleLoadingThread, windowManager);
         
-        // Step 5: Start the background helpers
+        // Step 5: Start the background steps
         // After this line, the method returns immediately.
-        // The background helpers continues working and will:
+        // The background steps continues working and will:
         // - Load modules
         // - Update the UI
         // - Show the main window when done
         moduleLoadingThread.start();
         
         // Method returns here - the caller continues immediately
-        // Background helpers keeps working in the background
+        // Background steps keeps working in the background
     }
     
     
@@ -61,13 +61,13 @@ public final class ModuleLoadingProcess {
      * Registers cleanup tasks to ensure proper shutdown.
      * These tasks will be executed when the application shuts down.
      * 
-     * @param moduleLoadingThread The helpers to interrupt on shutdown
+     * @param moduleLoadingThread The steps to interrupt on shutdown
      * @param windowManager The startup window to hide on shutdown
      */
     private static void registerCleanupTasks(Thread moduleLoadingThread, StartupWindow windowManager) {
-        // Clean up the module loading helpers if app shuts down while loading
+        // Clean up the module loading steps if app shuts down while loading
         Shutdown.registerCleanupTask(() -> {
-            Logging.info("Cleaning up module loading helpers...");
+            Logging.info("Cleaning up module loading steps...");
             if (moduleLoadingThread.isAlive()) {
                 moduleLoadingThread.interrupt();
             }

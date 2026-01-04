@@ -30,7 +30,7 @@ public final class JsonUtil {
     /**
      * Shared ObjectMapper instance for JSON operations.
      * 
-     * <p>ObjectMapper is helpers-safe after configuration, so we can reuse it
+     * <p>ObjectMapper is steps-safe after configuration, so we can reuse it
      * across all JSON operations for better performance.
      */
     private static final ObjectMapper jsonMapper = new ObjectMapper();

@@ -25,7 +25,7 @@ public final class ModuleUIUpdater {
      */
     public static void updateUIWithLoadedGames(GDKGameLobbyController lobbyController) {
         // Schedule UI update to run on JavaFX Application Thread (required for UI operations)
-        Logging.info("Scheduling UI refresh on JavaFX helpers...");
+        Logging.info("Scheduling UI refresh on JavaFX steps...");
         Platform.runLater(() -> {
             try {
                 Logging.info("Refreshing available game modules in UI...");

@@ -14,7 +14,7 @@ import java.util.Set;
 import javafx.application.Platform;
 
 /**
- * Helper class for loading modules from compiled classes.
+ * Given a directory, we load the game module given its compiled code.
  * 
  * <p>This class handles the complete process of loading a game module from its
  * compiled bytecode into a usable GameModule instance. It performs validation,
@@ -25,9 +25,9 @@ import javafx.application.Platform;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleLoaderHelper {
+public final class ModuleLoader {
     
-    private ModuleLoaderHelper() {
+    private ModuleLoader() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -73,7 +73,7 @@ public final class ModuleLoaderHelper {
             //   - Source files are valid (Main.java, Metadata.java exist and have correct structure)
             //   - Compiled classes exist (target/classes/Main.class exists)
             // If either check fails, we can't load the module, so return early
-            if (!CheckIfModuleIsLoadable.isReadyToLoad(moduleDir)) {
+            if (!ModuleValidator.preLoadCheck(moduleDir)) {
                 Logging.info("Module " + moduleName + " failed pre-load validation");
                 return null;
             }
@@ -93,7 +93,7 @@ public final class ModuleLoaderHelper {
             //   - Resolving class references when loading the Main class
             // ModuleClassLoaderFactory creates a URLClassLoader with all necessary paths
             Logging.info("🔧 Creating classloader for module: " + moduleName);
-            URLClassLoader classLoader = ModuleClassLoaderFactory.create(moduleDir);
+            URLClassLoader classLoader = CreateClassLoader.create(moduleDir);
             Logging.info("✅ Classloader created successfully for module: " + moduleName);
             
             // Check timeout after ClassLoader creation
@@ -186,7 +186,7 @@ public final class ModuleLoaderHelper {
             // Now that the class is loaded, we verify it implements the GameModule interface
             // This uses reflection to check if the class implements GameModule
             // We can't do this check before loading because we need the Class object
-            if (!ModuleTargetValidator.isValidMainClass(mainClass)) {
+            if (!ModuleTargetValidator.postLoadCheck(mainClass)) {
                 Logging.info("Main class validation failed for " + moduleName + " - does not implement GameModule");
                 return null;
             }

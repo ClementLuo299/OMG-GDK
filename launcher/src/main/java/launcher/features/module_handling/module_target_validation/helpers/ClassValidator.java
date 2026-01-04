@@ -1,10 +1,10 @@
-package launcher.features.module_handling.module_target_validation;
+package launcher.features.module_handling.module_target_validation.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 
 /**
- * Helper class for validating loaded classes.
+ * Helper class for validating already loaded classes.
  * 
  * @author Clement Luo
  * @date January 3, 2026

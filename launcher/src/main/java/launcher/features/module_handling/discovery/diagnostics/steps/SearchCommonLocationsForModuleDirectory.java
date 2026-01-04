@@ -1,4 +1,4 @@
-package launcher.features.module_handling.discovery.diagnostics.helpers;
+package launcher.features.module_handling.discovery.diagnostics.steps;
 
 import gdk.internal.Logging;
 

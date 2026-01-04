@@ -112,7 +112,7 @@ public class GameModuleRefreshManager {
      *   <li>Change detection and reporting</li>
      * </ul>
      * 
-     * <p>This operation runs in a background helpers to keep the UI responsive.
+     * <p>This operation runs in a background steps to keep the UI responsive.
      */
     public void handleRefresh() {
         // Initialize UI state for refresh operation
@@ -120,14 +120,14 @@ public class GameModuleRefreshManager {
         messageManager.setRefreshing(true);
         messageManager.clearMessages();
 
-        // Snapshot current state on JavaFX helpers for safe background use
+        // Snapshot current state on JavaFX steps for safe background use
         List<GameModule> previousModulesSnapshot = new ArrayList<>(uiUpdater.availableGameModules);
         int previousCountSnapshot = previousModuleCount;
 
         // Clear UI selections immediately to prevent launching stale modules
         uiUpdater.clearUISelections();
         
-        // Perform refresh in background helpers to keep UI responsive
+        // Perform refresh in background steps to keep UI responsive
         new Thread(() -> {
             try {
                 performFullRefresh(previousModulesSnapshot, previousCountSnapshot);
@@ -149,8 +149,8 @@ public class GameModuleRefreshManager {
      *   <li>Reports module changes if this is not the first load</li>
      * </ul>
      * 
-     * <p>Can be called from any helpers; UI updates are automatically scheduled
-     * on the JavaFX application helpers if needed.
+     * <p>Can be called from any steps; UI updates are automatically scheduled
+     * on the JavaFX application steps if needed.
      */
     public void refreshAvailableGameModulesFast() {
         try {
@@ -176,7 +176,7 @@ public class GameModuleRefreshManager {
             // Filter out any null modules
             List<GameModule> validModules = moduleDiscoveryHandler.filterValidModules(discoveredGameModules);
             
-            // Update UI on JavaFX helpers
+            // Update UI on JavaFX steps
             previousModuleCount = uiUpdater.updateUIForFastRefresh(
                 validModules, discoveryResult, messageManager, moduleChangeReporter, previousModuleNames);
             
@@ -188,7 +188,7 @@ public class GameModuleRefreshManager {
     // ==================== PRIVATE HELPER METHODS - FULL REFRESH ====================
     
     /**
-     * Performs the core full refresh logic in a background helpers.
+     * Performs the core full refresh logic in a background steps.
      * 
      * @param previousModulesSnapshot Snapshot of modules before refresh
      * @param previousCountSnapshot Count of modules before refresh
@@ -212,7 +212,7 @@ public class GameModuleRefreshManager {
         // Check for compilation failures and report them
         checkAndReportCompilationFailures(discoveryResult.getCompilationFailures());
         
-        // Update ComboBox UI on JavaFX helpers
+        // Update ComboBox UI on JavaFX steps
         uiUpdater.updateComboBoxUI(discoveredGameModules);
         
         // Detect and report module changes

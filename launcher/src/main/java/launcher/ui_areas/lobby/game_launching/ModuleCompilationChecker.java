@@ -94,7 +94,7 @@ public class ModuleCompilationChecker {
     // ==================== PRIVATE HELPER METHODS ====================
     
     /**
-     * Reports compilation failures to the UI on the JavaFX helpers.
+     * Reports compilation failures to the UI on the JavaFX steps.
      * 
      * @param compilationFailures List of module names that failed to compile
      */

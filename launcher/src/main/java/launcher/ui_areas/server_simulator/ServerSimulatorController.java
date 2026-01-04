@@ -471,8 +471,8 @@ public class ServerSimulatorController {
      * 
      * <p>This method adds a message to the display area with proper
      * timestamp formatting and ensures the display scrolls to show
-     * the latest message. This method is helpers-safe and can be called
-     * from any helpers, as it uses Platform.runLater to update the UI.
+     * the latest message. This method is steps-safe and can be called
+     * from any steps, as it uses Platform.runLater to update the UI.
      * 
      * @param messageText The message text to display
      */

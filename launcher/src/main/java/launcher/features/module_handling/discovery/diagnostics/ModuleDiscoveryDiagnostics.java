@@ -1,7 +1,7 @@
 package launcher.features.module_handling.discovery.diagnostics;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.discovery.diagnostics.helpers.*;
+import launcher.features.module_handling.discovery.diagnostics.steps.*;
 
 import java.io.File;
 

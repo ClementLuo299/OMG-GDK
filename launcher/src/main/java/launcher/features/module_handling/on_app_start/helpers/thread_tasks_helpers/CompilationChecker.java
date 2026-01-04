@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Checks for compilation failures and displays warnings.
- * Handles both Swing EDT (progress updates) and JavaFX helpers (controller checks).
+ * Handles both Swing EDT (progress updates) and JavaFX steps (controller checks).
  * 
  * @author Clement Luo
  * @date December 27, 2025
@@ -34,12 +34,12 @@ public final class CompilationChecker {
     
     /**
      * Checks for compilation failures and displays warnings if needed.
-     * The controller check must run on the JavaFX helpers.
+     * The controller check must run on the JavaFX steps.
      * 
      * @param lobbyController The controller to check for issues
      */
     public static void checkForCompilationIssues(GDKGameLobbyController lobbyController) {
-        // Check for compilation failures (must run on JavaFX helpers for controller access)
+        // Check for compilation failures (must run on JavaFX steps for controller access)
         Platform.runLater(() -> {
             try {
                 if (lobbyController != null) {

@@ -2,10 +2,10 @@ package launcher.features.module_handling.discovery;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.module_handling.compilation.ModuleCompiler;
+import launcher.features.module_handling.compilation.LoadModules;
 import launcher.features.file_paths.PathUtil;
 import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
-import launcher.features.module_handling.module_source_validation.ModuleValidator;
+import launcher.features.module_handling.module_source_validation.ModuleSourceValidator;
 import launcher.features.module_handling.discovery.diagnostics.ModuleDiscoveryDiagnostics;
 
 import java.io.File;
@@ -131,7 +131,7 @@ public final class ModuleDiscovery {
             
             // Load modules one by one until we find the selected game
             for (File moduleDir : moduleDirectories) {
-                GameModule module = ModuleCompiler.loadModule(moduleDir);
+                GameModule module = LoadModules.loadModule(moduleDir);
                 if (module != null && gameName.equals(module.getMetadata().getGameName())) {
                     Logging.info("Module lookup: Found game module: " + gameName);
                     return module;
@@ -188,12 +188,12 @@ public final class ModuleDiscovery {
             // Filter to only valid module structures
             List<File> validModuleDirectories = new ArrayList<>();
             for (File folder : moduleDirectories) {
-                if (launcher.features.module_handling.module_source_validation.ModuleValidator.isValidModule(folder)) {
+                if (ModuleSourceValidator.isValidModule(folder)) {
                     validModuleDirectories.add(folder);
                 }
             }
             
-            ModuleCompiler.ModuleLoadResult result = ModuleCompiler.loadModules(validModuleDirectories);
+            LoadModules.ModuleLoadResult result = LoadModules.loadModules(validModuleDirectories);
             List<GameModule> discoveredModules = result.getLoadedModules();
             
             // Log compilation failures if any
@@ -268,7 +268,7 @@ public final class ModuleDiscovery {
             Logging.info("Validating " + moduleDirectories.size() + " module folders...");
             for (File moduleFolder : moduleDirectories) {
                 try {
-                    if (ModuleValidator.isValidModule(moduleFolder)) {
+                    if (ModuleSourceValidator.isValidModule(moduleFolder)) {
                         validModuleDirectories.add(moduleFolder);
                         Logging.info("Valid module found: " + moduleFolder.getName());
                     } else {

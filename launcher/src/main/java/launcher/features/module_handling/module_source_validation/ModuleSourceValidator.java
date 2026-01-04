@@ -21,9 +21,9 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleValidator {
+public final class ModuleSourceValidator {
     
-    private ModuleValidator() {
+    private ModuleSourceValidator() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

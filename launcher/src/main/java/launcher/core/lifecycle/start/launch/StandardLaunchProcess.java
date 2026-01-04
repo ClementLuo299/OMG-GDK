@@ -40,7 +40,7 @@ public final class StandardLaunchProcess {
             GDKGameLobbyController lobbyController = 
                 InitializeLobbyUIForStandardLaunch.initialize(primaryApplicationStage);
 
-            // Step 3: Start loading modules in a background helpers
+            // Step 3: Start loading modules in a background steps
             ModuleLoadingProcess.start(primaryApplicationStage, lobbyController, windowManager);
 
             Logging.info("GDK application startup completed successfully");

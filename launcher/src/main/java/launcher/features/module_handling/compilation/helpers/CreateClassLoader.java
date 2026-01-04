@@ -16,9 +16,9 @@ import java.util.List;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class ModuleClassLoaderFactory {
+public final class CreateClassLoader {
     
-    private ModuleClassLoaderFactory() {
+    private CreateClassLoader() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -133,7 +133,7 @@ public final class ModuleClassLoaderFactory {
         }
         
         Logging.info("Created classloader with " + classpathUrls.size() + " classpath entries for module: " + moduleDir.getName());
-        return new URLClassLoader(classpathUrls.toArray(new URL[0]), ModuleClassLoaderFactory.class.getClassLoader());
+        return new URLClassLoader(classpathUrls.toArray(new URL[0]), CreateClassLoader.class.getClassLoader());
     }
 }
 

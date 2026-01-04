@@ -28,7 +28,7 @@ import java.util.Optional;
  *   <li>Displaying information pop_up_dialogs</li>
  *   <li>Displaying confirmation pop_up_dialogs (with custom button text support)</li>
  *   <li>Displaying custom and expandable pop_up_dialogs</li>
- *   <li>Application-specific dialog helpers</li>
+ *   <li>Application-specific dialog steps</li>
  * </ul>
  * 
  * @author Clement Luo
@@ -379,8 +379,8 @@ public class DialogUtil {
     /**
      * Ensures dialog is shown on the JavaFX Application Thread.
      * 
-     * <p>This method checks if the current helpers is the JavaFX Application Thread.
-     * If not, it schedules the runnable to run on that helpers using Platform.runLater().
+     * <p>This method checks if the current steps is the JavaFX Application Thread.
+     * If not, it schedules the runnable to run on that steps using Platform.runLater().
      * 
      * @param runnable The dialog display code to execute
      */

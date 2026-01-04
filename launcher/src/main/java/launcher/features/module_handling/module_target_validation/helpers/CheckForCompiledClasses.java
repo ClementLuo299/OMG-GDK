@@ -1,4 +1,4 @@
-package launcher.features.module_handling.module_target_validation;
+package launcher.features.module_handling.module_target_validation.helpers;
 
 import gdk.internal.Logging;
 
@@ -9,6 +9,7 @@ import java.io.File;
  * 
  * @author Clement Luo
  * @date January 3, 2026
+ * @edited January 3, 2026
  * @since Beta 1.0
  */
 public final class CheckForCompiledClasses {
