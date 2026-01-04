@@ -32,11 +32,11 @@ import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
  * 
  * This class manages the main lobby interface where users can select and launch
  * game modules. It provides functionality for game selection, JSON configuration
- * validation, and game launching with proper error handling.
+ * module_code_validation, and game launching with proper error handling.
  * 
  * Key responsibilities:
  * - Manage the game selection interface
- * - Handle JSON configuration input and validation
+ * - Handle JSON configuration input and module_code_validation
  * - Coordinate game launching with the ViewModel
  * - Provide user feedback through messages and error pop_up_dialogs
  * - Manage the refresh of available game modules

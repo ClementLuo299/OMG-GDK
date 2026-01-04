@@ -1,4 +1,4 @@
-package launcher.features.module_handling.compilation.helpers;
+package launcher.features.module_handling.compilation;
 
 import gdk.internal.Logging;
 

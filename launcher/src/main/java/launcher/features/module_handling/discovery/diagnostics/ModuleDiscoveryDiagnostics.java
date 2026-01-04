@@ -34,7 +34,7 @@ public final class ModuleDiscoveryDiagnostics {
      *   <li>Checking compilation status</li>
      * </ul>
      * 
-     * <p>This will help identify file system, path, or validation issues.
+     * <p>This will help identify file system, path, or module_code_validation issues.
      * 
      * @param modulesDirectoryPath The path to the modules directory
      */
@@ -65,6 +65,9 @@ public final class ModuleDiscoveryDiagnostics {
             
             // Step 5: Validate module directories
             ValidateModuleDirectories.validate(modulesDirectory);
+            
+            // Step 6: Check compilation status
+            ValidateModuleDirectories.checkCompilationStatus(modulesDirectory);
             
         } catch (Exception e) {
             Logging.error("Error during diagnostics: " + e.getMessage(), e);

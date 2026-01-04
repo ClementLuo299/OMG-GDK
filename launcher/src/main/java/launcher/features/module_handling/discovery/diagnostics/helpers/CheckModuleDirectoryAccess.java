@@ -12,9 +12,9 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class CheckDirectoryAccess {
+public final class CheckModuleDirectoryAccess {
     
-    private CheckDirectoryAccess() {
+    private CheckModuleDirectoryAccess() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

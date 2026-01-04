@@ -64,16 +64,16 @@ public class GameLaunchErrorHandler {
     }
     
     /**
-     * Handles validation error during launch.
+     * Handles module_code_validation error during launch.
      * 
      * <p>For UI launches, shows an error dialog and message.
      * For auto-launches, only logs the error.
      * 
-     * @param errorMessage The validation error message
+     * @param errorMessage The module_code_validation error message
      * @param isAutoLaunch Whether this is an auto-launch (affects error handling)
      */
     public void handleValidationError(String errorMessage, boolean isAutoLaunch) {
-        Logging.error("Game launch validation failed: " + errorMessage);
+        Logging.error("Game launch module_code_validation failed: " + errorMessage);
         
         if (!isAutoLaunch) {
             DialogUtil.showError("Launch Error", errorMessage);

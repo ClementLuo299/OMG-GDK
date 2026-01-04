@@ -12,7 +12,7 @@ import java.io.File;
  * existence, directory type, readability, and listing capability.
  * 
  * <p>This is a general-purpose utility that can be used anywhere directory
- * access validation is needed.
+ * access module_code_validation is needed.
  * 
  * @author Clement Luo
  * @date January 3, 2026

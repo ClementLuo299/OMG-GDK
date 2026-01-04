@@ -1,10 +1,12 @@
 package launcher.features.module_handling.discovery.diagnostics.helpers;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.validation.ModuleValidator;
-import launcher.features.module_handling.validation.helpers.CheckCompilationNeeded;
+import launcher.features.module_handling.module_code_validation.ModuleValidator;
+import launcher.features.module_handling.compilation.CheckCompilationNeeded;
+import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Helper class for validating module directories during diagnostics.
@@ -23,61 +25,73 @@ public final class ValidateModuleDirectories {
     /**
      * Validates all module directories found in the modules directory.
      * 
+     * <p>This method uses ScanForModuleFolders to find potential module folders
+     * (which already filters out infrastructure directories), then uses
+     * ModuleValidator to check each one and logs the validation results.
+     * 
      * @param modulesDirectory The modules directory containing potential module folders
      */
     public static void validate(File modulesDirectory) {
-        File[] subdirs = modulesDirectory.listFiles(File::isDirectory);
-        if (subdirs == null) {
-            Logging.error("Cannot list subdirectories (null returned)");
+        String modulesDirectoryPath = modulesDirectory.getAbsolutePath();
+        List<File> moduleFolders = ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
+        
+        if (moduleFolders.isEmpty()) {
+            Logging.info("No module folders found in: " + modulesDirectoryPath);
             return;
         }
         
-        Logging.info("Found " + subdirs.length + " subdirectories:");
-        for (File subdir : subdirs) {
-            String moduleName = subdir.getName();
-            Logging.info("Checking subdirectory: " + moduleName);
+        Logging.info("Found " + moduleFolders.size() + " potential module folder(s):");
+        for (File moduleFolder : moduleFolders) {
+            String moduleName = moduleFolder.getName();
+            Logging.info("Checking module folder: " + moduleName);
             
-            // Skip infrastructure and hidden directories
-            String dirName = subdir.getName();
-            if (dirName.equals("target") || dirName.startsWith(".")) {
-                Logging.info("Skipping internal directory: " + moduleName);
-                continue;
-            }
-            
-            // Check module structure
-            Logging.info("Validating module structure for: " + moduleName);
-            
-            // Check for required files
-            File mainJavaFile = new File(subdir, "src/main/java/Main.java");
-            File metadataJavaFile = new File(subdir, "src/main/java/Metadata.java");
-            File targetClassesDir = new File(subdir, "target/classes");
-            File mainClassFile = new File(targetClassesDir, "Main.class");
-            
-            Logging.info("Main.java exists: " + mainJavaFile.exists());
-            Logging.info("Metadata.java exists: " + metadataJavaFile.exists());
-            Logging.info("target/classes exists: " + targetClassesDir.exists());
-            Logging.info("Main.class exists: " + mainClassFile.exists());
-            
-            // Try to validate the structure
+            // Validate using ModuleValidator (which already checks all required files)
             try {
-                boolean isValid = ModuleValidator.isValidModule(subdir);
-                Logging.info("Module structure validation result: " + isValid);
-                
-                if (isValid) {
-                    Logging.info("Module " + moduleName + " is VALID!");
-                    
-                    // Check compilation status
-                    boolean needsCompilation = CheckCompilationNeeded.needsCompilation(subdir);
-                    Logging.info("Compilation needed: " + needsCompilation);
-                    
-                    if (needsCompilation) {
-                        Logging.info("Run 'mvn compile' in modules/" + moduleName + " to compile");
-                    }
-                } else {
-                    Logging.info("Module " + moduleName + " is INVALID");
-                }
+                boolean isValid = ModuleValidator.isValidModule(moduleFolder);
+                Logging.info("Module validation result for " + moduleName + ": " + (isValid ? "VALID" : "INVALID"));
             } catch (Exception e) {
                 Logging.error("Error validating module " + moduleName + ": " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Checks compilation status for all valid module directories found in the modules directory.
+     * 
+     * <p>This method uses ScanForModuleFolders to find potential module folders,
+     * validates each one, and then checks compilation status for valid modules.
+     * 
+     * @param modulesDirectory The modules directory containing potential module folders
+     */
+    public static void checkCompilationStatus(File modulesDirectory) {
+        String modulesDirectoryPath = modulesDirectory.getAbsolutePath();
+        List<File> moduleFolders = ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
+        
+        if (moduleFolders.isEmpty()) {
+            Logging.info("No module folders found in: " + modulesDirectoryPath);
+            return;
+        }
+        
+        Logging.info("Checking compilation status for " + moduleFolders.size() + " potential module folder(s):");
+        for (File moduleFolder : moduleFolders) {
+            String moduleName = moduleFolder.getName();
+            
+            // Only check compilation for valid modules
+            try {
+                boolean isValid = ModuleValidator.isValidModule(moduleFolder);
+                if (!isValid) {
+                    Logging.info("Skipping compilation check for invalid module: " + moduleName);
+                    continue;
+                }
+                
+                boolean needsCompilation = CheckCompilationNeeded.needsCompilation(moduleFolder);
+                Logging.info("Module " + moduleName + " - Compilation needed: " + needsCompilation);
+                
+                if (needsCompilation) {
+                    Logging.info("Run 'mvn compile' in modules/" + moduleName + " to compile");
+                }
+            } catch (Exception e) {
+                Logging.error("Error checking compilation status for module " + moduleName + ": " + e.getMessage());
             }
         }
     }

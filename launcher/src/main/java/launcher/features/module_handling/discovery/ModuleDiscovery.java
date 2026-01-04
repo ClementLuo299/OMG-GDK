@@ -4,8 +4,8 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.compilation.ModuleCompiler;
 import launcher.features.file_paths.PathUtil;
-import launcher.features.module_handling.discovery.module_root_scanning.ScanForModuleFolders;
-import launcher.features.module_handling.validation.ModuleValidator;
+import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
+import launcher.features.module_handling.module_code_validation.ModuleValidator;
 import launcher.features.module_handling.discovery.diagnostics.ModuleDiscoveryDiagnostics;
 
 import java.io.File;
@@ -152,7 +152,7 @@ public final class ModuleDiscovery {
             // Filter to only valid module structures
             List<File> validModuleDirectories = new ArrayList<>();
             for (File folder : moduleDirectories) {
-                if (launcher.features.module_handling.validation.ModuleValidator.isValidModule(folder)) {
+                if (launcher.features.module_handling.module_code_validation.ModuleValidator.isValidModule(folder)) {
                     validModuleDirectories.add(folder);
                 }
             }

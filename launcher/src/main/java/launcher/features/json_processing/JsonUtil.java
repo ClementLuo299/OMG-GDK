@@ -9,7 +9,7 @@ import java.util.Map;
  * Utility class for JSON operations.
  * 
  * <p>This class has a single responsibility: providing centralized JSON parsing,
- * validation, and formatting functionality using Jackson ObjectMapper.
+ * module_code_validation, and formatting functionality using Jackson ObjectMapper.
  * 
  * <p>Key responsibilities:
  * <ul>
@@ -102,7 +102,7 @@ public final class JsonUtil {
      * 
      * <p>This method provides access to the shared ObjectMapper for classes
      * that need to perform custom JSON operations beyond the standard parsing
-     * and validation methods.
+     * and module_code_validation methods.
      * 
      * @return The shared ObjectMapper instance
      */
