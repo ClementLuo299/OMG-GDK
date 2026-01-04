@@ -1,7 +1,7 @@
 package launcher.features.module_handling.compilation;
 
 import gdk.api.GameModule;
-import launcher.features.module_handling.compilation.helpers.ModuleLoader;
+import launcher.features.module_handling.compilation.helpers.ModuleLoaderHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,12 +9,19 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Load a module from a directory.
+ * Public API for module loading operations.
  * 
  * <p>This class provides methods for loading modules from compiled classes.
+ * It handles the complete module loading process including validation, class loading,
+ * and instantiation.
+ * 
+ * <p>For other compilation-related operations:
+ * <ul>
+ *   <li>Checking if compilation is needed: use {@link CheckCompilationNeeded}</li>
+ * </ul>
  * 
  * <p>All other classes in this package are internal implementation details.
- * External code should only use this class for compilation and loading operations.
+ * External code should only use this class for module loading operations.
  *
  * @author Clement Luo
  * @date August 8, 2025
@@ -83,7 +90,7 @@ public final class ModuleCompiler {
      * @return The loaded GameModule instance, or null if loading failed
      */
     public static GameModule loadModule(File moduleDir) {
-        return ModuleLoader.loadModule(moduleDir);
+        return ModuleLoaderHelper.loadModule(moduleDir);
     }
     
     /**
@@ -97,7 +104,7 @@ public final class ModuleCompiler {
      * @return ModuleLoadResult containing loaded modules and compilation failures
      */
     public static ModuleLoadResult loadModules(List<File> moduleDirectories) {
-        return ModuleLoader.loadModules(moduleDirectories);
+        return ModuleLoaderHelper.loadModules(moduleDirectories);
     }
 }
 
