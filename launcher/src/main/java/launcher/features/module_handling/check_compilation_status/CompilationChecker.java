@@ -12,9 +12,9 @@ import java.io.File;
  * @edited January 4, 2026
  * @since Beta 1.0
  */
-public final class CompilationCheck {
+public final class CompilationChecker {
     
-    private CompilationCheck() {
+    private CompilationChecker() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -28,7 +28,7 @@ public final class CompilationCheck {
      *   <li>Source files are newer than compiled classes</li>
      * </ul>
      * 
-     * @param moduleDir The module directory to check
+     * @param moduleDir The module folder to check
      * @return true if the module needs compile_modules, false otherwise
      */
     public static boolean needsCompilation(File moduleDir) {

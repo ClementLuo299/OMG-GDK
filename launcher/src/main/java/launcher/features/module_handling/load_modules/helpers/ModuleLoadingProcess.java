@@ -3,10 +3,10 @@ package launcher.features.module_handling.load_modules.helpers;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.load_modules.LoadModules;
-import launcher.features.module_handling.load_modules.helpers.module_loading_steps.CreateClassLoader;
-import launcher.features.module_handling.load_modules.helpers.module_loading_steps.InstantiateModule;
-import launcher.features.module_handling.load_modules.helpers.module_loading_steps.LoadMainClass;
-import launcher.features.module_handling.load_modules.helpers.module_loading_steps.PreLoadValidator;
+import launcher.features.module_handling.load_modules.helpers.steps.ClassLoaderCreator;
+import launcher.features.module_handling.load_modules.helpers.steps.LoadGameModuleFromMain;
+import launcher.features.module_handling.load_modules.helpers.steps.LoadMainClassFromBytecode;
+import launcher.features.module_handling.load_modules.helpers.steps.PreLoadValidation;
 import launcher.features.module_handling.module_target_validation.ModuleTargetValidator;
 
 import java.io.File;
@@ -77,7 +77,7 @@ public final class ModuleLoadingProcess {
             //   - Source files are valid (Main.java, Metadata.java exist and have correct structure)
             //   - Compiled classes exist (target/classes/Main.class exists)
             // If either check fails, we can't load the module, so return early
-            if (!PreLoadValidator.preLoadCheck(moduleDir)) {
+            if (!PreLoadValidation.preLoadCheck(moduleDir)) {
                 Logging.info("Module " + moduleName + " failed pre-load validation");
                 return null;
             }
@@ -97,7 +97,7 @@ public final class ModuleLoadingProcess {
             //   - Resolving class references when load_modules the Main class
             // ModuleClassLoaderFactory creates a URLClassLoader with all necessary paths
             Logging.info("🔧 Creating classloader for module: " + moduleName);
-            URLClassLoader classLoader = CreateClassLoader.create(moduleDir);
+            URLClassLoader classLoader = ClassLoaderCreator.create(moduleDir);
             Logging.info("✅ Classloader created successfully for module: " + moduleName);
             
             // Check timeout after ClassLoader creation
@@ -109,7 +109,7 @@ public final class ModuleLoadingProcess {
             // ========================================================================
             // STEP 4: Load the Main class from bytecode into memory
             // ========================================================================
-            Class<?> mainClass = LoadMainClass.load(classLoader, moduleDir, moduleName, startTime);
+            Class<?> mainClass = LoadMainClassFromBytecode.load(classLoader, moduleDir, moduleName, startTime);
             if (mainClass == null) {
                 return null; // Error already logged in LoadMainClass
             }
@@ -137,7 +137,7 @@ public final class ModuleLoadingProcess {
             // ========================================================================
             // STEP 6: Instantiate the GameModule
             // ========================================================================
-            return InstantiateModule.instantiate(mainClass, moduleName);
+            return LoadGameModuleFromMain.load(mainClass, moduleName);
             
         } catch (Exception e) {
             // Catch-all for any unexpected errors in the entire load_modules process

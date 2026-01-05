@@ -174,7 +174,9 @@ public class GameModuleRefreshManager {
                 moduleDiscoveryHandler.processDiscoveredModules(discoveredGameModules);
             
             // Filter out any null modules
-            List<GameModule> validModules = moduleDiscoveryHandler.filterValidModules(discoveredGameModules);
+            List<GameModule> validModules = discoveredGameModules.stream()
+                .filter(module -> module != null)
+                .collect(java.util.stream.Collectors.toList());
             
             // Update UI on JavaFX steps
             previousModuleCount = uiUpdater.updateUIForFastRefresh(
@@ -194,8 +196,10 @@ public class GameModuleRefreshManager {
      * @param previousCountSnapshot Count of modules before refresh
      */
     private void performFullRefresh(List<GameModule> previousModulesSnapshot, int previousCountSnapshot) {
-        // Extract previous module names for change detection
-        Set<String> previousModuleNames = moduleDiscoveryHandler.extractModuleNames(previousModulesSnapshot, previousCountSnapshot);
+        // Extract previous module names for change detection (only if not first load)
+        Set<String> previousModuleNames = previousCountSnapshot > 0 
+            ? moduleDiscoveryHandler.collectModuleNames(previousModulesSnapshot)
+            : new HashSet<>();
 
         // Discover and load modules using ViewModel (with failures)
         LoadModules.ModuleLoadResult discoveryResult = moduleDiscoveryHandler.discoverModulesWithFailures(uiUpdater.availableGameModules.size());

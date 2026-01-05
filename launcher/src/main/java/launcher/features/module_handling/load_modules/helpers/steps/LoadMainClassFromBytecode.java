@@ -1,4 +1,4 @@
-package launcher.features.module_handling.load_modules.helpers.module_loading_steps;
+package launcher.features.module_handling.load_modules.helpers.steps;
 
 import gdk.internal.Logging;
 
@@ -17,9 +17,9 @@ import javafx.application.Platform;
  * @edited January 4, 2026
  * @since Beta 1.0
  */
-public final class LoadMainClass {
+public final class LoadMainClassFromBytecode {
     
-    private LoadMainClass() {
+    private LoadMainClassFromBytecode() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

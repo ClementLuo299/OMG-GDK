@@ -1,17 +1,17 @@
-package launcher.features.module_handling.on_app_start.helpers;
+package launcher.ui_areas.lobby.lifecycle.init.helpers;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers.CompilationChecker;
-import launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers.LoadModules;
-import launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers.ModuleUIUpdater;
+import launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers.CompilationChecker;
+import launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers.LoadModules;
+import launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers.ModuleUIUpdater;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;
 
 /**
- * Creates and manages the background steps that loads game modules during startup.
- * Focuses on steps creation, error handling, and coordinating startup phases.
+ * Creates and manages the background thread that loads game modules during startup.
+ * Focuses on thread creation, error handling, and coordinating startup phases.
  * 
  * @author Clement Luo
  * @date December 21, 2025
@@ -23,12 +23,12 @@ public final class ModuleLoadingThread {
     private ModuleLoadingThread() {}
 
     /**
-     * Creates and configures the background steps that loads modules.
+     * Creates and configures the background thread that loads modules.
      * 
      * @param primaryApplicationStage The primary stage to show when ready
      * @param lobbyController The controller to update with loaded games
      * @param windowManager The startup window
-     * @return The configured but not-yet-started steps
+     * @return The configured but not-yet-started thread
      */
     public static Thread create(Stage primaryApplicationStage,
                                 GDKGameLobbyController lobbyController, 
@@ -36,12 +36,12 @@ public final class ModuleLoadingThread {
 
         return new Thread(() -> {
             try {
-                Logging.info("Starting module ui_loading on background steps");
+                Logging.info("Starting module loading on background thread");
                 
                 // Phase 1: Load all game modules
                 LoadModules.loadModules();
                 
-                // Phase 2: Check for load_modules issues
+                // Phase 2: Check for loading issues
                 CompilationChecker.checkForCompilationIssues(lobbyController);
                 
                 // Phase 3: Update UI with loaded games
@@ -51,7 +51,7 @@ public final class ModuleLoadingThread {
                 Logging.info("All startup tasks complete - showing main stage");
                 StartupWindowToMainStageTransition.showMainStage(primaryApplicationStage, windowManager);
                 
-                Logging.info("Module ui_loading steps completed successfully");
+                Logging.info("Module loading thread completed successfully");
                 
             } catch (Exception e) {
                 handleModuleLoadingError(e, primaryApplicationStage, windowManager);
@@ -60,7 +60,7 @@ public final class ModuleLoadingThread {
     }
     
     /**
-     * Handles errors that occur during module ui_loading.
+     * Handles errors that occur during module loading.
      * Attempts to show the main stage even if errors occurred.
      * 
      * @param error The exception that occurred
@@ -70,7 +70,7 @@ public final class ModuleLoadingThread {
     private static void handleModuleLoadingError(Exception error, 
                                                  Stage primaryApplicationStage, 
                                                  StartupWindow windowManager) {
-        Logging.error("Critical error in module ui_loading steps: " + error.getMessage(), error);
+        Logging.error("Critical error in module loading thread: " + error.getMessage(), error);
         
         // Even on error, try to show the main stage
         try {

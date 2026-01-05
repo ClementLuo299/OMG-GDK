@@ -1,4 +1,4 @@
-package launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers;
+package launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.load_modules.LoadModules;
@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Orchestrates the module ui_loading workflow.
- * Coordinates initialization, module processing, ui_loading, and finalization.
+ * Orchestrates the module loading workflow.
+ * Coordinates initialization, module processing, loading, and finalization.
  * 
  * @author Clement Luo
  * @date December 21, 2025
@@ -21,16 +21,16 @@ public final class ModuleLoadingSteps {
     private ModuleLoadingSteps() {}
     
     /**
-     * Orchestrates the complete module load_modules process.
-     * Coordinates initialization, processing, load_modules, and reporting.
+     * Orchestrates the complete module loading process.
+     * Coordinates initialization, processing, loading, and reporting.
      * 
      * @param validModuleDirectories List of valid module directories to load
-     * @return ModuleLoadResult containing loaded modules and load_modules failures
+     * @return ModuleLoadResult containing loaded modules and loading failures
      */
     public static LoadModules.ModuleLoadResult executeLoading(List<File> validModuleDirectories) {
         // Step 1: Check if there are any modules to load
         if (validModuleDirectories == null || validModuleDirectories.isEmpty()) {
-            Logging.info("No modules to load - skipping load_modules workflow");
+            Logging.info("No modules to load - skipping loading workflow");
             return new LoadModules.ModuleLoadResult(new ArrayList<>(), new ArrayList<>());
         }
         
@@ -48,17 +48,17 @@ public final class ModuleLoadingSteps {
     }
     
     /**
-     * Initializes module load_modules.
+     * Initializes module loading.
      */
     public static void initializeModuleLoading() {
-        Logging.info("Preparing module module_finding...");
+        Logging.info("Preparing module discovery...");
     }
     
     /**
-     * Finalizes the module load_modules process.
+     * Finalizes the module loading process.
      */
     public static void finalizeModuleLoading() {
-        Logging.info("Finalizing module load_modules...");
+        Logging.info("Finalizing module loading...");
     }
 }
 

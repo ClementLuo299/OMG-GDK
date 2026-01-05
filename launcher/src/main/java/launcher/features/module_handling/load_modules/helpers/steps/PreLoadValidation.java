@@ -19,9 +19,9 @@ import java.io.File;
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class PreLoadValidator {
+public final class PreLoadValidation {
     
-    private PreLoadValidator() {
+    private PreLoadValidation() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

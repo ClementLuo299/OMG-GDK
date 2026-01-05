@@ -34,13 +34,6 @@ This directory contains packages for handling game modules throughout their life
 
 **Responsibility:** Loads compiled modules into memory (class loading and instantiation).
 
-**Key Functionality:**
-- Creates class loaders for module dependencies
-- Loads Main class from compiled bytecode
-- Instantiates GameModule instances
-- Handles JavaFX platform initialization
-- Includes timeout protection
-
 ---
 
 ### 5. module_finding
@@ -49,24 +42,13 @@ This directory contains packages for handling game modules throughout their life
 
 **Responsibility:** Finds and loads a game module by its game name.
 
-**Key Functionality:**
-- Scans modules directory for available modules
-- Loads modules one by one until finding a match
-- Stops early when match is found for efficiency
-
 ---
 
 ### 6. module_root_scanning
 
 **Entry Point:** `ScanForModuleFolders.java`
 
-**Responsibility:** Scans the filesystem to find module directories.
-
-**Key Functionality:**
-- Checks directory accessibility
-- Scans modules directory for potential module folders
-- Filters out infrastructure directories (target, .git, etc.)
-- Returns list of candidate module directories
+**Responsibility:** Scans the filesystem to find module folders.
 
 ---
 
@@ -76,11 +58,6 @@ This directory contains packages for handling game modules throughout their life
 
 **Responsibility:** Validates that module source files have the correct structure and required files.
 
-**Key Functionality:**
-- Checks for required files (Main.java, Metadata.java)
-- Validates file structure and directory layout
-- Verifies minimal API signatures in source files
-
 ---
 
 ### 8. module_target_validation
@@ -89,38 +66,4 @@ This directory contains packages for handling game modules throughout their life
 
 **Responsibility:** Validates loaded module classes after they've been loaded into memory.
 
-**Key Functionality:**
-- Validates that Main class implements GameModule interface
-- Performs post-load class validation
-- Ensures loaded modules conform to expected API
-
 ---
-
-### 9. on_app_start
-
-**Entry Point:** `ModuleLoadingProcess.java`
-
-**Responsibility:** Coordinates the module loading process during application startup.
-
-**Key Functionality:**
-- Orchestrates module discovery, loading, and UI updates
-- Manages background thread for module loading
-- Coordinates startup phases (loading, validation, UI updates)
-- Handles cleanup and shutdown tasks
-
----
-
-## Package Dependencies
-
-Packages are designed to minimize dependencies:
-
-- **module_finding** → uses `module_root_scanning` and `load_modules`
-- **load_modules** → uses `module_source_validation`, `module_target_validation`, `check_compilation_status`, and `compile_modules`
-- **on_app_start** → uses `module_root_scanning`, `module_source_validation`, and `load_modules`
-
-## Design Principles
-
-1. **Single Responsibility:** Each package has one clear purpose
-2. **Single Entry Point:** Only one class per package is accessed externally
-3. **Internal Helpers:** Implementation details are in helper classes/package subdirectories
-4. **Clear Boundaries:** Packages use explicit imports and avoid circular dependencies

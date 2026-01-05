@@ -1,6 +1,7 @@
 package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
+import gdk.api.GameMetadata;
 import gdk.internal.Logging;
 import launcher.features.file_paths.PathUtil;
 import launcher.features.module_handling.load_modules.LoadModules;
@@ -13,8 +14,11 @@ import javafx.application.Platform;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Handles UI coordination for module module_finding operations.
@@ -128,8 +132,8 @@ public class ModuleDiscoveryHandler {
      * 
      * <p>This method:
      * <ul>
-     *   <li>Delegates processing to business service</li>
-     *   <li>Creates UI messages from business results</li>
+     *   <li>Extracts metadata from modules</li>
+     *   <li>Creates UI messages from metadata</li>
      *   <li>Handles errors gracefully</li>
      * </ul>
      * 
@@ -137,36 +141,28 @@ public class ModuleDiscoveryHandler {
      * @return Result containing module names and UI messages
      */
     public ModuleDiscoveryResult processDiscoveredModules(List<GameModule> discoveredGameModules) {
-        // Process using ModuleMetadataExtractor
-        ModuleMetadataExtractor.ModuleDiscoveryResult businessResult = 
-            ModuleMetadataExtractor.processDiscoveredModules(discoveredGameModules);
+        // Extract metadata from modules
+        List<GameMetadata> metadataList = ModuleMetadataExtractor.getMetadataFromModules(discoveredGameModules);
         
-        // Create UI messages from business results
+        // Extract module names and create UI messages
+        Set<String> moduleNames = new HashSet<>();
         List<String> uiMessages = new ArrayList<>();
-        for (ModuleMetadataExtractor.ModuleInfo info : businessResult.moduleInfos) {
-            uiMessages.add("Detected game: " + info.gameName);
+        
+        for (GameMetadata metadata : metadataList) {
+            String gameName = metadata.getGameName();
+            moduleNames.add(gameName);
+            uiMessages.add("Detected game: " + gameName);
         }
         
-        if (businessResult.totalCount > 0) {
-            uiMessages.add("Successfully detected " + businessResult.totalCount + " game(s)");
-            Logging.info("Ready to update UI with " + businessResult.totalCount + " modules");
+        if (!metadataList.isEmpty()) {
+            uiMessages.add("Successfully detected " + metadataList.size() + " game(s)");
+            Logging.info("Ready to update UI with " + metadataList.size() + " modules");
         } else {
             uiMessages.add("No games detected - check modules directory");
             Logging.warning("No modules were loaded. Check logs above for ui_loading errors.");
         }
         
-        return new ModuleDiscoveryResult(businessResult.moduleNames, uiMessages);
-    }
-    
-    /**
-     * Filters out null modules from the discovered list.
-     * Delegates to business service.
-     * 
-     * @param discoveredGameModules List of discovered modules (may contain nulls)
-     * @return List containing only valid (non-null) modules
-     */
-    public List<GameModule> filterValidModules(List<GameModule> discoveredGameModules) {
-        return ModuleMetadataExtractor.filterValidModules(discoveredGameModules);
+        return new ModuleDiscoveryResult(moduleNames, uiMessages);
     }
     
     /**
@@ -190,25 +186,15 @@ public class ModuleDiscoveryHandler {
     
     /**
      * Collects module names from a collection of game modules.
-     * Delegates to business service.
      * 
      * @param modules Collection of game modules (list or observable list)
      * @return Set of module names
      */
     public Set<String> collectModuleNames(Iterable<GameModule> modules) {
-        return ModuleMetadataExtractor.collectModuleNames(modules);
-    }
-    
-    /**
-     * Extracts module names from a list of modules.
-     * Delegates to business service.
-     * 
-     * @param modules List of game modules
-     * @param previousCount Previous module count (used to determine if this is first load)
-     * @return Set of module names
-     */
-    public Set<String> extractModuleNames(List<GameModule> modules, int previousCount) {
-        return ModuleMetadataExtractor.extractModuleNames(modules, previousCount);
+        return StreamSupport.stream(modules.spliterator(), false)
+            .filter(module -> module != null)
+            .map(module -> module.getMetadata().getGameName())
+            .collect(Collectors.toSet());
     }
     
     // ==================== INNER CLASSES ====================

@@ -1,4 +1,4 @@
-package launcher.features.module_handling.load_modules.helpers.module_loading_steps;
+package launcher.features.module_handling.load_modules.helpers.steps;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -14,9 +14,9 @@ import gdk.internal.Logging;
  * @edited January 4, 2026
  * @since Beta 1.0
  */
-public final class InstantiateModule {
+public final class LoadGameModuleFromMain {
     
-    private InstantiateModule() {
+    private LoadGameModuleFromMain() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -30,7 +30,7 @@ public final class InstantiateModule {
      * @param moduleName The name of the module (for logging)
      * @return The instantiated GameModule, or null if instantiation failed
      */
-    public static GameModule instantiate(Class<?> mainClass, String moduleName) {
+    public static GameModule load(Class<?> mainClass, String moduleName) {
         // Finally, create an instance of the Main class by calling its no-arg constructor
         // We can safely cast to GameModule because it was validated before calling this method
         // This is where the module's constructor runs, so any initialization code executes here

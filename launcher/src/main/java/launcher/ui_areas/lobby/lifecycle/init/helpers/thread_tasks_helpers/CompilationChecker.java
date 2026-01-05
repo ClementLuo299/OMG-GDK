@@ -1,4 +1,4 @@
-package launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers;
+package launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers;
 
 import gdk.internal.Logging;
 import javafx.application.Platform;
@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Checks for load_modules failures and displays warnings.
- * Handles both Swing EDT (progress updates) and JavaFX steps (controller checks).
+ * Checks for loading failures and displays warnings.
+ * Handles both Swing EDT (progress updates) and JavaFX thread (controller checks).
  * 
  * @author Clement Luo
  * @date December 27, 2025
@@ -18,13 +18,13 @@ import java.util.List;
  */
 public final class CompilationChecker {
     
-    /** Temporary storage for load_modules failures from startup load_modules. */
+    /** Temporary storage for loading failures from startup loading. */
     private static List<String> startupFailures = new ArrayList<>();
     
     private CompilationChecker() {}
     
     /**
-     * Stores load_modules failures from startup load_modules for later reporting.
+     * Stores loading failures from startup loading for later reporting.
      * 
      * @param failures List of module names that failed to compile
      */
@@ -33,23 +33,23 @@ public final class CompilationChecker {
     }
     
     /**
-     * Checks for load_modules failures and displays warnings if needed.
-     * The controller check must run on the JavaFX steps.
+     * Checks for loading failures and displays warnings if needed.
+     * The controller check must run on the JavaFX thread.
      * 
      * @param lobbyController The controller to check for issues
      */
     public static void checkForCompilationIssues(GDKGameLobbyController lobbyController) {
-        // Check for load_modules failures (must run on JavaFX steps for controller access)
+        // Check for loading failures (must run on JavaFX thread for controller access)
         Platform.runLater(() -> {
             try {
                 if (lobbyController != null) {
-                    // Report failures from startup load_modules
+                    // Report failures from startup loading
                     lobbyController.reportStartupCompilationFailures(startupFailures);
                     // Clear stored failures after reporting
                     startupFailures.clear();
                 }
             } catch (Exception e) {
-                Logging.error("Error checking load_modules issues: " + e.getMessage());
+                Logging.error("Error checking loading issues: " + e.getMessage());
             }
         });
     }

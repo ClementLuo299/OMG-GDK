@@ -1,4 +1,4 @@
-package launcher.features.module_handling.load_modules.helpers.module_loading_steps;
+package launcher.features.module_handling.load_modules.helpers.steps;
 
 import gdk.internal.Logging;
 
@@ -9,16 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helper class for creating class loaders for modules.
+ * Helper class for loading classes from modules.
  * 
  * @author Clement Luo
  * @date January 3, 2026
  * @edited January 3, 2026
  * @since Beta 1.0
  */
-public final class CreateClassLoader {
+public final class ClassLoaderCreator {
     
-    private CreateClassLoader() {
+    private ClassLoaderCreator() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -133,7 +133,7 @@ public final class CreateClassLoader {
         }
         
         Logging.info("Created classloader with " + classpathUrls.size() + " classpath entries for module: " + moduleDir.getName());
-        return new URLClassLoader(classpathUrls.toArray(new URL[0]), CreateClassLoader.class.getClassLoader());
+        return new URLClassLoader(classpathUrls.toArray(new URL[0]), ClassLoaderCreator.class.getClassLoader());
     }
 }
 

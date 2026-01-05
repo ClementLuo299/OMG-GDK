@@ -1,4 +1,4 @@
-package launcher.features.module_handling.on_app_start.helpers.thread_tasks_helpers;
+package launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers;
 
 
 import java.util.List;
