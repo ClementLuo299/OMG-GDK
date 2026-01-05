@@ -1,4 +1,4 @@
-package launcher.features.file_handling.access.existence;
+package launcher.features.file_handling.directory_existence;
 
 import java.io.File;
 
