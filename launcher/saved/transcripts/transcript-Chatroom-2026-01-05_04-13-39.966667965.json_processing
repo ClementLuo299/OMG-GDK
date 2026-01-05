@@ -1,0 +1,21 @@
+{
+  "header" : {
+    "generatedAt" : "2026-01-05 04:13:39.968",
+    "title" : "Game Session Transcript"
+  },
+  "messages" : [ {
+    "gameName" : "Chatroom",
+    "function" : "init",
+    "gameVersion" : "1.0.0",
+    "event" : "session_start",
+    "timestamp" : "2026-01-05 04:13:36.255",
+    "direction" : "in"
+  },
+
+    {
+    "function" : "end",
+    "timestamp" : "2026-01-05T04:13:39.965906620Z",
+    "direction" : "in",
+    "playerId" : "p1"
+  } ]
+}

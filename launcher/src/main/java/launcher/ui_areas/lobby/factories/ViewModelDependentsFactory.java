@@ -4,7 +4,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import launcher.features.game_launching.GameLaunchService;
 import launcher.features.json_processing.JsonProcessingService;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
@@ -93,9 +92,8 @@ public class ViewModelDependentsFactory {
             moduleCompilationChecker
         );
         
-        // Create business service for game launching
-        GameLaunchService gameLaunchService = new GameLaunchService(applicationViewModel);
-        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(gameLaunchService, 
+        // Create game launching manager
+        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(applicationViewModel, 
             currentResult.jsonActionButtonsController(), gameLaunchErrorHandler);
         
         // ==================== INITIALIZE RECREATED COMPONENTS ====================

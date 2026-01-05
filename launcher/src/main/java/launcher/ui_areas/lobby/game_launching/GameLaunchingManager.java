@@ -2,7 +2,8 @@ package launcher.ui_areas.lobby.game_launching;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.game_launching.GameLaunchService;
+import launcher.features.game_launching.LaunchGame;
+import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.Map;
  *   <li>Reporting errors and success to users via error handler</li>
  * </ul>
  * 
- * <p>Business logic (module_source_validation, parsing, launching) is delegated to {@link GameLaunchService}.
+ * <p>Business logic (module_source_validation, parsing, launching) is delegated to {@link LaunchGame}.
  * 
  * <p>Supports two launch modes:
  * <ul>
@@ -34,8 +35,8 @@ public class GameLaunchingManager {
     
     // ==================== DEPENDENCIES ====================
     
-    /** Business logic service for game launching operations. */
-    private final GameLaunchService launchService;
+    /** ViewModel for launching games. */
+    private final GDKViewModel viewModel;
     
     /** Controller for JSON input/action buttons in the UI. */
     private final JsonActionButtonsController jsonActionButtonsController;
@@ -48,14 +49,14 @@ public class GameLaunchingManager {
     /**
      * Creates a new GameLaunchingManager.
      * 
-     * @param launchService The business logic service for game launching
+     * @param viewModel The ViewModel for launching games
      * @param jsonActionButtonsController The JSON action buttons controller
      * @param errorHandler The error handler for launch errors
      */
-    public GameLaunchingManager(GameLaunchService launchService,
+    public GameLaunchingManager(GDKViewModel viewModel,
                              JsonActionButtonsController jsonActionButtonsController,
                              GameLaunchErrorHandler errorHandler) {
-        this.launchService = launchService;
+        this.viewModel = viewModel;
         this.jsonActionButtonsController = jsonActionButtonsController;
         this.errorHandler = errorHandler;
     }
@@ -83,17 +84,18 @@ public class GameLaunchingManager {
         // Get JSON text from UI
         String jsonText = getJsonTextFromUI();
         
-        // Parse JSON using business service
-        Map<String, Object> jsonConfigurationData = launchService.parseJsonConfiguration(jsonText);
-        if (jsonConfigurationData == null && !jsonText.isEmpty()) {
-            // Invalid JSON syntax - report error to UI
-            errorHandler.handleValidationError(
-                "Invalid JSON syntax - Please enter valid JSON configuration.", false);
-            return false;
+        // Validate JSON syntax (if provided)
+        if (!jsonText.isEmpty()) {
+            Map<String, Object> testParse = launcher.features.json_processing.JsonParser.parse(jsonText);
+            if (testParse == null) {
+                errorHandler.handleValidationError(
+                    "Invalid JSON syntax - Please enter valid JSON configuration.", false);
+                return false;
+            }
         }
         
         // Launch with UI configuration (not auto-launch)
-        return launchGame(selectedGameModule, jsonConfigurationData, false);
+        return launchGame(selectedGameModule, jsonText, false);
     }
     
     /**
@@ -108,14 +110,8 @@ public class GameLaunchingManager {
      */
     public boolean launchGameWithSavedJson(GameModule gameModule, String savedJson) {
         try {
-            // Parse the saved JSON using business service (silently fail if invalid, use defaults)
-            Map<String, Object> jsonConfigurationData = launchService.parseJsonConfiguration(savedJson);
-            if (jsonConfigurationData == null && savedJson != null && !savedJson.trim().isEmpty()) {
-                Logging.error("Auto-launch: Failed to parse saved JSON");
-            }
-            
             // Launch the game with the saved configuration (auto-launch mode)
-            return launchGame(gameModule, jsonConfigurationData, true);
+            return launchGame(gameModule, savedJson, true);
         } catch (Exception e) {
             Logging.error("Auto-launch: Error launching game with saved JSON: " + e.getMessage(), e);
             return false;
@@ -127,55 +123,31 @@ public class GameLaunchingManager {
     /**
      * Core launch method that coordinates UI and business logic.
      * 
-     * <p>This method:
-     * <ol>
-     *   <li>Validates ViewModel availability (reports to UI if not)</li>
-     *   <li>Validates game launch prerequisites (delegates to business service)</li>
-     *   <li>Applies JSON configuration (delegates to business service)</li>
-     *   <li>Executes the launch (delegates to business service)</li>
-     *   <li>Reports results to UI</li>
-     * </ol>
-     * 
-     * @param selectedGameModule The game module to launch
-     * @param jsonConfigurationData The parsed JSON configuration data (may be null)
+     * @param gameModule The game module to launch
+     * @param startMessage The JSON start message string
      * @param isAutoLaunch Whether this is an auto-launch (affects error handling)
      * @return true if launch was successful, false otherwise
      */
-    private boolean launchGame(GameModule selectedGameModule, 
-                              Map<String, Object> jsonConfigurationData, 
-                              boolean isAutoLaunch) {
-        // Validate ViewModel is available (report to UI if not)
-        if (!launchService.isViewModelAvailable()) {
-            errorHandler.handleViewModelUnavailable(isAutoLaunch);
-            return false;
-        }
-        
-        // Validate game launch using business service
-        launcher.features.game_launching.GameLaunchService.LaunchValidationResult validation = 
-            launchService.validateGameLaunch(selectedGameModule);
-        if (!validation.isValid()) {
-            errorHandler.handleValidationError(validation.errorMessage(), isAutoLaunch);
-            return false;
-        }
-        
-        String gameName = selectedGameModule.getMetadata().getGameName();
-        Logging.info("Preparing to launch game: " + gameName);
-        
-        // Apply JSON configuration using business service
-        boolean configSuccess = launchService.applyGameConfiguration(
-            selectedGameModule, jsonConfigurationData, isAutoLaunch);
-        if (!configSuccess) {
-            errorHandler.handleConfigurationFailure(gameName, isAutoLaunch);
-            return false;
-        }
-        
-        // Execute the launch using business service
+    private boolean launchGame(GameModule gameModule, String startMessage, boolean isAutoLaunch) {
         try {
-            String jsonText = getJsonTextFromUI();
-            launchService.executeLaunch(selectedGameModule, jsonText);
+            String gameName = gameModule != null ? gameModule.getMetadata().getGameName() : "unknown";
+            Logging.info("Preparing to launch game: " + gameName);
+            
+            LaunchGame.launch(viewModel, gameModule, startMessage, isAutoLaunch);
             errorHandler.reportSuccessfulLaunch(gameName);
             return true;
+        } catch (IllegalStateException e) {
+            if (viewModel == null) {
+                errorHandler.handleViewModelUnavailable(isAutoLaunch);
+            } else if (gameModule == null) {
+                errorHandler.handleValidationError(e.getMessage(), isAutoLaunch);
+            } else {
+                errorHandler.handleConfigurationFailure(
+                    gameModule.getMetadata().getGameName(), isAutoLaunch);
+            }
+            return false;
         } catch (Exception e) {
+            String gameName = gameModule != null ? gameModule.getMetadata().getGameName() : "unknown";
             errorHandler.handleLaunchException(gameName, e, isAutoLaunch);
             return false;
         }

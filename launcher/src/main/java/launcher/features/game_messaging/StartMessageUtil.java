@@ -127,6 +127,52 @@ public final class StartMessageUtil {
         return loadStartMessage(Path.of(ALL_MODES_FILE));
     }
     
+    // ==================== PUBLIC METHODS - VALIDATION ====================
+    
+    /**
+     * Parses and validates a start message string.
+     * 
+     * @param jsonText The JSON string to parse and validate
+     * @return The parsed and validated start message map
+     * @throws IllegalStateException If the string is empty, invalid JSON, or not a valid start message
+     */
+    public static Map<String, Object> parseAndValidateStartMessage(String jsonText) {
+        if (jsonText == null || jsonText.trim().isEmpty()) {
+            throw new IllegalStateException("Start message is required");
+        }
+        
+        Map<String, Object> message = launcher.features.json_processing.JsonParser.parse(jsonText);
+        if (message == null) {
+            throw new IllegalStateException("Invalid JSON in start message");
+        }
+        
+        validateStartMessage(message);
+        return message;
+    }
+    
+    /**
+     * Validates that a message map is a valid start message.
+     * A valid start message must have function="start" or function="init".
+     * 
+     * @param message The message map to validate
+     * @throws IllegalStateException If the message is not a valid start message
+     */
+    public static void validateStartMessage(Map<String, Object> message) {
+        if (message == null) {
+            throw new IllegalStateException("Start message is required");
+        }
+        
+        Object function = message.get("function");
+        if (!(function instanceof String)) {
+            throw new IllegalStateException("Start message must have a 'function' field");
+        }
+        
+        String func = (String) function;
+        if (!"start".equals(func) && !"init".equals(func)) {
+            throw new IllegalStateException("Start message must have function='start' or function='init', got: " + func);
+        }
+    }
+    
     // ==================== PRIVATE METHODS - LOADING ====================
     
     /**

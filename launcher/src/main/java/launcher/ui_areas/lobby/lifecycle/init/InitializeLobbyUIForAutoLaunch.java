@@ -3,7 +3,7 @@ package launcher.ui_areas.lobby.lifecycle.init;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.json_processing.JsonUtil;
-import launcher.features.game_launching.GameLaunchUtil;
+import launcher.features.game_launching.LaunchGame;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.ControllerMode;
@@ -265,24 +265,13 @@ public final class InitializeLobbyUIForAutoLaunch {
      * @return true if launch was successful, false otherwise
      */
     public static boolean launchGame(GameModule gameModule, String savedJson, GDKViewModel viewModel) {
-        // Parse JSON configuration
-        java.util.Map<String, Object> jsonConfigurationData = 
-            GameLaunchUtil.parseJsonString(savedJson);
-        
-        // Prepare game with configuration
-        boolean configSuccess = GameLaunchUtil.launchGameWithConfiguration(
-            gameModule, jsonConfigurationData, true);
-        
-        if (!configSuccess) {
-            Logging.info("Auto-launch: Game configuration failed");
+        try {
+            LaunchGame.launch(viewModel, gameModule, savedJson, true);
+            return true;
+        } catch (Exception e) {
+            Logging.error("Auto-launch: Game launch failed: " + e.getMessage(), e);
             return false;
         }
-        
-        // Launch the game via ViewModel
-        // This sets up all MessagingBridge subscriptions, server simulator, transcript recording, etc.
-        viewModel.handleLaunchGame(gameModule, savedJson);
-        
-        return true;
     }
     
     // ==================== PUBLIC METHODS - MODE TRANSITION ====================

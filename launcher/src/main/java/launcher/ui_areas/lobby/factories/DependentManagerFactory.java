@@ -4,7 +4,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
-import launcher.features.game_launching.GameLaunchService;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.lifecycle.LobbyShutdownManager;
@@ -98,9 +97,8 @@ public class DependentManagerFactory {
             moduleCompilationChecker
         );
         
-        // Create business service for game launching
-        GameLaunchService gameLaunchService = new GameLaunchService(applicationViewModel);
-        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(gameLaunchService, jsonActionButtonsController, gameLaunchErrorHandler);
+        // Create game launching manager
+        GameLaunchingManager gameLaunchManager = new GameLaunchingManager(applicationViewModel, jsonActionButtonsController, gameLaunchErrorHandler);
         MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonActionButtonsController);
         LobbyShutdownManager lobbyShutdownManager = new LobbyShutdownManager(jsonPersistenceManager, gameSelectionController);
         

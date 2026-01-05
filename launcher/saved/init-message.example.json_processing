@@ -1,0 +1,14 @@
+{
+  "players" : [ {
+    "role" : "host",
+    "name" : "Player1",
+    "id" : "p1"
+  }, {
+    "role" : "guest",
+    "name" : "Player2",
+    "id" : "p2"
+  } ],
+  "function" : "init",
+  "localPlayerId" : "p1",
+  "gameMode" : "multi_player"
+}

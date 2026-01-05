@@ -16,7 +16,7 @@ import java.util.Map;
  * @edited January 4, 2026
  * @since Beta 1.0
  */
-public class GameLaunchService {
+public class LaunchGame {
     
     /**
      * Launches a game with the provided ViewModel, game module, and start message.
@@ -28,10 +28,10 @@ public class GameLaunchService {
      * @throws IllegalStateException If validation fails
      * @throws Exception If the launch fails
      */
-    public static void launchGame(GDKViewModel viewModel, 
-                                  GameModule gameModule, 
-                                  String startMessage,
-                                  boolean isAutoLaunch) throws Exception {
+    public static void launch(GDKViewModel viewModel,
+                              GameModule gameModule,
+                              String startMessage,
+                              boolean isAutoLaunch) throws Exception {
 
         // Validate the prerequisites
         if (viewModel == null) {
