@@ -10,12 +10,13 @@ import java.io.File;
  * validation without attempting to list directory contents.
  * 
  * @author Clement Luo
- * @date January 3, 2026
+ * @date January 4, 2026
+ * @edited January 4, 2026
  * @since Beta 1.0
  */
-public final class DirectoryValidator {
+public final class DirectoryExistenceCheck {
     
-    private DirectoryValidator() {
+    private DirectoryExistenceCheck() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     

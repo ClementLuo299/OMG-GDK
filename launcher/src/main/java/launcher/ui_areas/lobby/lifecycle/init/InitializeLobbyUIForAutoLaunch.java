@@ -7,7 +7,7 @@ import launcher.features.game_launching.GameLaunchUtil;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.ControllerMode;
-import launcher.features.file_handling.FilePaths;
+import launcher.features.file_handling.file_paths.GetOtherPaths;
 
 import javafx.stage.Stage;
 import javafx.application.Platform;
@@ -95,7 +95,7 @@ public final class InitializeLobbyUIForAutoLaunch {
     public static boolean isAutoLaunchEnabled() {
         try {
             // Check if the auto-launch flag is enabled
-            Path autoLaunchFile = Paths.get(FilePaths.AUTO_LAUNCH_ENABLED_FILE);
+            Path autoLaunchFile = Paths.get(GetOtherPaths.AUTO_LAUNCH_ENABLED_FILE);
             if (!Files.exists(autoLaunchFile)) {
                 return false; // Default to disabled
             }
@@ -106,8 +106,8 @@ public final class InitializeLobbyUIForAutoLaunch {
             }
 
             // Check if required files exist
-            Path jsonFile = Paths.get(FilePaths.JSON_PERSISTENCE_FILE);
-            Path selectedGameFile = Paths.get(FilePaths.SELECTED_GAME_FILE);
+            Path jsonFile = Paths.get(GetOtherPaths.JSON_PERSISTENCE_FILE);
+            Path selectedGameFile = Paths.get(GetOtherPaths.SELECTED_GAME_FILE);
             
             if (!Files.exists(jsonFile)) {
                 Logging.info("Auto-launch: No saved JSON found");
@@ -148,8 +148,8 @@ public final class InitializeLobbyUIForAutoLaunch {
      */
     public static AutoLaunchData loadAutoLaunchData() {
         try {
-            Path jsonFile = Paths.get(FilePaths.JSON_PERSISTENCE_FILE);
-            Path selectedGameFile = Paths.get(FilePaths.SELECTED_GAME_FILE);
+            Path jsonFile = Paths.get(GetOtherPaths.JSON_PERSISTENCE_FILE);
+            Path selectedGameFile = Paths.get(GetOtherPaths.SELECTED_GAME_FILE);
             
             if (!Files.exists(jsonFile)) {
                 Logging.info("Auto-launch: No saved JSON found");

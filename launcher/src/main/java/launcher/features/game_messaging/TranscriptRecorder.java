@@ -483,7 +483,7 @@ public final class TranscriptRecorder {
      * Saves the transcript in both JSON and text formats.
      * 
      * <p>This method saves the transcript in both JSON and text formats for
-     * maximum readability and programmatic access. If no base filename is provided,
+     * maximum readability and programmatic directory_access. If no base filename is provided,
      * it generates one based on the game name and timestamp.
      * 
      * @param baseFileName Base filename without extension, or null for auto-generation

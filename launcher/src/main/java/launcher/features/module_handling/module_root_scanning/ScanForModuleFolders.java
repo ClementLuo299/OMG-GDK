@@ -1,6 +1,6 @@
 package launcher.features.module_handling.module_root_scanning;
 
-import launcher.features.file_handling.access.DirectoryAccessCheck;
+import launcher.features.file_handling.directory_access.DirectoryAccessCheck;
 import launcher.features.module_handling.module_root_scanning.helpers.ModuleFolderFinder;
 
 import java.io.File;
@@ -40,7 +40,7 @@ public final class ScanForModuleFolders {
      *         or empty list if the directory is not accessible
      */
     public static List<File> findModuleFolders(String modulesDirectoryPath) {
-        // Check access first
+        // Check directory_access first
         if (!DirectoryAccessCheck.checkAccess(modulesDirectoryPath)) {
             return new java.util.ArrayList<>();
         }

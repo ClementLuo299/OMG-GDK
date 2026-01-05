@@ -8,7 +8,7 @@ import launcher.ui_areas.lobby.GDKGameLobbyController;
  * 
  * <p>This class is responsible for establishing the connection between
  * the UI controller and the application's ViewModel, enabling the controller
- * to access and update the ViewModel's state.
+ * to directory_access and update the ViewModel's state.
  * 
  * @author Clement Luo
  * @date January 2, 2026
@@ -26,7 +26,7 @@ public final class WireViewModelToController {
      * 
      * <p>This method establishes the connection between the UI controller
      * and the application's data model. This enables the controller to
-     * access and update the ViewModel's state.
+     * directory_access and update the ViewModel's state.
      * 
      * @param applicationViewModel The ViewModel instance containing application state
      * @param lobbyController The lobby controller to connect with the ViewModel

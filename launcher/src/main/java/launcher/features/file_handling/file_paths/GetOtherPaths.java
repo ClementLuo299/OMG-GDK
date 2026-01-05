@@ -1,4 +1,4 @@
-package launcher.features.file_handling.get_file_paths;
+package launcher.features.file_handling.file_paths;
 
 /**
  * Utility class for centralized file path constants.
@@ -12,13 +12,13 @@ package launcher.features.file_handling.get_file_paths;
  * @edited January 4, 2026
  * @since 1.0
  */
-public final class FilePathConstants {
+public final class GetOtherPaths {
     
     /**
      * Private constructor to prevent instantiation.
      * This is a utility class with only static constants.
      */
-    private FilePathConstants() {
+    private GetOtherPaths() {
         throw new AssertionError("FilePaths should not be instantiated");
     }
     

@@ -527,7 +527,7 @@ public class ServerSimulatorController {
     /**
      * Gets the root VBox container for scene creation.
      * 
-     * <p>This method provides access to the root container for
+     * <p>This method provides directory_access to the root container for
      * creating the server simulator scene. This is typically used
      * by the parent component to create the scene.
      * 

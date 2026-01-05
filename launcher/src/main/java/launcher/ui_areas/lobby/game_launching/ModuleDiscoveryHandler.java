@@ -3,7 +3,7 @@ package launcher.ui_areas.lobby.game_launching;
 import gdk.api.GameModule;
 import gdk.api.GameMetadata;
 import gdk.internal.Logging;
-import launcher.features.file_handling.PathUtil;
+import launcher.features.file_handling.file_paths.GetModulesDirectoryPath;
 import launcher.features.module_handling.load_modules.LoadModules;
 import launcher.features.module_handling.extract_metadata.ModuleMetadataExtractor;
 import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
@@ -86,7 +86,7 @@ public class ModuleDiscoveryHandler {
     public LoadModules.ModuleLoadResult discoverModulesWithFailures(int availableGameModulesSize) {
         try {
             // Get modules directory path
-            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
+            String modulesDirectoryPath = GetModulesDirectoryPath.getModulesDirectoryPath();
             Logging.info("Scanning for modules in: " + modulesDirectoryPath);
             
             // Scan for module folders

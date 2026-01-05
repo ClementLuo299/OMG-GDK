@@ -39,7 +39,7 @@ public final class CompilationChecker {
      * @param lobbyController The controller to check for issues
      */
     public static void checkForCompilationIssues(GDKGameLobbyController lobbyController) {
-        // Check for loading failures (must run on JavaFX thread for controller access)
+        // Check for loading failures (must run on JavaFX thread for controller directory_access)
         Platform.runLater(() -> {
             try {
                 if (lobbyController != null) {

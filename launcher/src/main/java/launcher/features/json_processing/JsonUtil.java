@@ -15,7 +15,7 @@ import java.util.Map;
  * <ul>
  *   <li>Validating JSON string syntax</li>
  *   <li>Parsing JSON strings into Map structures</li>
- *   <li>Providing access to the shared ObjectMapper instance</li>
+ *   <li>Providing directory_access to the shared ObjectMapper instance</li>
  * </ul>
  * 
  * @author Clement Luo
@@ -100,7 +100,7 @@ public final class JsonUtil {
     /**
      * Gets the shared ObjectMapper instance.
      * 
-     * <p>This method provides access to the shared ObjectMapper for classes
+     * <p>This method provides directory_access to the shared ObjectMapper for classes
      * that need to perform custom JSON operations beyond the standard parsing
      * and module_source_validation methods.
      * 

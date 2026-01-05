@@ -42,7 +42,7 @@ public final class LoadGameModuleFromMain {
             GameModule module = (GameModule) mainClass.getDeclaredConstructor().newInstance();
             Logging.info("✅ Instance created for module: " + moduleName);
             
-            // Verify we can access the module's extract_metadata (sanity check)
+            // Verify we can directory_access the module's extract_metadata (sanity check)
             String gameName = module.getMetadata().getGameName();
             Logging.info("✅ Successfully loaded module: " + moduleName + " (Game: " + gameName + ")");
             return module;

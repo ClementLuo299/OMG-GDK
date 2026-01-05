@@ -1,7 +1,7 @@
 package launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers;
 
 import gdk.internal.Logging;
-import launcher.features.file_handling.PathUtil;
+import launcher.features.file_handling.file_paths.GetModulesDirectoryPath;
 import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 import launcher.features.module_handling.module_source_validation.ModuleSourceValidator;
 
@@ -68,7 +68,7 @@ public final class LoadModules {
     private static List<File> discoverValidModules() {
         try {
             // Get modules directory path
-            String modulesDirectoryPath = PathUtil.getModulesDirectoryPath();
+            String modulesDirectoryPath = GetModulesDirectoryPath.getModulesDirectoryPath();
             
             // Scan for module folders
             List<File> moduleDirectories = ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
