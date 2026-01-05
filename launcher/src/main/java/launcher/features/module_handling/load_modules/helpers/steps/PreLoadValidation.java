@@ -1,7 +1,7 @@
-package launcher.features.module_handling.load_modules.helpers.module_loading_steps;
+package launcher.features.module_handling.load_modules.helpers.steps;
 
 import gdk.internal.Logging;
-import launcher.features.module_handling.check_compilation_status.CheckCompilationNeeded;
+import launcher.features.module_handling.check_compilation_status.CompilationChecker;
 import launcher.features.module_handling.compile_modules.CompileModule;
 import launcher.features.module_handling.module_source_validation.ModuleSourceValidator;
 
@@ -56,7 +56,7 @@ public final class PreLoadValidator {
         }
         
         // Check if module needs compile_modules
-        if (CheckCompilationNeeded.needsCompilation(moduleDir)) {
+        if (CompilationChecker.needsCompilation(moduleDir)) {
             Logging.info("Module " + moduleName + " needs compile_modules - attempting to compile...");
             
             // Automatically compile the module
@@ -70,7 +70,7 @@ public final class PreLoadValidator {
             Logging.info("Module " + moduleName + " compiled successfully");
             
             // Verify compile_modules succeeded by checking again
-            if (CheckCompilationNeeded.needsCompilation(moduleDir)) {
+            if (CompilationChecker.needsCompilation(moduleDir)) {
                 Logging.warning("Module " + moduleName + " still needs compile_modules after compile attempt");
                 return false;
             }

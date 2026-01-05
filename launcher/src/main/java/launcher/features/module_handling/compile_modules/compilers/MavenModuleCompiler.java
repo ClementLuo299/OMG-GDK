@@ -9,12 +9,12 @@ import java.io.File;
  * 
  * @author Clement Luo
  * @date January 3, 2026
- * @edited January 3, 2026
+ * @edited January 4, 2026
  * @since Beta 1.0
  */
-public final class MavenCompiler {
+public final class MavenModuleCompiler {
     
-    private MavenCompiler() {
+    private MavenModuleCompiler() {
         throw new AssertionError("Utility class should not be instantiated");
     }
     
@@ -24,7 +24,7 @@ public final class MavenCompiler {
      * @param modulePath The absolute path to the module directory to compile
      * @return true if compile_modules was successful, false otherwise
      */
-    public static boolean compileModule(String modulePath) {
+    public static boolean compile(String modulePath) {
         Logging.info("Building module: " + modulePath);
         
         try {
