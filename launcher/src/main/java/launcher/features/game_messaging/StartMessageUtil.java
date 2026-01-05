@@ -130,12 +130,12 @@ public final class StartMessageUtil {
     // ==================== PRIVATE METHODS - LOADING ====================
     
     /**
-     * Loads a init message from a file file_paths.
+     * Loads a init message from a file file_handling.
      * 
      * <p>This method reads a JSON file and parses it into a Map structure.
      * Returns null if the file doesn't exist, is not readable, or parsing fails.
      * 
-     * @param filePath The file_paths to the init message file
+     * @param filePath The file_handling to the init message file
      * @return The parsed init message map, or null if ui_loading fails
      */
     public static Map<String, Object> loadStartMessage(Path filePath) {

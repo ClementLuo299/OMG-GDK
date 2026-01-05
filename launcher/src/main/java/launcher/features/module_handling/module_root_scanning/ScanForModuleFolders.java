@@ -1,6 +1,6 @@
 package launcher.features.module_handling.module_root_scanning;
 
-import launcher.features.file_paths.DirectoryAccessCheck;
+import launcher.features.file_handling.access.DirectoryAccessCheck;
 import launcher.features.module_handling.module_root_scanning.helpers.ModuleFolderFinder;
 
 import java.io.File;

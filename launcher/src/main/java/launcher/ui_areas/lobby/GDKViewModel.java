@@ -618,7 +618,7 @@ public class GDKViewModel {
     private void refreshAvailableGameModules() {
         try {
             // Discover and load modules (result not used, just triggers refresh)
-            String modulesDirectoryPath = launcher.features.file_paths.PathUtil.getModulesDirectoryPath();
+            String modulesDirectoryPath = launcher.features.file_handling.PathUtil.getModulesDirectoryPath();
             List<File> moduleDirectories = launcher.features.module_handling.module_root_scanning.ScanForModuleFolders.findModuleFolders(modulesDirectoryPath);
             
             List<File> validModuleDirectories = new ArrayList<>();

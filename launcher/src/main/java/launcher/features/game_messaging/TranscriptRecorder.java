@@ -212,8 +212,8 @@ public final class TranscriptRecorder {
      * including header and messages. If no target file is provided, it generates
      * a filename based on the game name and timestamp.
      * 
-     * @param targetFile The target file file_paths, or null for auto-generation
-     * @return The file_paths to the saved transcript file, or null if saving failed
+     * @param targetFile The target file file_handling, or null for auto-generation
+     * @return The file_handling to the saved transcript file, or null if saving failed
      */
     public static Path saveTranscript(Path targetFile) {
         try {
@@ -326,8 +326,8 @@ public final class TranscriptRecorder {
      * formatting, headers, and message details. If no target file is provided,
      * it generates a filename based on the game name and timestamp.
      * 
-     * @param targetFile The target file file_paths, or null for auto-generation
-     * @return The file_paths to the saved transcript file, or null if saving failed
+     * @param targetFile The target file file_handling, or null for auto-generation
+     * @return The file_handling to the saved transcript file, or null if saving failed
      */
     public static Path saveTranscriptAsText(Path targetFile) {
         try {

@@ -7,7 +7,7 @@ import launcher.features.game_launching.GameLaunchUtil;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.ControllerMode;
-import launcher.features.file_paths.FilePaths;
+import launcher.features.file_handling.FilePaths;
 
 import javafx.stage.Stage;
 import javafx.application.Platform;

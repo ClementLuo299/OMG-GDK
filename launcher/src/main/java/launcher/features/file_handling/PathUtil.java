@@ -1,4 +1,4 @@
-package launcher.features.file_paths;
+package launcher.features.file_handling;
 
 import gdk.internal.Logging;
 

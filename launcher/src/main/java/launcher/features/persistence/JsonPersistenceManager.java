@@ -31,13 +31,13 @@ public class JsonPersistenceManager {
     
     // ==================== CONSTANTS ====================
     
-    /** File file_paths for persisted JSON content. */
+    /** File file_handling for persisted JSON content. */
     private static final String JSON_PERSISTENCE_FILE = "saved/gdk-json_processing-persistence.txt";
     
-    /** File file_paths for persistence toggle state. */
+    /** File file_handling for persistence toggle state. */
     private static final String PERSISTENCE_TOGGLE_FILE = "saved/gdk-persistence-toggle.txt";
     
-    /** File file_paths for selected game name. */
+    /** File file_handling for selected game name. */
     private static final String SELECTED_GAME_FILE = "saved/gdk-selected-game.txt";
     
     // ==================== DEPENDENCIES ====================

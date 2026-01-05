@@ -1,4 +1,4 @@
-package launcher.features.file_paths;
+package launcher.features.file_handling;
 
 /**
  * Utility class for centralized file path constants.

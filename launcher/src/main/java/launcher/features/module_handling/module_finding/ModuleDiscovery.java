@@ -3,7 +3,7 @@ package launcher.features.module_handling.module_finding;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.module_handling.load_modules.LoadModules;
-import launcher.features.file_paths.PathUtil;
+import launcher.features.file_handling.PathUtil;
 import launcher.features.module_handling.module_root_scanning.ScanForModuleFolders;
 import java.io.File;
 import java.util.List;
