@@ -4,7 +4,11 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import gdk.internal.MessagingBridge;
 import launcher.features.file_handling.file_paths.GetModulesDirectoryPath;
-import launcher.features.game_messaging.TranscriptRecorder;
+import launcher.features.transcript_recording.recording.RecordInboundMessage;
+import launcher.features.transcript_recording.recording.RecordOutboundMessage;
+import launcher.features.transcript_recording.session_management.EndSession;
+import launcher.features.transcript_recording.session_management.StartSession;
+import launcher.features.transcript_recording.transcript_saving.TranscriptSaver;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -92,7 +96,7 @@ public class GDKViewModel {
     /** Subscription for the per-game server simulator consumer. */
     private MessagingBridge.Subscription serverSimulatorSubscription;
 
-    /** Subscription for transcript recording during a game session. */
+    /** Subscription for transcript transcript_recording during a game session. */
     private MessagingBridge.Subscription transcriptSubscription;
 
     // ==================== CONSTRUCTORS ====================
@@ -263,7 +267,7 @@ public class GDKViewModel {
         // Set up MessagingBridge consumer BEFORE launching the game
         setupMessagingBridgeConsumer();
         
-        // Also set up transcript recording consumer
+        // Also set up transcript transcript_recording consumer
         if (transcriptSubscription != null) {
             transcriptSubscription.unsubscribe();
             transcriptSubscription = null;
@@ -271,7 +275,7 @@ public class GDKViewModel {
         transcriptSubscription = MessagingBridge.addConsumer(msg -> {
             try {
                 // Record the message to the transcript
-                TranscriptRecorder.recordFromGame(msg);
+                RecordInboundMessage.record(msg);
             } catch (Exception ignored) {}
         });
         
@@ -324,13 +328,13 @@ public class GDKViewModel {
         // Set up the lobby return callback for games
         MessagingBridge.setLobbyReturnCallback(this::returnToLobby);
         
-        // Start transcript recording with game extract_metadata
+        // Start transcript recording with game metadata
         String gameName = selectedGameModule.getMetadata().getGameName();
         String gameVersion = selectedGameModule.getMetadata().getGameVersion();
-        TranscriptRecorder.startSession(gameName, gameVersion);
+        StartSession.start(gameName, gameVersion);
         
         Logging.info("🎮 Game launched successfully: " + gameName + " (v" + gameVersion + ")");
-        Logging.info("📝 Started transcript recording for game session");
+        Logging.info("📝 Started transcript transcript_recording for game session");
     }
     
     /**
@@ -437,7 +441,7 @@ public class GDKViewModel {
                             messageMap.put("text", messageText);
                         }
                         // Record to transcript
-                        TranscriptRecorder.recordToGame(messageMap);
+                        RecordOutboundMessage.record(messageMap);
                         java.util.Map<String, Object> response = currentlyRunningGame.handleMessage(messageMap);
                         if (response == null) {
                             response = new java.util.HashMap<>();
@@ -448,7 +452,7 @@ public class GDKViewModel {
                             response.put("timestamp", java.time.Instant.now().toString());
                         }
                         // Record from game
-                        TranscriptRecorder.recordFromGame(response);
+                        RecordInboundMessage.record(response);
                         String responseText = JSON_PRETTY_WRITER.writeValueAsString(response);
                         serverSimulatorController.addReceivedMessageToDisplay(responseText);
                     } catch (Exception e) {
@@ -557,8 +561,8 @@ public class GDKViewModel {
             }
             
             // End transcript session and save transcript
-            TranscriptRecorder.endSessionIfEndDetected(null);
-            TranscriptRecorder.saveCurrentTranscript();
+            EndSession.endFromEndMessage(null);
+            TranscriptSaver.saveTranscriptBothFormats(null);
             Logging.info("📝 Transcript session ended and saved");
             
             currentlyRunningGame = null;

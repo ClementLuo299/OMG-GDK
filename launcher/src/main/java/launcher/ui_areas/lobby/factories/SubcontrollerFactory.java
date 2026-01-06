@@ -7,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
-import launcher.features.persistence.JsonPersistenceManager;
 import launcher.ui_areas.lobby.json_editor.JsonEditorOperations;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
@@ -53,7 +52,6 @@ public class SubcontrollerFactory {
      * @param settingsButton The settings button
      * @param messageManager The message manager
      * @param launchButtonManager The launch button manager
-     * @param jsonPersistenceManager The JSON persistence manager
      * @param jsonEditorOperations The JSON editor operations manager
      * @return Result containing all created subcontrollers
      */
@@ -72,7 +70,6 @@ public class SubcontrollerFactory {
             Button settingsButton,
             MessageManager messageManager,
             LaunchButtonManager launchButtonManager,
-            JsonPersistenceManager jsonPersistenceManager,
             JsonEditorOperations jsonEditorOperations) {
         
         // Create game modules list
@@ -84,8 +81,7 @@ public class SubcontrollerFactory {
             launchGameButton,
             availableGameModules,
             messageManager,
-            launchButtonManager,
-            jsonPersistenceManager
+            launchButtonManager
         );
         
         // Create JSON action buttons controller
@@ -98,7 +94,6 @@ public class SubcontrollerFactory {
             sendMessageButton,
             jsonPersistenceToggle,
             jsonEditorOperations,
-            jsonPersistenceManager,
             messageManager
         );
         

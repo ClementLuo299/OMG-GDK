@@ -1,7 +1,8 @@
-package launcher.features.game_messaging.sending;
+package launcher.features.game_messaging;
 
 import gdk.api.GameModule;
-import launcher.features.transcript_recording.TranscriptRecorder;
+import launcher.features.transcript_recording.recording.RecordInboundMessage;
+import launcher.features.transcript_recording.recording.RecordOutboundMessage;
 
 import java.util.Map;
 
@@ -34,14 +35,14 @@ public class SendMessageToGame {
         }
         
         // Record message to transcript before sending
-        TranscriptRecorder.recordToGame(messageData);
+        RecordOutboundMessage.record(messageData);
         
         // Send the message to the game module
         Map<String, Object> response = gameModule.handleMessage(messageData);
         
         // Record response if present
         if (response != null) {
-            TranscriptRecorder.recordFromGame(response);
+            RecordInboundMessage.record(response);
         }
         
         return response;

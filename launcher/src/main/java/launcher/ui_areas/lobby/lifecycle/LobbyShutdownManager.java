@@ -3,7 +3,10 @@ package launcher.ui_areas.lobby.lifecycle;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.persistence.JsonPersistenceManager;
+import launcher.features.persistence.helpers.save.SavePreviouslySelectedGame;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
+import com.jfoenix.controls.JFXToggleButton;
 
 /**
  * Manages shutdown operations for the lobby controller.
@@ -11,31 +14,29 @@ import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
  * 
  * @author Clement Luo
  * @date December 29, 2025
- * @edited December 29, 2025
+ * @edited January 5, 2026
  * @since Beta 1.0
  */
 public class LobbyShutdownManager {
     
-    // ==================== DEPENDENCIES ====================
-    
-    private final JsonPersistenceManager jsonPersistenceManager;
+    private final JsonEditor jsonInputEditor;
+    private final JFXToggleButton jsonPersistenceToggle;
     private final GameSelectionController gameSelectionController;
-    
-    // ==================== CONSTRUCTOR ====================
     
     /**
      * Create a new LobbyShutdownManager.
      * 
-     * @param jsonPersistenceManager The JSON persistence manager
+     * @param jsonInputEditor The JSON input editor
+     * @param jsonPersistenceToggle The JSON persistence toggle
      * @param gameSelectionController The game selection controller (may be null)
      */
-    public LobbyShutdownManager(JsonPersistenceManager jsonPersistenceManager,
+    public LobbyShutdownManager(JsonEditor jsonInputEditor,
+                                 JFXToggleButton jsonPersistenceToggle,
                                  GameSelectionController gameSelectionController) {
-        this.jsonPersistenceManager = jsonPersistenceManager;
+        this.jsonInputEditor = jsonInputEditor;
+        this.jsonPersistenceToggle = jsonPersistenceToggle;
         this.gameSelectionController = gameSelectionController;
     }
-    
-    // ==================== LIFECYCLE OPERATIONS ====================
     
     /**
      * Handle application shutdown and save settings.
@@ -44,19 +45,14 @@ public class LobbyShutdownManager {
      */
     public void handleShutdown() {
         try {
-            if (jsonPersistenceManager != null) {
-                // Save JSON content if persistence is enabled
-                jsonPersistenceManager.saveJsonContent();
-                
-                // Save persistence toggle state
-                jsonPersistenceManager.savePersistenceToggleState();
-                
-                // Save selected game
-                GameModule selectedGame = gameSelectionController != null ? 
-                    gameSelectionController.getSelectedGameModule() : null;
-                if (selectedGame != null) {
-                    jsonPersistenceManager.persistSelectedGame(selectedGame.getMetadata().getGameName());
-                }
+            // Save all persistence settings
+            JsonPersistenceManager.save(jsonInputEditor, jsonPersistenceToggle);
+            
+            // Save selected game
+            GameModule selectedGame = gameSelectionController != null ? 
+                gameSelectionController.getSelectedGameModule() : null;
+            if (selectedGame != null) {
+                SavePreviouslySelectedGame.save(selectedGame.getMetadata().getGameName());
             }
             
             Logging.info("Application settings saved successfully");

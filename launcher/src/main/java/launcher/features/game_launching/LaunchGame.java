@@ -4,7 +4,7 @@ import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.game_launching.helpers.SendStartMessage;
-import launcher.features.game_messaging.StartMessageUtil;
+import launcher.features.json_processing.JsonParser;
 
 import java.util.Map;
 
@@ -41,8 +41,8 @@ public class LaunchGame {
             throw new IllegalStateException("No game module is selected");
         }
         
-        // Get the start message map
-        Map<String, Object> startMessageMap = StartMessageUtil.parseAndValidateStartMessage(startMessage);
+        // Parse and validate the start message
+        Map<String, Object> startMessageMap = JsonParser.parseAndValidateStartMessage(startMessage);
         
         // Send the start message to the game module
         if (!SendStartMessage.send(gameModule, startMessageMap, isAutoLaunch)) {

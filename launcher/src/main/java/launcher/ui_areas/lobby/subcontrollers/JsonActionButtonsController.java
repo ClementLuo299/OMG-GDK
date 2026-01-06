@@ -38,7 +38,6 @@ public class JsonActionButtonsController {
     
     // Managers
     private final JsonEditorOperations jsonEditorOperations;
-    private final JsonPersistenceManager jsonPersistenceManager;
     private final MessageManager messageManager;
     
     // State
@@ -69,7 +68,6 @@ public class JsonActionButtonsController {
             Button sendMessageButton,
             JFXToggleButton jsonPersistenceToggle,
             JsonEditorOperations jsonEditorOperations,
-            JsonPersistenceManager jsonPersistenceManager,
             MessageManager messageManager) {
         
         this.jsonInputEditor = jsonInputEditor;
@@ -80,7 +78,6 @@ public class JsonActionButtonsController {
         this.sendMessageButton = sendMessageButton;
         this.jsonPersistenceToggle = jsonPersistenceToggle;
         this.jsonEditorOperations = jsonEditorOperations;
-        this.jsonPersistenceManager = jsonPersistenceManager;
         this.messageManager = messageManager;
     }
     
@@ -105,16 +102,11 @@ public class JsonActionButtonsController {
         
         // Save JSON toggle (persistence toggle): Enable/disable JSON persistence
         jsonPersistenceToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            // Skip messages during startup ui_loading
-            if (jsonPersistenceManager.isLoadingPersistenceSettings()) {
-                return;
-            }
-            
             boolean isEnabled = newValue;
-            jsonPersistenceManager.savePersistenceToggleState();
+            JsonPersistenceManager.save(jsonInputEditor, jsonPersistenceToggle);
             
             if (!isEnabled) {
-                jsonPersistenceManager.clearJsonPersistenceFile();
+                JsonPersistenceManager.clear();
                 messageManager.addMessage("📋 JSON persistence disabled");
             } else {
                 messageManager.addMessage("📋 JSON persistence enabled");

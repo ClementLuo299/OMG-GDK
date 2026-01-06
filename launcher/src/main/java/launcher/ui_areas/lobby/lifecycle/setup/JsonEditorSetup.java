@@ -50,17 +50,15 @@ public class JsonEditorSetup {
      * 
      * @param jsonInputEditor The JSON input editor
      * @param jsonPersistenceToggle The JSON persistence toggle
-     * @param jsonPersistenceManager The JSON persistence manager
      */
     public static void setupPersistenceListener(
             JsonEditor jsonInputEditor,
-            JFXToggleButton jsonPersistenceToggle,
-            JsonPersistenceManager jsonPersistenceManager) {
+            JFXToggleButton jsonPersistenceToggle) {
         
         Platform.runLater(() -> {
             jsonInputEditor.textProperty().addListener((observable, oldValue, newValue) -> {
                 if (jsonPersistenceToggle.isSelected()) {
-                    jsonPersistenceManager.saveJsonContent();
+                    JsonPersistenceManager.save(jsonInputEditor, jsonPersistenceToggle);
                 }
             });
         });

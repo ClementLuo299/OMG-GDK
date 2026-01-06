@@ -3,7 +3,7 @@ package launcher.ui_areas.lobby.subcontrollers;
 import gdk.api.GameModule;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
-import launcher.features.persistence.JsonPersistenceManager;
+import launcher.features.persistence.helpers.save.SavePreviouslySelectedGame;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -27,7 +27,6 @@ public class GameSelectionController {
     // Managers
     private final MessageManager messageManager;
     private final LaunchButtonManager launchButtonManager;
-    private final JsonPersistenceManager jsonPersistenceManager;
     
     // State
     private final ObservableList<GameModule> availableGameModules;
@@ -47,22 +46,19 @@ public class GameSelectionController {
      * @param availableGameModules The observable list of available game modules
      * @param messageManager The message manager
      * @param launchButtonManager The launch button manager
-     * @param jsonPersistenceManager The JSON persistence manager
      */
     public GameSelectionController(
             ComboBox<GameModule> gameSelector,
             Button launchGameButton,
             ObservableList<GameModule> availableGameModules,
             MessageManager messageManager,
-            LaunchButtonManager launchButtonManager,
-            JsonPersistenceManager jsonPersistenceManager) {
+            LaunchButtonManager launchButtonManager) {
         
         this.gameSelector = gameSelector;
         this.launchGameButton = launchGameButton;
         this.availableGameModules = availableGameModules;
         this.messageManager = messageManager;
         this.launchButtonManager = launchButtonManager;
-        this.jsonPersistenceManager = jsonPersistenceManager;
     }
     
     // ==================== INITIALIZATION ====================
@@ -98,7 +94,7 @@ public class GameSelectionController {
             
             if (selectedGameModule != null) {
                 messageManager.addMessage("Selected game: " + selectedGameName);
-                jsonPersistenceManager.persistSelectedGame(selectedGameName);
+                SavePreviouslySelectedGame.save(selectedGameName);
             } else {
                 messageManager.addMessage("No game selected");
             }

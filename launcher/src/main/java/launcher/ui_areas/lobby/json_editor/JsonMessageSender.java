@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.json_editor;
 
 import gdk.api.GameModule;
 import launcher.features.json_processing.JsonProcessingService;
-import launcher.features.game_messaging.GameMessageHandler;
+import launcher.features.game_messaging.SendMessageToGame;
 
 import java.util.Map;
 
@@ -17,7 +17,7 @@ import java.util.Map;
  * </ul>
  * 
  * <p>Business logic (JSON parsing, formatting) is delegated to {@link JsonProcessingService}.
- * Message sending is delegated to {@link GameMessageHandler}.
+ * Message sending is delegated to {@link SendMessageToGame}.
  * 
  * @author Clement Luo
  * @date December 29, 2025
@@ -91,24 +91,23 @@ public class JsonMessageSender {
         }
         
         // Send message using business logic handler
-        GameMessageHandler.MessageResult result = GameMessageHandler.sendMessage(selectedGameModule, messageData);
-        
-        if (!result.isSuccess()) {
-            messageReporter.addMessage("Error: " + result.getErrorMessage());
-            return;
-        }
-        
-        // Handle the response if there is one
-        if (result.hasResponse()) {
-            // Format response using business service
-            String responseJson = jsonProcessingService.formatJsonResponse(result.getResponse());
+        try {
+            Map<String, Object> response = SendMessageToGame.sendMessage(selectedGameModule, messageData);
             
-            // Display in the output area (UI operation)
-            jsonOutputEditor.setText(responseJson);
-            
-            messageReporter.addMessage("Message sent successfully to " + gameModuleName + " - Response received");
-        } else {
-            messageReporter.addMessage("No response from " + gameModuleName);
+            // Handle the response if there is one
+            if (response != null) {
+                // Format response using business service
+                String responseJson = jsonProcessingService.formatJsonResponse(response);
+                
+                // Display in the output area (UI operation)
+                jsonOutputEditor.setText(responseJson);
+                
+                messageReporter.addMessage("Message sent successfully to " + gameModuleName + " - Response received");
+            } else {
+                messageReporter.addMessage("No response from " + gameModuleName);
+            }
+        } catch (Exception e) {
+            messageReporter.addMessage("Error: " + e.getMessage());
         }
     }
 }

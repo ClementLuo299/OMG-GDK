@@ -2,7 +2,8 @@ package launcher.features.game_launching.helpers;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.game_messaging.TranscriptRecorder;
+import launcher.features.transcript_recording.recording.RecordInboundMessage;
+import launcher.features.transcript_recording.recording.RecordOutboundMessage;
 
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public final class SendStartMessage {
         try {
 
             // Record the start message to the transcript
-            TranscriptRecorder.recordToGame(startMessage);
+            RecordOutboundMessage.record(startMessage);
             
             // Send the start message to the game module
             Map<String, Object> response = gameModule.handleMessage(startMessage);
@@ -44,7 +45,7 @@ public final class SendStartMessage {
             // Record the response to the transcript 
             if (response != null && !isAutoLaunch) {
                 Logging.info("Start message acknowledged by " + gameModule.getMetadata().getGameName());
-                TranscriptRecorder.recordFromGame(response);
+                RecordInboundMessage.record(response);
             }
             return true;
         } catch (Exception e) {

@@ -66,8 +66,7 @@ public class ViewModelDependentsFactory {
             launchGameButton,
             currentResult.gameSelectionController().getAvailableGameModules(),
             currentResult.messageManager(),
-            currentResult.launchButtonManager(),
-            currentResult.jsonPersistenceManager()
+            currentResult.launchButtonManager()
         );
         
         LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(

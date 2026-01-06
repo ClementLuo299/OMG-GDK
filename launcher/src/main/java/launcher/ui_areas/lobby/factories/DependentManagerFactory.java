@@ -18,7 +18,8 @@ import launcher.ui_areas.lobby.messaging.MessageBridgeManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
 import launcher.ui_areas.lobby.ui_management.LoadingAnimationManager;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
-import launcher.features.persistence.JsonPersistenceManager;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
+import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
@@ -64,7 +65,8 @@ public class DependentManagerFactory {
      * @param loadingAnimationManager The ui_loading animation manager (already created by BasicManagerFactory)
      * @param moduleCompilationChecker The module load_modules checker (already created by BasicManagerFactory)
      * @param gameLaunchErrorHandler The game launch error handler (already created by BasicManagerFactory)
-     * @param jsonPersistenceManager The JSON persistence manager (already created by BasicManagerFactory)
+     * @param jsonInputEditor The JSON input editor
+     * @param jsonPersistenceToggle The JSON persistence toggle
      * @return Result containing only the dependent more_managers created by this factory
      */
     public static DependentManagerCreationResult createDependentManagers(
@@ -82,7 +84,8 @@ public class DependentManagerFactory {
             LoadingAnimationManager loadingAnimationManager,
             ModuleCompilationChecker moduleCompilationChecker,
             GameLaunchErrorHandler gameLaunchErrorHandler,
-            JsonPersistenceManager jsonPersistenceManager) {
+            JsonEditor jsonInputEditor,
+            JFXToggleButton jsonPersistenceToggle) {
         
         // ==================== CREATE DEPENDENT MANAGERS ====================
         
@@ -100,7 +103,7 @@ public class DependentManagerFactory {
         // Create game launching manager
         GameLaunchingManager gameLaunchManager = new GameLaunchingManager(applicationViewModel, jsonActionButtonsController, gameLaunchErrorHandler);
         MessageBridgeManager messageBridgeManager = new MessageBridgeManager(jsonActionButtonsController);
-        LobbyShutdownManager lobbyShutdownManager = new LobbyShutdownManager(jsonPersistenceManager, gameSelectionController);
+        LobbyShutdownManager lobbyShutdownManager = new LobbyShutdownManager(jsonInputEditor, jsonPersistenceToggle, gameSelectionController);
         
         SettingsNavigationManager settingsNavigationManager = new SettingsNavigationManager(controller, () -> {
             if (exitButton != null && exitButton.getScene() != null) {

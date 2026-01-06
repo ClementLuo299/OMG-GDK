@@ -3,7 +3,9 @@ package launcher.ui_areas.lobby.lifecycle.setup;
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.features.persistence.JsonPersistenceManager;
+import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.ui_areas.lobby.messaging.MessageBridgeManager;
+import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.ui_management.StatusLabelManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
@@ -34,7 +36,8 @@ public class PostInitializationSetup {
     public static void performSetup(
             GDKGameLobbyController controller,
             MessageBridgeManager messageBridgeManager,
-            JsonPersistenceManager jsonPersistenceManager,
+            JsonEditor jsonInputEditor,
+            JFXToggleButton jsonPersistenceToggle,
             StatusLabelManager statusLabelManager,
             GameSelectionController gameSelectionController,
             JsonActionButtonsController jsonActionButtonsController,
@@ -48,7 +51,7 @@ public class PostInitializationSetup {
         // ==================== PERSISTENCE SETUP ====================
         
         // Load saved JSON content and toggle state
-        jsonPersistenceManager.loadPersistenceSettings();
+        JsonPersistenceManager.load(jsonInputEditor, jsonPersistenceToggle);
         
         // ==================== UI STATE INITIALIZATION ====================
         

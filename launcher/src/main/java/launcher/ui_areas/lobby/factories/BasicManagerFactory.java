@@ -9,7 +9,6 @@ import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.features.json_processing.JsonProcessingService;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.features.persistence.JsonPersistenceManager;
 import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
 import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
@@ -37,7 +36,6 @@ public class BasicManagerFactory {
     public record BasicManagerCreationResult(
         MessageManager messageManager,
         LoadingAnimationManager loadingAnimationManager,
-        JsonPersistenceManager jsonPersistenceManager,
         ModuleCompilationChecker moduleCompilationChecker,
         JsonEditorOperations jsonEditorOperations,
         GameLaunchErrorHandler gameLaunchErrorHandler,
@@ -79,7 +77,6 @@ public class BasicManagerFactory {
         
         MessageManager messageManager = new MessageManager(messageContainer, messageScrollPane);
         LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
-        JsonPersistenceManager jsonPersistenceManager = new JsonPersistenceManager(jsonInputEditor, jsonPersistenceToggle);
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter::addMessage);
         
         // Create business service for JSON processing
@@ -93,7 +90,6 @@ public class BasicManagerFactory {
         return new BasicManagerCreationResult(
             messageManager,
             loadingAnimationManager,
-            jsonPersistenceManager,
             moduleCompilationChecker,
             jsonEditorOperations,
             gameLaunchErrorHandler,

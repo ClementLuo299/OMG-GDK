@@ -5,7 +5,6 @@ import gdk.internal.Logging;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.features.persistence.JsonPersistenceManager;
 import launcher.ui_areas.lobby.subcontrollers.TopBarController;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
@@ -196,7 +195,6 @@ public class LobbyInitializationManager {
             settingsButton,
             basicManagers.messageManager(),
             basicManagers.launchButtonManager(),
-            basicManagers.jsonPersistenceManager(),
             basicManagers.jsonEditorOperations()
         );
         
@@ -218,7 +216,8 @@ public class LobbyInitializationManager {
             basicManagers.loadingAnimationManager(),
             basicManagers.moduleCompilationChecker(),
             basicManagers.gameLaunchErrorHandler(),
-            basicManagers.jsonPersistenceManager()
+            jsonInputEditor,
+            jsonPersistenceToggle
         );
         
         // ==================== SETUP JSON EDITORS ====================
@@ -245,14 +244,15 @@ public class LobbyInitializationManager {
         // ==================== UI SETUP ====================
         
         UiSetup.setupUserInterface(messageContainer);
-        JsonEditorSetup.setupPersistenceListener(jsonInputEditor, jsonPersistenceToggle, basicManagers.jsonPersistenceManager());
+        JsonEditorSetup.setupPersistenceListener(jsonInputEditor, jsonPersistenceToggle);
         
         // ==================== POST-INITIALIZATION SETUP ====================
         
         PostInitializationSetup.performSetup(
             controller,
             dependentManagers.messageBridgeManager(),
-            basicManagers.jsonPersistenceManager(),
+            jsonInputEditor,
+            jsonPersistenceToggle,
             basicManagers.statusLabelManager(),
             subcontrollerResult.gameSelectionController(),
             subcontrollerResult.jsonActionButtonsController(),
@@ -266,7 +266,6 @@ public class LobbyInitializationManager {
             jsonOutputEditor,
             basicManagers.messageManager(),
             basicManagers.loadingAnimationManager(),
-            basicManagers.jsonPersistenceManager(),
             basicManagers.moduleCompilationChecker(),
             basicManagers.jsonEditorOperations(),
             basicManagers.statusLabelManager(),
@@ -327,7 +326,6 @@ public class LobbyInitializationManager {
             currentResult.jsonOutputEditor(),
             currentResult.messageManager(),
             updateResult.loadingAnimationManager(),
-            currentResult.jsonPersistenceManager(),
             updateResult.moduleCompilationChecker(),
             updateResult.jsonEditorOperations(),
             currentResult.statusLabelManager(),
@@ -355,7 +353,6 @@ public class LobbyInitializationManager {
         JsonEditor jsonOutputEditor,
         MessageManager messageManager,
         LoadingAnimationManager loadingAnimationManager,
-        JsonPersistenceManager jsonPersistenceManager,
         ModuleCompilationChecker moduleCompilationChecker,
         JsonEditorOperations jsonEditorOperations,
         StatusLabelManager statusLabelManager,

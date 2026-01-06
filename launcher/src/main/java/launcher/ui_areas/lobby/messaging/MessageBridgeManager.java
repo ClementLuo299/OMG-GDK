@@ -1,7 +1,6 @@
 package launcher.ui_areas.lobby.messaging;
 
 import gdk.internal.MessagingBridge;
-import launcher.features.game_messaging.MessageProcessingService;
 import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 
 import java.util.Map;
@@ -25,10 +24,7 @@ public class MessageBridgeManager {
      * @param jsonActionButtonsController The JSON action buttons controller
      */
     public MessageBridgeManager(JsonActionButtonsController jsonActionButtonsController) {
-        // Create business service for message processing
-        MessageProcessingService messageProcessingService = new MessageProcessingService();
         this.messageProcessor = new MessageBridgeProcessor(
-            messageProcessingService,
             jsonActionButtonsController != null ? jsonActionButtonsController.getJsonOutputEditor() : null
         );
     }

@@ -1,12 +1,11 @@
-package launcher.features.game_messaging.validation;
+package launcher.features.json_processing.validation;
 
 import java.util.Map;
 
 /**
- * Utility class for checking if a message is a start message.
+ * Utility class for checking message functions.
  * 
- * <p>This class checks that a message has the required function field
- * (function="start" or function="init").
+ * <p>This class checks message function fields for validation purposes.
  * 
  * @author Clement Luo
  * @date August 8, 2025
@@ -16,7 +15,7 @@ import java.util.Map;
 public final class MessageFunctionCheck {
     
     private MessageFunctionCheck() {
-        throw new AssertionError("StartMessageUtil should not be instantiated");
+        throw new AssertionError("MessageFunctionCheck should not be instantiated");
     }
     
     /**
@@ -40,6 +39,18 @@ public final class MessageFunctionCheck {
         if (!"start".equals(func) && !"init".equals(func)) {
             throw new IllegalStateException("Start message must have function='start' or function='init', got: " + func);
         }
+    }
+    
+    /**
+     * Checks if a message is an "end" message.
+     * 
+     * @param message The message to check
+     * @return true if the message is an end message, false otherwise
+     */
+    public static boolean isEndMessage(Map<String, Object> message) {
+        if (message == null) return false;
+        Object fn = message.get("function");
+        return fn != null && "end".equals(String.valueOf(fn));
     }
 }
 
