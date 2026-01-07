@@ -9,7 +9,7 @@ import java.util.Map;
  * 
  * @author Clement Luo
  * @date August 8, 2025
- * @edited January 5, 2026
+ * @edited January 6, 2026
  * @since 1.0
  */
 public final class MessageFunctionCheck {
