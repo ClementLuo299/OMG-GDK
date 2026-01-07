@@ -3,7 +3,7 @@ package launcher.ui_areas.lobby.subcontrollers;
 import gdk.api.GameModule;
 import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.LaunchButtonManager;
-import launcher.features.persistence.helpers.save.SavePreviouslySelectedGame;
+import launcher.features.persistence.JsonPersistenceManager;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -94,7 +94,7 @@ public class GameSelectionController {
             
             if (selectedGameModule != null) {
                 messageManager.addMessage("Selected game: " + selectedGameName);
-                SavePreviouslySelectedGame.save(selectedGameName);
+                JsonPersistenceManager.saveSelectedGame(selectedGameName);
             } else {
                 messageManager.addMessage("No game selected");
             }

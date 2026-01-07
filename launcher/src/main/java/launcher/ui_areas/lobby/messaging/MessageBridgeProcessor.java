@@ -33,7 +33,7 @@ public class MessageBridgeProcessor {
             // Check if it's an "end" message and update UI if needed
             Object function = msg != null ? msg.get("function") : null;
             if ("end".equals(function) && jsonOutputEditor != null) {
-                String pretty = JsonFormatter.formatJsonResponse(msg);
+                String pretty = JsonFormatter.format(msg);
                 Platform.runLater(() -> jsonOutputEditor.setText(pretty));
             }
         } catch (Exception ignored) {

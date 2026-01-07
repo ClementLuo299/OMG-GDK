@@ -3,7 +3,6 @@ package launcher.ui_areas.lobby.lifecycle;
 import gdk.api.GameModule;
 import gdk.internal.Logging;
 import launcher.features.persistence.JsonPersistenceManager;
-import launcher.features.persistence.helpers.save.SavePreviouslySelectedGame;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 import com.jfoenix.controls.JFXToggleButton;
@@ -52,7 +51,7 @@ public class LobbyShutdownManager {
             GameModule selectedGame = gameSelectionController != null ? 
                 gameSelectionController.getSelectedGameModule() : null;
             if (selectedGame != null) {
-                SavePreviouslySelectedGame.save(selectedGame.getMetadata().getGameName());
+                JsonPersistenceManager.saveSelectedGame(selectedGame.getMetadata().getGameName());
             }
             
             Logging.info("Application settings saved successfully");

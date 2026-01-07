@@ -1,6 +1,7 @@
 package launcher.ui_areas.lobby.json_editor.features;
 
 import launcher.features.json_processing.JsonFormatter;
+import launcher.features.json_processing.JsonParser;
 import launcher.core.ui_features.pop_up_dialogs.DialogUtil;
 import org.fxmisc.richtext.CodeArea;
 
@@ -25,14 +26,17 @@ public class CodeAreaJsonFormatter {
             return;
         }
         
-        String formattedJson = JsonFormatter.format(jsonText);
-        if (formattedJson != null) {
-            codeArea.replaceText(formattedJson);
-        } else {
-            // Show error dialog if formatting fails
+        // Parse the JSON string first, then format it
+        java.util.Map<String, Object> parsed = JsonParser.parse(jsonText);
+        if (parsed == null) {
+            // Show error dialog if parsing fails
             DialogUtil.showError("Error", "Invalid JSON", 
                 "The content is not valid JSON.");
+            return;
         }
+        
+        String formattedJson = JsonFormatter.format(parsed);
+        codeArea.replaceText(formattedJson);
     }
     
     /**

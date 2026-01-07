@@ -1,6 +1,7 @@
 package launcher.ui_areas.lobby.json_editor;
 
-import launcher.features.json_processing.JsonProcessingService;
+import launcher.features.json_processing.JsonFormatter;
+import launcher.features.json_processing.JsonParser;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ import java.util.Map;
  *   <li>Reporting user actions via messages</li>
  * </ul>
  * 
- * <p>Business logic (JSON parsing, formatting) is delegated to {@link JsonProcessingService}.
+ * <p>Business logic (JSON parsing, formatting) is delegated to {@link JsonParser} and {@link JsonFormatter}.
  * 
  * @author Clement Luo
  * @date December 29, 2025
@@ -32,9 +33,6 @@ public class JsonEditorOperations {
     }
     
     // ==================== DEPENDENCIES ====================
-    
-    /** Business logic service for JSON processing. */
-    private final JsonProcessingService jsonProcessingService;
     
     /** Input JSON editor UI component. */
     private final JsonEditor jsonInputEditor;
@@ -53,20 +51,17 @@ public class JsonEditorOperations {
     /**
      * Creates a new JsonEditorOperations.
      * 
-     * @param jsonProcessingService The business logic service for JSON processing
      * @param jsonInputEditor The input JSON editor
      * @param jsonOutputEditor The output JSON editor
      * @param messageReporter Callback to report messages to the UI
      */
-    public JsonEditorOperations(JsonProcessingService jsonProcessingService,
-                                JsonEditor jsonInputEditor, 
+    public JsonEditorOperations(JsonEditor jsonInputEditor, 
                                 JsonEditor jsonOutputEditor, 
                                 MessageReporter messageReporter) {
-        this.jsonProcessingService = jsonProcessingService;
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;
         this.messageReporter = messageReporter;
-        this.messageSender = new JsonMessageSender(jsonProcessingService, jsonInputEditor, jsonOutputEditor, messageReporter);
+        this.messageSender = new JsonMessageSender(jsonInputEditor, jsonOutputEditor, messageReporter);
     }
     
     /**
@@ -120,8 +115,8 @@ public class JsonEditorOperations {
         // Get the JSON text from the UI text area
         String jsonConfigurationText = jsonInputEditor.getText().trim();
         
-        // Delegate parsing to business service
-        return jsonProcessingService.parseJsonConfiguration(jsonConfigurationText);
+        // Delegate parsing to JsonParser
+        return JsonParser.parse(jsonConfigurationText);
     }
     
     /**
@@ -130,8 +125,8 @@ public class JsonEditorOperations {
      * @param response The response map to format and display
      */
     public void displayJsonResponse(Map<String, Object> response) {
-        // Format using business service
-        String formattedJson = jsonProcessingService.formatJsonResponse(response);
+        // Format using JsonFormatter
+        String formattedJson = JsonFormatter.format(response);
         // Update UI
         jsonOutputEditor.setText(formattedJson);
     }

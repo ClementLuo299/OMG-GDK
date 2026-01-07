@@ -2,7 +2,6 @@ package launcher.ui_areas.lobby.lifecycle.init;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
-import launcher.features.json_processing.JsonUtil;
 import launcher.features.game_launching.LaunchGame;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
@@ -170,7 +169,7 @@ public final class InitializeLobbyUIForAutoLaunch {
             }
             
             // Validate JSON syntax as part of ui_loading
-            if (!JsonUtil.isValidJson(savedJson)) {
+            if (launcher.features.json_processing.JsonParser.parse(savedJson) == null) {
                 Logging.info("Auto-launch: Invalid JSON syntax in saved data");
                 return null;
             }

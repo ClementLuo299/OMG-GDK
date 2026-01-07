@@ -1,4 +1,4 @@
-package launcher.features.json_processing.validation;
+package launcher.features.json_processing;
 
 import java.util.Map;
 

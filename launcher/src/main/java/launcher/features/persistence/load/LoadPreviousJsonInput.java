@@ -1,7 +1,7 @@
-package launcher.features.persistence.helpers.load;
+package launcher.features.persistence.load;
 
-import launcher.features.persistence.helpers.load.helpers.LoadJsonFile;
-import launcher.features.persistence.helpers.load.helpers.LoadPersistenceToggleState;
+import launcher.features.persistence.load.helpers.LoadJsonFile;
+import launcher.features.persistence.load.helpers.LoadPersistenceToggleState;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import com.jfoenix.controls.JFXToggleButton;
 

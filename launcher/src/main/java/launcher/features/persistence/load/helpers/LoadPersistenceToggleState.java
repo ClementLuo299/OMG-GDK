@@ -1,4 +1,4 @@
-package launcher.features.persistence.helpers.load.helpers;
+package launcher.features.persistence.load.helpers;
 
 import com.jfoenix.controls.JFXToggleButton;
 import gdk.internal.Logging;

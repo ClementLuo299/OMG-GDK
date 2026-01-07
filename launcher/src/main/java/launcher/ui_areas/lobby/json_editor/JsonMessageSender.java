@@ -1,7 +1,8 @@
 package launcher.ui_areas.lobby.json_editor;
 
 import gdk.api.GameModule;
-import launcher.features.json_processing.JsonProcessingService;
+import launcher.features.json_processing.JsonFormatter;
+import launcher.features.json_processing.JsonParser;
 import launcher.features.game_messaging.SendMessageToGame;
 
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
  *   <li>Reporting success/failure messages to users</li>
  * </ul>
  * 
- * <p>Business logic (JSON parsing, formatting) is delegated to {@link JsonProcessingService}.
+ * <p>Business logic (JSON parsing, formatting) is delegated to {@link JsonParser} and {@link JsonFormatter}.
  * Message sending is delegated to {@link SendMessageToGame}.
  * 
  * @author Clement Luo
@@ -27,9 +28,6 @@ import java.util.Map;
 public class JsonMessageSender {
     
     // ==================== DEPENDENCIES ====================
-    
-    /** Business logic service for JSON processing. */
-    private final JsonProcessingService jsonProcessingService;
     
     /** Input JSON editor UI component. */
     private final JsonEditor jsonInputEditor;
@@ -45,16 +43,13 @@ public class JsonMessageSender {
     /**
      * Creates a new JsonMessageSender.
      * 
-     * @param jsonProcessingService The business logic service for JSON processing
      * @param jsonInputEditor The input JSON editor
      * @param jsonOutputEditor The output JSON editor
      * @param messageReporter Callback to report messages to the UI
      */
-    public JsonMessageSender(JsonProcessingService jsonProcessingService,
-                            JsonEditor jsonInputEditor,
+    public JsonMessageSender(JsonEditor jsonInputEditor,
                             JsonEditor jsonOutputEditor,
                             JsonEditorOperations.MessageReporter messageReporter) {
-        this.jsonProcessingService = jsonProcessingService;
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;
         this.messageReporter = messageReporter;
@@ -82,8 +77,8 @@ public class JsonMessageSender {
             return;
         }
         
-        // Parse JSON using business service
-        Map<String, Object> messageData = jsonProcessingService.parseJsonConfiguration(jsonContent);
+        // Parse JSON using JsonParser
+        Map<String, Object> messageData = JsonParser.parse(jsonContent);
         
         if (messageData == null) {
             messageReporter.addMessage("Invalid JSON syntax - message not sent");
@@ -96,8 +91,8 @@ public class JsonMessageSender {
             
             // Handle the response if there is one
             if (response != null) {
-                // Format response using business service
-                String responseJson = jsonProcessingService.formatJsonResponse(response);
+                // Format response using JsonFormatter
+                String responseJson = JsonFormatter.format(response);
                 
                 // Display in the output area (UI operation)
                 jsonOutputEditor.setText(responseJson);

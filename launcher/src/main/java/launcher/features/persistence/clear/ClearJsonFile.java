@@ -1,4 +1,4 @@
-package launcher.features.persistence.helpers.clear;
+package launcher.features.persistence.clear;
 
 import gdk.internal.Logging;
 import launcher.features.file_handling.file_paths.GetOtherPaths;

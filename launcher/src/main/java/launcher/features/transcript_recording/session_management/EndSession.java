@@ -1,6 +1,6 @@
 package launcher.features.transcript_recording.session_management;
 
-import launcher.features.json_processing.validation.MessageFunctionCheck;
+import launcher.features.json_processing.MessageFunctionCheck;
 import launcher.features.transcript_recording.Transcript;
 import launcher.features.transcript_recording.transcript_saving.TranscriptSaver;
 

@@ -1,9 +1,10 @@
 package launcher.features.persistence;
 
-import launcher.features.persistence.helpers.clear.ClearJsonFile;
-import launcher.features.persistence.helpers.load.LoadPreviousJsonInput;
-import launcher.features.persistence.helpers.save.SaveJsonContent;
-import launcher.features.persistence.helpers.save.SavePersistenceToggleState;
+import launcher.features.persistence.clear.ClearJsonFile;
+import launcher.features.persistence.load.LoadPreviousJsonInput;
+import launcher.features.persistence.save.SaveJsonContent;
+import launcher.features.persistence.save.SavePersistenceToggleState;
+import launcher.features.persistence.save.SavePreviouslySelectedGame;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import com.jfoenix.controls.JFXToggleButton;
 
@@ -43,6 +44,15 @@ public final class JsonPersistenceManager {
     public static void save(JsonEditor jsonInputEditor, JFXToggleButton jsonPersistenceToggle) {
         SaveJsonContent.save(jsonInputEditor, jsonPersistenceToggle);
         SavePersistenceToggleState.save(jsonPersistenceToggle);
+    }
+    
+    /**
+     * Saves the selected game name to file.
+     * 
+     * @param gameName The name of the selected game module
+     */
+    public static void saveSelectedGame(String gameName) {
+        SavePreviouslySelectedGame.save(gameName);
     }
     
     /**

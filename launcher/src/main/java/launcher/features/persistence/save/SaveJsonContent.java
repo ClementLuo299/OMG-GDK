@@ -1,4 +1,4 @@
-package launcher.features.persistence.helpers.save;
+package launcher.features.persistence.save;
 
 import gdk.internal.Logging;
 import launcher.features.file_handling.directory_existence.ParentDirectoryExistenceCheck;

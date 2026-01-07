@@ -4,7 +4,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import launcher.features.json_processing.JsonProcessingService;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
 import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
@@ -54,9 +53,7 @@ public class ViewModelDependentsFactory {
         
         ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter::addMessage);
         
-        // Create business service for JSON processing
-        JsonProcessingService jsonProcessingService = new JsonProcessingService();
-        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(jsonProcessingService, 
+        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(
             currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
         
         // ==================== RECREATE COMPONENTS (NO VIEWMODEL DEPENDENCY) ====================
