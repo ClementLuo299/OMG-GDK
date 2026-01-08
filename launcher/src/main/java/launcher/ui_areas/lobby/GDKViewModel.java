@@ -157,13 +157,13 @@ public class GDKViewModel {
     /**
      * Public method for games to call when they want to return to the lobby.
      * This method safely cleans up the game and returns to the lobby scene.
-     * In auto-launch mode (when returnToNormalGDKCallback is set), it will init the normal GDK interface instead.
+     * In auto-launch mode (when returnToNormalGDKCallback is set), it will ui_initialization the normal GDK interface instead.
      */
     public void returnToLobby() {
         Logging.info("🎮 Game requested return to lobby via returnToLobby()");
         cleanupGameAndServerSimulator();
         
-        // If in auto-launch mode, use the callback to init normal GDK
+        // If in auto-launch mode, use the callback to ui_initialization normal GDK
         if (returnToNormalGDKCallback != null) {
             Logging.info("🎮 Auto-launch mode: Starting normal GDK interface");
             returnToNormalGDKCallback.run();
@@ -285,9 +285,9 @@ public class GDKViewModel {
             primaryApplicationStage.setScene(gameScene);
             updateGameStateAfterSuccessfulLaunch(selectedGameModule);
             
-            // Auto-init server simulator with game (ensure single instance) - with delay to allow game to configure
+            // Auto-ui_initialization server simulator with game (ensure single instance) - with delay to allow game to configure
             if (serverSimulatorStage == null) {
-                // Add a small delay to allow the game to process init messages and potentially close the simulator
+                // Add a small delay to allow the game to process ui_initialization messages and potentially close the simulator
                 new Thread(() -> {
                     try {
                         Thread.sleep(1000); // 1 second delay

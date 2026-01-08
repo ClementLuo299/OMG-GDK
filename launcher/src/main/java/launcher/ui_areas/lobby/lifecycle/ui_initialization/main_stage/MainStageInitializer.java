@@ -1,9 +1,9 @@
-package launcher.ui_areas.lobby.lifecycle.init.main_stage;
+package launcher.ui_areas.lobby.lifecycle.ui_initialization.main_stage;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import gdk.internal.Logging;
-import launcher.ui_areas.lobby.lifecycle.init.main_stage.config.MainStageConfiguration;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.main_stage.config.MainStageConfiguration;
 
 /**
  * Initializes the primary application stage with basic properties and event handlers.

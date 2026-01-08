@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.callbacks;
+package launcher.ui_areas.lobby.lifecycle.init_temp.callback_wiring;
 
 import gdk.api.GameModule;
 import launcher.ui_areas.lobby.lifecycle.LobbyShutdownManager;

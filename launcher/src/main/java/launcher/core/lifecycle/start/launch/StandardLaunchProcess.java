@@ -3,7 +3,7 @@ package launcher.core.lifecycle.start.launch;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.lifecycle.init.InitializeLobbyUIForStandardLaunch;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.InitializeLobbyUIForStandardLaunch;
 import launcher.ui_areas.lobby.lifecycle.module_loading_temp.ModuleLoadingProcess;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.features.development.ProgramDelay;
@@ -47,7 +47,7 @@ public final class StandardLaunchProcess {
             
         } catch (Exception startupError) {
             Logging.error("GDK application startup failed: " + startupError.getMessage(), startupError);
-            throw new RuntimeException("Failed to init GDK application", startupError);
+            throw new RuntimeException("Failed to ui_initialization GDK application", startupError);
         }
     }
 }

@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import launcher.core.lifecycle.start.auto_launch.AutoLaunchProcess;
 import launcher.core.lifecycle.start.launch.StandardLaunchProcess;
 import launcher.ui_areas.startup_window.StartupWindow;
-import launcher.ui_areas.lobby.lifecycle.init.InitializeLobbyUIForAutoLaunch;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.InitializeLobbyUIForAutoLaunch;
 
 /**
  * Orchestrates the startup process of the GDK application.
@@ -52,7 +52,7 @@ public final class Startup {
 
         } catch (Exception startupError) {
             Logging.error("GDK application startup failed: " + startupError.getMessage(), startupError);
-            throw new RuntimeException("Failed to init GDK application", startupError);
+            throw new RuntimeException("Failed to ui_initialization GDK application", startupError);
         }
     }
 }

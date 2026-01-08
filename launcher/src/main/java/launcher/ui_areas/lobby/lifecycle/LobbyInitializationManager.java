@@ -22,9 +22,9 @@ import launcher.ui_areas.lobby.factories.BasicManagerFactory;
 import launcher.ui_areas.lobby.factories.DependentManagerFactory;
 import launcher.ui_areas.lobby.factories.SubcontrollerFactory;
 import launcher.ui_areas.lobby.factories.ViewModelDependentsFactory;
-import launcher.ui_areas.lobby.lifecycle.init.callbacks.CallbackWiring;
-import launcher.ui_areas.lobby.lifecycle.init.json_editor.JsonEditorSetup;
-import launcher.ui_areas.lobby.lifecycle.init.post_init.PostInitializationSetup;
+import launcher.ui_areas.lobby.lifecycle.init_temp.callback_wiring.CallbackWiring;
+import launcher.ui_areas.lobby.lifecycle.init_temp.json_editor.JsonEditorSetup;
+import launcher.ui_areas.lobby.lifecycle.init_temp.post_init.PostInitializationSetup;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -145,7 +145,7 @@ public class LobbyInitializationManager {
     
     /**
      * Initialize all lobby components.
-     * Creates all more_managers, subcontrollers, wires callbacks, and sets up the UI.
+     * Creates all more_managers, subcontrollers, wires callback_wiring, and sets up the UI.
      * 
      * @param applicationViewModel The application ViewModel (may be null initially)
      * @return Initialization result containing all more_managers and subcontrollers

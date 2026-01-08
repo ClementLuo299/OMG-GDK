@@ -28,7 +28,7 @@ public class Main implements GameModule {
     private static final String GAME_ID = "chatroom";
     private final Metadata metadata;
     
-    // Transient state from init message
+    // Transient state from ui_initialization message
     private String lastGameMode = "unknown";
     private List<Map<String, Object>> lastPlayers = new ArrayList<>();
     private String localPlayerId = null;
@@ -88,10 +88,10 @@ public class Main implements GameModule {
             Logging.info("📋 Returning extract_metadata for Chatroom");
             return metadata.toMap();
         }
-        if ("init".equals(function)) {
-            // Only process init message if we haven't already received one
+        if ("ui_initialization".equals(function)) {
+            // Only process ui_initialization message if we haven't already received one
             if (!"unknown".equals(lastGameMode)) {
-                Logging.info("⚠️ Ignoring subsequent init message - game mode already set to: " + lastGameMode);
+                Logging.info("⚠️ Ignoring subsequent ui_initialization message - game mode already set to: " + lastGameMode);
                 return java.util.Map.of("status", "ignored", "reason", "game_mode_already_set");
             }
             
@@ -263,7 +263,7 @@ public class Main implements GameModule {
     
     private String buildPlayersText() {
         if (lastPlayers == null || lastPlayers.isEmpty()) {
-            return "No players provided in init message.";
+            return "No players provided in ui_initialization message.";
         }
         StringBuilder sb = new StringBuilder();
         for (Map<String, Object> p : lastPlayers) {
@@ -320,7 +320,7 @@ public class Main implements GameModule {
         titleLabel = new javafx.scene.control.Label("🎮 Chatroom - " + getGameModeDisplayName());
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #007bff;");
         
-        // Game info (reflect init message if available)
+        // Game info (reflect ui_initialization message if available)
         int playerCount = lastPlayers != null ? lastPlayers.size() : 0;
         String mode = lastGameMode != null ? lastGameMode : "unknown";
         infoLabelRef = new javafx.scene.control.Label(

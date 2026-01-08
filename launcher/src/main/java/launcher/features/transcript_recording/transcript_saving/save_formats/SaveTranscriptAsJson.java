@@ -77,14 +77,14 @@ public final class SaveTranscriptAsJson {
                 }
             }
             
-            // Add game init message if available
+            // Add game ui_initialization message if available
             for (Map<String, Object> entry : Transcript.entries) {
                 if ("meta".equals(entry.get("type")) && "session_start".equals(entry.get("event"))) {
                     Map<String, Object> startMessage = new HashMap<>();
                     String timestamp = (String) entry.get("timestamp");
                     startMessage.put("timestamp", FormatTimestamp.format(Instant.parse(timestamp)));
                     startMessage.put("direction", "in");
-                    startMessage.put("function", "init");
+                    startMessage.put("function", "ui_initialization");
                     startMessage.put("gameName", entry.get("gameName"));
                     startMessage.put("gameVersion", entry.get("gameVersion"));
                     startMessage.put("event", "session_start");

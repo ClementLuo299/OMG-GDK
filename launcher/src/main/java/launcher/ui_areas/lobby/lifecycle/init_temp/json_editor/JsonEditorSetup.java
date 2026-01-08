@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.json_editor;
+package launcher.ui_areas.lobby.lifecycle.init_temp.json_editor;
 
 import javafx.application.Platform;
 import javafx.scene.layout.Priority;

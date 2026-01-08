@@ -43,7 +43,7 @@ public final class LoadingSpinnerAnimator {
      * Starts the spinner animation.
      * 
      * Begins the continuous rotation animation. Safe to call multiple times;
-     * will only init if not already running.
+     * will only ui_initialization if not already running.
      */
     public void start() {
         if (!animationTimer.isRunning()) {

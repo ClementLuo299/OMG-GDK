@@ -76,13 +76,13 @@ public final class SaveTranscriptAsText {
             textTranscript.append("MESSAGE FLOW:\n");
             textTranscript.append("-".repeat(80)).append("\n\n");
             
-            // Add game init message first if available
+            // Add game ui_initialization message first if available
             for (Map<String, Object> entry : Transcript.entries) {
                 if ("meta".equals(entry.get("type")) && "session_start".equals(entry.get("event"))) {
                     textTranscript.append("Message #1\n");
                     textTranscript.append("Time: ").append(FormatTimestamp.format(Instant.parse((String) entry.get("timestamp")))).append("\n");
                     textTranscript.append("Direction: IN\n");
-                    textTranscript.append("Function: init\n");
+                    textTranscript.append("Function: ui_initialization\n");
                     textTranscript.append("Summary: Game session started\n");
                     textTranscript.append("Details:\n");
                     textTranscript.append("  gameName: ").append(entry.get("gameName")).append("\n");

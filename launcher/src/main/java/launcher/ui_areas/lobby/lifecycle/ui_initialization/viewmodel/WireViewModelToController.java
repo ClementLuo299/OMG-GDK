@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.viewmodel;
+package launcher.ui_areas.lobby.lifecycle.ui_initialization.viewmodel;
 
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.GDKGameLobbyController;

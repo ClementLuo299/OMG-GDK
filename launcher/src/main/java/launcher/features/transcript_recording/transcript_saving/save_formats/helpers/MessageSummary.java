@@ -28,7 +28,7 @@ public final class MessageSummary {
         if (function == null) return null;
         
         switch (function) {
-            case "init":
+            case "ui_initialization":
                 String gameMode = (String) details.get("gameMode");
                 Object players = details.get("players");
                 String localPlayer = (String) details.get("localPlayerId");

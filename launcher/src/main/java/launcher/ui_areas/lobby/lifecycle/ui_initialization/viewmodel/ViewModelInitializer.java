@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.viewmodel;
+package launcher.ui_areas.lobby.lifecycle.ui_initialization.viewmodel;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;

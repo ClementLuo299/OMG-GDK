@@ -20,7 +20,7 @@ public final class MessageFunctionCheck {
     
     /**
      * Checks if a message map is a valid start message.
-     * A valid start message must have function="start" or function="init".
+     * A valid start message must have function="start" or function="ui_initialization".
      * 
      * @param message The message map to check
      * @throws IllegalStateException If the message is not a valid start message
@@ -36,8 +36,8 @@ public final class MessageFunctionCheck {
         }
         
         String func = (String) function;
-        if (!"start".equals(func) && !"init".equals(func)) {
-            throw new IllegalStateException("Start message must have function='start' or function='init', got: " + func);
+        if (!"start".equals(func) && !"ui_initialization".equals(func)) {
+            throw new IllegalStateException("Start message must have function='start' or function='ui_initialization', got: " + func);
         }
     }
     

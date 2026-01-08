@@ -1,15 +1,15 @@
-package launcher.ui_areas.lobby.lifecycle.init;
+package launcher.ui_areas.lobby.lifecycle.ui_initialization;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.ui_areas.lobby.lifecycle.init.main_stage.MainStageInitializer;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.main_stage.MainStageInitializer;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.lifecycle.init.ui_optimizers.SceneOptimizer;
-import launcher.ui_areas.lobby.lifecycle.init.ui_optimizers.StageOptimizer;
-import launcher.ui_areas.lobby.lifecycle.init.scene_and_controller.LoadLobbySceneAndGetController;
-import launcher.ui_areas.lobby.lifecycle.init.viewmodel.ViewModelInitializer;
-import launcher.ui_areas.lobby.lifecycle.init.viewmodel.WireViewModelToController;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.ui_optimizers.SceneOptimizer;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.ui_optimizers.StageOptimizer;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.scene_and_controller.LoadLobbySceneAndGetController;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.viewmodel.ViewModelInitializer;
+import launcher.ui_areas.lobby.lifecycle.ui_initialization.viewmodel.WireViewModelToController;
 
 /**
  * Initializes the main user interface components.

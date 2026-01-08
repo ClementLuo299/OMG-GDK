@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.post_init;
+package launcher.ui_areas.lobby.lifecycle.init_temp.post_init;
 
 import gdk.internal.Logging;
 import javafx.scene.layout.VBox;
