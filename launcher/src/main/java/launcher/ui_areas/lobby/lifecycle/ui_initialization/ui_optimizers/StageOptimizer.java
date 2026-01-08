@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.optimizers;
+package launcher.ui_areas.lobby.lifecycle.init.ui_optimizers;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -27,12 +27,12 @@ public final class StageOptimizer {
      * @param mainLobbyScene The scene to optimize during resize
      */
     public static void optimize(Stage primaryApplicationStage, Scene mainLobbyScene) {
-        // Width resize optimizers
+        // Width resize ui_optimizers
         primaryApplicationStage.widthProperty().addListener((obs, oldVal, newVal) -> {
             optimizeDuringResize(mainLobbyScene);
         });
         
-        // Height resize optimizers
+        // Height resize ui_optimizers
         primaryApplicationStage.heightProperty().addListener((obs, oldVal, newVal) -> {
             optimizeDuringResize(mainLobbyScene);
         });
@@ -48,7 +48,7 @@ public final class StageOptimizer {
         // Add performance class during resize
         mainLobbyScene.getRoot().getStyleClass().add("resize-active");
         
-        // Use JavaFX's built-in resize optimizers
+        // Use JavaFX's built-in resize ui_optimizers
         Platform.runLater(() -> {
             // Reduce layout complexity during resize
             mainLobbyScene.getRoot().setCache(true);
