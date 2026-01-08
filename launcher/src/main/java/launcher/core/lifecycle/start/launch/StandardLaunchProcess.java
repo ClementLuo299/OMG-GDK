@@ -3,8 +3,7 @@ package launcher.core.lifecycle.start.launch;
 import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.lifecycle.ui_initialization.InitializeLobbyUIForStandardLaunch;
-import launcher.ui_areas.lobby.lifecycle.module_loading_temp.ModuleLoadingProcess;
+import launcher.ui_areas.lobby.lifecycle.startup.LobbyStartup;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.features.development.ProgramDelay;
 
@@ -13,7 +12,7 @@ import launcher.features.development.ProgramDelay;
  * 
  * @author Clement Luo
  * @date December 22, 2025
- * @edited December 22, 2025
+ * @edited January 8, 2026
  * @since Beta 1.0
  */
 public final class StandardLaunchProcess {
@@ -36,12 +35,8 @@ public final class StandardLaunchProcess {
             // Single development delay point for debugging startup window
             ProgramDelay.delay("Startup process beginning");
 
-            // Initialize the user interface by initializing the controller
-            GDKGameLobbyController lobbyController = 
-                InitializeLobbyUIForStandardLaunch.initialize(primaryApplicationStage);
-
-            // Step 3: Start load_modules modules in a background steps
-            ModuleLoadingProcess.start(primaryApplicationStage, lobbyController, windowManager);
+            // Initialize the user interface and start module loading
+            LobbyStartup.startStandardLaunch(primaryApplicationStage, windowManager);
 
             Logging.info("GDK application startup completed successfully");
             

@@ -21,9 +21,9 @@ import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.LoadingAnimationManager;
 import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.game_launching.GameLaunchingManager;
-import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
-import launcher.ui_areas.lobby.lifecycle.LobbyShutdownManager;
-import launcher.ui_areas.lobby.lifecycle.ControllerModeManager;
+import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ControllerInitialization;
+import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ViewModelInitialization;
+import launcher.ui_areas.lobby.lifecycle.shutdown.LobbyShutdownManager;
 import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
 
@@ -51,31 +51,30 @@ public class GDKGameLobbyController implements Initializable {
     // ==================== FXML INJECTIONS ====================
     
     // Game Selection Components
-    @FXML private ComboBox<GameModule> gameSelector;
-    @FXML private Button launchGameButton;
-    @FXML private Button refreshButton;
+    @FXML ComboBox<GameModule> gameSelector;
+    @FXML Button launchGameButton;
+    @FXML Button refreshButton;
     @FXML private ProgressIndicator refreshProgressIndicator;
-    @FXML private Button settingsButton;
+    @FXML Button settingsButton;
     
     // Message and Logging Components
-    @FXML private ScrollPane messageScrollPane;
-    @FXML private VBox messageContainer;
+    @FXML ScrollPane messageScrollPane;
+    @FXML VBox messageContainer;
     
     // JSON Configuration Components
-    @FXML private VBox jsonInputEditorContainer;
-    @FXML private VBox jsonOutputEditorContainer;
-    @FXML private Button clearInputButton;
-
-    @FXML private Button clearOutputButton2;
-    @FXML private Button metadataRequestButton;
-    @FXML private Button sendMessageButton;
-    @FXML private JFXToggleButton jsonPersistenceToggle;
+    @FXML VBox jsonInputEditorContainer;
+    @FXML VBox jsonOutputEditorContainer;
+    @FXML Button clearInputButton;
+    @FXML Button clearOutputButton2;
+    @FXML Button metadataRequestButton;
+    @FXML Button sendMessageButton;
+    @FXML JFXToggleButton jsonPersistenceToggle;
     
     // Application Control Components
-    @FXML private Button exitButton;
-    @FXML private Label statusLabel;
-    @FXML private ProgressBar loadingProgressBar;
-    @FXML private Label loadingStatusLabel;
+    @FXML Button exitButton;
+    @FXML Label statusLabel;
+    @FXML ProgressBar loadingProgressBar;
+    @FXML Label loadingStatusLabel;
 
     // ==================== DEPENDENCIES & STATE ====================
     
@@ -84,12 +83,12 @@ public class GDKGameLobbyController implements Initializable {
      */
     private GDKViewModel applicationViewModel;
     
-    // ==================== MANAGERS ====================
-    
     /**
-     * Manager for controller mode logic
+     * Controller mode (set before initialization for auto-launch)
      */
-    private final ControllerModeManager controllerModeManager = new ControllerModeManager();
+    private ControllerMode controllerMode = ControllerMode.NORMAL;
+    
+    // ==================== MANAGERS ====================
     
     /**
      * Manager for handling message display queue
@@ -117,9 +116,14 @@ public class GDKGameLobbyController implements Initializable {
     private LobbyShutdownManager lobbyShutdownManager;
     
     /**
-     * Manager for lobby initialization
+     * Manager for lobby controller initialization
      */
-    private LobbyInitializationManager initializationManager;
+    private ControllerInitialization initializationManager;
+    
+    /**
+     * Manager for ViewModel initialization and updates
+     */
+    private ViewModelInitialization viewModelInitialization;
     
     // ==================== SUBCONTROLLERS ====================
     
@@ -137,7 +141,7 @@ public class GDKGameLobbyController implements Initializable {
      * @param mode The mode to set
      */
     public void setControllerMode(ControllerMode mode) {
-        controllerModeManager.setMode(mode);
+        this.controllerMode = mode;
     }
     
     /**
@@ -146,7 +150,7 @@ public class GDKGameLobbyController implements Initializable {
      * @return The current mode
      */
     public ControllerMode getControllerMode() {
-        return controllerModeManager.getMode();
+        return controllerMode;
     }
     
     /**
@@ -161,38 +165,17 @@ public class GDKGameLobbyController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Logging.info("Initializing GDK Game Picker Controller (mode: " + controllerModeManager.getModeString() + ")");
-        
         // Skip GUI setup in AUTO_LAUNCH mode
-        if (controllerModeManager.shouldSkipGuiSetup()) {
-            controllerModeManager.handleAutoLaunchInitialization(this);
+        if (controllerMode == ControllerMode.AUTO_LAUNCH) {
+            Logging.info("Skipping GUI setup for AUTO_LAUNCH mode");
+            Logging.info("GDK Game Picker Controller initialized (AUTO_LAUNCH mode)");
             return;
         }
         
-        // Normal mode: full GUI setup
-        initializationManager = new LobbyInitializationManager(
-            this,
-            this::addUserMessage,
-            gameSelector,
-            launchGameButton,
-            refreshButton,
-            settingsButton,
-            messageScrollPane,
-            messageContainer,
-            jsonInputEditorContainer,
-            jsonOutputEditorContainer,
-            clearInputButton,
-            clearOutputButton2,
-            metadataRequestButton,
-            sendMessageButton,
-            jsonPersistenceToggle,
-            exitButton,
-            statusLabel,
-            loadingProgressBar,
-            loadingStatusLabel
-        );
+        initializationManager = new ControllerInitialization(this, this::addUserMessage);
+        viewModelInitialization = new ViewModelInitialization(this, this::addUserMessage);
         
-        LobbyInitializationManager.InitializationResult result = initializationManager.initialize(applicationViewModel);
+        ControllerInitialization.InitializationResult result = initializationManager.initialize(applicationViewModel);
         
         // Store all initialized components
         messageManager = result.messageManager();
@@ -210,7 +193,7 @@ public class GDKGameLobbyController implements Initializable {
     /**
      * Store the last initialization result for ViewModel updates.
      */
-    private LobbyInitializationManager.InitializationResult lastInitializationResult;
+    private ControllerInitialization.InitializationResult lastInitializationResult;
 
     // ==================== DEPENDENCY INJECTION ====================
     
@@ -223,9 +206,9 @@ public class GDKGameLobbyController implements Initializable {
         this.applicationViewModel = applicationViewModel;
         
         // Update ViewModel in all components that need it
-        if (initializationManager != null && lastInitializationResult != null) {
-            LobbyInitializationManager.InitializationResult updatedResult = 
-                initializationManager.updateViewModel(applicationViewModel, lastInitializationResult);
+        if (viewModelInitialization != null && lastInitializationResult != null) {
+            ControllerInitialization.InitializationResult updatedResult =
+                viewModelInitialization.updateViewModel(applicationViewModel, lastInitializationResult);
             
             // Update all references with the new components
             moduleCompilationChecker = updatedResult.moduleCompilationChecker();
@@ -310,6 +293,27 @@ public class GDKGameLobbyController implements Initializable {
             moduleCompilationChecker.reportCompilationFailures(failures);
         }
     }
+    
+    // ==================== GETTERS FOR INITIALIZATION ====================
+    // Public getters for ControllerInitialization to access UI components
+    
+    public ComboBox<GameModule> getGameSelector() { return gameSelector; }
+    public Button getLaunchGameButton() { return launchGameButton; }
+    public Button getRefreshButton() { return refreshButton; }
+    public Button getSettingsButton() { return settingsButton; }
+    public ScrollPane getMessageScrollPane() { return messageScrollPane; }
+    public VBox getMessageContainer() { return messageContainer; }
+    public VBox getJsonInputEditorContainer() { return jsonInputEditorContainer; }
+    public VBox getJsonOutputEditorContainer() { return jsonOutputEditorContainer; }
+    public Button getClearInputButton() { return clearInputButton; }
+    public Button getClearOutputButton2() { return clearOutputButton2; }
+    public Button getMetadataRequestButton() { return metadataRequestButton; }
+    public Button getSendMessageButton() { return sendMessageButton; }
+    public JFXToggleButton getJsonPersistenceToggle() { return jsonPersistenceToggle; }
+    public Button getExitButton() { return exitButton; }
+    public Label getStatusLabel() { return statusLabel; }
+    public ProgressBar getLoadingProgressBar() { return loadingProgressBar; }
+    public Label getLoadingStatusLabel() { return loadingStatusLabel; }
     
     /**
      * Check for load_modules failures on startup.

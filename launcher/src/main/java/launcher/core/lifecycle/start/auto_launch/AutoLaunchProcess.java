@@ -6,7 +6,8 @@ import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.features.module_handling.module_finding.ModuleDiscovery;
-import launcher.ui_areas.lobby.lifecycle.ui_initialization.InitializeLobbyUIForAutoLaunch;
+import launcher.ui_areas.lobby.lifecycle.startup.LobbyStartup;
+import launcher.ui_areas.lobby.lifecycle.startup.ui_initialization.InitializeLobbyUIForAutoLaunch;
 
 /**
  * Handles the auto-launch flow for the GDK application.
@@ -42,49 +43,7 @@ public final class AutoLaunchProcess {
      * @return true if auto-launch was successful, false otherwise
      */
     public static boolean launch(Stage primaryApplicationStage, Runnable normalLaunchCallback) {
-        try {
-            // Step 1: Load and validate saved auto-launch data
-            InitializeLobbyUIForAutoLaunch.AutoLaunchData data = InitializeLobbyUIForAutoLaunch.loadAutoLaunchData();
-            if (data == null) {
-                return false;
-            }
-            
-            Logging.info("Auto-launch: Attempting to launch " + data.getSelectedGameName() + " with saved JSON");
-
-            // Step 2: Find and load the selected game module
-            GameModule selectedModule = ModuleDiscovery.getModuleByName(data.getSelectedGameName());
-            if (selectedModule == null) {
-                Logging.info("Auto-launch: Selected game module not found: " + data.getSelectedGameName());
-                return false;
-            }
-
-            // Step 3: Create and configure controller/viewmodel
-            InitializeLobbyUIForAutoLaunch.AutoLaunchComponents components =
-                InitializeLobbyUIForAutoLaunch.createAutoLaunchComponents(primaryApplicationStage);
-            GDKGameLobbyController controller = components.getController();
-            GDKViewModel viewModel = components.getViewModel();
-            
-            // Step 4: Configure the primary stage for the game
-            InitializeLobbyUIForAutoLaunch.configureStageForGame(primaryApplicationStage, selectedModule);
-            
-            // Step 5: Set up callback for returning to normal GDK
-            viewModel.setReturnToNormalGDKCallback(() -> {
-                InitializeLobbyUIForAutoLaunch.returnToNormalGDK(controller, normalLaunchCallback);
-            });
-            
-            // Step 6: Launch the game with saved configuration
-            if (InitializeLobbyUIForAutoLaunch.launchGame(selectedModule, data.getSavedJson(), viewModel)) {
-                Logging.info("Auto-launch: Successfully launched " + data.getSelectedGameName() + 
-                    " using ViewModel (consistent with normal mode)");
-                return true;
-            }
-            
-            return false;
-            
-        } catch (Exception e) {
-            Logging.error("Auto-launch failed with error: " + e.getMessage(), e);
-            return false;
-        }
+        return LobbyStartup.startAutoLaunch(primaryApplicationStage, normalLaunchCallback);
     }
 }
 

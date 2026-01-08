@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
+import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ControllerInitialization;
 import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
 import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
@@ -62,7 +62,7 @@ public class BasicManagerFactory {
      */
     public static BasicManagerCreationResult createBasicManagers(
             GDKViewModel applicationViewModel,
-            LobbyInitializationManager.MessageReporter messageReporter,
+            ControllerInitialization.MessageReporter messageReporter,
             VBox messageContainer,
             ScrollPane messageScrollPane,
             Button refreshButton,

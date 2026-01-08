@@ -5,7 +5,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.ui_areas.lobby.lifecycle.LobbyInitializationManager;
+import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ControllerInitialization;
 import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.game_launching.GameLaunchingManager;
 import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
@@ -41,13 +41,13 @@ public class ViewModelDependentsFactory {
      */
     public static ViewModelDependentsResult recreateComponents(
             GDKViewModel applicationViewModel,
-            LobbyInitializationManager.MessageReporter messageReporter,
+            ControllerInitialization.MessageReporter messageReporter,
             ComboBox<?> gameSelector,
             Button launchGameButton,
             Button refreshButton,
             ProgressBar loadingProgressBar,
             Label loadingStatusLabel,
-            LobbyInitializationManager.InitializationResult currentResult) {
+            ControllerInitialization.InitializationResult currentResult) {
         
         // ==================== RECREATE VIEWMODEL-DEPENDENT COMPONENTS ====================
         
