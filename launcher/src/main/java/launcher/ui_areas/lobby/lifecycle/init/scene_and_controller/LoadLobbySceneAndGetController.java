@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.lifecycle.init.scene_controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import launcher.core.ui_features.ui_loading.fonts.FontLoader;
+import launcher.ui_areas.shared.fonts.FontLoader;
 import launcher.core.GDKApplication;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 
