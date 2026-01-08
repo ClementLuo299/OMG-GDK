@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.setup;
+package launcher.ui_areas.lobby.lifecycle.init.json_editor;
 
 import javafx.application.Platform;
 import javafx.scene.layout.Priority;
@@ -9,14 +9,17 @@ import launcher.features.persistence.JsonPersistenceManager;
 
 /**
  * Handles setup of JSON editor containers and persistence listeners.
- * Encapsulates JSON editor UI setup logic to reduce complexity in LobbyInitializationManager.
  * 
  * @author Clement Luo
  * @date December 29, 2025
- * @edited December 29, 2025
+ * @edited January 6, 2026
  * @since Beta 1.0
  */
-public class JsonEditorSetup {
+public final class JsonEditorSetup {
+    
+    private JsonEditorSetup() {
+        throw new AssertionError("Utility class should not be instantiated");
+    }
     
     /**
      * Set up JSON editor containers in the UI.
@@ -33,11 +36,9 @@ public class JsonEditorSetup {
             VBox jsonInputEditorContainer,
             VBox jsonOutputEditorContainer) {
         
-        // Add editors to containers
         jsonInputEditorContainer.getChildren().add(jsonInputEditor);
         jsonOutputEditorContainer.getChildren().add(jsonOutputEditor);
         
-        // Configure layout constraints
         VBox.setVgrow(jsonInputEditorContainer, Priority.ALWAYS);
         VBox.setVgrow(jsonOutputEditorContainer, Priority.ALWAYS);
         VBox.setVgrow(jsonInputEditor, Priority.ALWAYS);

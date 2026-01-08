@@ -12,7 +12,7 @@ import com.jfoenix.controls.JFXToggleButton;
  * Coordinates persistence operations.
  * 
  * <p>This class provides static methods to coordinate persistence operations
- * across multiple persistence helpers.
+ * across multiple persistence config.
  * 
  * @author Clement Luo
  * @date December 27, 2025

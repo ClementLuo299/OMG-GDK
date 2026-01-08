@@ -1,8 +1,8 @@
-package launcher.ui_areas.lobby.lifecycle.init;
+package launcher.ui_areas.lobby.lifecycle.module_loading_temp;
 
 import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.ui_areas.lobby.lifecycle.init.helpers.ModuleLoadingThread;
+import launcher.ui_areas.lobby.lifecycle.module_loading_temp.helpers.ModuleLoadingThread;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.core.lifecycle.stop.Shutdown;

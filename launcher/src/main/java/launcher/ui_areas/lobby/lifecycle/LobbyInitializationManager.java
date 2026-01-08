@@ -22,10 +22,9 @@ import launcher.ui_areas.lobby.factories.BasicManagerFactory;
 import launcher.ui_areas.lobby.factories.DependentManagerFactory;
 import launcher.ui_areas.lobby.factories.SubcontrollerFactory;
 import launcher.ui_areas.lobby.factories.ViewModelDependentsFactory;
-import launcher.ui_areas.lobby.lifecycle.setup.CallbackWiring;
-import launcher.ui_areas.lobby.lifecycle.setup.JsonEditorSetup;
-import launcher.ui_areas.lobby.lifecycle.setup.PostInitializationSetup;
-import launcher.ui_areas.lobby.lifecycle.setup.UiSetup;
+import launcher.ui_areas.lobby.lifecycle.init.callbacks.CallbackWiring;
+import launcher.ui_areas.lobby.lifecycle.init.json_editor.JsonEditorSetup;
+import launcher.ui_areas.lobby.lifecycle.init.post_init.PostInitializationSetup;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -241,9 +240,8 @@ public class LobbyInitializationManager {
             dependentManagers.gameModuleRefreshManager()
         );
         
-        // ==================== UI SETUP ====================
+        // ==================== JSON PERSISTENCE LISTENER ====================
         
-        UiSetup.setupUserInterface(messageContainer);
         JsonEditorSetup.setupPersistenceListener(jsonInputEditor, jsonPersistenceToggle);
         
         // ==================== POST-INITIALIZATION SETUP ====================
@@ -256,7 +254,8 @@ public class LobbyInitializationManager {
             basicManagers.statusLabelManager(),
             subcontrollerResult.gameSelectionController(),
             subcontrollerResult.jsonActionButtonsController(),
-            subcontrollerResult.topBarController()
+            subcontrollerResult.topBarController(),
+            messageContainer
         );
         
         // ==================== BUILD RESULT ====================

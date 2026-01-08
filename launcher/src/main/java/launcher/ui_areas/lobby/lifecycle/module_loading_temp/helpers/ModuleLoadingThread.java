@@ -1,13 +1,13 @@
-package launcher.ui_areas.lobby.lifecycle.init.helpers;
+package launcher.ui_areas.lobby.lifecycle.module_loading_temp.helpers;
 
 import gdk.internal.Logging;
+import javafx.application.Platform;
 import javafx.stage.Stage;
-import launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers.CompilationChecker;
-import launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers.LoadModules;
-import launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers.ModuleUIUpdater;
+import launcher.ui_areas.lobby.lifecycle.module_loading_temp.helpers.thread_tasks_helpers.CompilationChecker;
+import launcher.ui_areas.lobby.lifecycle.module_loading_temp.helpers.thread_tasks_helpers.LoadModules;
+import launcher.ui_areas.lobby.lifecycle.module_loading_temp.helpers.thread_tasks_helpers.ModuleUIUpdater;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.startup_window.StartupWindow;
-import launcher.core.ui_features.ui_loading.stage.StartupWindowToMainStageTransition;
 
 /**
  * Creates and manages the background thread that loads game modules during startup.
@@ -49,7 +49,11 @@ public final class ModuleLoadingThread {
                 
                 // Phase 4: Show main stage and hide startup window
                 Logging.info("All startup tasks complete - showing main stage");
-                StartupWindowToMainStageTransition.showMainStage(primaryApplicationStage, windowManager);
+                windowManager.hide();
+                Platform.runLater(() -> {
+                    primaryApplicationStage.setOpacity(1.0);
+                    primaryApplicationStage.show();
+                });
                 
                 Logging.info("Module loading thread completed successfully");
                 
@@ -74,7 +78,11 @@ public final class ModuleLoadingThread {
         
         // Even on error, try to show the main stage
         try {
-            StartupWindowToMainStageTransition.showMainStage(primaryApplicationStage, windowManager);
+            windowManager.hide();
+            Platform.runLater(() -> {
+                primaryApplicationStage.setOpacity(1.0);
+                primaryApplicationStage.show();
+            });
         } catch (Exception showError) {
             Logging.error("Failed to show main stage after error: " + showError.getMessage());
         }

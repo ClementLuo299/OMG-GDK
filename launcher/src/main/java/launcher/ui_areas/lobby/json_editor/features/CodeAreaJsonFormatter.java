@@ -2,7 +2,7 @@ package launcher.ui_areas.lobby.json_editor.features;
 
 import launcher.features.json_processing.JsonFormatter;
 import launcher.features.json_processing.JsonParser;
-import launcher.core.ui_features.pop_up_dialogs.DialogUtil;
+import launcher.ui_areas.shared.dialogs.DialogUtil;
 import org.fxmisc.richtext.CodeArea;
 
 /**

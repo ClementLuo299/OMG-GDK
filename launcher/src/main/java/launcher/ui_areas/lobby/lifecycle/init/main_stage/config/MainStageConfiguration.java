@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.main_stage;
+package launcher.ui_areas.lobby.lifecycle.init.main_stage.config;
 
 /**
  * Constants for main stage configuration.

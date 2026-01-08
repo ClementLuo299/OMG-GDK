@@ -4,7 +4,7 @@ import gdk.internal.Logging;
 import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
 import launcher.ui_areas.lobby.lifecycle.init.InitializeLobbyUIForStandardLaunch;
-import launcher.ui_areas.lobby.lifecycle.init.ModuleLoadingProcess;
+import launcher.ui_areas.lobby.lifecycle.module_loading_temp.ModuleLoadingProcess;
 import launcher.ui_areas.startup_window.StartupWindow;
 import launcher.features.development.ProgramDelay;
 

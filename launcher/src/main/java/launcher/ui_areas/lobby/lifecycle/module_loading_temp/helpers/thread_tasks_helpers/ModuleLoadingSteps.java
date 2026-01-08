@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.helpers.thread_tasks_helpers;
+package launcher.ui_areas.lobby.lifecycle.module_loading_temp.helpers.thread_tasks_helpers;
 
 import gdk.internal.Logging;
 import launcher.features.module_handling.load_modules.LoadModules;

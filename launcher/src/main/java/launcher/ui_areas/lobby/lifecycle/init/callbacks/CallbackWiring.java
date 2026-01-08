@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.setup;
+package launcher.ui_areas.lobby.lifecycle.init.callbacks;
 
 import gdk.api.GameModule;
 import launcher.ui_areas.lobby.lifecycle.LobbyShutdownManager;
@@ -10,18 +10,21 @@ import launcher.ui_areas.lobby.subcontrollers.JsonActionButtonsController;
 import launcher.ui_areas.lobby.subcontrollers.TopBarController;
 
 /**
- * Handles wiring of callbacks between subcontrollers and more_managers.
- * Encapsulates callback wiring logic to reduce complexity in LobbyInitializationManager.
+ * Handles wiring of callbacks between subcontrollers and managers.
  * 
  * @author Clement Luo
  * @date December 29, 2025
- * @edited December 29, 2025
+ * @edited January 6, 2026
  * @since Beta 1.0
  */
-public class CallbackWiring {
+public final class CallbackWiring {
+    
+    private CallbackWiring() {
+        throw new AssertionError("Utility class should not be instantiated");
+    }
     
     /**
-     * Wire up callbacks between subcontrollers and more_managers.
+     * Wire up callbacks between subcontrollers and managers.
      * Connects UI events to business logic handlers.
      * 
      * @param gameSelectionController The game selection controller
@@ -41,9 +44,7 @@ public class CallbackWiring {
             SettingsNavigationManager settingsNavigationManager,
             GameModuleRefreshManager gameModuleRefreshManager) {
         
-        // ==================== GAME SELECTION CALLBACKS ====================
-        
-        // Launch game callback
+        // Game selection callbacks
         gameSelectionController.setOnLaunchGame(() -> {
             GameModule selectedGame = gameSelectionController.getSelectedGameModule();
             if (gameLaunchManager != null) {
@@ -51,28 +52,23 @@ public class CallbackWiring {
             }
         });
         
-        // Game selection change callback - update JSON editor with selected game
         gameSelectionController.setOnGameSelected(() -> {
             jsonActionButtonsController.setSelectedGameModule(gameSelectionController.getSelectedGameModule());
         });
         
-        // ==================== TOP BAR CALLBACKS ====================
-        
-        // Exit callback
+        // Top bar callbacks
         topBarController.setOnExit(() -> {
             if (lobbyShutdownManager != null) {
                 lobbyShutdownManager.handleShutdown();
             }
         });
         
-        // Refresh callback
         topBarController.setOnRefresh(() -> {
             if (gameModuleRefreshManager != null) {
                 gameModuleRefreshManager.handleRefresh();
             }
         });
         
-        // Settings callback
         topBarController.setOnOpenSettings(() -> {
             if (settingsNavigationManager != null) {
                 settingsNavigationManager.openSettingsPage();

@@ -1,4 +1,4 @@
-package launcher.core.ui_features.ui_loading.fonts;
+package launcher.ui_areas.shared.fonts;
 
 import gdk.internal.Logging;
 import javafx.scene.text.Font;

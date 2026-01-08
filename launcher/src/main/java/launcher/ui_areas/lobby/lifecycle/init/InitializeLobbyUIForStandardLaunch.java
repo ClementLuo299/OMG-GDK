@@ -5,9 +5,9 @@ import javafx.stage.Stage;
 import launcher.ui_areas.lobby.GDKViewModel;
 import launcher.ui_areas.lobby.lifecycle.init.main_stage.MainStageInitializer;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.lifecycle.init.optimization.SceneOptimizer;
-import launcher.ui_areas.lobby.lifecycle.init.optimization.StageOptimizer;
-import launcher.ui_areas.lobby.lifecycle.init.scene_controller.LoadLobbySceneAndGetController;
+import launcher.ui_areas.lobby.lifecycle.init.optimizers.SceneOptimizer;
+import launcher.ui_areas.lobby.lifecycle.init.optimizers.StageOptimizer;
+import launcher.ui_areas.lobby.lifecycle.init.scene_and_controller.LoadLobbySceneAndGetController;
 import launcher.ui_areas.lobby.lifecycle.init.viewmodel.ViewModelInitializer;
 import launcher.ui_areas.lobby.lifecycle.init.viewmodel.WireViewModelToController;
 

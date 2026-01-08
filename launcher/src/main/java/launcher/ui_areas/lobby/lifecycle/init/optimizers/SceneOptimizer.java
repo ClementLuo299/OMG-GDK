@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.init.optimization;
+package launcher.ui_areas.lobby.lifecycle.init.optimizers;
 
 import javafx.scene.Scene;
 import javafx.application.Platform;

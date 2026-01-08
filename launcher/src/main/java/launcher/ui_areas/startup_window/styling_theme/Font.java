@@ -1,6 +1,6 @@
 package launcher.ui_areas.startup_window.styling_theme;
 
-import launcher.core.ui_features.ui_loading.fonts.FontLoader;
+import launcher.ui_areas.shared.fonts.FontLoader;
 
 /**
  * Typography constants for the startup window theme.
