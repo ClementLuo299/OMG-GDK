@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.startup.controller_initialization;
+package launcher.ui_areas.lobby.lifecycle.controller_initialization;
 
 import gdk.internal.Logging;
 import launcher.ui_areas.lobby.GDKGameLobbyController;
@@ -17,17 +17,14 @@ import launcher.ui_areas.lobby.factories.ViewModelDependentsFactory;
 public class ViewModelInitialization {
     
     private final GDKGameLobbyController controller;
-    private final ControllerInitialization.MessageReporter messageReporter;
     
     /**
      * Create a new ViewModelInitialization.
      * 
      * @param controller The main lobby controller
-     * @param messageReporter Callback for reporting messages
      */
-    public ViewModelInitialization(GDKGameLobbyController controller, ControllerInitialization.MessageReporter messageReporter) {
+    public ViewModelInitialization(GDKGameLobbyController controller) {
         this.controller = controller;
-        this.messageReporter = messageReporter;
     }
     
     // ==================== VIEWMODEL UPDATES ====================
@@ -41,16 +38,16 @@ public class ViewModelInitialization {
      * @param currentResult The current initialization result
      * @return Updated initialization result with new ViewModel references
      */
-    public ControllerInitialization.InitializationResult updateViewModel(
+    public InitializationResult updateViewModel(
             GDKViewModel applicationViewModel, 
-            ControllerInitialization.InitializationResult currentResult) {
+            InitializationResult currentResult) {
         
         Logging.info("Updating ViewModel references in lobby components");
         
         // ==================== RECREATE VIEWMODEL-DEPENDENT COMPONENTS ====================
         
         ViewModelDependentsFactory.ViewModelDependentsResult updateResult = ViewModelDependentsFactory.recreateComponents(
-            applicationViewModel, messageReporter, controller.getGameSelector(), controller.getLaunchGameButton(), controller.getRefreshButton(),
+            applicationViewModel, controller::addUserMessage, controller.getGameSelector(), controller.getLaunchGameButton(), controller.getRefreshButton(),
             controller.getLoadingProgressBar(), controller.getLoadingStatusLabel(), currentResult
         );
         
@@ -62,7 +59,7 @@ public class ViewModelInitialization {
         
         // ==================== BUILD UPDATED RESULT ====================
         
-        return new ControllerInitialization.InitializationResult(currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(),
+        return new InitializationResult(currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(),
             currentResult.messageManager(), updateResult.loadingAnimationManager(), updateResult.moduleCompilationChecker(),
             updateResult.jsonEditorOperations(), currentResult.statusLabelManager(), currentResult.launchButtonManager(),
             currentResult.moduleChangeReporter(), updateResult.gameLaunchManager(), currentResult.messageBridgeManager(),

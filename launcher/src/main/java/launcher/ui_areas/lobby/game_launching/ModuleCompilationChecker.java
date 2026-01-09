@@ -5,6 +5,7 @@ import javafx.application.Platform;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Handles reporting of module load_modules failures to the UI.
@@ -20,30 +21,15 @@ import java.util.List;
  * 
  * @author Clement Luo
  * @date December 27, 2025
- * @edited January 3, 2026
+ * @edited January 8, 2026
  * @since Beta 1.0
  */
 public class ModuleCompilationChecker {
     
-    // ==================== INTERFACES ====================
-    
-    /**
-     * Interface for reporting messages to the UI.
-     * Allows this checker to report load_modules failures without direct UI dependencies.
-     */
-    public interface MessageReporter {
-        /**
-         * Adds a message to be displayed to the user.
-         * 
-         * @param message The message to display
-         */
-        void addMessage(String message);
-    }
-    
     // ==================== DEPENDENCIES ====================
     
     /** Callback for reporting messages to the UI. */
-    private final MessageReporter messageReporter;
+    private final Consumer<String> messageReporter;
     
     // ==================== CONSTRUCTOR ====================
     
@@ -52,7 +38,7 @@ public class ModuleCompilationChecker {
      * 
      * @param messageReporter Callback to report messages to the UI
      */
-    public ModuleCompilationChecker(MessageReporter messageReporter) {
+    public ModuleCompilationChecker(Consumer<String> messageReporter) {
         this.messageReporter = messageReporter;
     }
     
@@ -106,12 +92,12 @@ public class ModuleCompilationChecker {
             // Report each failure individually
             for (String moduleName : failuresForUI) {
                 String message = "Module '" + moduleName + "' failed to compile - check source code for errors";
-                messageReporter.addMessage(message);
+                messageReporter.accept(message);
             }
             
             // Report summary message
             String summaryMessage = "Compilation failures detected in: " + String.join(", ", failuresForUI);
-            messageReporter.addMessage(summaryMessage);
+            messageReporter.accept(summaryMessage);
         });
     }
 }

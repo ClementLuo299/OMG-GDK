@@ -6,6 +6,7 @@ import launcher.features.json_processing.JsonParser;
 import launcher.features.game_messaging.SendMessageToGame;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Handles UI coordination for sending messages to game modules from JSON editor.
@@ -36,7 +37,7 @@ public class JsonMessageSender {
     private final JsonEditor jsonOutputEditor;
     
     /** Callback for reporting messages to the UI. */
-    private final JsonEditorOperations.MessageReporter messageReporter;
+    private final Consumer<String> messageReporter;
     
     // ==================== CONSTRUCTOR ====================
     
@@ -49,7 +50,7 @@ public class JsonMessageSender {
      */
     public JsonMessageSender(JsonEditor jsonInputEditor,
                             JsonEditor jsonOutputEditor,
-                            JsonEditorOperations.MessageReporter messageReporter) {
+                            Consumer<String> messageReporter) {
         this.jsonInputEditor = jsonInputEditor;
         this.jsonOutputEditor = jsonOutputEditor;
         this.messageReporter = messageReporter;
@@ -63,7 +64,7 @@ public class JsonMessageSender {
     public void sendMessage(GameModule selectedGameModule) {
         // Check if a game module is selected
         if (selectedGameModule == null) {
-            messageReporter.addMessage("Please select a game module first before sending a message");
+            messageReporter.accept("Please select a game module first before sending a message");
             return;
         }
         
@@ -73,7 +74,7 @@ public class JsonMessageSender {
         
         if (jsonContent.isEmpty()) {
             // If the JSON field is empty, send a placeholder message
-            messageReporter.addMessage("No content to send to " + gameModuleName + " (JSON field is empty)");
+            messageReporter.accept("No content to send to " + gameModuleName + " (JSON field is empty)");
             return;
         }
         
@@ -81,7 +82,7 @@ public class JsonMessageSender {
         Map<String, Object> messageData = JsonParser.parse(jsonContent);
         
         if (messageData == null) {
-            messageReporter.addMessage("Invalid JSON syntax - message not sent");
+            messageReporter.accept("Invalid JSON syntax - message not sent");
             return;
         }
         
@@ -97,12 +98,12 @@ public class JsonMessageSender {
                 // Display in the output area (UI operation)
                 jsonOutputEditor.setText(responseJson);
                 
-                messageReporter.addMessage("Message sent successfully to " + gameModuleName + " - Response received");
+                messageReporter.accept("Message sent successfully to " + gameModuleName + " - Response received");
             } else {
-                messageReporter.addMessage("No response from " + gameModuleName);
+                messageReporter.accept("No response from " + gameModuleName);
             }
         } catch (Exception e) {
-            messageReporter.addMessage("Error: " + e.getMessage());
+            messageReporter.accept("Error: " + e.getMessage());
         }
     }
 }

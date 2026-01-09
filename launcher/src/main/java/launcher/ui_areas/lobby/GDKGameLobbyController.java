@@ -21,8 +21,9 @@ import launcher.ui_areas.lobby.messaging.MessageManager;
 import launcher.ui_areas.lobby.ui_management.LoadingAnimationManager;
 import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
 import launcher.ui_areas.lobby.game_launching.GameLaunchingManager;
-import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ControllerInitialization;
-import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ViewModelInitialization;
+import launcher.ui_areas.lobby.lifecycle.controller_initialization.ControllerInitialization;
+import launcher.ui_areas.lobby.lifecycle.controller_initialization.ViewModelInitialization;
+import launcher.ui_areas.lobby.lifecycle.controller_initialization.InitializationResult;
 import launcher.ui_areas.lobby.lifecycle.shutdown.LobbyShutdownManager;
 import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
 import launcher.ui_areas.lobby.subcontrollers.GameSelectionController;
@@ -172,10 +173,10 @@ public class GDKGameLobbyController implements Initializable {
             return;
         }
         
-        initializationManager = new ControllerInitialization(this, this::addUserMessage);
-        viewModelInitialization = new ViewModelInitialization(this, this::addUserMessage);
+        initializationManager = new ControllerInitialization(this);
+        viewModelInitialization = new ViewModelInitialization(this);
         
-        ControllerInitialization.InitializationResult result = initializationManager.initialize(applicationViewModel);
+        InitializationResult result = initializationManager.initialize(applicationViewModel);
         
         // Store all initialized components
         messageManager = result.messageManager();
@@ -193,7 +194,7 @@ public class GDKGameLobbyController implements Initializable {
     /**
      * Store the last initialization result for ViewModel updates.
      */
-    private ControllerInitialization.InitializationResult lastInitializationResult;
+    private InitializationResult lastInitializationResult;
 
     // ==================== DEPENDENCY INJECTION ====================
     
@@ -207,7 +208,7 @@ public class GDKGameLobbyController implements Initializable {
         
         // Update ViewModel in all components that need it
         if (viewModelInitialization != null && lastInitializationResult != null) {
-            ControllerInitialization.InitializationResult updatedResult =
+            InitializationResult updatedResult =
                 viewModelInitialization.updateViewModel(applicationViewModel, lastInitializationResult);
             
             // Update all references with the new components
@@ -235,10 +236,11 @@ public class GDKGameLobbyController implements Initializable {
     
     /**
      * Add a message to the user message area with queue system.
+     * Package-private so ControllerInitialization can access it.
      * 
      * @param userMessage The message to display to the user
      */
-    private void addUserMessage(String userMessage) {
+    void addUserMessage(String userMessage) {
         if (messageManager != null) {
             messageManager.addMessage(userMessage);
         }

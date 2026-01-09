@@ -80,7 +80,7 @@ public class JsonEditorOperations {
      */
     public void clearJsonInputData() {
         jsonInputEditor.clear();
-        messageReporter.addMessage("Cleared JSON input data");
+        messageReporter.accept("Cleared JSON input data");
     }
     
     /**
@@ -88,7 +88,7 @@ public class JsonEditorOperations {
      */
     public void clearJsonOutputData() {
         jsonOutputEditor.clear();
-        messageReporter.addMessage("Cleared JSON output data");
+        messageReporter.accept("Cleared JSON output data");
     }
     
     /**
@@ -102,7 +102,7 @@ public class JsonEditorOperations {
         jsonInputEditor.setText(metadataRequest);
         
         // Provide user feedback about the action
-        messageReporter.addMessage("Filled JSON input with extract_metadata request");
+        messageReporter.accept("Filled JSON input with extract_metadata request");
     }
     
     /**

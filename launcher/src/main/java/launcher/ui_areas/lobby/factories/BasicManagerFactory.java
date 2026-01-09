@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import com.jfoenix.controls.JFXToggleButton;
 import launcher.ui_areas.lobby.json_editor.JsonEditor;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ControllerInitialization;
+import java.util.function.Consumer;
 import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.game_launching.ModuleChangesReporter;
 import launcher.ui_areas.lobby.game_launching.ModuleCompilationChecker;
@@ -62,7 +62,7 @@ public class BasicManagerFactory {
      */
     public static BasicManagerCreationResult createBasicManagers(
             GDKViewModel applicationViewModel,
-            ControllerInitialization.MessageReporter messageReporter,
+            Consumer<String> messageReporter,
             VBox messageContainer,
             ScrollPane messageScrollPane,
             Button refreshButton,
@@ -76,13 +76,13 @@ public class BasicManagerFactory {
         
         MessageManager messageManager = new MessageManager(messageContainer, messageScrollPane);
         LoadingAnimationManager loadingAnimationManager = new LoadingAnimationManager(refreshButton, loadingProgressBar, loadingStatusLabel);
-        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter::addMessage);
+        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter);
         
-        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(jsonInputEditor, jsonOutputEditor, messageReporter::addMessage);
+        JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(jsonInputEditor, jsonOutputEditor, messageReporter);
         GameLaunchErrorHandler gameLaunchErrorHandler = new GameLaunchErrorHandler(messageManager);
         StatusLabelManager statusLabelManager = new StatusLabelManager(statusLabel);
         LaunchButtonManager launchButtonManager = new LaunchButtonManager(launchGameButton);
-        ModuleChangesReporter moduleChangeReporter = new ModuleChangesReporter(messageReporter::addMessage);
+        ModuleChangesReporter moduleChangeReporter = new ModuleChangesReporter(messageReporter);
         
         return new BasicManagerCreationResult(
             messageManager,

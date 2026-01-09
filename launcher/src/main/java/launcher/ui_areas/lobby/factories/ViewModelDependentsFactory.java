@@ -5,7 +5,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ControllerInitialization;
+import launcher.ui_areas.lobby.lifecycle.controller_initialization.InitializationResult;
+import java.util.function.Consumer;
 import launcher.ui_areas.lobby.game_launching.GameLaunchErrorHandler;
 import launcher.ui_areas.lobby.game_launching.GameLaunchingManager;
 import launcher.ui_areas.lobby.game_launching.GameModuleRefreshManager;
@@ -41,20 +42,20 @@ public class ViewModelDependentsFactory {
      */
     public static ViewModelDependentsResult recreateComponents(
             GDKViewModel applicationViewModel,
-            ControllerInitialization.MessageReporter messageReporter,
+            Consumer<String> messageReporter,
             ComboBox<?> gameSelector,
             Button launchGameButton,
             Button refreshButton,
             ProgressBar loadingProgressBar,
             Label loadingStatusLabel,
-            ControllerInitialization.InitializationResult currentResult) {
+            InitializationResult currentResult) {
         
         // ==================== RECREATE VIEWMODEL-DEPENDENT COMPONENTS ====================
         
-        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter::addMessage);
+        ModuleCompilationChecker moduleCompilationChecker = new ModuleCompilationChecker(messageReporter);
         
         JsonEditorOperations jsonEditorOperations = new JsonEditorOperations(
-            currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter::addMessage);
+            currentResult.jsonInputEditor(), currentResult.jsonOutputEditor(), messageReporter);
         
         // ==================== RECREATE COMPONENTS (NO VIEWMODEL DEPENDENCY) ====================
         

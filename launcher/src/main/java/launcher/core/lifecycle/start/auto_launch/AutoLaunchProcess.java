@@ -1,13 +1,7 @@
 package launcher.core.lifecycle.start.auto_launch;
 
-import gdk.api.GameModule;
-import gdk.internal.Logging;
 import javafx.stage.Stage;
-import launcher.ui_areas.lobby.GDKGameLobbyController;
-import launcher.ui_areas.lobby.GDKViewModel;
-import launcher.features.module_handling.module_finding.ModuleDiscovery;
 import launcher.ui_areas.lobby.lifecycle.startup.LobbyStartup;
-import launcher.ui_areas.lobby.lifecycle.startup.ui_initialization.InitializeLobbyUIForAutoLaunch;
 
 /**
  * Handles the auto-launch flow for the GDK application.

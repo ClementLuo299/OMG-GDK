@@ -1,4 +1,4 @@
-package launcher.ui_areas.lobby.lifecycle.startup.controller_initialization;
+package launcher.ui_areas.lobby.lifecycle.controller_initialization;
 
 import gdk.api.GameModule;
 import gdk.internal.Logging;
@@ -24,7 +24,6 @@ import launcher.ui_areas.lobby.factories.SubcontrollerFactory;
 import launcher.ui_areas.lobby.factories.ViewModelDependentsFactory;
 import launcher.ui_areas.lobby.lifecycle.startup.component_setup.callback_wiring.CallbackWiring;
 import launcher.ui_areas.lobby.lifecycle.startup.component_setup.json_editor.JsonEditorSetup;
-import launcher.ui_areas.lobby.lifecycle.startup.controller_initialization.ViewModelInitialization;
 import launcher.ui_areas.lobby.lifecycle.shutdown.LobbyShutdownManager;
 import launcher.ui_areas.settings_page.SettingsNavigationManager;
 import launcher.features.persistence.JsonPersistenceManager;
@@ -49,25 +48,14 @@ import com.jfoenix.controls.JFXToggleButton;
 public class ControllerInitialization {
     
     private final GDKGameLobbyController controller;
-    private final MessageReporter messageReporter;
-    
-    /**
-     * Interface for reporting messages to the UI.
-     * This is a common interface used by multiple managers.
-     */
-    public interface MessageReporter {
-        void addMessage(String message);
-    }
     
     /**
      * Create a new ControllerInitialization.
      * 
      * @param controller The main lobby controller
-     * @param messageReporter Callback for reporting messages
      */
-    public ControllerInitialization(GDKGameLobbyController controller, MessageReporter messageReporter) {
+    public ControllerInitialization(GDKGameLobbyController controller) {
         this.controller = controller;
-        this.messageReporter = messageReporter;
     }
     
     // ==================== INITIALIZATION ====================
@@ -92,7 +80,7 @@ public class ControllerInitialization {
         // Basic managers don't depend on subcontrollers and are needed by them
         
         BasicManagerFactory.BasicManagerCreationResult basicManagers = BasicManagerFactory.createBasicManagers(
-            applicationViewModel, messageReporter, controller.getMessageContainer(), controller.getMessageScrollPane(), controller.getRefreshButton(),
+            applicationViewModel, controller::addUserMessage, controller.getMessageContainer(), controller.getMessageScrollPane(), controller.getRefreshButton(),
             controller.getLoadingProgressBar(), controller.getLoadingStatusLabel(), jsonInputEditor, jsonOutputEditor,
             controller.getJsonPersistenceToggle(), controller.getStatusLabel(), controller.getLaunchGameButton()
         );
@@ -169,30 +157,5 @@ public class ControllerInitialization {
             subcontrollerResult.topBarController(),             dependentManagers.gameModuleRefreshManager());
     }
     
-    // ==================== DATA STRUCTURES ====================
-    
-    /**
-     * Result of initialization containing all created managers and subcontrollers.
-     * Used to pass initialization results between methods and to the main controller.
-     */
-    public record InitializationResult(
-        JsonEditor jsonInputEditor,
-        JsonEditor jsonOutputEditor,
-        MessageManager messageManager,
-        LoadingAnimationManager loadingAnimationManager,
-        ModuleCompilationChecker moduleCompilationChecker,
-        JsonEditorOperations jsonEditorOperations,
-        StatusLabelManager statusLabelManager,
-        LaunchButtonManager launchButtonManager,
-        ModuleChangesReporter moduleChangeReporter,
-        GameLaunchingManager gameLaunchManager,
-        MessageBridgeManager messageBridgeManager,
-        LobbyShutdownManager lobbyShutdownManager,
-        SettingsNavigationManager settingsNavigationManager,
-        GameSelectionController gameSelectionController,
-        JsonActionButtonsController jsonActionButtonsController,
-        TopBarController topBarController,
-        GameModuleRefreshManager gameModuleRefreshManager
-    ) {}
 }
 

@@ -4,6 +4,7 @@ import gdk.internal.Logging;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Reports changes in available game modules to the UI.
@@ -16,30 +17,15 @@ import java.util.Set;
  * 
  * @author Clement Luo
  * @date December 29, 2025
- * @edited December 30, 2025
+ * @edited January 8, 2026
  * @since Beta 1.0
  */
 public class ModuleChangesReporter {
     
-    // ==================== INTERFACES ====================
-    
-    /**
-     * Interface for reporting messages to the UI.
-     * Allows this reporter to send messages without direct UI dependencies.
-     */
-    public interface MessageReporter {
-        /**
-         * Adds a message to be displayed to the user.
-         * 
-         * @param message The message to display
-         */
-        void addMessage(String message);
-    }
-    
     // ==================== DEPENDENCIES ====================
     
     /** Callback for reporting messages to the UI. */
-    private final MessageReporter messageReporter;
+    private final Consumer<String> messageReporter;
     
     // ==================== CONSTRUCTOR ====================
     
@@ -48,7 +34,7 @@ public class ModuleChangesReporter {
      * 
      * @param messageReporter Callback to report messages to the UI
      */
-    public ModuleChangesReporter(MessageReporter messageReporter) {
+    public ModuleChangesReporter(Consumer<String> messageReporter) {
         this.messageReporter = messageReporter;
     }
     
@@ -152,21 +138,21 @@ public class ModuleChangesReporter {
         // Report each added module individually
         for (String moduleName : addedModules) {
             String message = "Added game module: " + moduleName;
-            messageReporter.addMessage(message);
+            messageReporter.accept(message);
             Logging.info(message);
         }
         
         // Report each removed module individually
         for (String moduleName : removedModules) {
             String message = "Removed game module: " + moduleName;
-            messageReporter.addMessage(message);
+            messageReporter.accept(message);
             Logging.info(message);
         }
         
         // Report no changes if nothing changed
         if (addedModules.isEmpty() && removedModules.isEmpty()) {
             String message = "No changes detected - " + currentModuleCount + " game module(s) available";
-            messageReporter.addMessage(message);
+            messageReporter.accept(message);
             Logging.info(message);
         }
     }

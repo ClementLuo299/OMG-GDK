@@ -1,6 +1,6 @@
 # Startup
 
-This directory contains the entry points and orchestration logic for starting up the lobby UI. It coordinates UI initialization, component setup, module loading, and controller initialization.
+This directory contains the entry points and orchestration logic for starting up the lobby UI. It coordinates UI initialization, component setup, and module loading.
 
 ## Package Overview
 
@@ -12,15 +12,7 @@ This directory contains the entry points and orchestration logic for starting up
 
 ---
 
-### 2. controller_initialization
-
-**Entry Point:** `ControllerInitialization.java`, `ViewModelInitialization.java`
-
-**Responsibility:** Manages initialization of the lobby controller and ViewModel. `ControllerInitialization` handles controller setup (managers, subcontrollers, callbacks, UI setup) independent of ViewModel availability. `ViewModelInitialization` handles ViewModel updates and component recreation when the ViewModel becomes available.
-
----
-
-### 3. ui_initialization
+### 2. ui_initialization
 
 **Entry Point:** `InitializeLobbyUIForStandardLaunch.java`, `InitializeLobbyUIForAutoLaunch.java`
 
@@ -28,7 +20,7 @@ This directory contains the entry points and orchestration logic for starting up
 
 ---
 
-### 4. module_loading
+### 3. module_loading
 
 **Entry Point:** `ModuleLoadingThread.java`
 
@@ -36,7 +28,7 @@ This directory contains the entry points and orchestration logic for starting up
 
 ---
 
-### 5. component_setup
+### 4. component_setup
 
 **Entry Point:** `CallbackWiring.java`, `JsonEditorSetup.java`
 
